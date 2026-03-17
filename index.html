@@ -1,0 +1,1984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GFE Experimental Workbench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=IM+Fell+English:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --parchment: #f5efe0;
+  --parchment-dark: #ede3cb;
+  --parchment-deep: #d9cba8;
+  --ink: #1c1208;
+  --ink-mid: #3d2e10;
+  --ink-light: #6b5230;
+  --ink-faint: #9c7d4a;
+  --ink-ghost: rgba(28,18,8,0.12);
+  --crimson: #8b1a1a;
+  --crimson-light: #b52a2a;
+  --crimson-pale: #e8c4c4;
+  --gold: #8a6a1a;
+  --gold-light: #c49a28;
+  --gold-pale: #f0e0a0;
+  --teal: #1a5a5a;
+  --teal-light: #2a8a7a;
+  --teal-pale: #c0e0d8;
+  --violet: #4a1a6a;
+  --violet-light: #7a3a9a;
+  --violet-pale: #d8c0e8;
+  --spine: rgba(28,18,8,0.25);
+  --rule: rgba(28,18,8,0.18);
+  --rule-light: rgba(28,18,8,0.08);
+
+  /* Zone colors */
+  --zone-fnd: var(--gold);
+  --zone-fnd-pale: var(--gold-pale);
+  --zone-brg: var(--teal);
+  --zone-brg-pale: var(--teal-pale);
+  --zone-art: var(--violet);
+  --zone-art-pale: var(--violet-pale);
+
+  /* Family colors */
+  --al: #1a5a1a;
+  --mis: #8a4a1a;
+  --dst: #8b1a1a;
+  --neutral: #5a5040;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #c8b898;
+  font-family: 'Crimson Pro', Georgia, serif;
+  color: var(--ink);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px;
+}
+
+/* ── BOOK CONTAINER ─────────────────────────────────────── */
+.book {
+  width: 100%;
+  max-width: 1480px;
+  display: grid;
+  grid-template-columns: 1fr 6px 1fr;
+  min-height: 92vh;
+  background: var(--parchment);
+  box-shadow:
+    -4px 0 12px rgba(0,0,0,0.35),
+    4px 0 12px rgba(0,0,0,0.35),
+    0 8px 32px rgba(0,0,0,0.45),
+    inset 0 0 80px rgba(0,0,0,0.04);
+  border-radius: 2px 2px 0 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.book::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 6px;
+  background: linear-gradient(to right, var(--crimson) 0%, var(--gold) 30%, var(--gold) 70%, var(--crimson) 100%);
+  opacity: 0.7;
+  z-index: 10;
+}
+
+/* Spine */
+.spine {
+  background: linear-gradient(to right,
+    rgba(0,0,0,0.18) 0%,
+    rgba(0,0,0,0.08) 30%,
+    rgba(0,0,0,0.12) 50%,
+    rgba(0,0,0,0.08) 70%,
+    rgba(0,0,0,0.18) 100%
+  );
+  position: relative;
+}
+.spine::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right,
+    rgba(255,255,255,0.05) 0%,
+    rgba(255,255,255,0.15) 50%,
+    rgba(255,255,255,0.05) 100%
+  );
+}
+
+/* Pages */
+.page {
+  padding: 36px 32px 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.page-left {
+  background: var(--parchment);
+}
+
+.page-right {
+  background: linear-gradient(to left, rgba(0,0,0,0.01) 0%, transparent 100%);
+  background-color: var(--parchment);
+  border-left: none;
+}
+
+/* Aged paper texture */
+.page::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(ellipse at 20% 80%, rgba(180,140,60,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(100,60,20,0.04) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* ── TYPOGRAPHY ─────────────────────────────────────────── */
+.page-title {
+  font-family: 'IM Fell English', serif;
+  font-size: 13px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 10px;
+  margin-bottom: 24px;
+}
+
+.section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 8px;
+}
+
+h2.reading-title {
+  font-family: 'IM Fell English', serif;
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.reading-subtitle {
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink-light);
+  margin-bottom: 20px;
+}
+
+/* ── UPLOAD AREA ────────────────────────────────────────── */
+.upload-zone {
+  border: 1.5px dashed var(--parchment-deep);
+  border-radius: 3px;
+  padding: 32px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(255,255,255,0.3);
+  margin-bottom: 16px;
+  position: relative;
+}
+.upload-zone:hover, .upload-zone.drag-over {
+  border-color: var(--gold);
+  background: var(--gold-pale);
+}
+.upload-zone input[type=file] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%;
+}
+.upload-icon {
+  font-size: 28px;
+  margin-bottom: 8px;
+  opacity: 0.5;
+}
+.upload-zone p {
+  font-size: 14px;
+  color: var(--ink-light);
+  line-height: 1.5;
+}
+.upload-zone strong {
+  color: var(--ink-mid);
+  font-weight: 600;
+}
+
+.paste-area {
+  width: 100%;
+  min-height: 80px;
+  padding: 12px 14px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--ink);
+  background: rgba(255,255,255,0.4);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  resize: vertical;
+  outline: none;
+  line-height: 1.5;
+}
+.paste-area:focus { border-color: var(--gold); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  font-family: 'Crimson Pro', serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  border: 1px solid var(--ink-mid);
+  background: var(--ink);
+  color: var(--parchment);
+  cursor: pointer;
+  border-radius: 1px;
+  transition: all 0.15s;
+}
+.btn:hover { background: var(--crimson); border-color: var(--crimson); }
+.btn-secondary {
+  background: transparent;
+  color: var(--ink-mid);
+  border-color: var(--rule);
+}
+.btn-secondary:hover { background: var(--parchment-dark); color: var(--ink); }
+
+.btn-sm {
+  padding: 5px 12px;
+  font-size: 12px;
+}
+
+/* ── SESSION QUEUE ──────────────────────────────────────── */
+.session-queue {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+.session-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.35);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.session-item:hover { background: var(--gold-pale); border-color: var(--gold); }
+.session-item.active { background: var(--gold-pale); border-color: var(--gold-light); }
+.session-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  padding: 2px 6px;
+  border-radius: 1px;
+  text-transform: uppercase;
+}
+.badge-continuation { background: var(--teal-pale); color: var(--teal); }
+.badge-expansion { background: var(--gold-pale); color: var(--gold); }
+.badge-parallel { background: var(--violet-pale); color: var(--violet); }
+.badge-new { background: var(--parchment-deep); color: var(--ink-light); }
+.session-remove {
+  margin-left: auto;
+  opacity: 0.4;
+  font-size: 16px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 4px;
+}
+.session-remove:hover { opacity: 1; color: var(--crimson); }
+
+/* ── CONSTELLATION ──────────────────────────────────────── */
+.constellation-wrap {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+#constellation-canvas {
+  width: 100%;
+  height: 220px;
+  border: 1px solid var(--rule);
+  background: rgba(255,255,255,0.2);
+  border-radius: 2px;
+  cursor: pointer;
+  display: block;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--ink-light);
+  margin-bottom: 8px;
+  min-height: 18px;
+}
+.breadcrumb-item {
+  cursor: pointer;
+  color: var(--gold);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+.breadcrumb-item:hover { color: var(--crimson); }
+.breadcrumb-sep { color: var(--ink-faint); }
+
+/* Constellation legend */
+.const-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+.const-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--ink-light);
+}
+.legend-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+}
+
+/* ── ENVELOPE ───────────────────────────────────────────── */
+.envelope-card {
+  background: linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.2) 100%);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.envelope-score {
+  font-family: 'IM Fell English', serif;
+  font-size: 44px;
+  line-height: 1;
+  font-weight: 400;
+  min-width: 70px;
+  text-align: center;
+}
+.envelope-status {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.envelope-components {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.env-comp {
+  text-align: center;
+}
+.env-comp-val {
+  font-family: 'DM Mono', monospace;
+  font-size: 14px;
+  font-weight: 500;
+}
+.env-comp-label {
+  font-size: 10px;
+  color: var(--ink-faint);
+  display: block;
+}
+
+/* ── TIMELINE ───────────────────────────────────────────── */
+.timeline-wrap {
+  margin-bottom: 20px;
+}
+.timeline-track {
+  position: relative;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.timeline-line {
+  position: absolute;
+  left: 0; right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--rule);
+  transform: translateY(-50%);
+}
+.timeline-stops {
+  position: relative;
+  display: flex;
+  gap: 0;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+}
+.timeline-stop {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.stop-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--parchment-deep);
+  border: 2px solid var(--ink-light);
+  transition: all 0.2s;
+  z-index: 1;
+}
+.timeline-stop.active .stop-dot,
+.timeline-stop:hover .stop-dot {
+  background: var(--gold);
+  border-color: var(--gold);
+  transform: scale(1.3);
+}
+.timeline-stop.report-boundary .stop-dot {
+  background: var(--crimson-pale);
+  border-color: var(--crimson);
+}
+.stop-label {
+  position: absolute;
+  top: 14px;
+  font-size: 9px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+  text-align: center;
+  transform: translateX(-50%);
+  left: 50%;
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.timeline-slider {
+  width: 100%;
+  accent-color: var(--gold);
+  cursor: pointer;
+  height: 2px;
+}
+
+/* ── PARTICIPANT STRIPS (LEFT PAGE OVERVIEW) ─────────── */
+.participant-strips {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.participant-strip {
+  padding: 10px 12px;
+  border: 1px solid var(--rule);
+  background: rgba(255,255,255,0.3);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+.participant-strip:hover { border-color: var(--gold); background: rgba(240,220,140,0.15); }
+.participant-strip.focused { border-color: var(--crimson); background: rgba(220,180,180,0.12); }
+
+.strip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 7px;
+}
+.strip-name {
+  font-family: 'IM Fell English', serif;
+  font-size: 15px;
+  font-weight: 400;
+}
+.strip-locus {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+}
+
+.mini-dims {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+.mini-dim {
+  position: relative;
+}
+.mini-dim-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+  text-align: center;
+  margin-bottom: 2px;
+}
+.mini-bar-wrap {
+  height: 6px;
+  background: var(--parchment-deep);
+  border-radius: 1px;
+  overflow: hidden;
+  display: flex;
+}
+.mini-bar-al { background: var(--al); }
+.mini-bar-mis { background: var(--mis); }
+.mini-bar-dst { background: var(--dst); }
+.mini-bar-neutral { background: transparent; }
+
+/* Dual register indicator */
+.dual-reg-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  border: 1px solid var(--parchment);
+}
+.dr-aligned { background: var(--al); }
+.dr-misaligned { background: var(--mis); }
+.dr-contradictory { background: var(--crimson); }
+
+/* ── RIGHT PAGE — DIMENSION READING ─────────────────── */
+.reading-area {
+  min-height: 60vh;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  text-align: center;
+  opacity: 0.5;
+}
+.empty-state-glyph {
+  font-family: 'IM Fell English', serif;
+  font-size: 64px;
+  line-height: 1;
+  margin-bottom: 16px;
+  opacity: 0.4;
+}
+.empty-state p {
+  font-size: 15px;
+  font-style: italic;
+  color: var(--ink-light);
+  max-width: 280px;
+  line-height: 1.6;
+}
+
+/* Participant full reading */
+.participant-reading {}
+
+.reading-header {
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 14px;
+  margin-bottom: 20px;
+}
+
+/* Dual register card */
+.dual-register-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 14px;
+  background: rgba(255,255,255,0.25);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+}
+.register-col-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 8px;
+}
+.register-col-label.external { color: var(--crimson); }
+
+.register-mismatch-note {
+  grid-column: 1 / -1;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--crimson);
+  border-top: 1px solid var(--crimson-pale);
+  padding-top: 8px;
+  margin-top: 4px;
+}
+
+/* Dimension cards */
+.zone-block {
+  margin-bottom: 18px;
+}
+.zone-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.zone-pip {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+}
+.zone-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+.zone-rule {
+  flex: 1;
+  height: 1px;
+  background: var(--rule-light);
+}
+
+.dim-card {
+  border: 1px solid var(--rule-light);
+  background: rgba(255,255,255,0.22);
+  border-radius: 2px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+}
+.dim-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 9px;
+}
+.dim-name {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: 0.04em;
+}
+.dim-gloss {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--ink-light);
+}
+.dim-values {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.dim-val {
+  text-align: center;
+}
+.dim-val-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.1;
+}
+.dim-val-label {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  display: block;
+}
+.val-A { color: var(--ink); }
+.val-L { color: var(--al); }
+.val-M { color: var(--mis); }
+.val-neutral { color: var(--neutral); }
+
+/* Stacked axis bar */
+.axis-bar {
+  height: 10px;
+  background: var(--parchment-deep);
+  border-radius: 1px;
+  overflow: hidden;
+  display: flex;
+  margin-bottom: 8px;
+  position: relative;
+}
+.axis-segment {
+  height: 100%;
+  transition: width 0.4s ease;
+}
+
+/* Emission row (provisional) */
+.emission-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--ink-light);
+  padding-top: 6px;
+  border-top: 1px dashed var(--rule-light);
+}
+.emission-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+.emission-family {
+  padding: 1px 6px;
+  border-radius: 1px;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.ef-Al { background: rgba(26,90,26,0.12); color: var(--al); }
+.ef-Mis { background: rgba(138,74,26,0.12); color: var(--mis); }
+.ef-Dst { background: rgba(139,26,26,0.12); color: var(--dst); }
+
+/* Provisional badge */
+.provisional-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--violet);
+  background: var(--violet-pale);
+  padding: 1px 5px;
+  border-radius: 1px;
+  vertical-align: middle;
+}
+
+/* ── MATRIX EVENTS ──────────────────────────────────────── */
+.matrix-events {
+  margin-bottom: 20px;
+}
+.event-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--rule-light);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.event-row:last-child { border-bottom: none; }
+.event-flow {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  white-space: nowrap;
+  color: var(--ink-faint);
+  min-width: 90px;
+}
+.event-dir {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  padding: 1px 5px;
+  border-radius: 1px;
+  white-space: nowrap;
+  min-width: 50px;
+  text-align: center;
+}
+.dir-acute { background: var(--gold-pale); color: var(--gold); }
+.dir-accum { background: var(--teal-pale); color: var(--teal); }
+.dir-lateral { background: var(--parchment-deep); color: var(--ink-light); }
+.dir-bypass { background: var(--violet-pale); color: var(--violet); }
+.event-desc { flex: 1; color: var(--ink-mid); }
+.event-mag {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
+/* ── ANALYSIS BLOCK ─────────────────────────────────────── */
+.analysis-block {
+  background: rgba(255,255,255,0.3);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--crimson);
+  border-radius: 0 2px 2px 0;
+  padding: 16px 18px;
+  margin-bottom: 20px;
+}
+.analysis-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.analysis-key {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  min-width: 80px;
+  padding-top: 2px;
+}
+.analysis-val { color: var(--ink-mid); }
+
+.invariant-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 4px;
+}
+.inv-chip {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 1px;
+  border: 1px solid var(--rule);
+}
+.inv-chip.held { background: rgba(26,90,26,0.08); border-color: rgba(26,90,26,0.3); color: var(--al); }
+.inv-chip.failed { background: rgba(139,26,26,0.08); border-color: rgba(139,26,26,0.3); color: var(--dst); }
+
+.key-finding {
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink);
+  margin-top: 8px;
+  border-top: 1px solid var(--rule-light);
+  padding-top: 10px;
+}
+
+/* Emission note */
+.emission-note {
+  font-style: italic;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink-light);
+  padding: 10px 14px;
+  border-left: 2px solid var(--gold-light);
+  background: rgba(240,220,140,0.08);
+  margin-bottom: 16px;
+}
+.emission-note-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* Taper indicator (provisional) */
+.taper-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--ink-light);
+  margin-top: 6px;
+}
+.taper-bar-wrap {
+  flex: 1;
+  height: 4px;
+  background: var(--parchment-deep);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.taper-bar {
+  height: 100%;
+  background: linear-gradient(to right, var(--gold), var(--teal), var(--violet));
+  border-radius: 2px;
+}
+.taper-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
+/* ── TABS (right page) ──────────────────────────────────── */
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 20px;
+}
+.tab {
+  padding: 7px 16px;
+  font-size: 12px;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  color: var(--ink-faint);
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  margin-bottom: -1px;
+}
+.tab:hover { color: var(--ink); }
+.tab.active { color: var(--ink); border-bottom-color: var(--crimson); }
+
+/* ── ERROR / STATUS ─────────────────────────────────────── */
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 2px;
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+.status-error { background: rgba(139,26,26,0.08); border: 1px solid rgba(139,26,26,0.2); color: var(--crimson); }
+.status-info { background: rgba(26,90,90,0.08); border: 1px solid rgba(26,90,90,0.2); color: var(--teal); }
+
+/* ── DIVIDER RULE ───────────────────────────────────────── */
+.rule { border: none; border-top: 1px solid var(--rule-light); margin: 16px 0; }
+
+/* ── RESPONSIVE ─────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .book {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 6px auto;
+  }
+  .spine { width: 100%; height: 6px; }
+  .page { padding: 24px 20px; }
+  .dual-register-card { grid-template-columns: 1fr; }
+}
+
+/* Loading state */
+.loading { opacity: 0.5; pointer-events: none; }
+
+/* Collapse toggle */
+.collapsible-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  padding: 6px 0;
+}
+.collapsible-arrow {
+  font-size: 10px;
+  transition: transform 0.2s;
+  color: var(--ink-faint);
+}
+.collapsible-arrow.open { transform: rotate(90deg); }
+.collapsible-body { overflow: hidden; }
+.collapsible-body.closed { display: none; }
+
+/* Sub-constellation indicator */
+.has-sub-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  color: var(--teal);
+  border: 1px solid var(--teal-pale);
+  border-radius: 1px;
+  padding: 1px 4px;
+  margin-left: 6px;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+/* Page number style marginalia */
+.marginalia {
+  position: absolute;
+  bottom: 20px;
+  font-family: 'IM Fell English', serif;
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+.marginalia-left { left: 32px; }
+.marginalia-right { right: 32px; }
+</style>
+</head>
+<body>
+
+<div class="book">
+  <!-- ── LEFT PAGE ── -->
+  <div class="page page-left" id="page-left">
+    <div class="page-title">GFE Experimental Workbench · v12.7</div>
+
+    <!-- Upload / Session -->
+    <div class="section-label">Case Sessions</div>
+
+    <div id="session-queue" class="session-queue" style="display:none;"></div>
+
+    <div class="upload-zone" id="drop-zone">
+      <input type="file" id="file-input" accept=".json,application/json" multiple>
+      <div class="upload-icon">⊕</div>
+      <p><strong>Drop JSON files here</strong><br>or click to browse<br><span style="font-size:12px;opacity:0.7;">Multiple files supported · paste below for quick entry</span></p>
+    </div>
+
+    <textarea class="paste-area" id="paste-area" placeholder="or paste JSON here…" rows="3"></textarea>
+    <div style="display:flex;gap:8px;margin-top:8px;margin-bottom:16px;">
+      <button class="btn btn-sm" onclick="loadFromPaste()">Load Case</button>
+      <button class="btn btn-secondary btn-sm" onclick="clearAll()">Clear All</button>
+    </div>
+
+    <div id="status-bar" class="status-bar" style="display:none;"></div>
+
+    <!-- Constellation -->
+    <div id="constellation-section" style="display:none;">
+      <div class="section-label">System Constellation</div>
+      <div class="breadcrumb" id="breadcrumb"></div>
+      <div class="constellation-wrap">
+        <canvas id="constellation-canvas"></canvas>
+      </div>
+      <div class="const-legend">
+        <div class="const-legend-item" style="color:var(--al)"><div class="legend-dot" style="color:var(--al)"></div>Aligned envelope</div>
+        <div class="const-legend-item" style="color:var(--mis)"><div class="legend-dot" style="color:var(--mis)"></div>Misaligned hold</div>
+        <div class="const-legend-item" style="color:var(--crimson)"><div class="legend-dot" style="color:var(--crimson)"></div>Collapse risk</div>
+        <div class="const-legend-item" style="color:var(--teal)"><div class="legend-dot" style="color:var(--teal)"></div>Relay active</div>
+      </div>
+    </div>
+
+    <hr class="rule" id="rule-mid" style="display:none;">
+
+    <!-- Envelope -->
+    <div id="envelope-section" style="display:none;">
+      <div class="section-label">Operating Envelope 𝒜_env</div>
+      <div class="envelope-card" id="envelope-card">
+        <div>
+          <div class="envelope-score" id="env-score">—</div>
+          <div class="envelope-status" id="env-status"></div>
+        </div>
+        <div>
+          <div class="envelope-components" id="env-components"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timeline -->
+    <div id="timeline-section" style="display:none;">
+      <div class="section-label">Timeline</div>
+      <div class="timeline-wrap">
+        <div class="timeline-track">
+          <div class="timeline-line"></div>
+          <div class="timeline-stops" id="timeline-stops"></div>
+        </div>
+        <input type="range" class="timeline-slider" id="timeline-slider" min="0" value="0" step="1">
+      </div>
+    </div>
+
+    <!-- Participant strips -->
+    <div id="strips-section" style="display:none;">
+      <div class="section-label">Participants</div>
+      <div class="participant-strips" id="participant-strips"></div>
+    </div>
+
+    <div class="marginalia marginalia-left" id="margin-left">Index</div>
+  </div>
+
+  <!-- ── SPINE ── -->
+  <div class="spine"></div>
+
+  <!-- ── RIGHT PAGE ── -->
+  <div class="page page-right" id="page-right">
+    <div class="page-title" id="right-title">Reading</div>
+
+    <div id="right-content">
+      <div class="empty-state">
+        <div class="empty-state-glyph">⊛</div>
+        <p>Load a case from the left page to begin reading.<br>Upload a JSON file or paste from your GPT.</p>
+      </div>
+    </div>
+
+    <div class="marginalia marginalia-right" id="margin-right">Detail</div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════
+let sessions = [];         // array of loaded case JSONs
+let currentSessionIdx = 0;
+let currentTimestep = 0;
+let focusedParticipantId = null;
+let constellationZoomStack = []; // fractal zoom breadcrumb
+let rightTab = 'dimensions'; // dimensions | events | analysis
+
+const DIM_GLOSSES = {
+  Cfg: 'admissibility',
+  Emb: 'support',
+  Org: 'coherence',
+  Dir: 'orientation',
+  Leg: 'inferability'
+};
+
+const DIM_ZONES = {
+  Cfg: 'foundation', Emb: 'foundation',
+  Org: 'bridge',
+  Dir: 'articulation', Leg: 'articulation'
+};
+
+const ZONE_META = {
+  foundation: { label: 'Foundation', color: 'var(--gold)', pip: '#c49a28', dims: ['Cfg','Emb'] },
+  bridge:     { label: 'Bridge',     color: 'var(--teal)', pip: '#2a8a7a', dims: ['Org'] },
+  articulation:{ label: 'Articulation', color: 'var(--violet)', pip: '#7a3a9a', dims: ['Dir','Leg'] }
+};
+
+// ══════════════════════════════════════════════════════════════
+// LOADING
+// ══════════════════════════════════════════════════════════════
+function loadFromPaste() {
+  const raw = document.getElementById('paste-area').value.trim();
+  if (!raw) { showStatus('Nothing to load.', 'error'); return; }
+  const cleaned = raw.replace(/^```[a-z]*\n?/,'').replace(/\n?```$/,'').trim();
+  try {
+    const data = JSON.parse(cleaned);
+    ingestCase(data);
+    document.getElementById('paste-area').value = '';
+  } catch(e) {
+    showStatus('Could not parse JSON: ' + e.message, 'error');
+  }
+}
+
+document.getElementById('file-input').addEventListener('change', function(e) {
+  Array.from(e.target.files).forEach(f => readFile(f));
+  this.value = '';
+});
+
+const dropZone = document.getElementById('drop-zone');
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  Array.from(e.dataTransfer.files).forEach(f => readFile(f));
+});
+
+function readFile(f) {
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      ingestCase(data);
+    } catch(e) {
+      showStatus('Could not parse ' + f.name + ': ' + e.message, 'error');
+    }
+  };
+  reader.readAsText(f);
+}
+
+function ingestCase(data) {
+  // Detect relation to existing sessions
+  const type = detectSessionType(data);
+  if (type === 'continuation' || type === 'expansion') {
+    mergeIntoSession(data, type);
+  } else {
+    addNewSession(data, type);
+  }
+  renderAll();
+}
+
+function detectSessionType(data) {
+  if (sessions.length === 0) return 'new';
+  const existingName = sessions[currentSessionIdx]?.system_name;
+  const newName = data.system_name || data.case_id;
+  if (!existingName || !newName) return 'parallel';
+  if (existingName === newName) {
+    // Check if timesteps overlap
+    const existingLabels = new Set(
+      sessions[currentSessionIdx].timeline?.map(t => t.timestep_label) || []
+    );
+    const newLabels = (data.timeline || []).map(t => t.timestep_label);
+    const overlap = newLabels.filter(l => existingLabels.has(l)).length;
+    return overlap > 0 ? 'expansion' : 'continuation';
+  }
+  return 'parallel';
+}
+
+function addNewSession(data, type) {
+  data._type = type;
+  data._id = Date.now();
+  sessions.push(data);
+  currentSessionIdx = sessions.length - 1;
+  currentTimestep = 0;
+  focusedParticipantId = null;
+  constellationZoomStack = [];
+}
+
+function mergeIntoSession(data, type) {
+  const session = sessions[currentSessionIdx];
+  if (type === 'continuation') {
+    // Append timesteps, mark boundary
+    const lastT = session.timeline?.length || 0;
+    (data.timeline || []).forEach((t, i) => {
+      t._report_boundary = (i === 0);
+      session.timeline.push(t);
+    });
+    // Merge participants (update if exists, add if new)
+    (data.participants || []).forEach(newP => {
+      const existing = (session.participants || []).find(p => p.id === newP.id);
+      if (existing) {
+        Object.assign(existing, newP);
+      } else {
+        session.participants = session.participants || [];
+        session.participants.push(newP);
+      }
+    });
+    session.matrix_events = (session.matrix_events || []).concat(data.matrix_events || []);
+  } else {
+    // expansion: add new participants, expand existing
+    (data.participants || []).forEach(newP => {
+      const existing = (session.participants || []).find(p => p.id === newP.id);
+      if (!existing) {
+        session.participants = session.participants || [];
+        session.participants.push(newP);
+      }
+    });
+    session.matrix_events = (session.matrix_events || []).concat(data.matrix_events || []);
+  }
+  currentTimestep = (session.timeline?.length || 1) - 1;
+}
+
+function clearAll() {
+  sessions = [];
+  currentSessionIdx = 0;
+  currentTimestep = 0;
+  focusedParticipantId = null;
+  constellationZoomStack = [];
+  renderAll();
+}
+
+// URL hash loading (for tappable links from GPT)
+window.addEventListener('load', () => {
+  const hash = window.location.hash;
+  if (hash && hash.length > 2) {
+    try {
+      const encoded = hash.slice(1);
+      const json = decodeURIComponent(atob(encoded));
+      const data = JSON.parse(json);
+      ingestCase(data);
+    } catch(e) {
+      // silent fail
+    }
+  }
+});
+
+// ══════════════════════════════════════════════════════════════
+// RENDER ORCHESTRATION
+// ══════════════════════════════════════════════════════════════
+function renderAll() {
+  renderSessionQueue();
+  if (sessions.length === 0) {
+    hide(['constellation-section','envelope-section','timeline-section','strips-section','rule-mid']);
+    document.getElementById('right-content').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-glyph">⊛</div>
+        <p>Load a case from the left page to begin reading.<br>Upload a JSON file or paste from your GPT.</p>
+      </div>`;
+    document.getElementById('right-title').textContent = 'Reading';
+    return;
+  }
+  show(['constellation-section','envelope-section','timeline-section','strips-section','rule-mid']);
+  const session = sessions[currentSessionIdx];
+  renderTimeline(session);
+  renderEnvelope(session);
+  renderParticipantStrips(session);
+  renderConstellation(session);
+  renderRightPage(session);
+}
+
+function hide(ids) { ids.forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; }); }
+function show(ids) { ids.forEach(id => { const el = document.getElementById(id); if(el) el.style.display = ''; }); }
+
+// ══════════════════════════════════════════════════════════════
+// SESSION QUEUE
+// ══════════════════════════════════════════════════════════════
+function renderSessionQueue() {
+  const el = document.getElementById('session-queue');
+  if (sessions.length === 0) { el.style.display = 'none'; return; }
+  el.style.display = 'flex';
+  el.innerHTML = sessions.map((s, i) => `
+    <div class="session-item ${i === currentSessionIdx ? 'active' : ''}" onclick="switchSession(${i})">
+      <span class="session-badge badge-${s._type || 'new'}">${s._type || 'new'}</span>
+      <span style="font-size:14px;">${esc(s.system_name || s.case_id || 'Case')}</span>
+      <span class="session-remove" onclick="removeSession(event,${i})">×</span>
+    </div>
+  `).join('');
+}
+
+function switchSession(i) {
+  currentSessionIdx = i;
+  currentTimestep = 0;
+  focusedParticipantId = null;
+  constellationZoomStack = [];
+  renderAll();
+}
+
+function removeSession(e, i) {
+  e.stopPropagation();
+  sessions.splice(i, 1);
+  if (currentSessionIdx >= sessions.length) currentSessionIdx = sessions.length - 1;
+  if (currentSessionIdx < 0) currentSessionIdx = 0;
+  renderAll();
+}
+
+// ══════════════════════════════════════════════════════════════
+// TIMELINE
+// ══════════════════════════════════════════════════════════════
+function renderTimeline(session) {
+  const tl = session.timeline || [];
+  const slider = document.getElementById('timeline-slider');
+  slider.max = Math.max(0, tl.length - 1);
+  slider.value = currentTimestep;
+
+  const stops = document.getElementById('timeline-stops');
+  stops.innerHTML = tl.map((t, i) => `
+    <div class="timeline-stop ${i === currentTimestep ? 'active' : ''} ${t._report_boundary ? 'report-boundary' : ''}"
+         onclick="jumpTo(${i})">
+      <div class="stop-dot"></div>
+      <div class="stop-label">${esc(t.timestep_label || 'T'+i)}</div>
+    </div>
+  `).join('');
+
+  slider.oninput = () => {
+    currentTimestep = parseInt(slider.value);
+    renderAll();
+  };
+}
+
+function jumpTo(i) {
+  currentTimestep = i;
+  document.getElementById('timeline-slider').value = i;
+  renderAll();
+}
+
+// ══════════════════════════════════════════════════════════════
+// ENVELOPE
+// ══════════════════════════════════════════════════════════════
+function computeEnvelope(session) {
+  const t = (session.timeline || [])[currentTimestep];
+  if (!t) return null;
+  // Find Cfg, Emb, Org for focused or system level
+  const pids = focusedParticipantId
+    ? [focusedParticipantId]
+    : (session.participants || []).map(p => p.id);
+
+  let cfgA = 0, embA = 0, orgA = 0, count = 0;
+  pids.forEach(pid => {
+    const dims = t.participants?.[pid]?.dimensions || {};
+    if (dims.Cfg) cfgA += dims.Cfg.A || 0;
+    if (dims.Emb) embA += dims.Emb.A || 0;
+    if (dims.Org) orgA += dims.Org.A || 0;
+    count++;
+  });
+  if (!count) return null;
+  cfgA /= count; embA /= count; orgA /= count;
+  const adm = Math.round(cfgA);
+  const bear = Math.round(embA);
+  const coh = Math.round(orgA);
+  const env = Math.round(Math.min(adm, bear, coh));
+  return { adm, bear, coh, env };
+}
+
+function renderEnvelope(session) {
+  const ev = computeEnvelope(session);
+  if (!ev) return;
+  const score = document.getElementById('env-score');
+  const status = document.getElementById('env-status');
+  const comps = document.getElementById('env-components');
+  const card = document.getElementById('envelope-card');
+
+  score.textContent = ev.env;
+  score.style.color = ev.env < 25 ? 'var(--crimson)' : ev.env < 50 ? 'var(--mis)' : 'var(--ink)';
+
+  if (ev.env < 10) {
+    status.textContent = '⬛ COLLAPSE';
+    status.style.color = 'var(--crimson)';
+  } else if (ev.env < 30) {
+    status.textContent = '⚠ CRITICAL';
+    status.style.color = 'var(--crimson)';
+  } else if (ev.env < 60) {
+    status.textContent = '◈ STRAINED';
+    status.style.color = 'var(--mis)';
+  } else {
+    status.textContent = '◉ HOLDING';
+    status.style.color = 'var(--al)';
+  }
+
+  comps.innerHTML = `
+    <div class="env-comp"><div class="env-comp-val" style="color:var(--gold)">${ev.adm}</div><span class="env-comp-label">Adm · Cfg</span></div>
+    <div class="env-comp"><div class="env-comp-val" style="color:var(--gold)">${ev.bear}</div><span class="env-comp-label">Bear · Emb</span></div>
+    <div class="env-comp"><div class="env-comp-val" style="color:var(--teal)">${ev.coh}</div><span class="env-comp-label">Coh · Org</span></div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════════════
+// CONSTELLATION CANVAS
+// ══════════════════════════════════════════════════════════════
+let constellationNodes = [];
+
+function renderConstellation(session) {
+  const canvas = document.getElementById('constellation-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.offsetWidth;
+  const H = 220;
+  canvas.width = W;
+  canvas.height = H;
+  ctx.clearRect(0, 0, W, H);
+
+  const t = (session.timeline || [])[currentTimestep];
+  if (!t) return;
+
+  // Determine which participants to show
+  let participants = session.participants || [];
+  let currentZoom = constellationZoomStack[constellationZoomStack.length - 1];
+  if (currentZoom) {
+    const parent = participants.find(p => p.id === currentZoom);
+    if (parent?.sub_participants?.length) {
+      participants = parent.sub_participants;
+    }
+  }
+
+  // Layout: circular arrangement
+  const cx = W / 2, cy = H / 2 + 10;
+  const r = Math.min(W, H) * 0.3;
+  constellationNodes = participants.map((p, i) => {
+    const angle = participants.length === 1
+      ? -Math.PI / 2
+      : (i / participants.length) * 2 * Math.PI - Math.PI / 2;
+    const x = participants.length === 1 ? cx : cx + r * Math.cos(angle);
+    const y = participants.length === 1 ? cy : cy + r * Math.sin(angle);
+
+    const dimData = t.participants?.[p.id]?.dimensions || {};
+    const orgA = dimData.Org?.A ?? 70;
+    const orgM = dimData.Org?.M ?? 20;
+    const cfgA = dimData.Cfg?.A ?? 70;
+    const embA = dimData.Emb?.A ?? 70;
+    const env = Math.min(cfgA, embA, orgA);
+    const totalA = Object.values(dimData).reduce((s, d) => s + (d.A||0), 0) / (Object.keys(dimData).length||1);
+    const totalL = Object.values(dimData).reduce((s, d) => s + (d.L||0), 0) / (Object.keys(dimData).length||1);
+    const totalM = Object.values(dimData).reduce((s, d) => s + (d.M||0), 0) / (Object.keys(dimData).length||1);
+
+    const ext = t.participants?.[p.id]?.emission_external;
+    const int_family = totalL > totalM ? 'Al' : totalM > totalL ? 'Mis' : 'neutral';
+    const ext_family = ext?.dominant_family || int_family;
+    const dr_state = ext_family !== int_family ? 'contradictory' : int_family;
+
+    return { p, x, y, env, totalA, totalL, totalM, int_family, ext_family, dr_state, orgA, orgM };
+  });
+
+  // Draw field lines between connected participants
+  const events = session.matrix_events?.filter(me => me.timestep_idx === currentTimestep) || [];
+  const interEvents = events.filter(me => me.source_participant && me.target_participant
+    && me.source_participant !== me.target_participant);
+
+  interEvents.forEach(me => {
+    const from = constellationNodes.find(n => n.p.id === me.source_participant);
+    const to = constellationNodes.find(n => n.p.id === me.target_participant);
+    if (!from || !to) return;
+    ctx.save();
+    ctx.globalAlpha = 0.35;
+    ctx.setLineDash(me.relay_type === 'field_relay' ? [4, 4] : me.relay_type === 'bypass' ? [2, 6] : []);
+    ctx.strokeStyle = me.direction === 'acute_down' ? '#c49a28'
+      : me.direction === 'accumulated_up' ? '#2a8a7a'
+      : '#9c7d4a';
+    ctx.lineWidth = Math.max(1, (me.magnitude || 3) * 0.4);
+    ctx.beginPath();
+    ctx.moveTo(from.x, from.y);
+    ctx.lineTo(to.x, to.y);
+    ctx.stroke();
+    ctx.restore();
+  });
+
+  // Draw nodes
+  constellationNodes.forEach(n => {
+    const { x, y, env, totalA, totalL, totalM, int_family, ext_family, dr_state, p } = n;
+    const radius = 18 + (totalA / 100) * 14;
+    const isFocused = focusedParticipantId === p.id;
+
+    // Outer ring = emission family
+    const ringColor = ext_family === 'Al' ? '#1a5a1a'
+      : ext_family === 'Mis' ? '#8a4a1a'
+      : ext_family === 'Dst' ? '#8b1a1a'
+      : '#5a5040';
+    const ringWidth = 2 + (totalM / 100) * 4; // emission amount
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x, y, radius + 5, 0, Math.PI * 2);
+    ctx.strokeStyle = ringColor;
+    ctx.lineWidth = ringWidth;
+    ctx.globalAlpha = 0.6;
+    ctx.stroke();
+    ctx.restore();
+
+    // Inner fill = internal state / envelope
+    const fillColor = env < 20 ? '#8b1a1a'
+      : env < 45 ? '#8a4a1a'
+      : int_family === 'Al' ? '#1a5a1a'
+      : '#5a5040';
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = fillColor;
+    ctx.globalAlpha = 0.18;
+    ctx.fill();
+    ctx.restore();
+
+    // Node border
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.strokeStyle = isFocused ? '#8b1a1a' : '#6b5230';
+    ctx.lineWidth = isFocused ? 2.5 : 1.5;
+    ctx.globalAlpha = isFocused ? 1 : 0.7;
+    ctx.stroke();
+    ctx.restore();
+
+    // Dual-register gap indicator
+    if (dr_state === 'contradictory') {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(x, y, radius + 9, 0, Math.PI * 2);
+      ctx.strokeStyle = '#8b1a1a';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 3]);
+      ctx.globalAlpha = 0.5;
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // Taper indicator (small arc showing zone distribution)
+    const taperAngle = n.p.locus ? {
+      'local': 0.4, 'intra-local': 0.2, 'inter-local': 0.6, 'field': 0.8, 'extra-local': 1.0
+    }[n.p.locus] || 0.5 : 0.5;
+
+    // Name
+    ctx.save();
+    ctx.font = `${isFocused ? 'bold ' : ''}13px "Crimson Pro", serif`;
+    ctx.fillStyle = '#1c1208';
+    ctx.globalAlpha = 0.9;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const label = p.name?.length > 12 ? p.name.slice(0,11)+'…' : (p.name || p.id);
+    ctx.fillText(label, x, y);
+    ctx.restore();
+
+    // Sub-participant indicator
+    if (p.sub_participants?.length) {
+      ctx.save();
+      ctx.font = '9px "DM Mono", monospace';
+      ctx.fillStyle = '#2a8a7a';
+      ctx.globalAlpha = 0.8;
+      ctx.textAlign = 'center';
+      ctx.fillText('⊕ ' + p.sub_participants.length, x, y + radius + 14);
+      ctx.restore();
+    }
+  });
+
+  // Breadcrumb
+  renderBreadcrumb(session);
+}
+
+document.getElementById('constellation-canvas').addEventListener('click', function(e) {
+  const rect = this.getBoundingClientRect();
+  const mx = (e.clientX - rect.left) * (this.width / rect.width);
+  const my = (e.clientY - rect.top) * (this.height / rect.height);
+  let hit = null;
+  let minDist = Infinity;
+  constellationNodes.forEach(n => {
+    const d = Math.hypot(mx - n.x, my - n.y);
+    if (d < 30 && d < minDist) { minDist = d; hit = n; }
+  });
+  if (hit) {
+    if (focusedParticipantId === hit.p.id) {
+      // Double-click logic: zoom into sub-constellation
+      if (hit.p.sub_participants?.length) {
+        constellationZoomStack.push(hit.p.id);
+        focusedParticipantId = null;
+        renderAll();
+        return;
+      }
+    }
+    focusedParticipantId = hit.p.id;
+    renderAll();
+  } else {
+    focusedParticipantId = null;
+    renderAll();
+  }
+});
+
+function renderBreadcrumb(session) {
+  const el = document.getElementById('breadcrumb');
+  if (constellationZoomStack.length === 0) { el.innerHTML = ''; return; }
+  const crumbs = ['<span class="breadcrumb-item" onclick="zoomToLevel(-1)">System</span>'];
+  constellationZoomStack.forEach((pid, i) => {
+    const p = findParticipant(session, pid);
+    crumbs.push('<span class="breadcrumb-sep">›</span>');
+    crumbs.push(`<span class="breadcrumb-item" onclick="zoomToLevel(${i})">${esc(p?.name||pid)}</span>`);
+  });
+  el.innerHTML = crumbs.join('');
+}
+
+function zoomToLevel(i) {
+  if (i < 0) { constellationZoomStack = []; }
+  else { constellationZoomStack = constellationZoomStack.slice(0, i+1); }
+  focusedParticipantId = null;
+  renderAll();
+}
+
+function findParticipant(session, id) {
+  const all = session.participants || [];
+  for (const p of all) {
+    if (p.id === id) return p;
+    if (p.sub_participants) {
+      const found = p.sub_participants.find(s => s.id === id);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+// ══════════════════════════════════════════════════════════════
+// PARTICIPANT STRIPS
+// ══════════════════════════════════════════════════════════════
+function renderParticipantStrips(session) {
+  const t = (session.timeline || [])[currentTimestep];
+  const participants = session.participants || [];
+  const el = document.getElementById('participant-strips');
+  if (!participants.length || !t) { el.innerHTML = ''; return; }
+
+  el.innerHTML = participants.map(p => {
+    const dims = t.participants?.[p.id]?.dimensions || {};
+    const isFocused = focusedParticipantId === p.id;
+    const dimOrder = ['Cfg','Emb','Org','Dir','Leg'];
+    const miniDims = dimOrder.map(d => {
+      const dim = dims[d] || {};
+      const A = dim.A || 0, L = dim.L || 0, M = dim.M || 0;
+      const pL = A > 0 ? (L/A)*100 : 0;
+      const pM = A > 0 ? (M/A)*100 : 0;
+      const pN = Math.max(0, 100 - pL - pM);
+      const ext = t.participants?.[p.id]?.emission_external?.by_dimension?.[d];
+      const drState = ext ? (ext.family !== (L > M ? 'Al' : 'Mis') ? 'contradictory' : 'aligned') : 'aligned';
+      return `<div class="mini-dim">
+        <div class="mini-dim-label">${d}</div>
+        <div class="mini-bar-wrap">
+          <div class="mini-bar-al axis-segment" style="width:${pL}%"></div>
+          <div class="mini-bar-mis axis-segment" style="width:${pM}%"></div>
+          <div style="flex:1;background:var(--parchment-deep)"></div>
+        </div>
+        ${drState === 'contradictory' ? '<div class="dual-reg-dot dr-contradictory"></div>' : ''}
+      </div>`;
+    }).join('');
+
+    return `<div class="participant-strip ${isFocused ? 'focused' : ''}" onclick="focusParticipant('${p.id}')">
+      <div class="strip-header">
+        <span class="strip-name">${esc(p.name||p.id)}</span>
+        <span class="strip-locus">${esc(p.locus||'local')}</span>
+      </div>
+      <div class="mini-dims">${miniDims}</div>
+    </div>`;
+  }).join('');
+}
+
+function focusParticipant(id) {
+  focusedParticipantId = focusedParticipantId === id ? null : id;
+  renderAll();
+}
+
+// ══════════════════════════════════════════════════════════════
+// RIGHT PAGE
+// ══════════════════════════════════════════════════════════════
+function renderRightPage(session) {
+  const t = (session.timeline || [])[currentTimestep];
+  if (!t) return;
+
+  const title = document.getElementById('right-title');
+  const content = document.getElementById('right-content');
+
+  if (!focusedParticipantId) {
+    // System view
+    title.textContent = session.system_name || 'System Reading';
+    renderSystemView(session, t, content);
+  } else {
+    const p = findParticipant(session, focusedParticipantId);
+    title.textContent = (p?.name || focusedParticipantId);
+    renderParticipantDetail(session, t, p, content);
+  }
+}
+
+function renderSystemView(session, t, el) {
+  const isLastStep = currentTimestep === (session.timeline?.length || 1) - 1;
+  const analysis = session.analysis;
+
+  let html = `
+    <div class="section-label" style="margin-bottom:8px;">${esc(t.timestep_label||'Timestep '+currentTimestep)}</div>
+    <p style="font-size:14px;font-style:italic;color:var(--ink-light);margin-bottom:18px;line-height:1.6;">${esc(t.narrative_note||'')}</p>
+  `;
+
+  // Emission notes
+  if (t.emission_notes) {
+    html += `<div class="emission-note"><span class="emission-note-label">Emission · E ≠ (A,L,M)</span>${esc(t.emission_notes)}</div>`;
+  }
+
+  // Events summary
+  const events = (session.matrix_events||[]).filter(me => me.timestep_idx === currentTimestep);
+  if (events.length) {
+    html += `<div class="section-label collapsible-toggle" onclick="toggleCollapse('sys-events')">
+      Matrix Events at this timestep
+      <span class="collapsible-arrow open" id="arr-sys-events">▶</span>
+    </div>
+    <div class="collapsible-body" id="sys-events">
+      <div class="matrix-events">${renderEvents(events)}</div>
+    </div>`;
+  }
+
+  // Analysis (at end or always)
+  if (analysis && isLastStep) {
+    html += renderAnalysisBlock(analysis);
+  }
+
+  if (!t.narrative_note && !events.length && !analysis) {
+    html += `<div class="empty-state" style="min-height:30vh;"><p>Click a participant to read their full state.<br>Or check the timeline for different moments.</p></div>`;
+  }
+
+  el.innerHTML = html;
+}
+
+function renderParticipantDetail(session, t, p, el) {
+  const dimData = t.participants?.[p?.id]?.dimensions || {};
+  const extEmission = t.participants?.[p?.id]?.emission_external;
+  const taper = t.participants?.[p?.id]?.taper_note;
+
+  // Tabs
+  let tabHtml = `<div class="tabs">
+    <div class="tab ${rightTab==='dimensions'?'active':''}" onclick="setTab('dimensions')">Dimensions</div>
+    <div class="tab ${rightTab==='events'?'active':''}" onclick="setTab('events')">Matrix Events</div>
+    <div class="tab ${rightTab==='analysis'?'active':''}" onclick="setTab('analysis')">Analysis</div>
+  </div>`;
+
+  let bodyHtml = '';
+
+  if (rightTab === 'dimensions') {
+    // Dual register card (provisional)
+    if (extEmission) {
+      bodyHtml += `<div><span class="provisional-badge">provisional</span> <span class="section-label" style="display:inline;">Dual Register</span></div>
+      <div class="dual-register-card" style="margin-top:8px;">
+        <div>
+          <div class="register-col-label">Internal Hold</div>
+          ${Object.entries(dimData).map(([d, dim]) => `
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:12px;">
+              <span style="font-family:'DM Mono',monospace;font-size:10px;width:28px;">${d}</span>
+              <div style="flex:1;height:5px;background:var(--parchment-deep);border-radius:1px;overflow:hidden;display:flex;">
+                <div style="width:${dim.A>0?(dim.L/dim.A)*100:0}%;background:var(--al);"></div>
+                <div style="width:${dim.A>0?(dim.M/dim.A)*100:0}%;background:var(--mis);"></div>
+              </div>
+              <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--ink-faint);">${dim.A||0}</span>
+            </div>`).join('')}
+        </div>
+        <div>
+          <div class="register-col-label external">External Emission</div>
+          ${extEmission.by_dimension ? Object.entries(extEmission.by_dimension).map(([d, em]) => `
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:12px;">
+              <span style="font-family:'DM Mono',monospace;font-size:10px;width:28px;">${d}</span>
+              <span class="emission-family ef-${em.family}">${em.family||'?'}</span>
+              <span style="font-size:11px;color:var(--ink-light);flex:1;">${esc(em.note||'')}</span>
+            </div>`).join('') : `<div style="font-style:italic;font-size:12px;color:var(--ink-light);">Dominant: ${extEmission.dominant_family||'—'}</div>`}
+          ${extEmission.note ? `<div class="register-mismatch-note">${esc(extEmission.note)}</div>` : ''}
+        </div>
+      </div>`;
+    }
+
+    // Taper (provisional)
+    if (taper) {
+      bodyHtml += `<div style="margin-bottom:12px;"><span class="provisional-badge">provisional</span>
+        <span style="font-size:12px;font-style:italic;color:var(--ink-light);margin-left:6px;">${esc(taper)}</span>
+      </div>`;
+    }
+
+    // Dimensions by zone
+    bodyHtml += '<div class="section-label">Dimension States</div>';
+    ['foundation','bridge','articulation'].forEach(zone => {
+      const zm = ZONE_META[zone];
+      const dimsInZone = zm.dims.filter(d => dimData[d]);
+      if (!dimsInZone.length) return;
+      bodyHtml += `<div class="zone-block">
+        <div class="zone-header">
+          <div class="zone-pip" style="background:${zm.pip}"></div>
+          <div class="zone-label" style="color:${zm.color}">${zm.label}</div>
+          <div class="zone-rule"></div>
+        </div>
+        ${dimsInZone.map(d => renderDimCard(d, dimData[d], extEmission)).join('')}
+      </div>`;
+    });
+
+  } else if (rightTab === 'events') {
+    const events = (session.matrix_events||[]).filter(me =>
+      me.timestep_idx === currentTimestep &&
+      (me.source_dimension_participant === p?.id || me.target_participant === p?.id
+        || me.source_participant === p?.id || me.target_dimension_participant === p?.id
+        || me.source === me.source || true) // show all events, highlight relevant
+    );
+    const relevant = events.filter(me =>
+      me.source_participant === p?.id || me.target_participant === p?.id
+    );
+    const general = events.filter(me =>
+      !me.source_participant && !me.target_participant
+    );
+    const show = relevant.length > 0 ? relevant : events;
+    if (!show.length) {
+      bodyHtml += `<p style="font-style:italic;color:var(--ink-faint);font-size:14px;margin-top:20px;">No matrix events at this timestep.</p>`;
+    } else {
+      bodyHtml += `<div class="matrix-events">${renderEvents(show)}</div>`;
+    }
+
+  } else if (rightTab === 'analysis') {
+    const analysis = session.analysis;
+    if (!analysis) {
+      bodyHtml += `<p style="font-style:italic;color:var(--ink-faint);font-size:14px;margin-top:20px;">Analysis appears at the final timestep.</p>`;
+    } else {
+      bodyHtml += renderAnalysisBlock(analysis);
+    }
+  }
+
+  // Sub-constellation prompt
+  if (p?.sub_participants?.length) {
+    bodyHtml += `<div style="margin-top:16px;padding:10px 12px;border:1px dashed var(--teal-pale);border-radius:2px;font-size:13px;">
+      <span style="color:var(--teal);">⊕</span> This participant contains <strong>${p.sub_participants.length}</strong> sub-participants.
+      <span class="has-sub-indicator" onclick="zoomToSub('${p.id}')">↳ Zoom in</span>
+    </div>`;
+  }
+
+  el.innerHTML = `<div class="reading-header">
+    <h2 class="reading-title">${esc(p?.name||focusedParticipantId||'')}</h2>
+    <div class="reading-subtitle">${esc(p?.locus||'local')} · ${esc(p?.description||'')}</div>
+  </div>
+  ${tabHtml}
+  <div class="participant-reading">${bodyHtml}</div>`;
+}
+
+function setTab(t) {
+  rightTab = t;
+  const session = sessions[currentSessionIdx];
+  if (session) renderRightPage(session);
+}
+
+function zoomToSub(parentId) {
+  constellationZoomStack.push(parentId);
+  focusedParticipantId = null;
+  renderAll();
+}
+
+function renderDimCard(d, dim, extEmission) {
+  const A = dim.A || 0, L = dim.L || 0, M = dim.M || 0;
+  const neutral = Math.max(0, A - L - M);
+  const pL = A > 0 ? (L/A)*100 : 0;
+  const pM = A > 0 ? (M/A)*100 : 0;
+  const pN = A > 0 ? (neutral/A)*100 : 0;
+  const pLost = Math.max(0, 100 - A);
+  const extDim = extEmission?.by_dimension?.[d];
+
+  return `<div class="dim-card">
+    <div class="dim-header">
+      <span class="dim-name">${d}</span>
+      <span class="dim-gloss">${DIM_GLOSSES[d]||''}</span>
+    </div>
+    <div class="dim-values">
+      <div class="dim-val"><div class="dim-val-num val-A">${A}</div><span class="dim-val-label">A · capacity</span></div>
+      <div class="dim-val"><div class="dim-val-num val-L">${L}</div><span class="dim-val-label">L · aligned</span></div>
+      <div class="dim-val"><div class="dim-val-num val-M">${M}</div><span class="dim-val-label">M · misaligned</span></div>
+      <div class="dim-val"><div class="dim-val-num val-neutral">${neutral}</div><span class="dim-val-label">neutral</span></div>
+    </div>
+    <div class="axis-bar">
+      <div class="axis-segment mini-bar-al" style="width:${pL}%"></div>
+      <div class="axis-segment mini-bar-mis" style="width:${pM}%"></div>
+      <div class="axis-segment" style="width:${pN}%;background:var(--parchment-deep)"></div>
+      <div class="axis-segment" style="width:${pLost}%;background:rgba(0,0,0,0.1)"></div>
+    </div>
+    ${extDim ? `<div class="emission-row">
+      <span class="emission-label">emission</span>
+      <span class="emission-family ef-${extDim.family}">${extDim.family}</span>
+      <span style="font-size:11px;color:var(--ink-light);flex:1;">${esc(extDim.note||'')}</span>
+      <span class="provisional-badge">provisional</span>
+    </div>` : ''}
+  </div>`;
+}
+
+function renderEvents(events) {
+  if (!events.length) return '<p style="font-style:italic;color:var(--ink-faint);font-size:13px;">No events.</p>';
+  return events.map(me => {
+    const dirClass = me.direction === 'acute_down' ? 'dir-acute'
+      : me.direction === 'accumulated_up' ? 'dir-accum'
+      : me.relay_type === 'bypass' ? 'dir-bypass'
+      : 'dir-lateral';
+    const dirLabel = me.direction === 'acute_down' ? '↓ acute'
+      : me.direction === 'accumulated_up' ? '↑ accum'
+      : me.relay_type === 'bypass' ? '↑ bypass'
+      : '↔ lateral';
+    const src = me.source_participant ? `${me.source_participant}.${me.source||'?'}` : (me.source||'?');
+    const tgt = me.target_participant ? `${me.target_participant}.${me.target||'?'}` : (me.target||'?');
+    return `<div class="event-row">
+      <span class="event-flow">${esc(src)} → ${esc(tgt)}</span>
+      <span class="event-dir ${dirClass}">${dirLabel}</span>
+      <span class="event-desc">${esc(me.effect||me.description||'')}</span>
+      ${me.magnitude ? `<span class="event-mag">×${me.magnitude}</span>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function renderAnalysisBlock(a) {
+  const invHtml = a.invariants_tested ? Object.entries(a.invariants_tested).map(([k,v]) =>
+    `<span class="inv-chip ${v?'held':'failed'}">${k}</span>`
+  ).join('') : '';
+
+  return `<div class="analysis-block">
+    <div class="section-label" style="margin-bottom:12px;">Structural Analysis</div>
+    ${a.cascade_type ? `<div class="analysis-row"><span class="analysis-key">Cascade</span><span class="analysis-val">${esc(a.cascade_type)}</span></div>` : ''}
+    ${a.starting_dimension ? `<div class="analysis-row"><span class="analysis-key">Starts at</span><span class="analysis-val">${esc(a.starting_dimension)}</span></div>` : ''}
+    ${a.failure_mode ? `<div class="analysis-row"><span class="analysis-key">Failure mode</span><span class="analysis-val">${esc(a.failure_mode)}</span></div>` : ''}
+    ${a.recovery_type ? `<div class="analysis-row"><span class="analysis-key">Recovery</span><span class="analysis-val">${esc(a.recovery_type)}</span></div>` : ''}
+    ${invHtml ? `<div class="analysis-row"><span class="analysis-key">Invariants</span><div>${invHtml}</div></div>` : ''}
+    ${a.key_finding ? `<div class="key-finding">"${esc(a.key_finding)}"</div>` : ''}
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// UTILITIES
+// ══════════════════════════════════════════════════════════════
+function esc(s) {
+  if (s == null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function toggleCollapse(id) {
+  const body = document.getElementById(id);
+  const arr = document.getElementById('arr-'+id);
+  if (!body) return;
+  const isOpen = !body.classList.contains('closed');
+  body.classList.toggle('closed', isOpen);
+  if (arr) arr.classList.toggle('open', !isOpen);
+}
+
+function showStatus(msg, type='info') {
+  const el = document.getElementById('status-bar');
+  el.className = 'status-bar status-' + type;
+  el.textContent = msg;
+  el.style.display = 'flex';
+  if (type === 'info') setTimeout(() => el.style.display = 'none', 3000);
+}
+
+// ══════════════════════════════════════════════════════════════
+// RESIZE
+// ══════════════════════════════════════════════════════════════
+window.addEventListener('resize', () => {
+  const session = sessions[currentSessionIdx];
+  if (session) renderConstellation(session);
+});
+
+// ── INIT ──
+renderAll();
+</script>
+</body>
+</html>
