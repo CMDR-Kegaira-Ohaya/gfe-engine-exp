@@ -1,0 +1,87 @@
+name: Index Cases
+
+on:
+  push:
+    paths:
+      - 'cases/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-index:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Build cases index
+        run: |
+          BRANCH="${GITHUB_REF_NAME}"
+          mkdir -p cases
+          
+          cat > /tmp/build_index.py << 'PYEOF'
+          import json, os, subprocess, sys
+          
+          cases_dir = "cases"
+          index_path = os.path.join(cases_dir, "index.json")
+          branch = sys.argv[1] if len(sys.argv) > 1 else "unknown"
+          
+          cases = []
+          for fname in sorted(os.listdir(cases_dir)):
+              if not fname.endswith(".json") or fname == "index.json":
+                  continue
+              fpath = os.path.join(cases_dir, fname)
+              try:
+                  with open(fpath) as f:
+                      data = json.load(f)
+                  
+                  try:
+                      modified = subprocess.check_output(
+                          ["git", "log", "-1", "--format=%aI", "--", fpath],
+                          text=True
+                      ).strip()
+                  except:
+                      modified = ""
+                  
+                  cases.append({
+                      "filename": fname,
+                      "size": os.path.getsize(fpath),
+                      "system_name": data.get("system_name", ""),
+                      "case_id": data.get("case_id", ""),
+                      "description": data.get("description", "")[:120],
+                      "participants": len(data.get("participants", [])),
+                      "timesteps": len(data.get("timeline", [])),
+                      "modified": modified,
+                      "locus": data.get("locus_of_analysis", "")
+                  })
+              except Exception as e:
+                  print(f"Skipping {fname}: {e}", file=sys.stderr)
+          
+          index = {
+              "branch": branch,
+              "count": len(cases),
+              "cases": cases
+          }
+          
+          with open(index_path, "w") as f:
+              json.dump(index, f, indent=2)
+          
+          print(f"Indexed {len(cases)} cases on branch '{branch}'")
+          PYEOF
+          
+          python3 /tmp/build_index.py "$BRANCH"
+
+      - name: Commit index
+        run: |
+          git add cases/index.json
+          git diff --cached --quiet || git commit -m "Auto-index: $(cat cases/index.json | python3 -c 'import json,sys; d=json.load(sys.stdin); print(f"{d[\"count\"]} cases on {d[\"branch\"]}")')"
+          git push

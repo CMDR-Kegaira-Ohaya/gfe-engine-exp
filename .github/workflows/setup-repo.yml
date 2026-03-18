@@ -1,0 +1,83 @@
+name: Setup Repository
+
+on:
+  workflow_dispatch:
+    inputs:
+      create_drafts:
+        description: 'Create drafts branch'
+        required: true
+        default: 'true'
+        type: boolean
+      project_branches:
+        description: 'Comma-separated branch names (auto-prefixed with cases/ if needed). For user branches: users/alice, users/bob'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Ensure cases directory exists on main
+        run: |
+          mkdir -p cases
+          if [ ! -f cases/.gitkeep ]; then
+            touch cases/.gitkeep
+            git add cases/.gitkeep
+            git diff --cached --quiet || git commit -m "Initialize cases directory"
+            git push
+          fi
+
+      - name: Create drafts branch
+        if: ${{ inputs.create_drafts == 'true' }}
+        run: |
+          if ! git ls-remote --heads origin drafts | grep -q drafts; then
+            git checkout -b drafts
+            git push origin drafts
+            echo "✅ Created 'drafts' branch"
+          else
+            echo "ℹ️ 'drafts' branch already exists"
+          fi
+          git checkout main
+
+      - name: Create project branches
+        if: ${{ inputs.project_branches != '' }}
+        run: |
+          IFS=',' read -ra BRANCHES <<< "${{ inputs.project_branches }}"
+          for branch in "${BRANCHES[@]}"; do
+            branch=$(echo "$branch" | xargs)
+            if [ -z "$branch" ]; then continue; fi
+            if [[ "$branch" != cases/* ]]; then
+              branch="cases/$branch"
+            fi
+            if ! git ls-remote --heads origin "$branch" | grep -q "$branch"; then
+              git checkout main
+              git checkout -b "$branch"
+              mkdir -p cases
+              touch cases/.gitkeep
+              git add cases/.gitkeep
+              git diff --cached --quiet || git commit -m "Initialize $branch"
+              git push origin "$branch"
+              echo "✅ Created '$branch' branch"
+            else
+              echo "ℹ️ '$branch' already exists"
+            fi
+          done
+
+      - name: Summary
+        run: |
+          echo "## Repository Branches" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          git ls-remote --heads origin | awk '{print "- `" $2 "`"}' | sed 's|refs/heads/||' >> $GITHUB_STEP_SUMMARY
