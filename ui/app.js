@@ -19,8 +19,12 @@ export function loadFromPaste() {
     if (urlMatch) {
       json = decodeURIComponent(atob(urlMatch[1]));
     } else {
-      const cleaned = raw.replace(/^```[a-z]*\n?/,'').replace(/\n?```$/,'').trim();
-      try { json = decodeURIComponent(atob(cleaned)); } catch (e) { json = cleaned; }
+      const cleaned = raw.replace(/^```[a-z]*\n?/, '').replace(/\n?```$/, '').trim();
+      try {
+        json = decodeURIComponent(atob(cleaned));
+      } catch (e) {
+        json = cleaned;
+      }
     }
   } catch (e) {
     json = raw;
@@ -36,21 +40,22 @@ export function loadFromPaste() {
   }
 }
 
-function readFile(f) {
-  const r = new FileReader();
-  r.onload = ev => {
+function readFile(file) {
+  const reader = new FileReader();
+  reader.onload = ev => {
     try {
       ingestCase(JSON.parse(ev.target.result));
     } catch (e) {
-      showMsg('Could not parse ' + f.name, 'error');
+      showMsg('Could not parse ' + file.name, 'error');
     }
   };
-  r.readAsText(f);
+  reader.readAsText(file);
 }
 
 export function ingestCase(data) {
   data = normalizeSchema(data);
   const type = detectType(data);
+
   if (type === 'continuation' || type === 'expansion') {
     mergeSession(data, type);
   } else {
@@ -62,6 +67,10 @@ export function ingestCase(data) {
     state.focusedPid = null;
     state.zoomStack = [];
   }
+
+  state.systemTab = 'overview';
+  state.rightTab = 'axes';
+
   saveToStorage();
   renderAll();
   showMsg('Case loaded: ' + (data.system_name || data.case_id || 'unnamed'), 'info');
@@ -69,60 +78,60 @@ export function ingestCase(data) {
 
 export function clearAll() {
   state.sessions = [];
+  state.sessionReports = {};
   state.currentIdx = 0;
   state.currentT = 0;
   state.focusedPid = null;
   state.zoomStack = [];
+  state.systemTab = 'overview';
+  state.rightTab = 'axes';
   clearAllStorage();
   renderAll();
 }
 
-export function setTab(t) {
-  state.rightTab = t;
-  const s = state.sessions[state.currentIdx];
-  if (s) {
-    const evt = new Event('gfe-tab-change');
-    window.dispatchEvent(evt);
-    renderAll();
-  }
+export function setTab(tab) {
+  if (state.focusedPid) state.rightTab = tab;
+  else state.systemTab = tab;
+  renderAll();
 }
 
 export function toggleC(id) {
-  const b = document.getElementById(id);
-  const a = document.getElementById('arr-' + id);
-  if (!b) return;
-  b.classList.toggle('closed');
-  if (a) a.classList.toggle('open', !b.classList.contains('closed'));
+  const body = document.getElementById(id);
+  const arrow = document.getElementById('arr-' + id);
+  if (!body) return;
+  body.classList.toggle('closed');
+  if (arrow) arrow.classList.toggle('open', !body.classList.contains('closed'));
 }
 
 function initDomBindings() {
   const fileInput = document.getElementById('file-input');
   if (fileInput) {
-    fileInput.addEventListener('change', function(e) {
+    fileInput.addEventListener('change', function (e) {
       Array.from(e.target.files).forEach(readFile);
       this.value = '';
     });
   }
 
-  const dz = document.getElementById('drop-zone');
-  if (dz) {
-    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
-    dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
-    dz.addEventListener('drop', e => {
+  const dropZone = document.getElementById('drop-zone');
+  if (dropZone) {
+    dropZone.addEventListener('dragover', e => {
       e.preventDefault();
-      dz.classList.remove('drag-over');
+      dropZone.classList.add('drag-over');
+    });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropZone.classList.remove('drag-over');
       Array.from(e.dataTransfer.files).forEach(readFile);
     });
   }
 
   const canvas = document.getElementById('constellation-canvas');
-  if (canvas) {
-    canvas.addEventListener('click', e => onConstellationClick(e, renderAll));
-  }
+  if (canvas) canvas.addEventListener('click', e => onConstellationClick(e, renderAll));
 
   window.addEventListener('resize', () => {
-    const s = state.sessions[state.currentIdx];
-    if (s) renderAll();
+    const session = state.sessions[state.currentIdx];
+    if (session) renderAll();
   });
 }
 
@@ -135,6 +144,7 @@ export function initApp() {
       ingestCase(JSON.parse(json));
       return;
     }
+
     const hash = window.location.hash;
     if (hash && hash.length > 2) {
       const json = decodeURIComponent(atob(hash.slice(1)));
@@ -144,6 +154,7 @@ export function initApp() {
   } catch (e) {
     console.error('URL load error:', e);
   }
+
   loadFromStorage(renderAll);
 }
 
@@ -155,11 +166,11 @@ window.connectRepo = connectRepo;
 window.switchBranch = switchBranch;
 window.onRepoFilterChange = onRepoFilterChange;
 window.resetRepoFilters = resetRepoFilters;
-window.loadRepoCase = (idx) => loadRepoCase(idx, ingestCase);
+window.loadRepoCase = idx => loadRepoCase(idx, ingestCase);
 window.jumpTo = jumpTo;
 window.focusP = focusP;
-window.zoomTo = (i) => zoomTo(i, renderAll);
-window.zoomToSub = (pid) => zoomToSub(pid, renderAll);
+window.zoomTo = i => zoomTo(i, renderAll);
+window.zoomToSub = pid => zoomToSub(pid, renderAll);
 window.setTab = setTab;
 window.toggleC = toggleC;
 window.saveCurrentCaseJson = saveCurrentCaseJson;
