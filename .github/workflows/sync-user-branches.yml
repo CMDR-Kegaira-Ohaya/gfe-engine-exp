@@ -28,18 +28,20 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+      - name: Fetch all remote branches
+        run: |
+          git fetch origin '+refs/heads/*:refs/remotes/origin/*' --prune
+
       - name: Sync main into cases/users/*
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          git fetch --all --prune
 
-          # List cases/users/* branches (no heredoc; YAML-safe)
-          BRANCHES="$(curl -sS -H "Authorization: Bearer $GITHUB_TOKEN" \
-            "https://api.github.com/repos/$REPO/branches?per_page=100" \
-            | python3 -c 'import json,sys,re; data=json.load(sys.stdin); print("\n".join([b.get("name","") for b in data if re.match(r"^cases/users/.+", b.get("name",""))]))')"
+          MAIN_REF="origin/main"
+
+          # List user branches from the local remote refs (no API calls, YAML-safe)
+          BRANCHES="$(git for-each-ref --format='%(refname:strip=3)' refs/remotes/origin/cases/users/* 2>/dev/null || true)"
 
           if [ -z "${BRANCHES:-}" ]; then
             echo "No cases/users/* branches found."
@@ -47,63 +49,50 @@ jobs:
           fi
 
           open_pr_if_needed () {
-            local BR="$1"
+            local BASE_BRANCH="$1"
 
-            # If an open PR already exists with head=main into base=$BR, do nothing.
+            # Avoid duplicates: if open PR already exists with head=main base=$BASE_BRANCH, do nothing.
             local EXISTING
-            EXISTING="$(curl -sS -H "Authorization: Bearer $GITHUB_TOKEN" \
-              "https://api.github.com/repos/$REPO/pulls?state=open&base=$BR&per_page=100" \
-              | python3 -c 'import json,sys; prs=json.load(sys.stdin); 
-for pr in prs:
-  if (pr.get("head") or {}).get("ref")=="main":
-    print(pr.get("html_url",""))
-    break')"
+            EXISTING="$(gh pr list --state open --base "$BASE_BRANCH" --head "main" --json number --jq '.[0].number' 2>/dev/null || true)"
 
             if [ -n "${EXISTING:-}" ]; then
-              echo "Existing PR already open: $EXISTING"
+              echo "Existing PR already open for main -> $BASE_BRANCH (#$EXISTING)"
               return 0
             fi
 
-            # Create PR: head=main, base=$BR
-            BODY="$(python3 -c "import json; print(json.dumps({
-              'title': 'Sync main into $BR',
-              'head': 'main',
-              'base': '$BR',
-              'body': 'Auto-generated: main has diverged from this user case branch. Resolve conflicts (if any), then merge to update the branch.'
-            }))")"
-
-            curl -sS -X POST -H "Authorization: Bearer $GITHUB_TOKEN" \
-              -H "Content-Type: application/json" \
-              "https://api.github.com/repos/$REPO/pulls" \
-              -d "$BODY" >/dev/null
-
-            echo "Opened PR: main -> $BR"
+            gh pr create \
+              --title "Sync main into $BASE_BRANCH" \
+              --body "Auto-generated: main has diverged from this user case branch. Resolve conflicts if any, then merge to update the branch." \
+              --base "$BASE_BRANCH" \
+              --head "main"
           }
 
           echo "$BRANCHES" | while read -r BR; do
             [ -z "$BR" ] && continue
             echo ""
-            echo "=== Syncing main -> $BR ==="
+            echo "=== Syncing $MAIN_REF -> $BR ==="
 
             git checkout -B "$BR" "origin/$BR"
             OLD_SHA="$(git rev-parse HEAD)"
 
-            if git merge --no-edit "origin/main"; then
+            if git merge --no-edit "$MAIN_REF"; then
               NEW_SHA="$(git rev-parse HEAD)"
+
               if [ "$NEW_SHA" = "$OLD_SHA" ]; then
-                echo "No changes needed for $BR"
+                echo "Already up to date: $BR"
                 continue
               fi
 
+              # Try push; if blocked (protection), open PR instead.
               if git push origin "$BR"; then
                 echo "Pushed updated $BR"
               else
-                echo "Push failed (possible branch protection) — opening PR"
+                echo "Push failed for $BR (possible branch protection) — opening PR instead"
                 git reset --hard "origin/$BR" || true
                 open_pr_if_needed "$BR"
               fi
             else
-              echo "Merge conflict — opening PR"
+              echo "Merge conflict for $BR — opening PR"
               git merge --abort || true
               open_pr_if_needed "$BR"
             fi
