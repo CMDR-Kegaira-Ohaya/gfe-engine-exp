@@ -1,23 +1,23 @@
-export const AXES = ['Cfg','Emb','Org','Dir','Leg'];
+export const AXES = ['Cfg', 'Emb', 'Org', 'Dir', 'Leg'];
 
 export const GLOSSES = {
-  Cfg:'admissibility · prevalence',
-  Emb:'bearable support',
-  Org:'coherence',
-  Dir:'directional expression',
-  Leg:'readability'
+  Cfg: 'admissibility · prevalence',
+  Emb: 'bearable support',
+  Org: 'coherence',
+  Dir: 'directional expression',
+  Leg: 'readability'
 };
 
 export const ZONES = {
-  foundation:   { dims:['Cfg','Emb'], color:'var(--gold)', pip:'#c9a84c', label:'Foundation' },
-  bridge:       { dims:['Org'],       color:'var(--teal)', pip:'#3a7a7a', label:'Bridge' },
-  articulation: { dims:['Dir','Leg'], color:'var(--violet)', pip:'#6a4a9a', label:'Articulation' }
+  foundation: { dims: ['Cfg', 'Emb'], color: 'var(--gold)', pip: '#c9a84c', label: 'Foundation' },
+  bridge: { dims: ['Org'], color: 'var(--teal)', pip: '#3a7a7a', label: 'Bridge' },
+  articulation: { dims: ['Dir', 'Leg'], color: 'var(--violet)', pip: '#6a4a9a', label: 'Articulation' }
 };
 
 export const SIGMA_COLORS = {
-  L:   { bg:'var(--al-pale)',  fg:'var(--al)',  bar:'rgba(74,138,90,0.5)',  barBright:'#4a8a5a' },
-  M:   { bg:'var(--mis-pale)', fg:'var(--mis)', bar:'rgba(192,112,64,0.5)', barBright:'#c07040' },
-  Dst: { bg:'var(--dst-pale)', fg:'var(--dst)', bar:'rgba(160,48,48,0.5)',  barBright:'#a03030' }
+  L: { bg: 'var(--al-pale)', fg: 'var(--al)', bar: 'rgba(74,138,90,0.5)', barBright: '#4a8a5a' },
+  M: { bg: 'var(--mis-pale)', fg: 'var(--mis)', bar: 'rgba(192,112,64,0.5)', barBright: '#c07040' },
+  Dst: { bg: 'var(--dst-pale)', fg: 'var(--dst)', bar: 'rgba(160,48,48,0.5)', barBright: '#a03030' }
 };
 
 export const state = {
@@ -27,6 +27,7 @@ export const state = {
   focusedPid: null,
   zoomStack: [],
   rightTab: 'axes',
+  systemTab: 'overview',
   cNodes: [],
   repoOwner: '',
   repoName: '',
@@ -34,7 +35,7 @@ export const state = {
   currentBranch: 'main',
   repoCases: [],
   githubToken: '',
-  repoFilter: { q:'', sigma:'', axis:'', mode:'', bundle:'', epsilon:'' }
+  repoFilter: { q: '', sigma: '', axis: '', mode: '', bundle: '', epsilon: '' }
 };
 
 export function show(id, visible) {
@@ -45,28 +46,32 @@ export function show(id, visible) {
 export function esc(s) {
   if (s == null) return '';
   return String(s)
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;');
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 export function escAttr(s) {
   if (s == null) return '';
   return String(s)
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;');
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
-export function showMsg(msg, type='info') {
+export function showMsg(msg, type = 'info') {
   const el = document.getElementById('msg-bar');
   if (!el) return;
-  el.className = 'msg-bar msg-'+type;
+  el.className = 'msg-bar msg-' + type;
   el.textContent = msg;
   el.style.display = 'block';
-  if (type === 'info') setTimeout(() => { el.style.display = 'none'; }, 2500);
+  if (type === 'info') {
+    setTimeout(() => {
+      el.style.display = 'none';
+    }, 2500);
+  }
 }
 
 export function getCurrentSession() {
