@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AENAON · GFE Workbench v15.6</title>
+<title>AENAON · GFE Workbench v15.7</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Cinzel:wght@400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -930,7 +930,7 @@ body::before {
 ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--gold-dim); }
 
-/* ── v15.6: PREVALENCE ── */
+/* ── v15.7: PREVALENCE ── */
 .prevalence-bar {
   display: flex;
   align-items: center;
@@ -963,7 +963,7 @@ body::before {
   flex: 1;
 }
 
-/* ── v15.6: THETA ── */
+/* ── v15.7: THETA ── */
 .theta-bar {
   display: flex;
   align-items: center;
@@ -997,7 +997,7 @@ body::before {
   color: var(--dst);
 }
 
-/* ── v15.6: COMPENSATION ── */
+/* ── v15.7: COMPENSATION ── */
 .comp-bar {
   display: flex;
   align-items: center;
@@ -1030,7 +1030,7 @@ body::before {
   flex: 1;
 }
 
-/* ── v15.6: VALENCE ── */
+/* ── v15.7: VALENCE ── */
 .valence-row {
   display: flex;
   align-items: center;
@@ -1043,7 +1043,7 @@ body::before {
 .valence-label { font-size: 7px; letter-spacing: 0.1em; text-transform: uppercase; }
 .valence-text { font-style: italic; font-size: 10px; color: var(--text2); }
 
-/* ── v15.6: FACE BADGE ── */
+/* ── v15.7: FACE BADGE ── */
 .face-badge {
   font-family: var(--font-mono);
   font-size: 7px;
@@ -1055,7 +1055,7 @@ body::before {
 .face-inner { background: var(--gold-pale); color: var(--gold-dim); }
 .face-outer { background: var(--teal-pale); color: var(--teal); }
 
-/* ── v15.6: INTERFERENCE ── */
+/* ── v15.7: INTERFERENCE ── */
 .interference-note {
   font-family: var(--font-mono);
   font-size: 8px;
@@ -1066,7 +1066,7 @@ body::before {
   border-radius: 1px;
 }
 
-/* ── v15.6: PRESSURE DYNAMICS ── */
+/* ── v15.7: PRESSURE DYNAMICS ── */
 .pressure-dynamics {
   font-style: italic;
   font-size: 13px;
@@ -1088,7 +1088,7 @@ body::before {
   margin-bottom: 4px;
 }
 
-/* ── v15.6: STRIP INDICATORS ── */
+/* ── v15.7: STRIP INDICATORS ── */
 .strip-indicators {
   display: flex;
   gap: 4px;
@@ -1263,7 +1263,7 @@ body::before {
   <!-- ── HEADER ── -->
   <header class="header">
     <span class="header-title">GFE Workbench</span>
-    <span class="header-subtitle">v15.6 · A/R/I · Θ</span>
+    <span class="header-subtitle">v15.7 · A/R/I · Θ</span>
     <div class="header-status">
       <div class="status-dot" id="status-dot"></div>
       <span class="status-label" id="status-label">No case loaded</span>
@@ -1783,7 +1783,7 @@ function renderStrips(s) {
         </div>
       </div>`;
     }).join('');
-    // v15.6 mini indicators
+    // v15.7 mini indicators
     let indicators = '';
     if (prev || theta?.active || comp?.active) {
       let inds = [];
@@ -1815,7 +1815,7 @@ function focusP(id) {
 }
 
 // ══════════════════════════════════════════════════════════
-// CONSTELLATION — v15.6 prevalence/Θ coloring
+// CONSTELLATION — v15.7 prevalence/Θ coloring
 // ══════════════════════════════════════════════════════════
 function renderConstellation(s) {
   const canvas = document.getElementById('constellation-canvas');
@@ -1844,7 +1844,7 @@ function renderConstellation(s) {
     const totalA = AXES.reduce((s,d)=>s+getA(d),0)/5;
     const orgA = getA('Org'), cfgA = getA('Cfg'), embA = getA('Emb');
     const env = Math.min(cfgA,embA,orgA);
-    // v15.6: prevalence and theta from data
+    // v15.7: prevalence and theta from data
     const prev = pdata.prevalence;
     const theta = pdata.theta;
     const comp = pdata.compensation;
@@ -1853,7 +1853,7 @@ function renderConstellation(s) {
     return { p, x, y, totalA, env, prevFamily, thetaActive, comp, orgA };
   });
 
-  // Draw inter-participant payload event lines (v15.6: source→medium→receiving)
+  // Draw inter-participant payload event lines (v15.7: source→medium→receiving)
   const events = (s.payload_events||[]).filter(pe=>pe.timestep_idx===currentT);
   events.forEach(pe => {
     const srcId = (pe.alpha_source||pe.alpha_from||'').split('.')[0];
@@ -1884,7 +1884,7 @@ function renderConstellation(s) {
     const radius = 14 + (totalA/100)*12;
     const sc = SIGMA_COLORS[prevFamily] || SIGMA_COLORS.L;
 
-    // v15.6: Θ ring (dashed red outer ring when theta active)
+    // v15.7: Θ ring (dashed red outer ring when theta active)
     if (thetaActive) {
       ctx.save();
       ctx.beginPath(); ctx.arc(x,y,radius+9,0,Math.PI*2);
@@ -2026,7 +2026,7 @@ function renderParticipantView(s, t, p, el) {
 
   let body = '';
   if (rightTab==='axes') {
-    // v15.6: Prevalence bar
+    // v15.7: Prevalence bar
     if (prev) {
       const prevSc = SIGMA_COLORS[prev.family] || SIGMA_COLORS.L;
       body += `<div class="prevalence-bar">
@@ -2036,7 +2036,7 @@ function renderParticipantView(s, t, p, el) {
       </div>`;
     }
 
-    // v15.6: Theta indicator
+    // v15.7: Theta indicator
     if (theta && theta.active) {
       body += `<div class="theta-bar">
         <span class="theta-label">Θ ACTIVE</span>
@@ -2045,7 +2045,7 @@ function renderParticipantView(s, t, p, el) {
       </div>`;
     }
 
-    // v15.6: Compensation indicator
+    // v15.7: Compensation indicator
     if (comp && comp.active) {
       const compCls = comp.type === 'maladaptive' ? 'comp-maladaptive' : 'comp-adaptive';
       body += `<div class="comp-bar">
@@ -2160,16 +2160,16 @@ function renderEventsHtml(events) {
     const unfLabel = pe.unfolding==='acute' ? '↓ acute' : '↑ accum';
     const regTag = pe.register==='emitted' ? 'tag-emitted' : 'tag-retained';
     const sigBadge = pe.sigma ? `<span class="sigma-badge sigma-${pe.sigma}" style="font-size:7px;">${pe.sigma}</span>` : '';
-    // v15.6: three-participant flow
+    // v15.7: three-participant flow
     const src = esc(pe.alpha_source||pe.alpha_from||'?');
     const med = pe.alpha_medium ? esc(pe.alpha_medium) : null;
     const rcv = esc(pe.alpha_receiving||pe.alpha_to||'?');
     const flowStr = med ? `${src} → <span style="color:var(--teal)">${med}</span> → ${rcv}` : `${src} → ${rcv}`;
-    // v15.6: face badge
+    // v15.7: face badge
     const faceBadge = pe.face ? `<span class="face-badge face-${pe.face}">${pe.face}</span>` : '';
-    // v15.6: interference note
+    // v15.7: interference note
     const intNote = pe.interference ? `<span class="interference-note">${esc(pe.interference)}</span>` : '';
-    // v15.6: bearing
+    // v15.7: bearing
     const bearNote = pe.bearing ? `<span class="tag-mode" title="payload_bearing">${esc(pe.bearing)}</span>` : '';
     return `<div class="event-row">
       <span class="ev-flow">${flowStr}</span>
