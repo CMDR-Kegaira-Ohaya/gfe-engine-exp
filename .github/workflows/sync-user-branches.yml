@@ -4,9 +4,8 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-  # optional: nightly safety sync
   schedule:
-    - cron: "17 3 * * *"
+    - cron: "17 3 * * *"  # optional nightly sync
 
 permissions:
   contents: write
@@ -35,21 +34,12 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-
           git fetch --all --prune
 
-          # List branches (4 now; per_page=100 is fine)
-          BRANCHES=$(curl -sS -H "Authorization: Bearer $GITHUB_TOKEN" \
+          # List cases/users/* branches (no heredoc; YAML-safe)
+          BRANCHES="$(curl -sS -H "Authorization: Bearer $GITHUB_TOKEN" \
             "https://api.github.com/repos/$REPO/branches?per_page=100" \
-            | python3 - <<'PY'
-import json,sys,re
-data=json.load(sys.stdin)
-for b in data:
-  name=b.get("name","")
-  if re.match(r"^cases/users/.+", name):
-    print(name)
-PY
-          )
+            | python3 -c 'import json,sys,re; data=json.load(sys.stdin); print("\n".join([b.get("name","") for b in data if re.match(r"^cases/users/.+", b.get("name",""))]))')"
 
           if [ -z "${BRANCHES:-}" ]; then
             echo "No cases/users/* branches found."
@@ -58,71 +48,63 @@ PY
 
           open_pr_if_needed () {
             local BR="$1"
-            local REPO="$2"
 
             # If an open PR already exists with head=main into base=$BR, do nothing.
             local EXISTING
-            EXISTING=$(curl -sS -H "Authorization: Bearer $GITHUB_TOKEN" \
+            EXISTING="$(curl -sS -H "Authorization: Bearer $GITHUB_TOKEN" \
               "https://api.github.com/repos/$REPO/pulls?state=open&base=$BR&per_page=100" \
-              | python3 - <<'PY'
-import json,sys
-prs=json.load(sys.stdin)
+              | python3 -c 'import json,sys; prs=json.load(sys.stdin); 
 for pr in prs:
-  if (pr.get("head") or {}).get("ref") == "main":
+  if (pr.get("head") or {}).get("ref")=="main":
     print(pr.get("html_url",""))
-    break
-PY
-            )
+    break')"
 
             if [ -n "${EXISTING:-}" ]; then
               echo "Existing PR already open: $EXISTING"
               return 0
             fi
 
+            # Create PR: head=main, base=$BR
+            BODY="$(python3 -c "import json; print(json.dumps({
+              'title': 'Sync main into $BR',
+              'head': 'main',
+              'base': '$BR',
+              'body': 'Auto-generated: main has diverged from this user case branch. Resolve conflicts (if any), then merge to update the branch.'
+            }))")"
+
             curl -sS -X POST -H "Authorization: Bearer $GITHUB_TOKEN" \
               -H "Content-Type: application/json" \
               "https://api.github.com/repos/$REPO/pulls" \
-              -d "$(python3 - <<PY
-import json
-print(json.dumps({
-  "title": "Sync main into " + "$BR",
-  "head": "main",
-  "base": "$BR",
-  "body": "Auto-generated: main has diverged from this user case branch. Resolve conflicts (if any), then merge to update the branch."
-}))
-PY
-              )" >/dev/null
+              -d "$BODY" >/dev/null
 
             echo "Opened PR: main -> $BR"
           }
 
           echo "$BRANCHES" | while read -r BR; do
+            [ -z "$BR" ] && continue
             echo ""
             echo "=== Syncing main -> $BR ==="
 
             git checkout -B "$BR" "origin/$BR"
-            OLD_SHA=$(git rev-parse HEAD)
+            OLD_SHA="$(git rev-parse HEAD)"
 
-            # Try merge main into branch
             if git merge --no-edit "origin/main"; then
-              NEW_SHA=$(git rev-parse HEAD)
+              NEW_SHA="$(git rev-parse HEAD)"
               if [ "$NEW_SHA" = "$OLD_SHA" ]; then
                 echo "No changes needed for $BR"
                 continue
               fi
 
-              # Try push; if push fails (e.g., protection), open PR
               if git push origin "$BR"; then
                 echo "Pushed updated $BR"
               else
-                echo "Push failed for $BR (possible branch protection) — creating PR instead"
-                # Reset branch back to origin state locally (clean)
+                echo "Push failed (possible branch protection) — opening PR"
                 git reset --hard "origin/$BR" || true
-                open_pr_if_needed "$BR" "$REPO"
+                open_pr_if_needed "$BR"
               fi
             else
-              echo "Merge conflict for $BR — creating PR"
+              echo "Merge conflict — opening PR"
               git merge --abort || true
-              open_pr_if_needed "$BR" "$REPO"
+              open_pr_if_needed "$BR"
             fi
           done
