@@ -1226,6 +1226,68 @@ body::before {
   padding: 12px 0;
 }
 
+/* ── REPO BROWSER: FILTERS + v15.7 FACETS ── */
+.repo-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 8px 0 10px;
+  padding: 8px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  border-radius: var(--radius);
+}
+.repo-filter-row { display: flex; gap: 6px; align-items: center; }
+.repo-filter-input {
+  width: 100%;
+  padding: 5px 8px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text2);
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  outline: none;
+}
+.repo-filter-input:focus { border-color: var(--gold-dim); }
+.repo-filter-select {
+  flex: 1;
+  padding: 4px 6px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text2);
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  outline: none;
+  cursor: pointer;
+}
+.repo-filter-select:focus { border-color: var(--gold-dim); }
+.repo-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+.repo-chip {
+  font-family: var(--font-mono);
+  font-size: 7px;
+  letter-spacing: 0.06em;
+  padding: 1px 5px;
+  border-radius: 1px;
+  border: 1px solid var(--border2);
+  color: var(--text3);
+  background: var(--surface3);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.repo-chip.sigma-L   { background: var(--al-pale);  color: var(--al);  border-color: rgba(74,138,90,0.25); }
+.repo-chip.sigma-M   { background: var(--mis-pale); color: var(--mis); border-color: rgba(192,112,64,0.25); }
+.repo-chip.sigma-Dst { background: var(--dst-pale); color: var(--dst); border-color: rgba(160,48,48,0.25); }
+.repo-chip.flag { background: rgba(201,168,76,0.08); color: var(--gold-dim); border-color: rgba(201,168,76,0.22); }
+.repo-chip.axis { background: var(--surface3); color: var(--text3); }
+.repo-chip.mode { background: rgba(58,122,122,0.10); color: var(--teal); border-color: rgba(58,122,122,0.22); }  
+
 /* ── RESPONSIVE ── */
 @media (max-width: 800px) {
   .app { grid-template-columns: 1fr; grid-template-rows: 56px auto 1fr; }
@@ -1308,6 +1370,7 @@ body::before {
         <select class="branch-select" id="branch-select" onchange="switchBranch(this.value)"></select>
       </div>
       <div id="repo-status" class="repo-status" style="display:none;"></div>
+      <div id="repo-filters" class="repo-filters" style="display:none;"></div>
       <div id="repo-list" class="repo-case-list"></div>
     </div>
 
@@ -1598,6 +1661,11 @@ function normalizeSchema(data) {
         if (obj.alpha_from == null && aSrc != null) obj.alpha_from = aSrc;
         if (obj.alpha_to == null && aRcv != null) obj.alpha_to = aRcv;
         if (obj.medium == null && aMed != null) obj.medium = aMed;
+        // v15.7: payload_bearing alias + mode normalization
+        if (obj.bearing == null && obj.payload_bearing != null) obj.bearing = obj.payload_bearing;
+        if (obj.payload_bearing == null && obj.bearing != null) obj.payload_bearing = obj.bearing;
+        if (typeof obj.mode === 'string') obj.mode = obj.mode.replaceAll('_','-');
+        if (typeof obj.mu === 'string') obj.mu = obj.mu.replaceAll('_','-');
 
         return obj;
       };
@@ -1914,28 +1982,56 @@ function renderConstellation(s) {
 
   // Draw inter-participant payload event lines (v15.7: source→medium→receiving)
   const events = (s.payload_events||[]).filter(pe=>pe.timestep_idx===currentT);
-  events.forEach(pe => {
+
+  // Aggregate identical flows so payload_bundle flattening doesn't overdraw.
+  // Key: src|med|rcv|unfolding|mode
+  const agg = new Map();
+
+  for (const pe of events) {
     const srcId = (pe.alpha_source||pe.alpha_from||'').split('.')[0];
     const rcvId = (pe.alpha_receiving||pe.alpha_to||'').split('.')[0];
-    const medId = (pe.alpha_medium||'').split('.')[0];
-    if (!srcId || !rcvId || srcId === rcvId) return;
-    const from = cNodes.find(n=>n.p.id===srcId);
-    const to = cNodes.find(n=>n.p.id===rcvId);
-    const med = medId ? cNodes.find(n=>n.p.id===medId) : null;
-    if (!from||!to) return;
+    const medId = (pe.alpha_medium||'').split('.')[0] || '';
+    if (!srcId || !rcvId || srcId === rcvId) continue;
+
+    const unfolding = (pe.unfolding === 'accumulated') ? 'accumulated' : 'acute';
+    const mode = (pe.mode||pe.mu||'').toString().replaceAll('_','-');
+    const key = `${srcId}|${medId}|${rcvId}|${unfolding}|${mode}`;
+
+    const mag = Number(pe.magnitude || 3);
+    const prev = agg.get(key) || { srcId, rcvId, medId, unfolding, mode, count: 0, sumMag: 0, maxMag: 0 };
+    prev.count += 1;
+    prev.sumMag += mag;
+    prev.maxMag = Math.max(prev.maxMag, mag);
+    agg.set(key, prev);
+  }
+
+  for (const a of agg.values()) {
+    const from = cNodes.find(n=>n.p.id===a.srcId);
+    const to = cNodes.find(n=>n.p.id===a.rcvId);
+    const med = a.medId ? cNodes.find(n=>n.p.id===a.medId) : null;
+    if (!from||!to) continue;
+
+    const baseW = Math.max(1, a.maxMag * 0.35);
+    const bumpW = Math.min(2.0, Math.log2(a.count + 1) * 0.45);
+    const lineW = baseW + bumpW;
+
+    const baseA = 0.18;
+    const bumpA = Math.min(0.22, Math.log2(a.count + 1) * 0.06);
+    const alpha = baseA + bumpA;
+
     ctx.save();
-    ctx.globalAlpha = 0.25;
-    ctx.setLineDash(pe.unfolding==='accumulated'?[4,4]:[]);
-    ctx.strokeStyle = pe.unfolding==='acute'?'#c9a84c':'#3a7a7a';
-    ctx.lineWidth = Math.max(1,(pe.magnitude||3)*0.35);
+    ctx.globalAlpha = alpha;
+    ctx.setLineDash(a.unfolding==='accumulated' ? [4,4] : []);
+    ctx.strokeStyle = a.unfolding==='acute' ? '#c9a84c' : '#3a7a7a';
+    ctx.lineWidth = lineW;
+
     if (med && med !== from && med !== to) {
-      // Three-participant: draw source→medium→receiving
       ctx.beginPath(); ctx.moveTo(from.x,from.y); ctx.lineTo(med.x,med.y); ctx.lineTo(to.x,to.y); ctx.stroke();
     } else {
       ctx.beginPath(); ctx.moveTo(from.x,from.y); ctx.lineTo(to.x,to.y); ctx.stroke();
     }
     ctx.restore();
-  });
+  }
 
   cNodes.forEach(n => {
     const { x, y, totalA, prevFamily, thetaActive, env, p, orgA, comp } = n;
@@ -2292,6 +2388,152 @@ let repoBranches = [];
 let currentBranch = 'main';
 let repoCases = [];
 
+// v15.7: repo facet filters derived from cases/index.json
+let repoFilter = { q:'', sigma:'', axis:'', mode:'', bundle:'', epsilon:'' };
+
+function getBranchLabel() {
+  return currentBranch === 'main' ? 'published' : currentBranch === 'drafts' ? 'draft' : currentBranch;
+}
+
+function escAttr(s) {
+  if (s == null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function uniqFacet(key) {
+  const set = new Set();
+  (repoCases||[]).forEach(c => (c?.[key]||[]).forEach(v => v && set.add(String(v))));
+  return Array.from(set).sort();
+}
+
+function onRepoFilterChange(key, val) {
+  repoFilter[key] = val;
+  renderRepoFilters();
+  renderRepoCaseList();
+}
+
+function resetRepoFilters() {
+  repoFilter = { q:'', sigma:'', axis:'', mode:'', bundle:'', epsilon:'' };
+  renderRepoFilters();
+  renderRepoCaseList();
+}
+
+function caseMatchesRepoFilters(c) {
+  if (!c) return false;
+
+  const q = (repoFilter.q||'').trim().toLowerCase();
+  if (q) {
+    const hay = ((c.system_name||'')+' '+(c.filename||'')+' '+(c.description||'')).toLowerCase();
+    if (!hay.includes(q)) return false;
+  }
+
+  if (repoFilter.sigma && !(c.payload_sigmas||[]).includes(repoFilter.sigma)) return false;
+  if (repoFilter.axis  && !(c.payload_axes||[]).includes(repoFilter.axis)) return false;
+
+  if (repoFilter.mode) {
+    const modes = (c.payload_modes||[]).map(m => String(m).replaceAll('_','-'));
+    if (!modes.includes(repoFilter.mode)) return false;
+  }
+
+  if (repoFilter.bundle === 'yes' && !c.uses_payload_bundle) return false;
+  if (repoFilter.bundle === 'no'  &&  c.uses_payload_bundle) return false;
+
+  if (repoFilter.epsilon === 'yes' && !c.has_epsilon) return false;
+  if (repoFilter.epsilon === 'no'  &&  c.has_epsilon) return false;
+
+  return true;
+}
+
+function renderRepoFilters() {
+  const el = document.getElementById('repo-filters');
+  if (!el) return;
+
+  if (!repoCases || !repoCases.length) {
+    el.style.display = 'none';
+    return;
+  }
+
+  const sigmas = uniqFacet('payload_sigmas');
+  const axes   = uniqFacet('payload_axes');
+  const modes  = uniqFacet('payload_modes').map(m => String(m).replaceAll('_','-')).sort();
+
+  const opt = (val, label, cur) => `<option value="${escAttr(val)}" ${val===cur?'selected':''}>${esc(label)}</option>`;
+
+  el.style.display = '';
+  el.innerHTML = `
+    <input class="repo-filter-input" placeholder="search…" value="${escAttr(repoFilter.q)}"
+      oninput="onRepoFilterChange('q', this.value)">
+    <div class="repo-filter-row">
+      <select class="repo-filter-select" onchange="onRepoFilterChange('sigma', this.value)">
+        ${opt('', 'σ any', repoFilter.sigma)}
+        ${sigmas.map(s => opt(s, 'σ '+s, repoFilter.sigma)).join('')}
+      </select>
+      <select class="repo-filter-select" onchange="onRepoFilterChange('axis', this.value)">
+        ${opt('', 'axis any', repoFilter.axis)}
+        ${axes.map(a => opt(a, a, repoFilter.axis)).join('')}
+      </select>
+      <select class="repo-filter-select" onchange="onRepoFilterChange('mode', this.value)">
+        ${opt('', 'mode any', repoFilter.mode)}
+        ${modes.map(m => opt(m, m, repoFilter.mode)).join('')}
+      </select>
+    </div>
+    <div class="repo-filter-row">
+      <select class="repo-filter-select" onchange="onRepoFilterChange('bundle', this.value)">
+        ${opt('', 'bundle any', repoFilter.bundle)}
+        ${opt('yes','bundle only', repoFilter.bundle)}
+        ${opt('no','no bundle', repoFilter.bundle)}
+      </select>
+      <select class="repo-filter-select" onchange="onRepoFilterChange('epsilon', this.value)">
+        ${opt('', 'ε any', repoFilter.epsilon)}
+        ${opt('yes','ε present', repoFilter.epsilon)}
+        ${opt('no','ε absent', repoFilter.epsilon)}
+      </select>
+      <button class="btn btn-ghost" onclick="resetRepoFilters()" style="padding:4px 10px;font-size:9px;">Reset</button>
+    </div>
+  `;
+}
+
+function renderRepoChipRow(c) {
+  const chips = [];
+  (c.payload_sigmas || []).forEach(s => chips.push(`<span class="repo-chip sigma-${escAttr(s)}">σ ${esc(s)}</span>`));
+  (c.payload_axes || []).slice(0, 5).forEach(a => chips.push(`<span class="repo-chip axis">${esc(a)}</span>`));
+  (c.payload_modes || []).slice(0, 3).forEach(m => chips.push(`<span class="repo-chip mode">${esc(String(m).replaceAll('_','-'))}</span>`));
+  if (c.uses_payload_bundle) chips.push(`<span class="repo-chip flag">bundle</span>`);
+  if (c.has_epsilon)         chips.push(`<span class="repo-chip flag">ε</span>`);
+  if (typeof c.payload_primitives === 'number') chips.push(`<span class="repo-chip">prim ${c.payload_primitives}</span>`);
+  if (typeof c.payload_events === 'number')     chips.push(`<span class="repo-chip">ev ${c.payload_events}</span>`);
+  return chips.length ? `<div class="repo-chip-row">${chips.join('')}</div>` : '';
+}
+
+function renderRepoCaseList() {
+  const statusEl = document.getElementById('repo-status');
+  const listEl = document.getElementById('repo-list');
+  if (!listEl) return;
+
+  const filtered = (repoCases || []).map((c, i) => ({c, i})).filter(({c}) => caseMatchesRepoFilters(c));
+  if (statusEl) statusEl.textContent = `${getBranchLabel()} · ${filtered.length}/${(repoCases||[]).length} cases`;
+
+  if (!filtered.length) {
+    listEl.innerHTML = '<div class="repo-empty">No cases match filters.</div>';
+    return;
+  }
+
+  listEl.innerHTML = filtered.map(({c, i}) => `
+    <div class="repo-case" onclick="loadRepoCase(${i})">
+      <div class="repo-case-name">${esc(c.system_name || c.filename)}</div>
+      <div class="repo-case-meta">
+        ${esc(c.filename)}
+        ${c.participants ? ' · ' + c.participants + 'p' : ''}
+        ${c.timesteps ? ' · ' + c.timesteps + 't' : ''}
+        ${c.size ? ' · ' + Math.round(c.size/1024) + 'kb' : ''}
+        ${c.modified ? ' · ' + esc(String(c.modified).slice(0,10)) : ''}
+      </div>
+      ${c.description ? `<div class="repo-case-desc">${esc(c.description)}</div>` : ''}
+      ${renderRepoChipRow(c)}
+    </div>
+  `).join('');
+}  
+  
 function getRepoConfig() {
   repoOwner = document.getElementById('repo-owner').value.trim();
   repoName = document.getElementById('repo-name').value.trim();
@@ -2435,23 +2677,20 @@ async function loadBranchCases() {
     }
   }
 
-  if (!repoCases.length) {
-    statusEl.textContent = `${currentBranch} · 0 cases`;
-    listEl.innerHTML = '<div class="repo-empty">No case files on this branch.</div>';
-    return;
-  }
+if (!repoCases.length) {
+  statusEl.textContent = `${getBranchLabel()} · 0 cases`;
+  const fEl = document.getElementById('repo-filters');
+  if (fEl) fEl.style.display = 'none';
+  listEl.innerHTML = '<div class="repo-empty">No case files on this branch.</div>';
+  return;
+}
 
-  const branchLabel = currentBranch === 'main' ? 'published' : currentBranch === 'drafts' ? 'draft' : currentBranch;
-  statusEl.textContent = `${branchLabel} · ${repoCases.length} case${repoCases.length===1?'':'s'}`;
+// Reset filters on each branch load (keeps UX sane)
+repoFilter = { q:'', sigma:'', axis:'', mode:'', bundle:'', epsilon:'' };
 
-  listEl.innerHTML = repoCases.map((c, i) => `
-    <div class="repo-case" onclick="loadRepoCase(${i})">
-      <div class="repo-case-name">${esc(c.system_name || c.filename)}</div>
-      <div class="repo-case-meta">
-        ${esc(c.filename)}${c.participants ? ' · ' + c.participants + 'p' : ''}${c.timesteps ? ' · ' + c.timesteps + 't' : ''}${c.size ? ' · ' + Math.round(c.size/1024) + 'kb' : ''}
-      </div>
-      ${c.description ? `<div class="repo-case-desc">${esc(c.description)}</div>` : ''}
-    </div>`).join('');
+// v15.7: render filters + filtered list (these functions update status text too)
+renderRepoFilters();
+renderRepoCaseList();
 }
 
 async function loadRepoCase(idx) {
