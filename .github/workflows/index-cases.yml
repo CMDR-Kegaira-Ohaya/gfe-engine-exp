@@ -3,11 +3,17 @@ name: Index Cases
 on:
   push:
     paths:
-      - 'cases/**'
+      - 'cases/**/*.json'
+    paths-ignore:
+      - 'cases/index.json'
   workflow_dispatch:
 
 permissions:
   contents: write
+
+concurrency:
+  group: index-cases-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-index:
@@ -23,65 +29,171 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Build cases index
+      - name: Build cases index (with payload summaries)
         run: |
           BRANCH="${GITHUB_REF_NAME}"
           mkdir -p cases
-          
+
           cat > /tmp/build_index.py << 'PYEOF'
           import json, os, subprocess, sys
-          
+          from typing import Any, Dict, List, Set, Tuple
+
           cases_dir = "cases"
           index_path = os.path.join(cases_dir, "index.json")
           branch = sys.argv[1] if len(sys.argv) > 1 else "unknown"
-          
+
+          def git_last_modified_iso(path: str) -> str:
+            try:
+              return subprocess.check_output(
+                ["git", "log", "-1", "--format=%aI", "--", path],
+                text=True
+              ).strip()
+            except Exception:
+              return ""
+
+          def _as_str(x: Any) -> str:
+            if x is None:
+              return ""
+            if isinstance(x, (str, int, float, bool)):
+              return str(x)
+            return ""
+
+          def _norm_mode(m: Any) -> str:
+            s = _as_str(m).strip()
+            if not s:
+              return ""
+            return s.replace("_", "-")
+
+          def summarize_payloads(data: Dict[str, Any]) -> Dict[str, Any]:
+            payload_events = data.get("payload_events") or []
+            if not isinstance(payload_events, list):
+              payload_events = []
+
+            payload_events_count = len(payload_events)
+
+            primitives_count = 0
+            uses_bundle = False
+
+            sigmas: Set[str] = set()
+            axes: Set[str] = set()
+            modes: Set[str] = set()
+            registers: Set[str] = set()
+            unfoldings: Set[str] = set()
+
+            has_epsilon = False
+
+            for ev in payload_events:
+              if not isinstance(ev, dict):
+                continue
+
+              bundle = ev.get("payload_bundle", None)
+              if isinstance(bundle, list) and len(bundle) > 0:
+                uses_bundle = True
+                prim_list = [p for p in bundle if isinstance(p, dict)]
+              else:
+                prim_list = [ev]
+
+              for p in prim_list:
+                primitives_count += 1
+
+                sigma = _as_str(p.get("sigma")) or _as_str(ev.get("sigma"))
+                if sigma:
+                  sigmas.add(sigma)
+
+                axis = _as_str(p.get("axis")) or _as_str(p.get("d")) or _as_str(ev.get("axis")) or _as_str(ev.get("d"))
+                if axis:
+                  axes.add(axis)
+
+                mode = _norm_mode(p.get("mode")) or _norm_mode(p.get("mu")) or _norm_mode(ev.get("mode")) or _norm_mode(ev.get("mu"))
+                if mode:
+                  modes.add(mode)
+
+                reg = _as_str(p.get("register")) or _as_str(p.get("r")) or _as_str(ev.get("register")) or _as_str(ev.get("r"))
+                if reg:
+                  registers.add(reg)
+
+                unf = _as_str(p.get("unfolding")) or _as_str(p.get("u")) or _as_str(ev.get("unfolding")) or _as_str(ev.get("u"))
+                if unf:
+                  unfoldings.add(unf)
+
+                # epsilon detection (v15.7): either epsilon object or epsilon_* keys
+                eps = p.get("epsilon", None)
+                if isinstance(eps, dict) and len(eps) > 0:
+                  has_epsilon = True
+                else:
+                  for k in p.keys():
+                    kl = str(k).lower()
+                    if kl.startswith("epsilon") or kl.startswith("eps"):
+                      has_epsilon = True
+                      break
+
+            def sorted_list(s: Set[str]) -> List[str]:
+              return sorted([x for x in s if x])
+
+            return {
+              "payload_events": payload_events_count,
+              "payload_primitives": primitives_count,
+              "uses_payload_bundle": uses_bundle,
+              "payload_sigmas": sorted_list(sigmas),
+              "payload_axes": sorted_list(axes),
+              "payload_modes": sorted_list(modes),
+              "payload_registers": sorted_list(registers),
+              "payload_unfoldings": sorted_list(unfoldings),
+              "has_epsilon": has_epsilon,
+            }
+
           cases = []
           for fname in sorted(os.listdir(cases_dir)):
-              if not fname.endswith(".json") or fname == "index.json":
-                  continue
-              fpath = os.path.join(cases_dir, fname)
-              try:
-                  with open(fpath) as f:
-                      data = json.load(f)
-                  
-                  try:
-                      modified = subprocess.check_output(
-                          ["git", "log", "-1", "--format=%aI", "--", fpath],
-                          text=True
-                      ).strip()
-                  except:
-                      modified = ""
-                  
-                  cases.append({
-                      "filename": fname,
-                      "size": os.path.getsize(fpath),
-                      "system_name": data.get("system_name", ""),
-                      "case_id": data.get("case_id", ""),
-                      "description": data.get("description", "")[:120],
-                      "participants": len(data.get("participants", [])),
-                      "timesteps": len(data.get("timeline", [])),
-                      "modified": modified,
-                      "locus": data.get("locus_of_analysis", "")
-                  })
-              except Exception as e:
-                  print(f"Skipping {fname}: {e}", file=sys.stderr)
-          
+            if not fname.endswith(".json") or fname == "index.json":
+              continue
+
+            fpath = os.path.join(cases_dir, fname)
+
+            try:
+              with open(fpath, "r", encoding="utf-8") as f:
+                data = json.load(f)
+
+              cases.append({
+                "filename": fname,
+                "size": os.path.getsize(fpath),
+                "system_name": (data.get("system_name") or ""),
+                "case_id": (data.get("case_id") or ""),
+                "description": (data.get("description") or "")[:160],
+                "participants": len(data.get("participants", [])) if isinstance(data.get("participants", []), list) else 0,
+                "timesteps": len(data.get("timeline", [])) if isinstance(data.get("timeline", []), list) else 0,
+                "modified": git_last_modified_iso(fpath),
+                "locus": (data.get("locus_of_analysis") or ""),
+                **summarize_payloads(data)
+              })
+
+            except Exception as e:
+              print(f"Skipping {fname}: {e}", file=sys.stderr)
+
           index = {
-              "branch": branch,
-              "count": len(cases),
-              "cases": cases
+            "branch": branch,
+            "count": len(cases),
+            "cases": cases
           }
-          
-          with open(index_path, "w") as f:
-              json.dump(index, f, indent=2)
-          
-          print(f"Indexed {len(cases)} cases on branch '{branch}'")
+
+          with open(index_path, "w", encoding="utf-8") as f:
+            json.dump(index, f, indent=2, ensure_ascii=False)
+
+          msg = f"Auto-index: {len(cases)} cases on {branch}"
+          with open("/tmp/index_commit_msg.txt", "w", encoding="utf-8") as f:
+            f.write(msg)
+
+          print(msg)
           PYEOF
-          
+
           python3 /tmp/build_index.py "$BRANCH"
 
       - name: Commit index
         run: |
           git add cases/index.json
-          git diff --cached --quiet || git commit -m "Auto-index: $(cat cases/index.json | python3 -c 'import json,sys; d=json.load(sys.stdin); print(f"{d[\"count\"]} cases on {d[\"branch\"]}")')"
+          if git diff --cached --quiet; then
+            echo "No index changes to commit."
+            exit 0
+          fi
+          MSG="$(cat /tmp/index_commit_msg.txt)"
+          git commit -m "$MSG"
           git push
