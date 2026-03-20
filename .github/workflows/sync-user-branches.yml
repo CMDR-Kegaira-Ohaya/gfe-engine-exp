@@ -1,0 +1,116 @@
+name: Sync User Case Branches
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * *"  # optional: nightly
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Sync main into cases/users/*
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          # Fetch everything
+          git fetch --all --prune
+
+          # List branches via GitHub API (more reliable than parsing git output)
+          BRANCHES=$(curl -sS -H "Authorization: Bearer $GITHUB_TOKEN" \
+            "https://api.github.com/repos/$REPO/branches?per_page=100" \
+            | python3 - <<'PY'
+import json,sys,re
+data=json.load(sys.stdin)
+for b in data:
+  name=b.get("name","")
+  if re.match(r"^cases/users/.+", name):
+    print(name)
+PY
+          )
+
+          if [ -z "$BRANCHES" ]; then
+            echo "No cases/users/* branches found."
+            exit 0
+          fi
+
+          echo "$BRANCHES" | while read -r BR; do
+            echo ""
+            echo "=== Syncing main -> $BR ==="
+
+            # Ensure we have the branch locally
+            git checkout -B "$BR" "origin/$BR"
+
+            # Try merge
+            if git merge --no-edit "origin/main"; then
+              # Only push if there is something to push
+              if git status --porcelain | grep -q .; then
+                echo "Working tree dirty (unexpected); aborting."
+                exit 1
+              fi
+
+              # If merge created a commit or fast-forward happened, push
+              # Detect divergence from origin/$BR
+              if ! git rev-parse HEAD | grep -q "$(git rev-parse origin/$BR)"; then
+                git push origin "$BR"
+                echo "Pushed updated $BR"
+              else
+                echo "No changes needed for $BR"
+              fi
+            else
+              echo "Merge conflict for $BR — creating/updating PR"
+              git merge --abort || true
+
+              # Create PR from main into the branch (base = user branch, head = main)
+              # Avoid duplicates: if an open PR already exists with head=main base=$BR, do nothing.
+              EXISTING=$(curl -sS -H "Authorization: Bearer $GITHUB_TOKEN" \
+                "https://api.github.com/repos/$REPO/pulls?state=open&base=$BR&per_page=100" \
+                | python3 - <<'PY'
+import json,sys
+prs=json.load(sys.stdin)
+for pr in prs:
+  if (pr.get("head") or {}).get("ref") == "main":
+    print(pr.get("html_url",""))
+    break
+PY
+              )
+
+              if [ -n "$EXISTING" ]; then
+                echo "Existing PR already open: $EXISTING"
+              else
+                curl -sS -X POST -H "Authorization: Bearer $GITHUB_TOKEN" \
+                  -H "Content-Type: application/json" \
+                  "https://api.github.com/repos/$REPO/pulls" \
+                  -d "$(python3 - <<PY
+import json
+print(json.dumps({
+  "title": "Sync main into " + "$BR",
+  "head": "main",
+  "base": "$BR",
+  "body": "Auto-generated: main has diverged from this user case branch. Resolve conflicts, then merge to update the branch."
+}))
+PY
+                  )" >/dev/null
+                echo "Opened PR: main -> $BR"
+              fi
+            fi
+          done
