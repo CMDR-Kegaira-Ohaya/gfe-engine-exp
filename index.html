@@ -1570,7 +1570,66 @@ function normalizeSchema(data) {
     };
     return out;
   }
+  // ── v15.7+ PAYLOAD EVENT COMPAT ──
+  // If payload_events uses payload_bundle, flatten it so the existing UI renderer
+  // (which expects 1 payload per event) still works.
+  if (Array.isArray(data.payload_events) && data.payload_events.length) {
+    const flattened = [];
 
+    for (const ev of data.payload_events) {
+      if (!ev || typeof ev !== 'object') continue;
+
+      const bundle = Array.isArray(ev.payload_bundle) ? ev.payload_bundle : null;
+
+      // Helper: map newer alpha_* names into any legacy fields the UI might be using.
+      const normalizeAlphaFields = (obj) => {
+        if (!obj || typeof obj !== 'object') return obj;
+
+        // Newer canonical names
+        const aSrc = obj.alpha_source ?? obj.alpha_from;
+        const aMed = obj.alpha_medium ?? obj.medium;
+        const aRcv = obj.alpha_receiving ?? obj.alpha_to;
+
+        // Preserve both naming styles (harmless if UI ignores some)
+        if (obj.alpha_source == null && aSrc != null) obj.alpha_source = aSrc;
+        if (obj.alpha_medium == null && aMed != null) obj.alpha_medium = aMed;
+        if (obj.alpha_receiving == null && aRcv != null) obj.alpha_receiving = aRcv;
+
+        if (obj.alpha_from == null && aSrc != null) obj.alpha_from = aSrc;
+        if (obj.alpha_to == null && aRcv != null) obj.alpha_to = aRcv;
+        if (obj.medium == null && aMed != null) obj.medium = aMed;
+
+        return obj;
+      };
+
+      if (bundle && bundle.length) {
+        for (const atom of bundle) {
+          // event-level fields + atom fields (atom may override specifics like d/mode/magnitude)
+          const merged = normalizeAlphaFields({
+            ...ev,
+            ...atom,
+            // keep these explicitly from the parent event unless atom overrides them
+            unfolding: atom?.unfolding ?? ev.unfolding,
+            register: atom?.register ?? ev.register,
+            sigma: atom?.sigma ?? ev.sigma,
+
+            // ensure axis key exists under common names (different schemas)
+            d: atom?.d ?? atom?.axis ?? ev.d ?? ev.axis,
+            axis: atom?.axis ?? atom?.d ?? ev.axis ?? ev.d,
+          });
+
+          // prevent recursion / double-processing
+          delete merged.payload_bundle;
+
+          flattened.push(merged);
+        }
+      } else {
+        flattened.push(normalizeAlphaFields(ev));
+      }
+    }
+
+    data.payload_events = flattened;
+  }
   return data;
 }
 
