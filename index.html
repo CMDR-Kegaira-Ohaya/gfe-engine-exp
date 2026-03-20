@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AENAON · G.F.E. Workbench v15.7</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Cinzel:wght@400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="ui/styles.css">
+</head>
+<body>
+
+<div class="aenaon-mark">
+  <svg width="120" height="60" viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="gold-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style="stop-color:#e8c870"/>
+        <stop offset="50%" style="stop-color:#c9a84c"/>
+        <stop offset="100%" style="stop-color:#7a6228"/>
+      </linearGradient>
+    </defs>
+    <g fill="url(#gold-grad)">
+      <polygon points="8,48 18,8 22,8 14,48" />
+      <polygon points="28,48 18,8 22,8 32,48" />
+      <rect x="12" y="30" width="16" height="2.5" rx="1"/>
+      <polygon points="20,2 21.5,9 18.5,9" />
+      <rect x="6" y="46" width="8" height="2" rx="1"/>
+      <rect x="26" y="46" width="8" height="2" rx="1"/>
+    </g>
+    <text x="38" y="32" font-family="Cinzel, serif" font-size="13" font-weight="400" fill="url(#gold-grad)" letter-spacing="3">AENAON</text>
+    <text x="42" y="46" font-family="Cinzel, serif" font-size="7" font-weight="400" fill="url(#gold-grad)" letter-spacing="4" opacity="0.7">UNIVERSE</text>
+    <line x1="38" y1="35" x2="112" y2="35" stroke="url(#gold-grad)" stroke-width="0.5" opacity="0.5"/>
+  </svg>
+</div>
+
+<div class="app">
+  <header class="header">
+    <span class="header-title">GFE Workbench</span>
+    <span class="header-subtitle">v15.7 · A/R/I · Θ</span>
+    <div class="header-status">
+      <div class="status-dot" id="status-dot"></div>
+      <span class="status-label" id="status-label">No case loaded</span>
+    </div>
+  </header>
+
+  <aside class="panel-left">
+    <div>
+      <div class="sec-label">Load Case</div>
+      <div class="upload-zone" id="drop-zone">
+        <input type="file" id="file-input" accept=".json,application/json" multiple>
+        <span class="upload-icon">⊕</span>
+        <p><strong>Drop JSON files</strong><br>or click to browse · multiple supported</p>
+      </div>
+      <textarea class="paste-input" id="paste-area" placeholder="or paste JSON / base64 link here…" rows="2"></textarea>
+      <div class="btn-row">
+        <button class="btn" onclick="loadFromPaste()">Load</button>
+        <button class="btn btn-ghost" onclick="clearAll()">Clear All</button>
+      </div>
+      <div id="msg-bar" style="display:none;margin-top:8px;"></div>
+    </div>
+
+    <div id="sessions-section" style="display:none;">
+      <div class="sec-label">Sessions</div>
+      <div class="session-list" id="session-list"></div>
+    </div>
+
+    <div>
+      <div class="sec-label">Case Repository</div>
+      <div class="repo-config">
+        <input class="repo-input" id="repo-owner" placeholder="owner" value="">
+        <input class="repo-input" id="repo-name" placeholder="repo" value="">
+        <button class="btn" onclick="connectRepo()" style="padding:4px 10px;font-size:9px;">Connect</button>
+      </div>
+      <div class="repo-config" style="margin-top:8px;">
+        <input class="repo-input" id="repo-token" type="password" placeholder="GitHub token">
+        <button class="btn" onclick="saveCurrentCaseJson()" style="padding:4px 10px;font-size:9px;">Save JSON</button>
+        <button class="btn" onclick="saveCurrentAnalysisMd()" style="padding:4px 10px;font-size:9px;">Save MD</button>
+        <button class="btn" onclick="saveBothToRepo()" style="padding:4px 10px;font-size:9px;">Save Both</button>
+      </div>
+      <div id="branch-bar" class="branch-bar" style="display:none;"></div>
+      <div id="branch-custom" class="branch-custom-row" style="display:none;">
+        <select class="branch-select" id="branch-select" onchange="switchBranch(this.value)"></select>
+      </div>
+      <div id="repo-status" class="repo-status" style="display:none;"></div>
+      <div id="repo-filters" class="repo-filters" style="display:none;"></div>
+      <div id="repo-list" class="repo-case-list"></div>
+    </div>
+
+    <div id="envelope-section" style="display:none;">
+      <div class="sec-label">Operating Envelope 𝒜_env</div>
+      <div class="envelope-card">
+        <div>
+          <div class="env-score" id="env-score">—</div>
+        </div>
+        <div>
+          <div class="env-status" id="env-status"></div>
+          <div class="env-components" id="env-components"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="constellation-section" style="display:none;">
+      <div class="sec-label">Constellation</div>
+      <div class="breadcrumb" id="breadcrumb"></div>
+      <div class="constellation-wrap">
+        <canvas id="constellation-canvas"></canvas>
+      </div>
+      <div class="const-legend">
+        <div class="legend-item" style="color:var(--al)"><div class="legend-pip" style="color:var(--al)"></div>L · aligned</div>
+        <div class="legend-item" style="color:var(--mis)"><div class="legend-pip" style="color:var(--mis)"></div>M · misaligned</div>
+        <div class="legend-item" style="color:var(--dst)"><div class="legend-pip" style="color:var(--dst)"></div>Dst · ruin</div>
+        <div class="legend-item" style="color:var(--teal)"><div class="legend-pip" style="color:var(--teal)"></div>Org relay</div>
+        <div class="legend-item" style="color:var(--dst)"><div class="legend-pip" style="color:var(--dst);border-style:dashed"></div>Θ active</div>
+      </div>
+    </div>
+
+    <div id="timeline-section" style="display:none;">
+      <div class="sec-label">Timeline</div>
+      <div class="timeline-wrap">
+        <div class="timeline-track">
+          <div class="timeline-line"></div>
+          <div class="timeline-stops" id="tl-stops"></div>
+        </div>
+        <input type="range" class="timeline-slider" id="tl-slider" min="0" value="0" step="1">
+      </div>
+    </div>
+
+    <div id="strips-section" style="display:none;">
+      <div class="sec-label">Participants</div>
+      <div id="strips"></div>
+    </div>
+  </aside>
+
+  <main class="panel-right" id="panel-right">
+    <div class="right-empty" id="right-empty">
+      <div class="right-empty-glyph">⊛</div>
+      <p>Load a case to begin.<br>Drop a JSON file or paste from your GPT.</p>
+    </div>
+    <div id="right-content" style="display:none;"></div>
+  </main>
+</div>
+
+<script type="module" src="ui/app.js"></script>
+</body>
+</html>
