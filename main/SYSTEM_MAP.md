@@ -1,0 +1,52 @@
+# System Map
+
+## Top-level role split
+
+### `/engine/`
+Canonical GFE source stack copied into the repository so sessions can bootstrap from repo state rather than hidden GPT memory.
+
+### `/main/`
+Operational control layer for GPT re-entry:
+- `TOC.md` = bootstrap entrypoint
+- `GPT_OPERATOR_MANUAL.md` = session operating logic
+- `SYSTEM_MAP.md` = structural map
+- `EDIT_RULES.md` = edit boundaries and workflow constraints
+- `REPO_SCHEMA.json` = machine-readable directory and file-role map
+
+### Root HTML
+- `index.html` = main Pages workbench entrypoint
+- `privacy.html` = public privacy page
+
+### `/ui/`
+Frontend modules for rendering, repo connection, timeline behavior, right-panel behavior, and state handling.
+
+### `/cases/`
+Repository-level case storage for public/shared/demo/smoke-test data.
+
+### `/.github/`
+Workflow and automation files for repository maintenance and Pages behavior.
+
+## Conceptual flow
+1. Operator or GPT enters through `/main/TOC.md`
+2. Canonical meaning comes from `/engine/*`
+3. Repo operating behavior comes from `/main/*`
+4. UI renders and manipulates case data through root HTML and `/ui/*5. Cases live under `/cases/*
+## Current intended usage
+- `main` branch = public workbench and canonical implementation
+- `cases/users/shared` = shared branch
+- `cases/users/various` = miscellaneous communal/testing branch
+
+## What should not be collapsed
+- engine doctrine vs UI code
+- repo operating map vs saved case data
+- bootstrap manuals vs canonical model files
+- public workbench repo vs later personal forks/copies
+
+## Session rebuild path
+If context is lost, the minimum recovery path is:
+`/main/TOC.md` → `/main/GPT_OPERATOR_MANUAL.md` → `/main/SYSTEM_MAP.md`
+
+## Editing hotspots
+- UI bugs: `/ui/*`, `index.html`
+- save/load behavior: `/ui/repo.js`, `/cases/*`, relevant workflow files
+- engine doctrine: `/engine/*` only when explicitly revising canonical content
