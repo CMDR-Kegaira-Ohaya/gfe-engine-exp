@@ -7,15 +7,26 @@
   <link rel="stylesheet" href="./ui-v2/styles.css" />
 </head>
 <body>
-  <div class="shell">
-    <aside class="sidebar">
-      <div class="brand">
+  <div class="app-shell">
+    <header class="masthead">
+      <div class="masthead-brand">
         <div class="eyebrow">GFE Experimental</div>
         <h1>Workbench v2</h1>
         <p>Workspace-first assembly, re-solve, and raw/derived separation.</p>
       </div>
+      <div class="masthead-workspace">
+        <div class="workspace-title" id="workspace-title">No workspace loaded</div>
+        <div class="workspace-subtitle" id="workspace-subtitle">Add one or more case sources to begin.</div>
+      </div>
+      <div class="masthead-actions">
+        <button id="resolve-btn">Re-solve</button>
+        <button id="export-assembled" class="ghost-btn">Copy assembled JSON</button>
+        <button id="export-dashboard" class="ghost-btn">Copy dashboard JSON</button>
+      </div>
+    </header>
 
-      <section class="card">
+    <section class="control-deck">
+      <section class="card deck-card mode-card">
         <div class="section-head">
           <h2>Workspace mode</h2>
         </div>
@@ -31,57 +42,47 @@
         </label>
       </section>
 
-      <section class="card">
+      <section class="card deck-card load-card">
         <div class="section-head">
           <h2>Load sources</h2>
           <button id="clear-workspace" class="ghost-btn">Clear</button>
         </div>
-        <label class="field">
-          <span>Paste case JSON</span>
-          <textarea id="paste-area" rows="6" placeholder="Paste one case JSON here"></textarea>
-        </label>
-        <div class="row">
-          <button id="load-paste">Add pasted case</button>
-          <label class="file-btn">
-            <input id="file-input" type="file" accept=".json,application/json" multiple />
-            <span>Add file(s)</span>
+        <div class="load-group">
+          <label class="field">
+            <span>Paste case JSON</span>
+            <textarea id="paste-area" rows="6" placeholder="Paste one case JSON here"></textarea>
           </label>
+          <div class="row">
+            <button id="load-paste">Add pasted case</button>
+            <label class="file-btn">
+              <input id="file-input" type="file" accept=".json,application/json" multiple />
+              <span>Add file(s)</span>
+            </label>
+          </div>
         </div>
       </section>
 
-      <section class="card">
+      <section class="card deck-card repo-card">
         <div class="section-head">
           <h2>Repo cases</h2>
           <button id="reload-index" class="ghost-btn">Reload</button>
         </div>
-        <div id="repo-cases" class="repo-list empty">Loading cases index…</div>
+        <div id="repo-cases" class="repo-list empty">Loading cases index… </div>
       </section>
-    </aside>
+    </section>
 
-    <main class="main">
-      <header class="topbar">
-        <div class="topbar-left">
-          <div class="workspace-title" id="workspace-title">No workspace loaded</div>
-          <div class="workspace-subtitle" id="workspace-subtitle">Add one or more case sources to begin.</div>
+    <section class="summary-grid" id="summary-grid"></section>
+
+    <section class="workstage">
+      <aside class="panel panel-sources">
+        <div class="panel-head">
+          <h2>Workspace sources</h2>
+          <span class="badge" id="source-count">0</span>
         </div>
-        <div class="topbar-actions">
-          <button id="resolve-btn">Re-solve</button>
-          <button id="export-assembled" class="ghost-btn">Copy assembled JSON</button>
-          <button id="export-dashboard" class="ghost-btn">Copy dashboard JSON</button>
-        </div>
-      </header>
+        <div id="workspace-sources" class="source-list empty">No sources loaded.</div>
+      </aside>
 
-      <section class="summary-grid" id="summary-grid"></section>
-
-      <section class="workspace-grid">
-        <div class="panel panel-sources">
-          <div class="panel-head">
-            <h2>Workspace sources</h2>
-            <span class="badge" id="source-count">0</span>
-          </div>
-          <div id="workspace-sources" class="source-list empty">No sources loaded.</div>
-        </div>
-
+      <section class="center-stage">
         <div class="panel panel-timeline">
           <div class="panel-head">
             <h2>Timeline</h2>
@@ -90,26 +91,26 @@
           <div id="timeline-list" class="timeline-list empty">No solved timeline yet.</div>
         </div>
 
-        <div class="panel panel-participants">
-          <div class="panel-head">
-            <h2>Participants</h2>
-            <span class="badge" id="participant-count">0</span>
-          </div>
-          <div id="participant-list" class="participant-list empty">No participants yet.</div>
+        <section class="tabs">
+          <button class="tab-btn active" data-tab="overview">Overview</button>
+          <button class="tab-btn" data-tab="payload">Payload</button>
+          <button class="tab-btn" data-tab="derived">Derived</button>
+          <button class="tab-btn" data-tab="dashboard">Dashboard</button>
+          <button class="tab-btn" data-tab="validation">Validation</button>
+          <button class="tab-btn" data-tab="raw">Raw</button>
+        </section>
+
+        <section id="tab-content" class="tab-content"></section>
+      </section>
+
+      <aside class="panel panel-participants">
+        <div class="panel-head">
+          <h2>Participants</h2>
+          <span class="badge" id="participant-count">0</span>
         </div>
-      </section>
-
-      <section class="tabs">
-        <button class="tab-btn active" data-tab="overview">Overview</button>
-        <button class="tab-btn" data-tab="payload">Payload</button>
-        <button class="tab-btn" data-tab="derived">Derived</button>
-        <button class="tab-btn" data-tab="dashboard">Dashboard</button>
-        <button class="tab-btn" data-tab="validation">Validation</button>
-        <button class="tab-btn" data-tab="raw">Raw</button>
-      </section>
-
-      <section id="tab-content" class="tab-content"></section>
-    </main>
+        <div id="participant-list" class="participant-list empty">No participants yet.</div>
+      </aside>
+    </section>
   </div>
 
   <template id="empty-state-template">
