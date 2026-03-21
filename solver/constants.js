@@ -16,7 +16,7 @@ export const MODES = Object.freeze([
   'threshold-transfer'
 ]);
 
-xport const COMPENSATION_MODES = Object.freeze([
+export const COMPENSATION_MODES = Object.freeze([
   'overflow',
   'substitute',
   'suppress',
