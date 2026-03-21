@@ -19,6 +19,9 @@ const smokeCase = {
             Org: { A: 79, R: 79, I: 79, sigma: 'L' },
             Dir: { A: 76, R: 76, I: 76, sigma: 'L' },
             Leg: { A: 77, R: 77, I: 77, sigma: 'L' }
+          },
+          cascade: {
+            attempts: [{ axis: 'Leg', completed: true }]
           }
         },
         p2: {
@@ -58,6 +61,9 @@ console.log(JSON.stringify({
   ok: validation.ok,
   issues: validation.issues.length,
   envelopeRows: solved.envelope_summary.length,
+  cascadeRows: (solved.cascade_summary || []).length,
   chunkCount: chunks.length,
+  p2ThetaActive: !!solved.timeline[0].participants.p2.theta?.active,
+  p2Compensation: solved.timeline[0].participants.p2.compensation?.type || null,
   p2Leg: solved.timeline[0].participants.p2.axes.Leg
 }, null, 2));
