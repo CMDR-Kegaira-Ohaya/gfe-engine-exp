@@ -79,7 +79,7 @@ export function validateCase(caseData) {
     if (event?.timestep_idx !== undefined && !Number.isInteger(event.timestep_idx)) {
       pushIssue(issues, 'warning', `${eventPath}.timestep_idx`, 'timestep_idx should be an integer.');
     }
-    if (!arrayIs=Array.isArray(event?.payload_bundle)) {
+    if (!Array.isArray(event?.payload_bundle)) {
       validatePayloadPrimitive(issues, event, eventPath);
     } else {
       event.payload_bundle.forEach((primitive, primitiveIdx) => {
