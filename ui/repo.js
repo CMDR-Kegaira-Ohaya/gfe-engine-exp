@@ -2,12 +2,20 @@ import { state, esc, escAttr, showMsg, getCurrentSession, setCurrentReport } fro
 import { renderAll } from './render.js';
 
 export function getBranchLabel() {
-  return state.currentBranch === 'main' ? 'published' : state.currentBranch === 'drafts' ? 'draft' : state.currentBranch;
+  return state.currentBranch === 'main'
+    ? 'published'
+    : state.currentBranch === 'drafts'
+      ? 'draft'
+      : state.currentBranch;
 }
 
 function uniqFacet(key) {
   const set = new Set();
-  (state.repoCases || []).forEach(c => (c?.[key] || []).forEach(v => v && set.add(String(v))));
+  (state.repoCases || []).forEach((c) => {
+    (c?.[key] || []).forEach((v) => {
+      if (v) set.add(String(v));
+    });
+  });
   return Array.from(set).sort();
 }
 
@@ -28,7 +36,7 @@ function caseMatchesRepoFilters(c) {
 
   const q = (state.repoFilter.q || '').trim().toLowerCase();
   if (q) {
-    const hay = ((c.system_name || '') + ' ' + (c.filename || '') + ' ' + (c.description || '')).toLowerCase();
+    const hay = `${c.system_name || ''} ${c.filename || ''} ${c.description || ''}`.toLowerCase();
     if (!hay.includes(q)) return false;
   }
 
@@ -36,7 +44,7 @@ function caseMatchesRepoFilters(c) {
   if (state.repoFilter.axis && !(c.payload_axes || []).includes(state.repoFilter.axis)) return false;
 
   if (state.repoFilter.mode) {
-    const modes = (c.payload_modes || []).map(m => String(m).replaceAll('_', '-'));
+    const modes = (c.payload_modes || []).map((m) => String(m).replaceAll('_', '-'));
     if (!modes.includes(state.repoFilter.mode)) return false;
   }
 
@@ -59,7 +67,7 @@ export function renderRepoFilters() {
 
   const sigmas = uniqFacet('payload_sigmas');
   const axes = uniqFacet('payload_axes');
-  const modes = uniqFacet('payload_modes').map(m => String(m).replaceAll('_', '-')).sort();
+  const modes = uniqFacet('payload_modes').map((m) => String(m).replaceAll('_', '-')).sort();
   const opt = (val, label, cur) => `<option value="${escAttr(val)}" ${val === cur ? 'selected' : ''}>${esc(label)}</option>`;
 
   el.style.display = '';
@@ -68,16 +76,16 @@ export function renderRepoFilters() {
       oninput="onRepoFilterChange('q', this.value)">
     <div class="repo-filter-row">
       <select class="repo-filter-select" onchange="onRepoFilterChange('sigma', this.value)">
-        ${opt('', 'σ any', state.repoFilter.sigma)}
-        ${sigmas.map(s => opt(s, 'σ ' + s, state.repoFilter.sigma)).join('')}
+        ${opt('', π any', state.repoFilter.sigma)}
+        ${sigmas.map((s) => opt(s, π ' + s, state.repoFilter.sigma)).join('')}
       </select>
       <select class="repo-filter-select" onchange="onRepoFilterChange('axis', this.value)">
         ${opt('', 'axis any', state.repoFilter.axis)}
-        ${axes.map(a => opt(a, a, state.repoFilter.axis)).join('')}
+        ${axes.map((a) => opt(a, a, state.repoFilter.axis)).join('')}
       </select>
       <select class="repo-filter-select" onchange="onRepoFilterChange('mode', this.value)">
         ${opt('', 'mode any', state.repoFilter.mode)}
-        ${modes.map(m => opt(m, m, state.repoFilter.mode)).join('')}
+        ${modes.map((m) => opt(m, m, state.repoFilter.mode)).join('')}
       </select>
     </div>
     <div class="repo-filter-row">
@@ -98,11 +106,11 @@ export function renderRepoFilters() {
 
 function renderRepoChipRow(c) {
   const chips = [];
-  (c.payload_sigmas || []).forEach(s => chips.push(`<span class="repo-chip sigma-${escAttr(s)}">σ ${esc(s)}</span>`));
-  (c.payload_axes || []).slice(0, 5).forEach(a => chips.push(`<span class="repo-chip axis">${esc(a)}</span>`));
-  (c.payload_modes || []).slice(0, 3).forEach(m => chips.push(`<span class="repo-chip mode">${esc(String(m).replaceAll('_', '-'))}</span>`));
-  if (c.uses_payload_bundle) chips.push(`<span class="repo-chip flag">bundle</span>`);
-  if (c.has_epsilon) chips.push(`<span class="repo-chip flag">ε</span>`);
+  (c.payload_sigmas || []).forEach((s) => chips.push(`<span class="repo-chip sigma-${escAttr(s)}">π ${esc(s)}</span>`));
+  (c.payload_axes || []).slice(0, 5).forEach((a) => chips.push(`<span class="repo-chip axis">${esc(a)}</span>`));
+  (c.payload_modes || []).slice(0, 3).forEach((m) => chips.push(`<span class="repo-chip mode">${esc(String(m).replaceAll('_', '-'))}</span>`));
+  if (c.uses_payload_bundle) chips.push('<span class="repo-chip flag">bundle</span>');
+  if (c.has_epsilon) chips.push('<span class="repo-chip flag">ε</span>');
   if (typeof c.payload_primitives === 'number') chips.push(`<span class="repo-chip">prim ${c.payload_primitives}</span>`);
   if (typeof c.payload_events === 'number') chips.push(`<span class="repo-chip">ev ${c.payload_events}</span>`);
   return chips.length ? `<div class="repo-chip-row">${chips.join('')}</div>` : '';
@@ -114,7 +122,7 @@ export function renderRepoCaseList() {
   if (!listEl) return;
 
   const filtered = (state.repoCases || []).map((c, i) => ({ c, i })).filter(({ c }) => caseMatchesRepoFilters(c));
-  if (statusEl) statusEl.textContent = `${getBranchLabel()} · ${filtered.length}/$(state.repoCases || []).length} cases`;
+  if (statusEl) statusEl.textContent = `${getBranchLabel()} · ${filtered.length}/${(state.repoCases || []).length} cases`;
 
   if (!filtered.length) {
     listEl.innerHTML = '<div class="repo-empty">No cases match filters.</div>';
@@ -133,7 +141,8 @@ export function renderRepoCaseList() {
       </div>
       ${c.description ? `<div class="repo-case-desc">${esc(c.description)}</div>` : ''}
       ${renderRepoChipRow(c)}
-    </div>`).join('');
+    </div>
+  `).join('');
 }
 
 export function getRepoConfig() {
@@ -189,23 +198,23 @@ export async function connectRepo() {
       headers: branchHeaders()
     });
     if (!res.ok) throw new Error(res.status === 404 ? 'Repository not found' : 'API error ' + res.status);
-    state.repoBranches = (await res.json()).map(b => b.name);
+    state.repoBranches = (await res.json()).map((b) => b.name);
   } catch (e) {
     if (statusEl) statusEl.textContent = e.message;
     return;
   }
 
-  const mainBranches = state.repoBranches.filter(b => b === 'main');
-  const draftBranches = state.repoBranches.filter(b => b === 'drafts');
-  const projectBranches = state.repoBranches.filter(b => b.startsWith('cases/'));
-  const otherBranches = state.repoBranches.filter(b => b !== 'main' && b !== 'drafts' && !b.startsWith('cases/'));
+  const mainBranches = state.repoBranches.filter((b) => b === 'main');
+  const draftBranches = state.repoBranches.filter((b) => b === 'drafts');
+  const projectBranches = state.repoBranches.filter((b) => b.startsWith('cases/'));
+  const otherBranches = state.repoBranches.filter((b) => b !== 'main' && b !== 'drafts' && !b.startsWith('cases/'));
 
   const barEl = document.getElementById('branch-bar');
   const quickBranches = [...mainBranches, ...draftBranches, ...projectBranches.slice(0, 3)];
   if (barEl) {
     if (quickBranches.length > 1 || projectBranches.length > 0) {
       barEl.style.display = 'flex';
-      barEl.innerHTML = quickBranches.map(b => {
+      barEl.innerHTML = quickBranches.map((b) => {
         const cls = b === 'drafts' ? 'draft' : b.startsWith('cases/') ? 'project' : '';
         const label = b.startsWith('cases/') ? b.replace('cases/', '') : b;
         return `<div class="branch-tab ${cls} ${b === state.currentBranch ? 'active' : ''}" onclick="switchBranch('${bw}')" title="${b}">${esc(label)}</div>`;
@@ -223,7 +232,7 @@ export async function connectRepo() {
       const sel = document.getElementById('branch-select');
       if (sel) {
         sel.innerHTML = '<option value="" disabled>More branches...</option>' +
-          allNonQuick.map(b => `<option value="${b}" ${b === state.currentBranch ? 'selected' : ''}>${bw}</option>`).join('');
+          allNonQuick.map((b) => `<option value="${bw}" ${b === state.currentBranch ? 'selected' : ''}>${bw}</option>`).join('');
       }
     } else {
       customEl.style.display = 'none';
@@ -238,7 +247,7 @@ export function switchBranch(branch) {
   state.currentBranch = branch;
   try { localStorage.setItem('gfe_repo_branch', branch); } catch (e) {}
 
-  document.querySelectorAll('.branch-tab').forEach(el => {
+  document.querySelectorAll('.branch-tab').forEach((el) => {
     el.classList.toggle('active', el.getAttribute('onclick')?.includes(`'${branch}'`));
   });
   const sel = document.getElementById('branch-select');
@@ -290,8 +299,8 @@ export async function loadBranchCases() {
 
       const files = await res.json();
       state.repoCases = files
-        .filter(f => f.name.endsWith('.json') && f.name !== 'index.json')
-        .map(f => ({
+        .filter((f) => f.name.endsWith('.json') && f.name !== 'index.json')
+        .map((f) => ({
           filename: f.name,
           size: f.size,
           system_name: f.name.replace('.json', ''),
