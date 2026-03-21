@@ -23,7 +23,9 @@ Read these next when the task concerns how this repository is organized or how t
 1. `/main/GPT_OPERATOR_MANUAL.md`
 2. `/main/SYSTEM_MAP.md`
 3. `/main/EDIT_RULES.md`
-4. `/main/REPO_SCHEMA.json`
+4. `/main/INSTRUCTIONS_INDEX.md`
+5. `/main/REPO_SCHEMA.json`
+6. `/PROCEDURE_INDEX.md`
 
 ### Layer 3 — Solver implementation
 Read these when the task concerns executable math, validation, normalization, dashboard shaping, or future runtime implementation.
@@ -55,8 +57,9 @@ Read these when the task concerns saved cases, case indexes, smoke tests, or mar
 - Then `/main/EDIT_RULES.md`
 - Then `/solver/`
 
-### Workflows / automation - start with `/.github/workflows/`
-- Check `csolver-selftest.yml`
+### Workflows / automation
+- Start with `/.github/workflows/`
+- Check `solver-selftest.yml`
 - Check `validate-cases.yml`
 - Then relevant `/solver/` scripts
 
@@ -70,11 +73,21 @@ Read these when the task concerns saved cases, case indexes, smoke tests, or mar
 - Then `/main/EDIT_RULES.md`
 - Then relevant implementation files
 
+### JavaScript structural inspection
+- Start with `/main/INSTRUCTIONS_INDEX.md`
+- Then `/tools/js/README.md`
+- Then use `npm run js:summary-all` or the narrower `js:check` / `js:symbols` / `js:deps` commands
+
 ### Session re-entry after context loss
 - Read this file
 - Read `/main/GPT_OPERATOR_MANUAL.md`
 - Read `/main/SYSTEM_MAP.md`
 - Only then branch into engine, solver, UI, or workflow files
+
+## Operational cross-links
+- Instructions and tooling: `/main/INSTRUCTIONS_INDEX.md`
+- Troubleshooting and repo-write recovery: `/PROCEDURE_INDEX.md`
+- JS parser tooling: `/tools/js/README.md`
 
 ## Hard rules
 - Do not treat dashboard or matrix outputs as ontology-source.
@@ -88,9 +101,10 @@ Read these when the task concerns saved cases, case indexes, smoke tests, or mar
 
 ## Current operational facts
 - `/solver/` now exists and contains executable runtime modules.
-- `[/.github/workflows/`] now contains at least two useful workflows: `solver-selftest.yml` and `validate-cases.yml`.
+- `/.github/workflows/` now contains at least two useful workflows: `solver-selftest.yml` and `validate-cases.yml`.
 - The workbench UI should rely on `/ui/app.js` for solver ingest behavior.
 - If a large file write fails through the assistant tool path, prefer manual paste or git-object write paths rather than redefining architecture.
+- JavaScript structural inspection tooling now exists under `/tools/js/` and should be discoverable from boot via `/main/INSTRUCTIONS_INDEX.md`.
 
 ## Canonical status labels
 - **Canonical**: source of truth for meaning
@@ -105,6 +119,7 @@ Read these when the task concerns saved cases, case indexes, smoke tests, or mar
 - `/solver/*` = Executable
 - `/index.html`, `/ui/*`, `.github/*` = Implementation
 - `/cases/*` = Data
+- `/tools/js/*` = Operational inspection tooling
 
 ## Starter prompt for future sessions
 Use repo-control first. Start at `/main/TOC.md`. Follow the authority order exactly. Do not infer structure outside mapped files.
