@@ -48,7 +48,7 @@ When repo-control is available:
 - Fix the smallest real blocker first.
 - Do not rewrite large files merely for style.
 - When a module is repeatedly unstable, replace it cleanly rather than stacking brittle patches.
-- Keep shared entrypoints stable: `index.html`, `/ui/`, `/cases/`, `/main/`, `/engine/`, `/solver/`, `/.github/workflows/`.
+- Keep shared entrypoints stable: `index.html`, `workbench-v2.html`, `/ui-v2/`, `/cases/`, `/main/`, `/engine/`, `/solver/`, `/.github/workflows/`.
 
 ## Report-first governance
 - The assistant may inspect, analyze, compare, and test.
@@ -83,8 +83,8 @@ If a new session starts with no prior context:
 ## Current repo role split
 - `/engine/` = canonical model stack
 - `/main/` = bootstrap and operator map
-- `/solver/` = executable implementation layer
-- `/ui/*` and root HTML = workbench implementation
+- `/solver/` = executable implementation layers
+- `index.html`, `workbench-v2.html`, and `/ui-v2/*` = active workbench implementation
 - `/.github/workflows/` = automated checks and maintenance flows
 - `/cases/` = saved data and smoke tests
 - `/tools/js/` = operational JavaScript inspection tooling
@@ -93,5 +93,6 @@ If a new session starts with no prior context:
 - `/solver/` exists and is active.
 - `solver-selftest.yml` checks solver integrity.
 - `validate-cases.yml` checks saved cases against solver validation.
-- The workbench should route ingest through `ui/app.js` and the solver runtime.
+- The public workbench now routes through `/index.html` and `/ui-v2/app.js`.
+- `workbench-v2.html` remains as a compatibility surface for the same v2 workbench.
 - Repo-useful tooling and troubleshooting should be discoverable from boot through `/main/INSTRUCTIONS_INDEX.md` and `/PROCEDURE_INDEX.md`.
