@@ -18,7 +18,9 @@ Restore working context quickly and reduce drift between sessions by making the 
 2. Read this file.
 3. Read `/main/SYSTEM_MAP.md`
 4. Read `/main/EDIT_RULES.md` if edits are likely.
-5. Only then open task-relevant engine, solver, UI, workflow, or case files.
+5. Read `/main/INSTRUCTIONS_INDEX.md` for repo-useful tooling and operational helpers.
+6. Read `/PROCEDURE_INDEX.md` if troubleshooting or repo-write recovery is relevant.
+7. Only then open task-relevant engine, solver, UI, workflow, or case files.
 
 ## Priority rules
 - Engine meaning comes from `/engine/*`.
@@ -85,9 +87,11 @@ If a new session starts with no prior context:
 - `/ui/*` and root HTML = workbench implementation
 - `/.github/workflows/` = automated checks and maintenance flows
 - `/cases/` = saved data and smoke tests
+- `/tools/js/` = operational JavaScript inspection tooling
 
 ## Current operational facts
 - `/solver/` exists and is active.
 - `solver-selftest.yml` checks solver integrity.
 - `validate-cases.yml` checks saved cases against solver validation.
 - The workbench should route ingest through `ui/app.js` and the solver runtime.
+- Repo-useful tooling and troubleshooting should be discoverable from boot through `/main/INSTRUCTIONS_INDEX.md` and `/PROCEDURE_INDEX.md`.
