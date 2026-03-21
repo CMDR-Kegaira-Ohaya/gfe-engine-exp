@@ -4,6 +4,29 @@ function pushIssue(list, level, path, message) {
   list.push({ level, path, message });
 }
 
+function normalizeMode(mode) {
+  return String(mode || '').replaceAll('_', '-');
+}
+
+function validatePayloadPrimitive(issues, primitive, path) {
+  if (primitive?.sigma && !SIGMA.includes(primitive.sigma)) {
+    pushIssue(issues, 'error', `${path}.sigma`, 'Sigma must be L, M, or Dst.');
+  }
+  if (primitive?.unfolding && !UNFOLDING.includes(primitive.unfolding)) {
+    pushIssue(issues, 'error', `${path}.unfolding`, 'Unfolding must be acute or accumulated.');
+  }
+  if (primitive?.register && !REGISTERS.includes(primitive.register)) {
+    pushIssue(issues, 'error', `${path}.register`, 'Register must be retained or emitted.');
+  }
+  const mode = primitive?.mode ?? primitive?.mu;
+  if (mode && !MODES.includes(normalizeMode(mode))) {
+    pushIssue(issues, 'error', `${path}.mode`, 'Mode must be one of the canonical payload modes.');
+  }
+  if (primitive?.axis && !AXES.includes(primitive.axis)) {
+    pushIssue(issues, 'warning', `${path}.axis`, 'Axis should be one of the five maintained axes.');
+  }
+}
+
 export function validateCase(caseData) {
   const issues = [];
   if (!caseData || typeof caseData !== 'object') {
@@ -53,18 +76,15 @@ export function validateCase(caseData) {
 
   (caseData.payload_events || []).forEach((event, eventIndex) => {
     const eventPath = `payload_events[${eventIndex}]`;
-    if (event?.sigma && !SIGMA.includes(event.sigma)) {
-      pushIssue(issues, 'error', `${eventPath}.sigma`, 'Sigma must be L, M, or Dst.');
+    if (event?.timestep_idx !== undefined && !Number.isInteger(event.timestep_idx)) {
+      pushIssue(issues, 'warning', `${eventPath}.timestep_idx`, 'timestep_idx should be an integer.');
     }
-    if (event?.unfolding && !UNFOLDING.includes(event.unfolding)) {
-      pushIssue(issues, 'error', `${eventPath}.unfolding`, 'Unfolding must be acute or accumulated.');
-    }
-    if (event?.register && !REGISTERS.includes(event.register)) {
-      pushIssue(issues, 'error', `${eventPath}.register`, 'Register must be retained or emitted.');
-    }
-    const mode = event?.mode || event?.mu;
-    if (mode && !MODES.includes(String(mode).replaceAll('_', '-'))) {
-      pushIssue(issues, 'error', `${eventPath}.mode`, 'Mode must be one of the canonical payload modes.');
+    if (!arrayIs=Array.isArray(event?.payload_bundle)) {
+      validatePayloadPrimitive(issues, event, eventPath);
+    } else {
+      event.payload_bundle.forEach((primitive, primitiveIdx) => {
+        validatePayloadPrimitive(issues, primitive, `${eventPath}.payload_bundle[${primitiveIdx}]`);
+      });
     }
   });
 
