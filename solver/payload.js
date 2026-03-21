@@ -24,40 +24,28 @@ function normalizeAxis(axis, fallback = 'Org') {
 
 function normalizeEpsilon(event = {}) {
   const epsilon = event.epsilon || {};
-  const deltaR = stableNumber(
-    epsilon?.delta_r ?? epsilon?.deltaR ?? epsilon?.dR ?? event.delta_r ?? event.deltaR ?? event.delta_R,
-    0
-  );
-  const deltaI = stableNumber(
-    epsilon?.delta_i ?? epsilon?.deltaI ?? epsilon?.dI ?? event.delta_i ?? event.deltaI ?? event.delta_I,
-    0
-  );
-  const deltaA = stableNumber(
-    epsilon?.delta_a ?? epsilon?.deltaA ?? epsilon?.delta ?? epsilon?.delta_d ?? event.delta_a ?? event.deltaA ?? event.delta ?? event.delta_d,
-    0
-  );
+  const deltaR = stableNumber(epsilon.delta_r ?? epsilon.deltaR ?? event.delta_r ?? event.deltaR, 0);
+  const deltaI = stableNumber(epsilon.delta_i ?? epsilon.deltaI ?? event.delta_i ?? event.deltaI, 0);
+  const deltaA = stableNumber(epsilon.delta_d ?? epsilon.deltaA ?? event.delta_d ?? event.deltaA ?? event.delta, 0);
   return { deltaR, deltaI, deltaA };
 }
 
-function normalizePrimitive(event = {}, fallbackAxis = 'Org') {
-  const axis = normalizeAxis(event.axis ?? event.d, fallbackAxis);
-  const unfolding = normalizeUnfolding(event.unfolding ?? event.u);
-  const register = normalizeRegister(event.register ?? event.r);
-  const mode = normalizeMode(event.mode ?? event.mu);
-  const magnitude = clip01(toMagnitudeScale(event.magnitude ?? event.g ?? 0));
+function normalizePrimitive(atom = {}, fallbackAxis = 'Org') {
+  const axis = normalizeAxis(atom.axis ?? atom.d, fallbackAxis);
+  const unfolding = normalizeUnfolding(atom.unfolding ?? atom.u);
+  const register = normalizeRegister(atom.register ?? atom.r);
+  const mode = normalizeMode(atom.mode ?? atom.mu);
 
   return {
-    sigma: normalizeSigma(event.sigma),
+    sigma: normalizeSigma(atom.sigma),
     d: axis,
     axis,
     unfolding,
-    u: unfolding,
     register,
-    r: register,
     mode,
     mu: mode,
-    epsilon: normalizeEpsilon(event),
-    magnitude
+    epsilon: normalizeEpsilon(atom),
+    magnitude: clip01(toMagnitudeScale(atom.magnitude ?? atom.g ?? 0))
   };
 }
 
@@ -65,17 +53,11 @@ export function normalizePayloadEvent(event = {}) {
   const source = parseAlphaRef(event.alpha_source ?? event.alpha_from);
   const medium = parseAlphaRef(event.alpha_medium ?? event.medium);
   const receiving = parseAlphaRef(event.alpha_receiving ?? event.alpha_to);
-
-  const fallbackAxis = normalizeAxis(
-    event.axis ?? event.d ?? receiving.axis ?? source.axis ?? 'Org',
-    'Org'
-  );
+  const fallbackAxis = normalizeAxis(event.axis ?? event.d ?? receiving.axis ?? source.axis ?? 'Org');
 
   const payloadBundleRaw = Array.isArray(event.payload_bundle) && event.payload_bundle.length
     ? event.payload_bundle
     : [event];
-
-  const payload_bundle = payloadBundleRaw.map(atom => normalizePrimitive(atom, fallbackAxis));
 
   return {
     ...event,
@@ -87,12 +69,9 @@ export function normalizePayloadEvent(event = {}) {
     mediumParticipantId: medium.participantId,
     receivingParticipantId: receiving.participantId,
     axis: fallbackAxis,
-    d: fallbackAxis,
     face: event.face || null,
-    payload_bundle,
     interference: event.interference || '',
-    bearing: event.bearing || '',
-    effect: event.effect || ''
+    payload_bundle: payloadBundleRaw.map(atom => normalizePrimitive(atom, fallbackAxis))
   };
 }
 
@@ -124,18 +103,45 @@ export function aggregateAxisPayload(events = [], participantId, axis, weights) 
   for (const event of events) {
     for (const primitive of event.payload_bundle || []) {
       if (primitive.axis !== axis) continue;
-      const unfoldingWeight = primitive.unfolding === 'accumulated'
-        ? weights.accumulatedWeight
-        : weights.acuteWeight;
-      const magnitude = clip01(primitive.magnitude);
-      const scaled = unfoldingWeight * magnitude;
+      const unfoldingWeight = primitive.unfolding === 'accumulated' ? weights.accumulatedWeight : weights.acuteWeight;
+      const scaled = unfoldingWeight * clip01(primitive.magnitude);
 
       if (event.receivingParticipantId === participantId && primitive.register === 'retained') {
         totals.deltaRIn += ((weights.etaRByMode[primitive.mode] || 0) + primitive.epsilon.deltaR) * scaled;
-        totals.deltaIEvent += ((weights.etaByMode??,{});
+        totals.deltaIEvent += ((weights.etaIByMode[primitive.mode] || 0) + primitive.epsilon.deltaI) * scaled;
+        if (primitive.sigma === 'M') {
+          totals.contestM += ((weights.etaAByMode[primitive.mode] || 0) + Math.max(0, primitive.epsilon.deltaA)) * scaled;
+        }
+        if (primitive.sigma === 'Dst') {
+          totals.contractDst += ((weights.etaDstByMode[primitive.mode] || 0) + Math.max(0, primitive.epsilon.deltaA)) * scaled;
+        }
+        totals.eventCount += 1;
+      }
+
+      if (event.sourceParticipantId === participantId && primitive.register === 'emitted') {
+        totals.deltaROut += (weights.emissionCostByMode[primitive.mode] || 0) * scaled;
+        totals.eventCount += 1;
       }
     }
   }
 
   return totals;
+}
+
+export function aggregateParticipantPayload(events = [], participantId, weights) {
+  return Object.fromEntries(
+    AXES.map(axis => [axis, aggregateAxisPayload(events, participantId, axis, weights)])
+  );
+}
+
+export function countParticipantModes(events = [], participantId) {
+  const counts = {};
+  for (const event of events) {
+    const involved = event.sourceParticipantId === participantId || event.receivingParticipantId === participantId;
+    if (!involved) continue;
+    for (const primitive of event.payload_bundle || []) {
+      counts[primitive.mode] = (counts[primitive.mode] || 0) + 1;
+    }
+  }
+  return counts;
 }
