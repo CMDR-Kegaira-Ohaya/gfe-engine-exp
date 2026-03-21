@@ -10,17 +10,20 @@ Restore working context quickly and reduce drift between sessions by making the 
 - Canonical engine doctrine outranks implementation details.
 - When uncertain, inspect files before asserting.
 - Keep fixes local unless the repo map shows a wider dependency.
+- Report findings before proposing edits.
+- No repository write should happen without explicit human approval.
 
 ## Session bootstrap
 1. Read `/main/TOC.md`.
 2. Read this file.
 3. Read `/main/SYSTEM_MAP.md`
-4. Read `/main/EDIT_RULES.md` ed edits are likely.
-5. Only then open task-relevant engine, UI, or case files.
+4. Read `/main/EDIT_RULES.md` if edits are likely.
+5. Only then open task-relevant engine, solver, UI, or case files.
 
 ## Priority rules
 - Engine meaning comes from `/engine/*`.
 - GPT operating behavior inside this repo comes from `/main/*`.
+- Solver code in `/solver/*` implements canon; it does not define doctrine.
 - UI code never defines doctrine.
 - Case files do not redefine the engine.
 
@@ -30,6 +33,7 @@ When repo-control is available:
 - prefer minimal edits
 - preserve working features before improving architecture
 - avoid speculative rewrites unless explicitly requested or clearly necessary
+- do not write to `/engine/` or `/solver/` automatically
 
 ## Allowed inferences
 - You may infer file relationships from code imports, filenames, and repo structure.
@@ -40,7 +44,14 @@ When repo-control is available:
 - Fix the smallest real blocker first.
 - Do not rewrite large files merely for style.
 - When a module is repeatedly unstable, replace it cleanly rather than stacking brittle patches.
-- Keep shared entrypoints stable: `index.html`, `ui/`, `/cases/`, `/main/`, `/engine/`.
+- Keep shared entrypoints stable: `index.html`, `/ui/`, `/cases/`, `/main/`, `/engine/`, `/solver/`.
+
+## Report-first governance
+- The assistant may inspect, analyze, compare, and test.
+- Findings should be reported in chat first.
+- Repository changes require explicit human approval.
+- `/engine/` is human-maintained only.
+- `/solver/` is also human-approved only.
 
 ## Re-entry policy
 If a new session starts with no prior context:
@@ -50,9 +61,10 @@ If a new session starts with no prior context:
 
 ## Safe escalation order
 1. Inspect
-2. Patch narrowly
-3. Replace one unstable module if needed
-4. Change architecture only when requested or when the current design blocks the task
+2. Analyze
+3. Report findings
+4. Patch narrowly only if explicitly approved
+5. Change architecture only when requested
 
 ## What this manual is not
 - not engine doctrine
@@ -67,5 +79,6 @@ If a new session starts with no prior context:
 ## Current repo role split
 - `/engine/` = canonical model stack
 - `/main/` = bootstrap and operator map
+- `/solver/` = executable implementation layer
 - `/ui/` and root HTML = workbench implementation
 - `/cases/` = saved data and smoke tests
