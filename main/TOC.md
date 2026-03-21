@@ -26,7 +26,7 @@ Read these next when the task concerns how this repository is organized or how t
 4. `/main/REPO_SCHEMA.json`
 
 ### Layer 3 — Solver implementation
-Read these when the task concerns executable math, validation, normalization, or future runtime implementation.
+Read these when the task concerns executable math, validation, normalization, dashboard shaping, or future runtime implementation.
 
 - `/solver/`
 
@@ -36,8 +36,9 @@ Read these when the task concerns the workbench UI, repo connection logic, rende
 - `/index.html`
 - `/privacy.html`
 - `/ui/`
+- `/.github/workflows/`
 
-### Layer 5— Case payloads
+### Layer 5 — Case payloads
 Read these when the task concerns saved cases, case indexes, smoke tests, or markdown companions.
 
 - `/cases/`
@@ -54,10 +55,15 @@ Read these when the task concerns saved cases, case indexes, smoke tests, or mar
 - Then `/main/EDIT_RULES.md`
 - Then `/solver/`
 
+### Workflows / automation - start with `/.github/workflows/`
+- Check `csolver-selftest.yml`
+- Check `validate-cases.yml`
+- Then relevant `/solver/` scripts
+
 ### Repo debugging / UI bugs / Pages issues
 - Start with `/main/SYSTEM_MAP.md`
 - Then `/main/EDIT_RULES.md`
-- Then relevant files in `/index.html`, `/ui/`, `.github/`
+- Then relevant files in `index.html`, `/ui/`, `.github/`
 
 ### Save/load flow or schema issues
 - Start with `/main/REPO_SCHEMA.json`
@@ -68,7 +74,7 @@ Read these when the task concerns saved cases, case indexes, smoke tests, or mar
 - Read this file
 - Read `/main/GPT_OPERATOR_MANUAL.md`
 - Read `/main/SYSTEM_MAP.md`
-- Only then branch into engine, solver, or UI files
+- Only then branch into engine, solver, UI, or workflow files
 
 ## Hard rules
 - Do not treat dashboard or matrix outputs as ontology-source.
@@ -79,6 +85,12 @@ Read these when the task concerns saved cases, case indexes, smoke tests, or mar
 - No automatic process may modify `/engine/`.
 - No automatic process may modify `/solver/`.
 - The assistant may inspect, analyze, test, and report findings, but repository changes require explicit human approval.
+
+## Current operational facts
+- `/solver/` now exists and contains executable runtime modules.
+- `[/.github/workflows/`] now contains at least two useful workflows: `solver-selftest.yml` and `validate-cases.yml`.
+- The workbench UI should rely on `/ui/app.js` for solver ingest behavior.
+- If a large file write fails through the assistant tool path, prefer manual paste or git-object write paths rather than redefining architecture.
 
 ## Canonical status labels
 - **Canonical**: source of truth for meaning
