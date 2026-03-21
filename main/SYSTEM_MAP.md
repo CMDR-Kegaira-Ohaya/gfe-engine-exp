@@ -13,6 +13,11 @@ Operational control layer for GPT re-entry:
 - `EDIT_RULES.md` = edit boundaries and workflow constraints
 - `REPO_SCHEMA.json` = machine-readable directory and file-role map
 
+### `/solver/`
+Executable implementation layer for validation, normalization, payload handling, and future runtime math.
+This layer implements canon but does not revise it.
+No automatic process may modify this layer.
+
 ### Root HTML
 - `index.html` = main Pages workbench entrypoint
 - `privacy.html` = public privacy page
@@ -30,13 +35,23 @@ Workflow and automation files for repository maintenance and Pages behavior.
 1. Operator or GPT enters through `/main/TOC.md`
 2. Canonical meaning comes from `/engine/*`
 3. Repo operating behavior comes from `/main/*`
-4. UI renders and manipulates case data through root HTML and `/ui/*5. Cases live under `/cases/*
+4. Executable logic, when present, lives in `/solver/*`
+5. UI renders and manipulates case data through root HTML and `/ui/*`
+6. Cases live under `/cases/*`
+
+## Governance rules
+- `/engine/` is canonical and human-maintained only.
+- `/solver/` is executable and human-approved only.
+- No automatic process may modify `/engine/` or `/solver/`.
+- The assistant may inspect, analyze, and report findings, but repository changes require explicit human approval.
+
 ## Current intended usage
 - `main` branch = public workbench and canonical implementation
 - `cases/users/shared` = shared branch
 - `cases/users/various` = miscellaneous communal/testing branch
 
 ## What should not be collapsed
+- engine doctrine vs solver implementation
 - engine doctrine vs UI code
 - repo operating map vs saved case data
 - bootstrap manuals vs canonical model files
@@ -47,6 +62,7 @@ If context is lost, the minimum recovery path is:
 `/main/TOC.md` → `/main/GPT_OPERATOR_MANUAL.md` → `/main/SYSTEM_MAP.md`
 
 ## Editing hotspots
+- solver work: `/solver/*`
 - UI bugs: `/ui/*`, `index.html`
 - save/load behavior: `/ui/repo.js`, `/cases/*`, relevant workflow files
 - engine doctrine: `/engine/*` only when explicitly revising canonical content
