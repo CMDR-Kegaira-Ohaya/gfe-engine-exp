@@ -1,12 +1,8 @@
-import { state, esc, escAttr, showMsg } from './state.js';
+import { state, esc, escAttr, showMsg, getCurrentSession, setCurrentReport } from './state.js';
 import { renderAll } from './render.js';
 
 export function getBranchLabel() {
-  return state.currentBranch === 'main'
-    ? 'published'
-    : state.currentBranch === 'drafts'
-      ? 'draft'
-      : state.currentBranch;
+  return state.currentBranch === 'main' ? 'published' : state.currentBranch === 'drafts' ? 'draft' : state.currentBranch;
 }
 
 function uniqFacet(key) {
@@ -22,7 +18,7 @@ export function onRepoFilterChange(key, val) {
 }
 
 export function resetRepoFilters() {
-  state.repoFilter = { q:'', sigma:'', axis:'', mode:'', bundle:'', epsilon:'' };
+  state.repoFilter = { q: '', sigma: '', axis: '', mode: '', bundle: '', epsilon: '' };
   renderRepoFilters();
   renderRepoCaseList();
 }
@@ -40,7 +36,7 @@ function caseMatchesRepoFilters(c) {
   if (state.repoFilter.axis && !(c.payload_axes || []).includes(state.repoFilter.axis)) return false;
 
   if (state.repoFilter.mode) {
-    const modes = (c.payload_modes || []).map(m => String(m).replaceAll('_','-'));
+    const modes = (c.payload_modes || []).map(m => String(m).replaceAll('_', '-'));
     if (!modes.includes(state.repoFilter.mode)) return false;
   }
 
@@ -63,8 +59,7 @@ export function renderRepoFilters() {
 
   const sigmas = uniqFacet('payload_sigmas');
   const axes = uniqFacet('payload_axes');
-  const modes = uniqFacet('payload_modes').map(m => String(m).replaceAll('_','-')).sort();
-
+  const modes = uniqFacet('payload_modes').map(m => String(m).replaceAll('_', '-')).sort();
   const opt = (val, label, cur) => `<option value="${escAttr(val)}" ${val === cur ? 'selected' : ''}>${esc(label)}</option>`;
 
   el.style.display = '';
@@ -105,7 +100,7 @@ function renderRepoChipRow(c) {
   const chips = [];
   (c.payload_sigmas || []).forEach(s => chips.push(`<span class="repo-chip sigma-${escAttr(s)}">σ ${esc(s)}</span>`));
   (c.payload_axes || []).slice(0, 5).forEach(a => chips.push(`<span class="repo-chip axis">${esc(a)}</span>`));
-  (c.payload_modes || []).slice(0, 3).forEach(m => chips.push(`<span class="repo-chip mode">${esc(String(m).replaceAll('_','-'))}</span>`));
+  (c.payload_modes || []).slice(0, 3).forEach(m => chips.push(`<span class="repo-chip mode">${esc(String(m).replaceAll('_', '-'))}</span>`));
   if (c.uses_payload_bundle) chips.push(`<span class="repo-chip flag">bundle</span>`);
   if (c.has_epsilon) chips.push(`<span class="repo-chip flag">ε</span>`);
   if (typeof c.payload_primitives === 'number') chips.push(`<span class="repo-chip">prim ${c.payload_primitives}</span>`);
@@ -118,7 +113,7 @@ export function renderRepoCaseList() {
   const listEl = document.getElementById('repo-list');
   if (!listEl) return;
 
-  const filtered = (state.repoCases || []).map((c, i) => ({ c, i })).filter(({ c }) => caseMatchesRepoFilters(c));
+  const filtered = (state.repoCases || []).map((c, i) => ({ c, i }).filter(({ c }) => caseMatchesRepoFilters(c));
   if (statusEl) statusEl.textContent = `${getBranchLabel()} · ${filtered.length}/${(state.repoCases || []).length} cases`;
 
   if (!filtered.length) {
@@ -174,7 +169,7 @@ export function loadRepoConfig() {
 }
 
 function branchHeaders() {
-  return { 'Accept': 'application/vnd.github+json' };
+  return { Accept: 'application/vnd.github+json' };
 }
 
 export async function connectRepo() {
@@ -182,10 +177,11 @@ export async function connectRepo() {
     showMsg('Enter owner and repo name', 'error');
     return;
   }
+
   const statusEl = document.getElementById('repo-status');
   if (statusEl) {
     statusEl.style.display = 'block';
-    statusEl.textContent = 'Connecting…';
+    statusEl.textContent = 'Connecting…";
   }
 
   try {
@@ -206,14 +202,13 @@ export async function connectRepo() {
 
   const barEl = document.getElementById('branch-bar');
   const quickBranches = [...mainBranches, ...draftBranches, ...projectBranches.slice(0, 3)];
-
   if (barEl) {
     if (quickBranches.length > 1 || projectBranches.length > 0) {
       barEl.style.display = 'flex';
       barEl.innerHTML = quickBranches.map(b => {
         const cls = b === 'drafts' ? 'draft' : b.startsWith('cases/') ? 'project' : '';
         const label = b.startsWith('cases/') ? b.replace('cases/', '') : b;
-        return `<div class="branch-tab ${cls} ${b === state.currentBranch ? 'active' : ''}" onclick="switchBranch('${b}')" title="${b}">${esc(label)}</div>`;
+        return `<div class="branch-tab ${cls} ${b === state.currentBranch ? 'active' : ''}" onclick="switchBranch('${bs}')" title="${b}">${esc(label)}</div>`;
       }).join('');
     } else {
       barEl.style.display = 'none';
@@ -227,7 +222,7 @@ export async function connectRepo() {
       customEl.style.display = 'flex';
       const sel = document.getElementById('branch-select');
       if (sel) {
-        sel.innerHTML = `<option value="" disabled>More branches…</option>` +
+        sel.innerHTML = `<option value="" disabled>More branches… </option>` +
           allNonQuick.map(b => `<option value="${b}" ${b === state.currentBranch ? 'selected' : ''}>${b}</option>`).join('');
       }
     } else {
@@ -270,6 +265,7 @@ export async function loadBranchCases() {
     } else {
       indexUrl = `https://raw.githubusercontent.com/${state.repoOwner}/${state.repoName}/${state.currentBranch}/cases/index.json`;
     }
+
     const res = await fetch(indexUrl);
     if (res.ok) {
       const data = await res.json();
@@ -282,6 +278,7 @@ export async function loadBranchCases() {
       const res = await fetch(`https://api.github.com/repos/${state.repoOwner}/${state.repoName}/contents/cases?ref=${state.currentBranch}`, {
         headers: branchHeaders()
       });
+
       if (!res.ok) {
         if (res.status === 404) {
           if (statusEl) statusEl.textContent = `No cases/ on ${state.currentBranch}`;
@@ -290,6 +287,7 @@ export async function loadBranchCases() {
         }
         throw new Error('API error ' + res.status);
       }
+
       const files = await res.json();
       state.repoCases = files
         .filter(f => f.name.endsWith('.json') && f.name !== 'index.json')
@@ -313,9 +311,21 @@ export async function loadBranchCases() {
     return;
   }
 
-  state.repoFilter = { q:'', sigma:'', axis:'', mode:'', bundle:'', epsilon:'' };
+  state.repoFilter = { q: '', sigma: '', axis: '', mode: '', bundle: '', epsilon: '' };
   renderRepoFilters();
   renderRepoCaseList();
+}
+
+async function fetchAnalysisMarkdown(filename) {
+  const mdName = filename.replace(/\.json$/i, '_analysis.md');
+  const url = `https://raw.githubusercontent.com/${state.repoOwner}/${state.repoName}/${state.currentBranch}/cases/${mdName}`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return '';
+    return await res.text();
+  } catch (e) {
+    return '';
+  }
 }
 
 export async function loadRepoCase(idx, ingestCase) {
@@ -328,16 +338,26 @@ export async function loadRepoCase(idx, ingestCase) {
 
   try {
     let url = c.download_url;
-    if (!url) {
-      url = `https://raw.githubusercontent.com/${state.repoOwner}/${state.repoName}/${state.currentBranch}/cases/${c.filename}`;
-    }
+    if (!url) url = `https://raw.githubusercontent.com/${state.repoOwner}/${state.repoName}/${state.currentBranch}/cases/${c.filename}`;
+
     const res = await fetch(url);
     if (!res.ok) throw new Error('Could not fetch file');
     const data = await res.json();
+
     ingestCase(data);
+    const session = getCurrentSession();
+    if (session) {
+      const report = await fetchAnalysisMarkdown(c.filename);
+      setCurrentReport(session, report);
+    }
+
+    renderAll();
+
     if (statusEl) {
       statusEl.textContent = `Loaded ✓ · ${branchLabel}`;
-      setTimeout(() => { statusEl.textContent = `${branchLabel} · ${state.repoCases.length} cases`; }, 1500);
+      setTimeout(() => {
+        statusEl.textContent = `${branchLabel} · ${state.repoCases.length} cases`;
+      }, 1500);
     }
   } catch (e) {
     if (statusEl) statusEl.textContent = 'Error: ' + e.message;
