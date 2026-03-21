@@ -1,33 +1,98 @@
-import { MODES } from './constants.js';
-import { clip01, parseAlphaRef, toCanonicalScale } from './utils.js';
+import { AXES, MODES, REGISTERS, SIGMA, UNFOLDING } from './constants.js';
+import { clip01, parseAlphaRef, stableNumber, toMagnitudeScale } from './utils.js';
 
 export function normalizeMode(mode) {
   const normalized = String(mode || 'load').replaceAll('_', '-');
   return MODES.includes(normalized) ? normalized : 'load';
 }
 
-export function normalizePayloadEvent(event) {
+export function normalizeSigma(sigma) {
+  return SIGMA.includes(sigma) ? sigma : 'L';
+}
+
+export function normalizeUnfolding(unfolding) {
+  return UNFOLDING.includes(unfolding) ? unfolding : 'acute';
+}
+
+export function normalizeRegister(register) {
+  return REGISTERS.includes(register) ? register : 'retained';
+}
+
+function normalizeAxis(axis, fallback = 'Org') {
+  return AXES.includes(axis) ? axis : fallback;
+}
+
+function normalizeEpsilon(event = {}) {
+  const epsilon = event.epsilon || {};
+  const deltaR = stableNumber(
+    epsilon?.delta_r ?? epsilon?.deltaR ?? epsilon?.dR ?? event.delta_r ?? event.deltaR ?? event.delta_R,
+    0
+  );
+  const deltaI = stableNumber(
+    epsilon?.delta_i ?? epsilon?.deltaI ?? epsilon?.dI ?? event.delta_i ?? event.deltaI ?? event.delta_I,
+    0
+  );
+  const deltaA = stableNumber(
+    epsilon?.delta_a ?? epsilon?.deltaA ?? epsilon?.delta ?? epsilon?.delta_d ?? event.delta_a ?? event.deltaA ?? event.delta ?? event.delta_d,
+    0
+  );
+  return { deltaR, deltaI, deltaA };
+}
+
+function normalizePrimitive(event = {}, fallbackAxis = 'Org') {
+  const axis = normalizeAxis(event.axis ?? event.d, fallbackAxis);
+  const unfolding = normalizeUnfolding(event.unfolding ?? event.u);
+  const register = normalizeRegister(event.register ?? event.r);
+  const mode = normalizeMode(event.mode ?? event.mu);
+  const magnitude = clip01(toMagnitudeScale(event.magnitude ?? event.g ?? 0));
+
+  return {
+    sigma: normalizeSigma(event.sigma),
+    d: axis,
+    axis,
+    unfolding,
+    u: unfolding,
+    register,
+    r: register,
+    mode,
+    mu: mode,
+    epsilon: normalizeEpsilon(event),
+    magnitude
+  };
+}
+
+export function normalizePayloadEvent(event = {}) {
   const source = parseAlphaRef(event.alpha_source ?? event.alpha_from);
   const medium = parseAlphaRef(event.alpha_medium ?? event.medium);
   const receiving = parseAlphaRef(event.alpha_receiving ?? event.alpha_to);
-  const axis = event.axis ?? event.d ?? receiving.axis ?? source.axis ?? 'Org';
+
+  const fallbackAxis = normalizeAxis(
+    event.axis ?? event.d ?? receiving.axis ?? source.axis ?? 'Org',
+    'Org'
+  );
+
+  const payloadBundleRaw = Array.isArray(event.payload_bundle) && event.payload_bundle.length
+    ? event.payload_bundle
+    : [event];
+
+  const payload_bundle = payloadBundleRaw.map(atom => normalizePrimitive(atom, fallbackAxis));
 
   return {
     ...event,
-    timestep_idx: Number.isInteger(event?.timestep_idx) ? event.timestep_idx : 0,
+    timestep_idx: Number.isInteger(event.timestep_idx) ? event.timestep_idx : 0,
     alpha_source: source.raw,
     alpha_medium: medium.raw,
     alpha_receiving: receiving.raw,
     sourceParticipantId: source.participantId,
     mediumParticipantId: medium.participantId,
     receivingParticipantId: receiving.participantId,
-    axis,
-    d: axis,
-    sigma: event?.sigma || 'L',
-    unfolding: event?.unfolding || 'acute',
-    register: event?.register || 'retained',
-    mode: normalizeMode(event?.mode || event?.mu),
-    magnitude: clip01(Number(event?.magnitude ?? 0))
+    axis: fallbackAxis,
+    d: fallbackAxis,
+    face: event.face || null,
+    payload_bundle,
+    interference: event.interference || '',
+    bearing: event.bearing || '',
+    effect: event.effect || ''
   };
 }
 
@@ -42,45 +107,35 @@ export function groupEventsByStep(payloadEvents = []) {
   return grouped;
 }
 
-export function aggregateAxisContributions(events, participantId, axis, weights) {
-  const totals = {
-    retainedIn: 0,
-    emittedOut: 0,
-    intensityDelta: 0,
-    misalignmentContest: 0,
-    destructiveContract: 0
+function defaultAggregateRow() {
+  return {
+    deltaRIn: 0,
+    deltaROut: 0,
+    deltaIEvent: 0,
+    contestM: 0,
+    contractDst: 0,
+    eventCount: 0
   };
+}
+
+export function aggregateAxisPayload(events = [], participantId, axis, weights) {
+  const totals = defaultAggregateRow();
 
   for (const event of events) {
-    if (event.axis !== axis) continue;
+    for (const primitive of event.payload_bundle || []) {
+      if (primitive.axis !== axis) continue;
+      const unfoldingWeight = primitive.unfolding === 'accumulated'
+        ? weights.accumulatedWeight
+        : weights.acuteWeight;
+      const magnitude = clip01(primitive.magnitude);
+      const scaled = unfoldingWeight * magnitude;
 
-    const mag = clip01(event.magnitude);
-    const unfoldingWeight = event.unfolding === 'accumulated' ? weights.accumulatedWeight : weights.acuteWeight;
-    const mode = event.mode;
-
-    if (event.receivingParticipantId === participantId && event.register === 'retained') {
-      totals.retainedIn += (weights.retainedRetentionByMode[mode] || 0) * unfoldingWeight * mag;
-      totals.intensityDelta += (weights.intensityByMode[mode] || 0) * unfoldingWeight * mag;
-      if (event.sigma === 'M') {
-        totals.misalignmentContest += (weights.misalignmentAvailabilityByMode[mode] || 0) * unfoldingWeight * mag;
+      if (event.receivingParticipantId === participantId && primitive.register === 'retained') {
+        totals.deltaRIn += ((weights.etaRByMode[primitive.mode] || 0) + primitive.epsilon.deltaR) * scaled;
+        totals.deltaIEvent += ((weights.etaByMode??,{});
       }
-      if (event.sigma === 'Dst') {
-        totals.destructiveContract += (weights.destructiveAvailabilityByMode[mode] || 0) * unfoldingWeight * mag;
-      }
-    }
-
-    if (event.sourceParticipantId === participantId && event.register === 'emitted') {
-      totals.emittedOut += (weights.emittedRetentionCostByMode[mode] || 0) * unfoldingWeight * mag;
     }
   }
 
   return totals;
-}
-
-export function normalizePayloadBundle(payloadBundle = []) {
-  return payloadBundle.map(atom => ({
-    ...atom,
-    mode: normalizeMode(atom.mode || atom.mu),
-    magnitude: clip01(toCanonicalScale(atom.magnitude ?? atom.g ?? 0))
-  }));
 }
