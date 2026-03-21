@@ -1,6 +1,7 @@
 
 import { validateCase, solveCase, buildDashboardChunks } from '../solver/index.js';
 import { renderAll } from './render.js';
+import { applyPolish } from './polish.js';
 
 const state = {
   mode: 'single',
@@ -182,6 +183,7 @@ function recompute() {
 
 function render() {
   renderAll({ state, els, activeSources });
+  applyPolish({ state, els, activeSources, rerender: render });
 }
 
 function readFiles(files) {
