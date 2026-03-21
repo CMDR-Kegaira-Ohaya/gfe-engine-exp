@@ -1,0 +1,65 @@
+# PROCEDURE_INDEX
+
+This file records stable procedures for repository troubleshooting and write-path recovery.
+Add new entries here when a failure mode becomes repeatable and a working procedure is confirmed.
+
+## Known likely errors
+
+- `401` / `403`
+  - token missing, expired, or under-scoped
+  - repo access not granted
+  - branch or workflow permissions blocked
+
+- `422`
+  - `saveFile` content is not valid Base64
+  - missing `sha` on update
+  - malformed payload
+  - invalid path or unsupported update shape
+
+- non-fast-forward
+  - branch moved ahead of the local/base ref used for the write
+  - refresh current branch ref, rebase/rebuild on latest tree, then retry
+
+- workflow write blocked
+  - workflow files are protected by missing permissions
+  - token or action path lacks workflow write capability
+
+## Procedure: `saveFile` content encoding
+
+GitHub’s API for `saveFile` requires the file content to be Base64-encoded UTF-8.
+
+Use this as the default procedure unless a smaller direct path is clearly safe:
+1. prepare the final UTF-8 text exactly as it should be written
+2. Base64-encode that full text
+3. pass the encoded string as `content`
+4. include `sha` when updating an existing file
+
+## Procedure: workflow-related edits
+
+If edits are required and they touch workflow behavior or workflow files, include:
+
+- `permissions: workflows: write`
+
+For `.github/workflows/*` edits specifically, verify that workflow write capability exists before attempting the commit.
+
+## Fallback plan
+
+When the normal write path becomes unstable:
+
+1. split writes into smaller files or smaller patches
+2. prefer exact replacement over mixed partial edits when possible
+3. refresh the latest branch state before retrying
+4. use alternative workflow paths when needed:
+   - GitHub UI edit
+   - manual paste/commit
+   - patch queue
+   - blob/tree/commit path if direct `saveFile` is failing for content size or payload shape
+
+## Notes to extend later
+
+Add confirmed procedures here for:
+- ref update failures
+- branch creation edge cases
+- workflow dispatch permission problems
+- large file replacement strategy
+- manual recovery steps after interrupted tool writes
