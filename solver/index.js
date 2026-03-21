@@ -1,5 +1,10 @@
 export { validateCase } from './validate.js';
-export { solveCase, buildEnvelopeSummary, solveParticipantStep, cfgGate } from './engine.js';
+export { solveCase, solveParticipantStep, buildEnvelopeSummary, buildCascadeSummary, cfgGate } from './engine.js';
 export { buildDashboardChunks } from './dashboard.js';
-export { normalizePayloadEvent, groupEventsByStep } from './payload.js';
+export { normalizePayloadEvent, groupEventsByStep, aggregateParticipantPayload, countParticipantModes } from './payload.js';
+export { derivePrevalence, deriveTheta } from './prevalence.js';
+export { deriveEnvelope } from './envelope.js';
+export { deriveCompensation } from './compensation.js';
+export { deriveCascad } from './cascade.js';
+export { updateParticipantAxes } from './state.js';
 export { DEFAULT_WEIGHTS } from './config.js';
