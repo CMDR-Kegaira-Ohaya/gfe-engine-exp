@@ -1,5 +1,5 @@
 {
-  "version": "1.0",
+  "version": "1.1",
   "entrypoint": "/main/TOC.md",
   "layers": [
     {
@@ -7,10 +7,10 @@
       "priority": 1,
       "paths": [
         "/engine/formed_existence_model_v15_7.md",
+        "/engine/AENAONEQU3.md",
         "/engine/kernel_v15_7.md",
         "/engine/spec_v15_7.md",
-        "/engine/gfe_exp_engine_core_v15_7.md",
-        "/engine/AENAONEQU3.md"
+        "/engine/gfe_exp_engine_core_v15_7.md"
       ],
       "status": "canonical"
     },
@@ -27,8 +27,16 @@
       "status": "operational"
     },
     {
-      "name": "implementation",
+      "name": "solver",
       "priority": 3,
+      "paths": [
+        "/solver/"
+      ],
+      "status": "executable"
+    },
+    {
+      "name": "implementation",
+      "priority": 4,
       "paths": [
         "/index.html",
         "/privacy.html",
@@ -39,16 +47,23 @@
     },
     {
       "name": "data",
-      "priority": 4,
+      "priority": 5,
       "paths": [
         "/cases/"
       ],
       "status": "data"
     }
   ],
+  "governance": {
+    "no_auto_write_engine": true,
+    "no_auto_write_solver": true,
+    "report_first": true,
+    "explicit_human_approval_required_for_repo_changes": true
+  },
   "edit_policy": {
     "narrow_fix_first": true,
     "do_not_infer_engine_beyond_canonical_files": true,
+    "do_not_let_solver_define_doctrine": true,
     "do_not_let_ui_define_doctrine": true,
     "prefer_repo_state_over_chat_memory_when_conflicting": true
   },
@@ -56,8 +71,16 @@
     "case_analysis": [
       "/main/TOC.md",
       "/engine/formed_existence_model_v15_7.md",
+      "/engine/AENAONEQU3.md",
       "/main/GPT_OPERATOR_MANUAL.md",
       "/cases/"
+    ],
+    "solver_work": [
+      "/main/TOC.md",
+      "/engine/formed_existence_model_v15_7.md",
+      "/engine/AENAONEQU3.md",
+      "/main/EDIT_RULES.md",
+      "/solver/"
     ],
     "ui_debugging": [
       "/main/TOC.md",
