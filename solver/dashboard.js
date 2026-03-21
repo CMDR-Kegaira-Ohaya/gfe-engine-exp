@@ -1,8 +1,23 @@
 import { AXES } from './constants.js';
 
+function deriveParticipantList(caseData) {
+  const declared = Array.isArray(caseData.participants) ? caseData.participants : [];
+  const map = new Map(declared.map(participant => [participant.id, participant]));
+
+  for (const step of caseData.timeline || []) {
+    for (const participantId of Object.keys(step.participants || {})) {
+      if (!map.has(participantId)) {
+        map.set(participantId, { id: participantId, name: participantId });
+      }
+    }
+  }
+
+  return Array.from(map.values());
+}
+
 export function buildDashboardChunks(caseData) {
   const chunks = [];
-  const participants = caseData.participants || [];
+  const participants = deriveParticipantList(caseData);
   const timeline = caseData.timeline || [];
 
   for (let pIndex = 0; pIndex < participants.length; pIndex += 1) {
