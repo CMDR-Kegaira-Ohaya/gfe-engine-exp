@@ -1,0 +1,505 @@
+{
+  "case_id": "gfe_timeline_smoke_test",
+  "system_name": "GFE Timeline Smoke Test",
+  "locus_of_analysis": "synthetic_test_frame",
+  "description": "Synthetic three-timestep case created to verify timeline movement, participant state updates, and markdown companion loading in the GFE Workbench.",
+  "participants": [
+    {
+      "id": "p1",
+      "name": "Operator A",
+      "address":"ΰ_(local)",
+      "description": "Synthetic participant for timeline verification."
+    },
+    {
+      "id": "p2",
+      "name": "Operator B",
+      "address": "ΰ_(local)",
+      "description": "Synthetic participant for timeline verification."
+    }
+  ],
+  "timeline": [
+    {
+      "timestep_label": "T0",
+      "narrative_note": "Baseline synthetic state for timeline verification.",
+      "pressure_notes": "Low strain; aligned baseline.",
+      "participants": {
+        "p1": {
+          "axes": {
+            "Cfg": {
+              "A": 82,
+              "R": 82,
+              "I": 82,
+              "sigma": "L",
+              "valence": "stable"
+            },
+            "Emb": {
+              "A": 80,
+              "R": 78,
+              "I": 78,
+              "sigma": "L",
+              "valence": "stable"
+            },
+            "Org": {
+              "A": 81,
+              "R": 80,
+              "I": 80,
+              "sigma": "L",
+              "valence": "stable"
+            },
+            "Dir": {
+              "A": 77,
+              "R": 75,
+              "I": 75,
+              "sigma": "L",
+              "valence": "stable"
+            },
+            "Leg": {
+              "A": 79,
+              "R": 77,
+              "I": 77,
+              "sigma": "L",
+              "valence": "stable"
+            }
+          },
+          "prevalence": {
+            "family": "L",
+            "note": "Aligned baseline."
+          },
+          "theta": {
+            "active": false
+          },
+          "compensation": {
+            "active": false
+          },
+          "payload_register": {
+            "retained": {
+              "note": "Neutral retained handling."
+            },
+            "emitted": {
+              "note": "Neutral outward handling."
+            }
+          },
+          "pressure_note": "No substantive pressure modeled."
+        },
+        "p2": {
+          "axes": {
+            "Cfg": {
+              "A": 81,
+              "R": 81,
+              "I": 81,
+              "sigma": "L",
+              "valence": "stable"
+            },
+            "Emb": {
+              "A": 79,
+              "R": 77,
+              "I": 77,
+              "sigma": "L",
+              "valence": "stable"
+            },
+            "Org": {
+              "A": 80,
+              "R": 79,
+              "I": 79,
+              "sigma": "L",
+              "valence": "stable"
+            },
+            "Dir": {
+              "A": 76,
+              "R": 74,
+              "I": 74,
+              "sigma": "L",
+              "valence": "stable"
+            },
+            "Leg": {
+              "A": 78,
+              "R": 76,
+              "I": 76,
+              "sigma": "L",
+              "valence": "stable"
+            }
+          },
+          "prevalence": {
+            "family": "L",
+            "note": "Aligned baseline."
+          },
+          "theta": {
+            "active": false
+          },
+          "compensation": {
+            "active": false
+          },
+          "payload_register": {
+            "retained": {
+              "note": "Neutral retained handling."
+            },
+            "emitted": {
+              "note": "Neutral outward handling."
+            }
+          },
+          "pressure_note": "No substantive pressure modeled."
+        }
+      }
+    },
+    {
+      "timestep_label": "T1",
+      "narrative_note": "Synthetic mid-step with moderate misalignment pressure localized in direction and legibility.",
+      "pressure_notes": "Moderate contest within availability; envelope should still hold.",
+      "participants": {
+        "p1": {
+          "axes": {
+            "Cfg": {
+              "A": 78,
+              "R": 74,
+              "I": 76,
+              "sigma": "L",
+              "valence": "strained but holding"
+            },
+            "Emb": {
+              "A": 74,
+              "R": 68,
+              "I": 70,
+              "sigma": "M",
+              "valence": "contested"
+            },
+            "Org": {
+              "A": 76,
+              "R": 70,
+              "I": 72,
+              "sigma": "M",
+              "valence": "contested"
+            },
+            "Dir": {
+              "A": 64,
+              "R": 52,
+              "I": 58,
+              "sigma": "M",
+              "valence": "misaligned"
+            },
+            "Leg": {
+              "A": 66,
+              "R": 54,
+              "I": 57,
+              "sigma": "M",
+              "valence": "misaligned"
+            }
+          },
+          "prevalence": {
+            "family": "M",
+            "note": "Mid-step contest localized in articulation."
+          },
+          "theta": {
+            "active": true,
+            "blocked_family": "L",
+            "note": "Mirrored threshold mode under synthetic strain."
+          },
+          "compensation": {
+            "active": true,
+            "type": "adaptive",
+            "note": "Synthetic adaptive containment."
+          },
+          "payload_register": {
+            "retained": {
+              "note": "Strain retained internally."
+            },
+            "emitted": {
+              "note": "Partially moderated outward expression."
+            }
+          },
+          "pressure_note": "Contest increases without destructive contraction."
+        },
+        "p2": {
+          "axes": {
+            "Cfg": {
+              "A": 77,
+              "R": 74,
+              "I": 75,
+              "sigma": "L",
+              "valence": "strained but holding"
+            },
+            "Emb": {
+              "A": 75,
+              "R": 71,
+              "I": 72,
+              "sigma": "L",
+              "valence": "strained"
+            },
+            "Org": {
+              "A": 77,
+              "R": 72,
+              "I": 73,
+              "sigma": "M",
+              "valence": "contested relay"
+            },
+            "Dir": {
+              "A": 70,
+              "R": 63,
+              "I": 65,
+              "sigma": "M",
+              "valence": "contested"
+            },
+            "Leg": {
+              "A": 69,
+              "R": 61,
+              "I": 63,
+              "sigma": "M",
+              "valence": "contested"
+            }
+          },
+          "prevalence": {
+            "family": "M",
+            "note": "Receives synthetic articulation strain."
+          },
+          "theta": {
+            "active": false
+          },
+          "compensation": {
+            "active": true,
+            "type": "adaptive",
+            "note": "Synthetic relay stabilization."
+          },
+          "payload_register": {
+            "retained": {
+              "note": "Receives contested signal."
+            },
+            "emitted": {
+              "note": "Outward handling remains partially coherent."
+            }
+          },
+          "pressure_note": "Contest transmitted through org-mediated handling."
+        }
+      }
+    },
+    {
+      "timestep_label": "T2",
+      "narrative_note": "Synthetic recovery step with restored coherence and reduced articulation strain.",
+      "pressure_notes": "Pressure falls; envelope remains intact; no destructive contraction modeled.",
+      "participants": {
+        "p1": {
+          "axes": {
+            "Cfg": {
+              "A": 80,
+              "R": 79,
+              "I": 79,
+              "sigma": "L",
+              "valence": "restabilizing"
+            },
+            "Emb": {
+              "A": 78,
+              "R": 74,
+              "I": 75,
+              "sigma": "L",
+              "valence": "recovering"
+            },
+            "Org": {
+              "A": 79,
+              "R": 76,
+              "I": 76,
+              "sigma": "L",
+              "valence": "recovering"
+            },
+            "Dir": {
+              "A": 73,
+              "R": 69,
+              "I": 70,
+              "sigma": "L",
+              "valence": "recovering"
+            },
+            "Leg": {
+              "A": 75,
+              "R": 71,
+              "I": 72,
+              "sigma": "L",
+              "valence": "recovering"
+            }
+          },
+          "prevalence": {
+            "family": "L",
+            "note": "Aligned prevalence restored."
+          },
+          "theta": {
+            "active": false
+          },
+          "compensation": {
+            "active": true,
+            "type": "adaptive",
+            "note": "Adaptive stabilization remains visible."
+          },
+          "payload_register": {
+            "retained": {
+              "note": "Retention normalized."
+            },
+            "emitted": {
+              "note": "Outward handling re-stabilized."
+            }
+          },
+          "pressure_note": "Synthetic strain reduced."
+        },
+        "p2": {
+          "axes": {
+            "Cfg": {
+              "A": 79,
+              "R": 78,
+              "I": 78,
+              "sigma": "L",
+              "valence": "restabilizing"
+            },
+            "Emb": {
+              "A": 78,
+              "R": 75,
+              "I": 75,
+              "sigma": "L",
+              "valence": "recovering"
+            },
+            "Org": {
+              "A": 79,
+              "R": 76,
+              "I": 76,
+              "sigma": "L",
+              "valence": "recovering"
+            },
+            "Dir": {
+              "A": 74,
+              "R": 70,
+              "I": 71,
+              "sigma": "L",
+              "valence": "recovering"
+            },
+            "Leg": {
+              "A": 74,
+              "R": 70,
+              "I": 71,
+              "sigma": "L",
+              "valence": "recovering"
+            }
+          },
+          "prevalence": {
+            "family": "L",
+            "note": "Aligned prevalence restored."
+          },
+          "theta": {
+            "active": false
+          },
+          "compensation": {
+            "active": true,
+            "type": "adaptive",
+            "note": "Synthetic stabilization persists briefly."
+          },
+          "payload_register": {
+            "retained": {
+              "note": "Retained handling normalized."
+            },
+            "emitted": {
+              "note": "Outward handling normalized."
+            }
+          },
+          "pressure_note": "Synthetic strain reduced."
+        }
+      }
+    }
+  ],
+  "payload_events": [
+    {
+      "timestep_idx": 0,
+      "alpha_source": "p1.Dir",
+      "alpha_medium": "p1.Org",
+      "alpha_receiving": "p2.Leg",
+      "face": "inner",
+      "payload_bearing": "synthetic-test",
+      "sigma": "L",
+      "d": "Leg",
+      "axis": "Leg",
+      "unfolding": "acute",
+      "register": "retained",
+      "mode": "load",
+      "effect": "Baseline synthetic transfer for timeline step T0.",
+      "magnitude": 1,
+      "payload_bundle": [
+        {
+          "sigma": "L",
+          "d": "Leg",
+          "unfolding": "acute",
+          "register": "retained",
+          "mode": "load"
+        }
+      ]
+    },
+    {
+      "timestep_idx": 1,
+      "alpha_source": "p1.Dir",
+      "alpha_medium": "p1.Org",
+      "alpha_receiving": "p2.Leg",
+      "face": "inner",
+      "payload_bearing": "synthetic-test",
+      "sigma": "M",
+      "d": "Leg",
+      "axis": "Leg",
+      "unfolding": "acute",
+      "register": "retained",
+      "mode": "amplify",
+      "effect": "Synthetic contested articulation transfer at T1.",
+      "magnitude": 3,
+      "payload_bundle": [
+        {
+          "sigma": "M",
+          "d": "Dir",
+          "unfolding": "acute",
+          "register": "retained",
+          "mode": "amplify"
+        },
+        {
+          "sigma": "M",
+          "d": "Leg",
+          "unfolding": "acute",
+          "register": "retained",
+          "mode": "load"
+        }
+      ]
+    },
+    {
+      "timestep_idx": 2,
+      "alpha_source": "p2.Org",
+      "alpha_medium": "p2.Dir",
+      "alpha_receiving": "p1.Leg",
+      "face": "outer",
+      "payload_bearing": "synthetic-test",
+      "sigma": "L",
+      "d": "Leg",
+      "axis": "Leg",
+      "unfolding": "accumulated",
+      "register": "emitted",
+      "mode": "route",
+      "effect": "Synthetic recovery routing at T2.",
+      "magnitude": 2,
+      "payload_bundle": [
+        {
+          "sigma": "L",
+          "d": "Org",
+          "unfolding": "accumulated",
+          "register": "emitted",
+          "mode": "route"
+        },
+        {
+          "sigma": "L",
+          "d": "Leg",
+          "unfolding": "accumulated",
+          "register": "emitted",
+          "mode": "route"
+        }
+      ]
+    }
+  ],
+  "analysis": {
+    "cascade_type": "local synthetic contest then recovery",
+    "starting_axis": "Dir",
+    "failure_grammar": "temporary misalignment without destructive contraction",
+    "recovery_type": "adaptive restabilization",
+    "key_finding": "Synthetic three-step case for verifying timeline movement, payload rendering, and markdown companion loading; not a substantive reading.",
+    "invariants_tested": {
+      "matrix_downstream": true,
+      "order_not_scan": true,
+      "payload_schema_respected": true,
+      "no_invented_case_claims": true
+    }
+  }
+}
