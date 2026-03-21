@@ -1,0 +1,25 @@
+name: validate-cases
+
+on:
+  push:
+    paths:
+      - 'cases/**'
+      - 'solver/**'
+      - '.github/workflows/validate-cases.yml'
+  pull_request:
+    paths:
+      - 'cases/**'
+      - 'solver/**'
+      - '.github/workflows/validate-cases.yml'
+  workflow_dispatch:
+
+jobs:
+  validate-cases:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Validate saved cases
+        run: node solver/check-cases.js
