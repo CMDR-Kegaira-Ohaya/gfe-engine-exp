@@ -22,6 +22,7 @@ export const SIGMA_COLORS = {
 
 export const state = {
   sessions: [],
+  sessionReports: {},
   currentIdx: 0,
   currentT: 0,
   focusedPid: null,
@@ -76,6 +77,21 @@ export function showMsg(msg, type = 'info') {
 
 export function getCurrentSession() {
   return state.sessions[state.currentIdx] || null;
+}
+
+export function getCurrentReport(session = getCurrentSession()) {
+  if (!session?._id) return '';
+  return state.sessionReports[session._id] || '';
+}
+
+export function setCurrentReport(session, markdown) {
+  if (!session?._id) return;
+  state.sessionReports[session._id] = markdown || '';
+}
+
+export function clearCurrentReport(session = getCurrentSession()) {
+  if (!session?._id) return ;
+  delete state.sessionReports[session._id];
 }
 
 export function findParticipant(session, id) {
