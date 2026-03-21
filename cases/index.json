@@ -1,6 +1,6 @@
 {
-  "branch": "main",
-  "count": 1,
+  "branch": "cases/users/op-a",
+  "count": 3,
   "cases": [
     {
       "filename": "_seed.json",
@@ -20,6 +20,73 @@
       "payload_modes": [],
       "payload_registers": [],
       "payload_unfoldings": [],
+      "has_epsilon": false
+    },
+    {
+      "filename": "gfe_save_flow_smoke_test_2026-03-21.json",
+      "size": 4921,
+      "system_name": "GFE Save Flow Smoke Test",
+      "case_id": "gfe_save_flow_smoke_test",
+      "description": "Synthetic two-participant smoke-test case created solely to verify GPT repo save flow for JSON and markdown companion output.",
+      "participants": 2,
+      "timesteps": 1,
+      "modified": "2026-03-21T01:29:19+02:00",
+      "locus": "synthetic_test_frame",
+      "payload_events": 1,
+      "payload_primitives": 1,
+      "uses_payload_bundle": true,
+      "payload_sigmas": [
+        "L"
+      ],
+      "payload_axes": [
+        "Leg"
+      ],
+      "payload_modes": [
+        "load"
+      ],
+      "payload_registers": [
+        "retained"
+      ],
+      "payload_unfoldings": [
+        "acute"
+      ],
+      "has_epsilon": false
+    },
+    {
+      "filename": "gfe_timeline_smoke_test_2026-03-21.json",
+      "size": 13463,
+      "system_name": "GFE Timeline Smoke Test",
+      "case_id": "gfe_timeline_smoke_test",
+      "description": "Synthetic three-timestep case created to verify timeline movement, participant state updates, and markdown companion loading in the GFE Workbench.",
+      "participants": 2,
+      "timesteps": 3,
+      "modified": "2026-03-21T03:58:48+02:00",
+      "locus": "synthetic_test_frame",
+      "payload_events": 3,
+      "payload_primitives": 5,
+      "uses_payload_bundle": true,
+      "payload_sigmas": [
+        "L",
+        "M"
+      ],
+      "payload_axes": [
+        "Dir",
+        "Leg",
+        "Org"
+      ],
+      "payload_modes": [
+        "amplify",
+        "load",
+        "route"
+      ],
+      "payload_registers": [
+        "emitted",
+        "retained"
+      ],
+      "payload_unfoldings": [
+        "accumulated",
+        "acute"
+      ],
       "has_epsilon": false
     }
   ]
