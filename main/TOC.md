@@ -33,11 +33,12 @@ Read these when the task concerns executable math, validation, normalization, da
 - `/solver/`
 
 ### Layer 4 — Application implementation
-Read these when the task concerns the workbench UI, repo connection logic, rendering, or Pages behavior.
+Read these when the task concerns the workbench UI, rendering, repo connection logic, or Pages behavior.
 
 - `/index.html`
+- `/workbench-v2.html`
 - `/privacy.html`
-- `/ui/`
+- `/ui-v2/`
 - `/.github/workflows/`
 
 ### Layer 5 — Case payloads
@@ -66,7 +67,7 @@ Read these when the task concerns saved cases, case indexes, smoke tests, or mar
 ### Repo debugging / UI bugs / Pages issues
 - Start with `/main/SYSTEM_MAP.md`
 - Then `/main/EDIT_RULES.md`
-- Then relevant files in `index.html`, `/ui/`, `.github/`
+- Then relevant files in `index.html`, `workbench-v2.html`, `/ui-v2/`, and `.github/`
 
 ### Save/load flow or schema issues
 - Start with `/main/REPO_SCHEMA.json`
@@ -102,7 +103,8 @@ Read these when the task concerns saved cases, case indexes, smoke tests, or mar
 ## Current operational facts
 - `/solver/` now exists and contains executable runtime modules.
 - `/.github/workflows/` now contains at least two useful workflows: `solver-selftest.yml` and `validate-cases.yml`.
-- The workbench UI should rely on `/ui/app.js` for solver ingest behavior.
+- The public workbench now routes through `/index.html` and `/ui-v2/app.js`.
+- `workbench-v2.html` remains as a compatibility surface for the same v2 workbench.
 - If a large file write fails through the assistant tool path, prefer manual paste or git-object write paths rather than redefining architecture.
 - JavaScript structural inspection tooling now exists under `/tools/js/` and should be discoverable from boot via `/main/INSTRUCTIONS_INDEX.md`.
 
@@ -117,7 +119,7 @@ Read these when the task concerns saved cases, case indexes, smoke tests, or mar
 - `/engine/*` = Canonical
 - `/main/*` = Operational
 - `/solver/*` = Executable
-- `/index.html`, `/ui/*`, `.github/*` = Implementation
+- `/index.html`, `/workbench-v2.html`, `/ui-v2/*`, `.github/*` = Implementation
 - `/cases/*` = Data
 - `/tools/js/*` = Operational inspection tooling
 
