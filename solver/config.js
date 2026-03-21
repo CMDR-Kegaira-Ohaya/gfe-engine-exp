@@ -1,5 +1,5 @@
 export const DEFAULT_WEIGHTS = Object.freeze({
-  retainedRetentionByMode: {
+  etaRByMode: {
     load: 0.12,
     route: 0.08,
     overflow: 0.10,
@@ -8,7 +8,7 @@ export const DEFAULT_WEIGHTS = Object.freeze({
     amplify: 0.14,
     'threshold-transfer': 0.11
   },
-  emittedRetentionCostByMode: {
+  emissionCostByMode: {
     load: 0.00,
     route: 0.03,
     overflow: 0.05,
@@ -17,7 +17,7 @@ export const DEFAULT_WEIGHTS = Object.freeze({
     amplify: 0.04,
     'threshold-transfer': 0.03
   },
-  intensityByMode: {
+  etaIByMode: {
     load: 0.10,
     route: 0.08,
     overflow: 0.12,
@@ -26,7 +26,7 @@ export const DEFAULT_WEIGHTS = Object.freeze({
     amplify: 0.16,
     'threshold-transfer': 0.11
   },
-  misalignmentAvailabilityByMode: {
+  etaAByMode: {
     load: 0.03,
     route: 0.02,
     overflow: 0.04,
@@ -35,7 +35,7 @@ export const DEFAULT_WEIGHTS = Object.freeze({
     amplify: 0.05,
     'threshold-transfer': 0.04
   },
-  destructiveAvailabilityByMode: {
+  etaDstByMode: {
     load: 0.08,
     route: 0.07,
     overflow: 0.10,
@@ -44,11 +44,16 @@ export const DEFAULT_WEIGHTS = Object.freeze({
     amplify: 0.11,
     'threshold-transfer': 0.09
   },
-  accumulatedWeight: 0.7,
   acuteWeight: 1.0,
-  relaxationRI: 0.35,
-  relaxationIA: 0.22,
-  emittedRegisterCost: 1.0,
+  accumulatedWeight: 0.7,
+  lambdaEmit: 1.0,
+  rhoRI: 0.35,
+  rhoIA: 0.22,
   cfgGateCenter: 0.45,
-  cfgGateSlope: 10
+  cfgGateSlope: 10,
+  thetaGateCenter: 0.33,
+  thetaGateSlope: 12,
+  thetaStressGap: 0.12,
+  destructiveSigmaFloor: 0.20,
+  misalignmentGap: 0.10
 });
