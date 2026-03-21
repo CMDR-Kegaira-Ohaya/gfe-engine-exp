@@ -1,6 +1,6 @@
 {
   "branch": "cases/users/op-a",
-  "count": 2,
+  "count": 3,
   "cases": [
     {
       "filename": "_seed.json",
@@ -48,6 +48,43 @@
         "retained"
       ],
       "payload_unfoldings": [
+        "acute"
+      ],
+      "has_epsilon": false
+    },
+    {
+      "filename": "gfe_timeline_smoke_test_2026-03-21.json",
+      "size": 13463,
+      "system_name": "GFE Timeline Smoke Test",
+      "case_id": "gfe_timeline_smoke_test",
+      "description": "Synthetic three-timestep case created to verify timeline movement, participant state updates, and markdown companion loading in the GFE Workbench.",
+      "participants": 2,
+      "timesteps": 3,
+      "modified": "2026-03-21T03:58:48+02:00",
+      "locus": "synthetic_test_frame",
+      "payload_events": 3,
+      "payload_primitives": 5,
+      "uses_payload_bundle": true,
+      "payload_sigmas": [
+        "L",
+        "M"
+      ],
+      "payload_axes": [
+        "Dir",
+        "Leg",
+        "Org"
+      ],
+      "payload_modes": [
+        "amplify",
+        "load",
+        "route"
+      ],
+      "payload_registers": [
+        "emitted",
+        "retained"
+      ],
+      "payload_unfoldings": [
+        "accumulated",
         "acute"
       ],
       "has_epsilon": false
