@@ -14,7 +14,7 @@ Operational control layer for GPT re-entry:
 - `REPO_SCHEMA.json` = machine-readable directory and file-role map
 
 ### `/solver/`
-Executable implementation layer for validation, normalization, payload handling, and future runtime math.
+Executable implementation layer for validation, normalization, payload handling, prevalence, envelope, compensation, cascade, and future runtime math.
 This layer implements canon but does not revise it.
 No automatic process may modify this layer.
 
@@ -24,12 +24,17 @@ No automatic process may modify this layer.
 
 ### `/ui/`
 Frontend modules for rendering, repo connection, timeline behavior, right-panel behavior, and state handling.
+``/ui/app.js` is the ingest entry point for running validation and solver runtime on loaded cases.
 
 ### `/cases/`
 Repository-level case storage for public/shared/demo/smoke-test data.
+Cases are now consumed not only by the workbench but also by solver validation scripts and workflows.
 
-### `/.github/`
+### `/.github/workflows/`
 Workflow and automation files for repository maintenance and Pages behavior.
+Currently includes at least:
+- `solver-selftest.yml` = solver integrity smoke test
+- `validate-cases.yml` = case validation against solver constraints
 
 ## Conceptual flow
 1. Operator or GPT enters through `/main/TOC.md`
@@ -37,7 +42,8 @@ Workflow and automation files for repository maintenance and Pages behavior.
 3. Repo operating behavior comes from `/main/*`
 4. Executable logic, when present, lives in `/solver/*`
 5. UI renders and manipulates case data through root HTML and `/ui/*`
-6. Cases live under `/cases/*`
+6. Workflows run repo-level checks over solver and case data
+7. Cases live under `/cases/*`
 
 ## Governance rules
 - `/engine/` is canonical and human-maintained only.
@@ -53,6 +59,7 @@ Workflow and automation files for repository maintenance and Pages behavior.
 ## What should not be collapsed
 - engine doctrine vs solver implementation
 - engine doctrine vs UI code
+- workflow automation vs canonical model
 - repo operating map vs saved case data
 - bootstrap manuals vs canonical model files
 - public workbench repo vs later personal forks/copies
@@ -65,4 +72,6 @@ If context is lost, the minimum recovery path is:
 - solver work: `/solver/*`
 - UI bugs: `/ui/*`, `index.html`
 - save/load behavior: `/ui/repo.js`, `/cases/*`, relevant workflow files
+- automation/validation: `/.github/workflows/*`, `/solver/check-cases.js`, `/solver/selftest.js`
 - engine doctrine: `/engine/*` only when explicitly revising canonical content
+- if a large file write fails through the assistant tool path, prefer manual paste or git-object write paths rather than restructuring the repo to match the tool
