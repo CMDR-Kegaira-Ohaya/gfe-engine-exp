@@ -4,7 +4,7 @@ import { derivePrevalence, deriveTheta } from './prevalence.js';
 import { deriveEnvelope, buildEnvelopeSummary } from './envelope.js';
 import { deriveCompensation } from './compensation.js';
 import { deriveCascade, buildCascadeSummary } from './cascade.js';
-import { updateParticipantAxes, cfgGate, solveParticipantStep as _legacySolveParticipantStep } from './state.js';
+import { updateParticipantAxes, cfgGate } from './state.js';
 import { deepClone, defaultParticipantState, ensureAxesContainer } from './utils.js';
 
 function mergeParticipantBase(previousParticipant = {}, participantData = {}, participantId = null) {
@@ -57,7 +57,7 @@ export function solveCase(caseData, options = {}) {
   const solved = deepClone(caseData);
 
   solved.solver = {
-    version: '0.2.0',
+    version: '0.2.1',
     mode: 'canon-locked-runtime',
     weights,
   };
@@ -83,4 +83,4 @@ export function solveCase(caseData, options = {}) {
   return solved;
 }
 
-export { buildEnvelopeSummary, buildCascadeSummary, cfgGate, _legacySolveParticipantStep };
+export { buildEnvelopeSummary, buildCascadeSummary, cfgGate };
