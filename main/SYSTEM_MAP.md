@@ -24,7 +24,7 @@ No automatic process may modify this layer.
 
 ### `/ui/`
 Frontend modules for rendering, repo connection, timeline behavior, right-panel behavior, and state handling.
-``/ui/app.js` is the ingest entry point for running validation and solver runtime on loaded cases.
+`/ui/app.js` is the ingest entry point for running validation and solver runtime on loaded cases.
 
 ### `/cases/`
 Repository-level case storage for public/shared/demo/smoke-test data.
@@ -35,6 +35,11 @@ Workflow and automation files for repository maintenance and Pages behavior.
 Currently includes at least:
 - `solver-selftest.yml` = solver integrity smoke test
 - `validate-cases.yml` = case validation against solver constraints
+
+## Self-referential capability map
+- workbench surfaces = `index.html` + `/ui/*`, and `workbench-v2.html` + `/ui-v2/*`
+- workflow surfaces = `/.github/workflows/*` for validation, selftest, and repo maintenance
+- inspection/tooling surfaces = `/tools/js/*` for JavaScript structure inspection and `/main/INSTRUCTIONS_INDEX.md` + `/PROCEDURE_INDEX.md` for operational guidance
 
 ## Conceptual flow
 1. Operator or GPT enters through `/main/TOC.md`
