@@ -1,6 +1,6 @@
 import { AXES } from './constants.js';
 
-function iterateAtempts(participantData = {}) {
+function iterateAttempts(participantData = {}) {
   const cascade = participantData.cascade || {};
   if (Array.isArray(cascade.attempts)) {
     return cascade.attempts;
@@ -17,7 +17,8 @@ export function deriveCascade(participantData = {}) {
     const axisState = axes[axis] || { A: 0, I: 0, sigma: 'L' };
     const cfgState = axes.Cfg || { A: 0, sigma: 'L' };
     const cfgOked = (cfgState.A || 0) > 0 && cfgState.sigma !== 'Dst';
-    const completed = !!attempt.nll ? !!attempt.completed : cfgOked && (axisState.sigma !== 'Dst');
+    const hasExplicitCompletion = typeof attempt.completed === 'boolean';
+    const completed = hasExplicitCompletion ? attempt.completed : (cfgOked && (axisState.sigma !== 'Dst'));
     return {
       axis,
       cfg_gated: cfgOked,
