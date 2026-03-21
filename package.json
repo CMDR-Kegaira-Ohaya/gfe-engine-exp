@@ -1,0 +1,16 @@
+{
+  "name": "gfe-engine-exp-tools",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "js:check": "node ./tools/js/parse.mjs check",
+    "js:ast": "node ./tools/js/parse.mjs ast",
+    "js:symbols": "node ./tools/js/parse.mjs symbols",
+    "js:deps": "node ./tools/js/parse.mjs deps",
+    "js:find": "node ./tools/js/parse.mjs find"
+  },
+  "dependencies": {
+    "acorn": "^8.16.0",
+    "acorn-walk": "^8.3.5"
+  }
+}
