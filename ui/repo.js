@@ -114,7 +114,7 @@ export function renderRepoCaseList() {
   if (!listEl) return;
 
   const filtered = (state.repoCases || []).map((c, i) => ({ c, i })).filter(({ c }) => caseMatchesRepoFilters(c));
-  if (statusEl) statusEl.textContent = `${getBranchLabel()} · ${filtered.length}/$(state.repoCases || []).length} cases`;
+  if (statusEl) statusEl.textContent = `${getBranchLabel()} · ${filtered.length}/${(state.repoCases || []).length} cases`;
 
   if (!filtered.length) {
     listEl.innerHTML = '<div class="repo-empty">No cases match filters.</div>';
@@ -181,7 +181,7 @@ export async function connectRepo() {
   const statusEl = document.getElementById('repo-status');
   if (statusEl) {
     statusEl.style.display = 'block';
-    statusEl.textContent = 'Connecting…";
+    statusEl.textContent = 'Connecting∦';
   }
 
   try {
@@ -208,7 +208,7 @@ export async function connectRepo() {
       barEl.innerHTML = quickBranches.map(b => {
         const cls = b === 'drafts' ? 'draft' : b.startsWith('cases/') ? 'project' : '';
         const label = b.startsWith('cases/') ? b.replace('cases/', '') : b;
-        return `<div class="branch-tab ${cls} ${b === state.currentBranch ? 'active' : ''}" onclick="switchBranch('${bw}')" title="${b}">${esc(label)}</div>`;
+        return `<div class="branch-tab ${cls} ${b === state.currentBranch ? 'active' : ''}" onclick="switchBranch('${b}')" title="${b}">${esc(label)}</div>`;
       }).join('');
     } else {
       barEl.style.display = 'none';
