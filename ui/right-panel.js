@@ -1,4 +1,4 @@
-import { AXES, GLOSSES, ZONES, SIGMA_COLORS, state, esc, findParticipant } from './state.js';
+import { AXES, GLOSSES, ZONES, SIGMA_COLORS, state, esc, findParticipant, getCurrentReport } from './state.js';
 
 export function renderRight(session) {
   const t = (session.timeline || [])[state.currentT];
@@ -8,11 +8,57 @@ export function renderRight(session) {
   else renderParticipantView(session, t, findParticipant(session, state.focusedPid), el);
 }
 
+function renderSystemTabs(hasReport) {
+  return `
+    <div class="tabs">
+      <div class="tab ${state.systemTab === 'overview' ? 'active' : ''}" onclick="setTab('overview')">Overview</div>
+      <div class="tab ${state.systemTab === 'report' ? 'active' : ''}" onclick="setTab('report')">Report</div>
+    </div>
+  `;
+}
+
+function renderMarkdown(md) {
+  const safe = esc(md || '');
+  if (!safe.trim()) {
+    return `<p style="font-style:italic;color:var(--text3);font-size:13px;margin-top:20px;">No markdown companion loaded for this case.</p>`;
+  }
+
+  let html = safe;
+  html = html.replace(/^### (.*)$/gm, '<h4 style="margin:16px 0 8px 0;font-size:15px;color:var(--text1);">$1</h4>');
+  html = html.replace(/^## (.*)$/gm, '<h3 style="margin:20px 0 10px 0;font-size:17px;color:var(--gold);">$1</h3>');
+  html = html.replace(/^# (.*)$/gm, '<h2 style="margin:0 0 12px 0;font-size:20px;color:var(--text1);">$1</h2>');
+  html = html.replace(/^- (.*)$/gm, '<li>$1</li>');
+  html = html.replace(/(<li>.*\\/li>\\n?)+/g, (match) => `<ul style="margin:8px 0 14px 18px;line-height:1.7;color:var(--text2);">${match}</ul>`);
+  html = html.replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>');
+  html = html.replace(/\\*(.*?)\\*/g, '<em>$1</em>');
+
+  const parts = html.split(/\\n\\n+/).map(block => block.trim()).filter(Boolean).map(block => {
+    if (block.startsWith('<h2') || block.startsWith('<h3') || block.startsWith('<h4') || block.startsWith('<ul')) return block;
+    if (block.startsWith('Date:') || block.startsWith('Case ID:') || block.startsWith('Branch:')) {
+      return `<div style="font-size:12px;color:var(--text3);margin:4px 0;">${block.replace(/\\n/g, '<br>')}</div>`;
+    }
+    return `<p style="font-size:14px;line-height:1.75;color:var(--text2);margin:0 0 14px 0;">${block.replace(/\\n/g, '<br>')}</p>`;
+  });
+
+  return `<div class="analysis-card" style="padding:20px 22px;">${parts.join('')}</div>`;
+}
+
 export function renderSystemView(session, t, el) {
-  let html = `<div class="reading-header">
-    <div class="reading-name">${esc(session.system_name || 'System')}</div>
-    <div class="reading-meta">${esc(t.timestep_label || '')}</div>
-  </div>`;
+  const report = getCurrentReport(session);
+  const hasReport = !!report;
+  let html = `
+    <div class="reading-header">
+      <div class="reading-name">${esc(session.system_name || 'System')}</div>
+      <div class="reading-meta">${esc(t.timestep_label || '')}</div>
+    </div>
+    ${renderSystemTabs(hasReport)}
+  `;
+
+  if (state.systemTab === 'report') {
+    html += renderMarkdown(report);
+    el.innerHTML = html;
+    return;
+  }
 
   if (t.narrative_note) {
     html += `<p style="font-size:14px;font-style:italic;color:var(--text2);line-height:1.7;margin-bottom:16px;">${esc(t.narrative_note)}</p>`;
@@ -26,8 +72,10 @@ export function renderSystemView(session, t, el) {
 
   const events = (session.payload_events || []).filter(pe => pe.timestep_idx === state.currentT);
   if (events.length) {
-    html += `<div class="sec-label collapsible-header" onclick="toggleC('sys-ev')">Payload Events <span class="collapsible-arr open" id="arr-sys-ev">▶</span></div>
-    <div class="collapsible-body" id="sys-ev"><div style="margin-bottom:16px;">${renderEventsHtml(events)}</div></div>`;
+    html += `
+      <div class="sec-label collapsible-header" onclick="toggleC('sys-ev')">Payload Events <span class="collapsible-arr open" id="arr-sys-ev">▶</span></div>
+      <div class="collapsible-body" id="sys-ev"><div style="margin-bottom:16px;">${renderEventsHtml(events)}</div></div>
+    `;
   }
 
   const isLast = state.currentT === ((session.timeline?.length || 1) - 1);
@@ -49,69 +97,82 @@ export function renderParticipantView(session, t, p, el) {
   const theta = pdata.theta;
   const comp = pdata.compensation;
 
-  const tabs = `<div class="tabs">
-    <div class="tab ${state.rightTab === 'axes' ? 'active' : ''}" onclick="setTab('axes')">Axes</div>
-    <div class="tab ${state.rightTab === 'events' ? 'active' : ''}" onclick="setTab('events')">Events</div>
-    <div class="tab ${state.rightTab === 'analysis' ? 'active' : ''}" onclick="setTab('analysis')">Analysis</div>
-  </div>`;
+  const tabs = `
+    <div class="tabs">
+      <div class="tab ${state.rightTab === 'axes' ? 'active' : ''}" onclick="setTab('axes')">Axes</div>
+      <div class="tab ${state.rightTab === 'events' ? 'active' : ''}" onclick="setTab('events')">Events</div>
+      <div class="tab ${state.rightTab === 'analysis' ? 'active' : ''}" onclick="setTab('analysis')">Analysis</div>
+    </div>
+  `;
 
   let body = '';
-
   if (state.rightTab === 'axes') {
     if (prev) {
       const prevSc = SIGMA_COLORS[prev.family] || SIGMA_COLORS.L;
-      body += `<div class="prevalence-bar">
-        <span class="prev-label">Prevalence</span>
-        <span class="prev-family" style="background:${prevSc.bg};color:${prevSc.fg};">${esc(prev.family)}</span>
-        ${prev.note ? `<span class="prev-note">${esc(prev.note)}</span>` : ''}
-      </div>`;
+      body += `
+        <div class="prevalence-bar">
+          <span class="prev-label">Prevalence</span>
+          <span class="prev-family" style="background:${prevSc.bg};color:${prevSc.fg};">${esc(prev.family)}</span>
+          ${prev.note ? `<span class="prev-note">${esc(prev.note)}</span>` : ''}
+        </div>
+      `;
     }
 
     if (theta && theta.active) {
-      body += `<div class="theta-bar">
-        <span class="theta-label">Θ ACTIVE</span>
-        ${theta.blocked_family ? `<span class="theta-blocked">${esc(theta.blocked_family)} blocked</span>` : ''}
-        ${theta.note ? `<span class="theta-note">${esc(theta.note)}</span>` : ''}
-      </div>`;
+      body += `
+        <div class="theta-bar">
+          <span class="theta-label">θ ACTIVE</span>
+          ${theta.blocked_family ? `<span class="theta-blocked">${esc(theta.blocked_family)} blocked</span>` : ''}
+          ${theta.note ? `<span class="theta-note">${esc(theta.note)}</span>` : ''}
+        </div>
+      `;
     }
 
     if (comp && comp.active) {
       const compCls = comp.type === 'maladaptive' ? 'comp-maladaptive' : 'comp-adaptive';
-      body += `<div class="comp-bar">
-        <span class="comp-label">Compensation</span>
-        <span class="comp-type ${compCls}">${esc(comp.type || 'active')}</span>
-        ${comp.note ? `<span class="comp-note">${esc(comp.note)}</span>` : ''}
-      </div>`;
+      body += `
+        <div class="comp-bar">
+          <span class="comp-label">Compensation</span>
+          <span class="comp-type ${compCls}">${esc(comp.type || 'active')}</span>
+          ${comp.note ? `<span class="comp-note">${esc(comp.note)}</span>` : ''}
+        </div>
+      `;
     }
 
     if (pr) {
-      body += `<div class="register-panel">
-        <div><div class="reg-col-label">Retained</div>
-          <div class="reg-note">${esc(pr.retained?.note || '—')}</div>
+      body += `
+        <div class="register-panel">
+          <div>
+            <div class="reg-col-label">Retained</div>
+            <div class="reg-note">${esc(pr.retained?.note || '—')}</div>
+          </div>
+          <div>
+            <div class="reg-col-label emitted">Emitted</div>
+            <div class="reg-note">${esc(pr.emitted?.note || '—')}</div>
+          </div>
+          ${pr.retained?.note && pr.emitted?.note && pr.retained.note !== pr.emitted.note
+            ? `<div class="reg-gap-note">Register gap: retained ≠ emitted — payload register divergence active</div>`
+            : ''}
         </div>
-        <div><div class="reg-col-label emitted">Emitted</div>
-          <div class="reg-note">${esc(pr.emitted?.note || '—')}</div>
-        </div>
-        ${pr.retained?.note && pr.emitted?.note && pr.retained.note !== pr.emitted.note
-          ? `<div class="reg-gap-note">Register gap: retained ≠ emitted — payload register divergence active</div>`
-          : ''}
-      </div>`;
+      `;
     }
 
     if (pNote) body += `<div class="pressure-note"><span class="pn-label">Pressure</span>${esc(pNote)}</div>`;
 
-    ['foundation','bridge','articulation'].forEach(zone => {
+    ['foundation', 'bridge', 'articulation'].forEach(zone => {
       const zm = ZONES[zone];
       const inZone = zm.dims.filter(d => axes[d]);
       if (!inZone.length) return;
-      body += `<div class="zone-block">
-        <div class="zone-header">
-          <div class="zone-pip" style="background:${zm.pip}"></div>
-          <div class="zone-label" style="color:${zm.color}">${zm.label}</div>
-          <div class="zone-rule"></div>
+      body += `
+        <div class="zone-block">
+          <div class="zone-header">
+            <div class="zone-pip" style="background:${zm.pip}"></div>
+            <div class="zone-label" style="color:${zm.color}">${zm.label}</div>
+            <div class="zone-rule"></div>
+          </div>
+          ${inZone.map(d => renderAxisCard(d, axes[d])).join('')}
         </div>
-        ${inZone.map(d => renderAxisCard(d, axes[d])).join('')}
-      </div>`;
+      `;
     });
   } else if (state.rightTab === 'events') {
     const all = (session.payload_events || []).filter(pe => pe.timestep_idx === state.currentT);
@@ -133,16 +194,23 @@ export function renderParticipantView(session, t, p, el) {
 
   let subHtml = '';
   if (p?.sub_participants?.length) {
-    subHtml = `<div class="sub-prompt">
-      <span>⊕ ${p.sub_participants.length} sub-participants</span>
-      <button class="sub-btn" onclick="zoomToSub('${p.id}')">Zoom in</button>
-    </div>`;
+    subHtml = `
+      <div class="sub-prompt">
+        <span>⊕ ${p.sub_participants.length} sub-participants</span>
+        <button class="sub-btn" onclick="zoomToSub('${p.id}')">Zoom in</button>
+      </div>
+    `;
   }
 
-  el.innerHTML = `<div class="reading-header">
-    <div class="reading-name">${esc(p?.name || state.focusedPid || '')}</div>
-    <div class="reading-meta">${esc(p?.address || p?.locus || 'local')} · ${esc(p?.description || '')}</div>
-  </div>${tabs}<div>${body}</div>${subHtml}`;
+  el.innerHTML = `
+    <div class="reading-header">
+      <div class="reading-name">${esc(p?.name || state.focusedPid || '')}</div>
+      <div class="reading-meta">${esc(p?.address || p?.locus || 'local')} · ${esc(p?.description || '')}</div>
+    </div>
+    ${tabs}
+    <div>${body}</div>
+    ${subHtml}
+  `;
 }
 
 export function renderAxisCard(d, ax) {
@@ -154,35 +222,37 @@ export function renderAxisCard(d, ax) {
   const isEq = Math.abs(A - R) <= 5 && Math.abs(A - I) <= 5 && A > 0;
   const valence = ax.valence || '';
 
-  return `<div class="axis-card">
-    <div class="axis-head">
-      <span class="axis-name">${d}</span>
-      <span class="axis-gloss">${GLOSSES[d] || ''}</span>
-      <span class="sigma-badge sigma-${sigma}">σ ${sigma}</span>
-    </div>
-    <div class="axis-vals">
-      <div class="axis-val"><div class="axis-val-num val-A">${A}</div><span class="axis-val-label">A · availability</span></div>
-      <div class="axis-val"><div class="axis-val-num val-R">${R}</div><span class="axis-val-label">R · retention</span></div>
-      <div class="axis-val"><div class="axis-val-num val-I">${I}</div><span class="axis-val-label">I · intensity</span></div>
-    </div>
-    <div class="ari-bar">
-      <div class="ari-bar-a" style="width:${A}%;background:${sc.bar};"></div>
-      <div class="ari-bar-r" style="width:${R}%;background:${sc.barBright};"></div>
-      <div class="ari-bar-i" style="left:${Math.min(I,99)}%;background:var(--gold-bright);"></div>
-    </div>
-    <div class="ari-bar-legend">
-      <div class="ari-legend-item"><div class="ari-legend-pip" style="background:${sc.bar}"></div>A</div>
-      <div class="ari-legend-item"><div class="ari-legend-pip" style="background:${sc.barBright}"></div>R</div>
-      <div class="ari-legend-item"><div class="ari-legend-pip" style="background:var(--gold-bright)"></div>I</div>
-      <div class="ari-legend-item" style="margin-left:auto;">
-        ${isEq ? '<span class="eq-indicator eq-yes">≈ equilibrium</span>' : '<span class="eq-indicator eq-no">≠ disequilibrium</span>'}
+  return `
+    <div class="axis-card">
+      <div class="axis-head">
+        <span class="axis-name">${d}</span>
+        <span class="axis-gloss">${GLOSSES[d] || ''}</span>
+        <span class="sigma-badge sigma-${sigma}">σ ${sigma}</span>
       </div>
+      <div class="axis-vals">
+        <div class="axis-val"><div class="axis-val-num val-A">${A}</div><span class="axis-val-label">A · availability</span></div>
+        <div class="axis-val"><div class="axis-val-num val-R">${R}</div><span class="axis-val-label">R · retention</span></div>
+        <div class="axis-val"><div class="axis-val-num val-I">${I}</div><span class="axis-val-label">I · intensity</span></div>
+      </div>
+      <div class="ari-bar">
+        <div class="ari-bar-a" style="width:${A}%;background:${sc.bar};"></div>
+        <div class="ari-bar-r" style="width:${R}%;background:${sc.barBright};"></div>
+        <div class="ari-bar-i" style="left:${Math.min(I, 99)}%;background:var(--gold-bright);"></div>
+      </div>
+      <div class="ari-bar-legend">
+        <div class="ari-legend-item"><div class="ari-legend-pip" style="background:${sc.bar}"></div>A</div>
+        <div class="ari-legend-item"><div class="ari-legend-pip" style="background:${sc.barBright}"></div>R</div>
+        <div class="ari-legend-item"><div class="ari-legend-pip" style="background:var(--gold-bright)"></div>I</div>
+        <div class="ari-legend-item" style="margin-left:auto;">
+          ${isEq ? '<span class="eq-indicator eq-yes">≈ equilibrium</span>' : '<span class="eq-indicator eq-no">≠ disequilibrium</span>'}
+        </div>
+      </div>
+      ${valence ? `<div class="valence-row"><span class="valence-label">α_d_valence ·</span><span class="valence-text">${esc(valence)}</span></div>` : ''}
     </div>
-    ${valence ? `<div class="valence-row"><span class="valence-label">α_d_valence ·</span><span class="valence-text">${esc(valence)}</span></div>` : ''}
-  </div>`;
+  `;
 }
 
-export function renderEventsHtml(events) {
+export function renderEventsHml(events) {
   if (!events.length) return '';
   return events.map(pe => {
     const unfTag = pe.unfolding === 'acute' ? 'tag-acute' : 'tag-accumulated';
@@ -192,7 +262,7 @@ export function renderEventsHtml(events) {
     const src = esc(pe.alpha_source || pe.alpha_from || '?');
     const med = pe.alpha_medium ? esc(pe.alpha_medium) : null;
     const rcv = esc(pe.alpha_receiving || pe.alpha_to || '?');
-    const flowStr = med ? `${src} → <span style="color:var(--teal)">${med}</span> → ${rcv}` : `${src} → ${rcv}`;
+    const flowStr = med ? `${src}→ <span style="color:var(--teal)">${med}</span> → ${rcv}` : `${src}→ ${rcv}`;
     const faceBadge = pe.face ? `<span class="face-badge face-${pe.face}">${pe.face}</span>` : '';
     const intNote = pe.interference ? `<span class="interference-note">${esc(pe.interference)}</span>` : '';
     const bearNote = pe.bearing ? `<span class="tag-mode" title="payload_bearing">${esc(pe.bearing)}</span>` : '';
@@ -212,8 +282,7 @@ export function renderEventsHtml(events) {
 
 export function renderAnalysisHtml(a) {
   const invHtml = a.invariants_tested
-    ? Object.entries(a.invariants_tested).map(([k,v]) =>
-        `<span class="inv-chip ${v ? 'held' : 'failed'}">${k}</span>`).join('')
+    ? Object.entries(a.invariants_tested).map(([k, v]) => `<span class="inv-chip ${v ? 'held' : 'failed'}">${k}</span>`).join('')
     : '';
 
   return `<div class="analysis-card">
