@@ -8,7 +8,7 @@ export function renderRight(session) {
   else renderParticipantView(session, t, findParticipant(session, state.focusedPid), el);
 }
 
-function renderSystemTabs(hasReport) {
+function renderSystemTabs() {
   return `
     <div class="tabs">
       <div class="tab ${state.systemTab === 'overview' ? 'active' : ''}" onclick="setTab('overview')">Overview</div>
@@ -17,41 +17,89 @@ function renderSystemTabs(hasReport) {
   `;
 }
 
+function renderInlineMarkdown(text) {
+  let out = esc(text || '');
+  out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  out = out.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  return out;
+}
+
 function renderMarkdown(md) {
-  const safe = esc(md || '');
-  if (!safe.trim()) {
+  const text = String(md || '');
+  if (!text.trim()) {
     return `<p style="font-style:italic;color:var(--text3);font-size:13px;margin-top:20px;">No markdown companion loaded for this case.</p>`;
   }
 
-  let html = safe;
-  html = html.replace(/^### (.*)$/gm, '<h4 style="margin:16px 0 8px 0;font-size:15px;color:var(--text1);">$1</h4>');
-  html = html.replace(/^## (.*)$/gm, '<h3 style="margin:20px 0 10px 0;font-size:17px;color:var(--gold);">$1</h3>');
-  html = html.replace(/^# (.*)$/gm, '<h2 style="margin:0 0 12px 0;font-size:20px;color:var(--text1);">$1</h2>');
-  html = html.replace(/^- (.*)$/gm, '<li>$1</li>');
-  html = html.replace(/(<li>.*\\/li>\\n?)+/g, (match) => `<ul style="margin:8px 0 14px 18px;line-height:1.7;color:var(--text2);">${match}</ul>`);
-  html = html.replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>');
-  html = html.replace(/\\*(.*?)\\*/g, '<em>$1</em>');
+  const lines = text.split('\n');
+  const parts = [];
+  let i = 0;
 
-  const parts = html.split(/\\n\\n+/).map(block => block.trim()).filter(Boolean).map(block => {
-    if (block.startsWith('<h2') || block.startsWith('<h3') || block.startsWith('<h4') || block.startsWith('<ul')) return block;
-    if (block.startsWith('Date:') || block.startsWith('Case ID:') || block.startsWith('Branch:')) {
-      return `<div style="font-size:12px;color:var(--text3);margin:4px 0;">${block.replace(/\\n/g, '<br>')}</div>`;
+  while (i < lines.length) {
+    const trim = lines[i].trim();
+
+    if (!trim) {
+      i += 1;
+      continue;
     }
-    return `<p style="font-size:14px;line-height:1.75;color:var(--text2);margin:0 0 14px 0;">${block.replace(/\\n/g, '<br>')}</p>`;
-  });
+
+    if (trim.startsWith('### ')) {
+      parts.push(`<h4 style="margin:16px 0 8px 0;font-size:15px;color:var(--text1);">${renderInlineMarkdown(trim.slice(4))}</h4>`);
+      i += 1;
+      continue;
+    }
+
+    if (trim.startsWith('## ')) {
+      parts.push(`<h3 style="margin:20px 0 10px 0;font-size:17px;color:var(--gold);">${renderInlineMarkdown(trim.slice(3))}</h3>`);
+      i += 1;
+      continue;
+    }
+
+    if (trim.startsWith('# ')) {
+      parts.push(`<h2 style="margin:0 0 12px 0;font-size:20px;color:var(--text1);">${renderInlineMarkdown(trim.slice(2))}</h2>`);
+      i += 1;
+      continue;
+    }
+
+    if (trim.startsWith('- ')) {
+      const items = [];
+      while (i < lines.length && lines[i].trim().startsWith('- ')) {
+        items.push(`<li>${renderInlineMarkdown(lines[i].trim().slice(2))}</li>`);
+        i += 1;
+      }
+      parts.push(`<ul style="margin:8px 0 14px 18px;line-height:1.7;color:var(--text2);">${items.join('')}</ul>`);
+      continue;
+    }
+
+    if (trim.startsWith('Date:') || trim.startsWith('Case ID:') || trim.startsWith('Branch:')) {
+      parts.push(`<div style="font-size:12px;color:var(--text3);margin:4px 0;">${renderInlineMarkdown(trim)}</div>`);
+      i += 1;
+      continue;
+    }
+
+    const para = [trim];
+    i += 1;
+    while (i < lines.length) {
+      const next = lines[i].trim();
+      if (!next || next.startsWith('#') || next.startsWith('- ') || next.startsWith('Date:') || next.startsWith('Case ID:') || next.startsWith('Branch:')) {
+        break;
+      }
+      para.push(next);
+      i += 1;
+    }
+    parts.push(`<p style="font-size:14px;line-height:1.75;color:var(--text2);margin:0 0 14px 0;">${renderInlineMarkdown(para.join('<br>'))}</p>`);
+  }
 
   return `<div class="analysis-card" style="padding:20px 22px;">${parts.join('')}</div>`;
 }
 
 export function renderSystemView(session, t, el) {
   const report = getCurrentReport(session);
-  const hasReport = !!report;
   let html = `
     <div class="reading-header">
       <div class="reading-name">${esc(session.system_name || 'System')}</div>
       <div class="reading-meta">${esc(t.timestep_label || '')}</div>
     </div>
-    ${renderSystemTabs(hasReport)}
+    ${renderSystemTabs()}
   `;
 
   if (state.systemTab === 'report') {
@@ -70,7 +118,7 @@ export function renderSystemView(session, t, el) {
     html += `<div class="pressure-dynamics"><span class="pd-label">Pressure dynamics</span>${esc(t.pressure_dynamics)}</div>`;
   }
 
-  const events = (session.payload_events || []).filter(pe => pe.timestep_idx === state.currentT);
+  const events = (session.payload_events || []).filter((pe) => pe.timestep_idx === state.currentT);
   if (events.length) {
     html += `
       <div class="sec-label collapsible-header" onclick="toggleC('sys-ev')">Payload Events <span class="collapsible-arr open" id="arr-sys-ev">▶</span></div>
@@ -121,7 +169,7 @@ export function renderParticipantView(session, t, p, el) {
     if (theta && theta.active) {
       body += `
         <div class="theta-bar">
-          <span class="theta-label">θ ACTIVE</span>
+          <span class="theta-label">Θ ACTIVE</span>
           ${theta.blocked_family ? `<span class="theta-blocked">${esc(theta.blocked_family)} blocked</span>` : ''}
           ${theta.note ? `<span class="theta-note">${esc(theta.note)}</span>` : ''}
         </div>
@@ -159,9 +207,9 @@ export function renderParticipantView(session, t, p, el) {
 
     if (pNote) body += `<div class="pressure-note"><span class="pn-label">Pressure</span>${esc(pNote)}</div>`;
 
-    ['foundation', 'bridge', 'articulation'].forEach(zone => {
+    ['foundation', 'bridge', 'articulation'].forEach((zone) => {
       const zm = ZONES[zone];
-      const inZone = zm.dims.filter(d => axes[d]);
+      const inZone = zm.dims.filter((d) => axes[d]);
       if (!inZone.length) return;
       body += `
         <div class="zone-block">
@@ -170,13 +218,13 @@ export function renderParticipantView(session, t, p, el) {
             <div class="zone-label" style="color:${zm.color}">${zm.label}</div>
             <div class="zone-rule"></div>
           </div>
-          ${inZone.map(d => renderAxisCard(d, axes[d])).join('')}
+          ${inZone.map((d) => renderAxisCard(d, axes[d])).join('')}
         </div>
       `;
     });
   } else if (state.rightTab === 'events') {
-    const all = (session.payload_events || []).filter(pe => pe.timestep_idx === state.currentT);
-    const rel = all.filter(pe => {
+    const all = (session.payload_events || []).filter((pe) => pe.timestep_idx === state.currentT);
+    const rel = all.filter((pe) => {
       const srcId = (pe.alpha_source || pe.alpha_from || '').split('.')[0];
       const rcvId = (pe.alpha_receiving || pe.alpha_to || '').split('.')[0];
       const medId = (pe.alpha_medium || '').split('.')[0];
@@ -252,9 +300,9 @@ export function renderAxisCard(d, ax) {
   `;
 }
 
-export function renderEventsHml(events) {
+export function renderEventsHtml(events) {
   if (!events.length) return '';
-  return events.map(pe => {
+  return events.map((pe) => {
     const unfTag = pe.unfolding === 'acute' ? 'tag-acute' : 'tag-accumulated';
     const unfLabel = pe.unfolding === 'acute' ? '↓ acute' : '↑ accum';
     const regTag = pe.register === 'emitted' ? 'tag-emitted' : 'tag-retained';
@@ -262,21 +310,23 @@ export function renderEventsHml(events) {
     const src = esc(pe.alpha_source || pe.alpha_from || '?');
     const med = pe.alpha_medium ? esc(pe.alpha_medium) : null;
     const rcv = esc(pe.alpha_receiving || pe.alpha_to || '?');
-    const flowStr = med ? `${src}→ <span style="color:var(--teal)">${med}</span> → ${rcv}` : `${src}→ ${rcv}`;
+    const flowStr = med ? `${src} → <span style="color:var(--teal)">${med}</span> → ${rcv}` : `${src} → ${rcv}`;
     const faceBadge = pe.face ? `<span class="face-badge face-${pe.face}">${pe.face}</span>` : '';
     const intNote = pe.interference ? `<span class="interference-note">${esc(pe.interference)}</span>` : '';
     const bearNote = pe.bearing ? `<span class="tag-mode" title="payload_bearing">${esc(pe.bearing)}</span>` : '';
-    return `<div class="event-row">
-      <span class="ev-flow">${flowStr}</span>
-      ${sigBadge}${faceBadge}
-      <span class="ev-tag ${unfTag}">${unfLabel}</span>
-      <span class="ev-tag ${regTag}">${pe.register || 'retained'}</span>
-      ${pe.mode ? `<span class="tag-mode">${esc(pe.mode)}</span>` : ''}
-      ${bearNote}
-      <span class="ev-desc">${esc(pe.effect || '')}</span>
-      ${intNote}
-      ${pe.magnitude ? `<span class="ev-mag">×${pe.magnitude}</span>` : ''}
-    </div>`;
+    return `
+      <div class="event-row">
+        <span class="ev-flow">${flowStr}</span>
+        ${sigBadge}${faceBadge}
+        <span class="ev-tag ${unfTag}">${unfLabel}</span>
+        <span class="ev-tag ${regTag}">${pe.register || 'retained'}</span>
+        ${pe.mode ? `<span class="tag-mode">${esc(pe.mode)}</span>` : ''}
+        ${bearNote}
+        <span class="ev-desc">${esc(pe.effect || '')}</span>
+        ${intNote}
+        ${pe.magnitude ? `<span class="ev-mag">×${pe.magnitude}</span>` : ''}
+      </div>
+    `;
   }).join('');
 }
 
