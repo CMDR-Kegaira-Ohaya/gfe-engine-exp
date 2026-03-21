@@ -5,6 +5,6 @@ export { normalizePayloadEvent, groupEventsByStep, aggregateParticipantPayload, 
 export { derivePrevalence, deriveTheta } from './prevalence.js';
 export { deriveEnvelope } from './envelope.js';
 export { deriveCompensation } from './compensation.js';
-export { deriveCascad } from './cascade.js';
+export { deriveCascade } from './cascade.js';
 export { updateParticipantAxes } from './state.js';
 export { DEFAULT_WEIGHTS } from './config.js';
