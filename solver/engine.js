@@ -1,73 +1,53 @@
-import { AXES, GROUNDING_AXES } from './constants.js';
 import { DEFAULT_WEIGHTS } from './config.js';
-import { aggregateAxisContributions, groupEventsByStep } from './payload.js';
-import { clip01, deepClone, ensureAxesContainer, toCanonicalScale, toDisplayScale } from './utils.js';
+import { aggregateParticipantPayload, groupEventsByStep, countParticipantModes } from './payload.js';
+import { derivePrevalence, deriveTheta } from './prevalence.js';
+import { deriveEnvelope, buildEnvelopeSummary } from './envelope.js';
+import { deriveCompensation } from './compensation.js';
+import { deriveCascade, buildCascadeSummary } from './cascade.js';
+import { updateParticipantAxes, cfgGate, solveParticipantStep as _legacySolveParticipantStep } from './state.js';
+import { deepClone, defaultParticipantState, ensureAxesContainer } from './utils.js';
 
-export function cfgGate(cfgAxis, weights = DEFAULT_WEIGHTS) {
-  const a = toCanonicalScale(cfgAxis?.A);
-  const x = weights.cfgGateSlope * (a - weights.cfgGateCenter);
-  return 1 / (1 + Math.exp(-x));
+function mergeParticipantBase(previousParticipant = {}, participantData = {}, participantId = null) {
+  const base = deepClone(previousParticipant?.id ? previousParticipant : defaultParticipantState(participantId));
+  const incoming = deepClone(participantData || {});
+  return {
+    ...base,
+    ...incoming,
+    id: participantId || incoming.id || base.id || null,
+    axes: ensureAxesContainer(incoming.axes || base.axes || {}),
+  };
 }
 
 export function solveParticipantStep(previousParticipant = {}, events = [], weights = DEFAULT_WEIGHTS) {
-  const previousAxes = ensureAxesContainer(previousParticipant.axes || {});
-  const nextAxes = {};
-
-  for (const axis of AXES) {
-    const prev = previousAxes[axis];
-    const A = toCanonicalScale(prev.A);
-    const R = toCanonicalScale(prev.R);
-    const I = toCanonicalScale(prev.I);
-    const contributions = aggregateAxisContributions(events, previousParticipant.id, axis, weights);
-
-    const nextR = clip01(
-      R + contributions.retainedIn - (weights.emittedRegisterCost * contributions.emittedOut)
-    );
-
-    const nextI = clip01(
-      I + contributions.intensityDelta + weights.relaxationRI * (nextR - I)
-    );
-
-    const gate = cfgGate(previousAxes.Cfg, weights);
-    const nextA = clip01(
-      A
-      - contributions.misalignmentContest
-      - contributions.destructiveContract
-      + gate * weights.relaxationIA * (nextI - A)
-    );
-
-    let sigma = prev.sigma || 'L';
-    if (contributions.destructiveContract > 0 || nextA < 0.2) sigma = 'Dst';
-    else if (contributions.misalignmentContest > 0 || nextA < A || nextI > nextA + 0.1) sigma = 'M';
-    else sigma = 'L';
-
-    nextAxes[axis] = {
-      A: toDisplayScale(nextA),
-      R: toDisplayScale(nextR),
-      I: toDisplayScale(nextI),
-      sigma,
-      valence: prev.valence || ''
-    };
-  }
-
-  const cfgSigma = nextAxes.Cfg.sigma;
-  const prevalence = {
-    family: cfgSigma === 'Dst' ? 'M' : cfgSigma,
-    note: previousParticipant.prevalence?.note || ''
-  };
-
-  const envelope = {
-    adm: nextAxes.Cfg.A,
-    bear: nextAxes.Emb.A,
-    coh: nextAxes.Org.A,
-    floor: Math.min(nextAxes.Cfg.A, nextAxes.Emb.A, nextAxes.Org.A)
-  };
+  const participant = mergeParticipantBase(previousParticipant, previousParticipant, previousParticipant.id || null);
+  const aggregates = aggregateParticipantPayload(events, participant.id, weights);
+  const updatedAxes = updateParticipantAxes(participant.axes, aggregates, weights);
+  const prevalence = derivePrevalence(updatedAxes.canonical, weights);
+  const theta = deriveTheta(updatedAxes.canonical, prevalence, weights);
+  const mode_counts = countParticipantModes(events, participant.id);
+  const compensation = deriveCompensation(mode_counts, theta);
+  const envelope = deriveEnvelope(updatedAxes.canonical);
+  const cascade = deriveCascade({
+    ...participant,
+    axes: updatedAxes.display,
+    _canonical_axes: updatedAxes.canonical,
+    compensation,
+  });
 
   return {
-    ...deepClone(previousParticipant),
-    axes: nextAxes,
+    ...participant,
+    axes: updatedAxes.display,
+    _canonical_axes: updatedAxes.canonical,
     prevalence,
-    envelope
+    theta,
+    compensation,
+    envelope,
+    cascade,
+    solver_debug: {
+      cfg_gate: updatedAxes.cfg_gate,
+      aggregates,
+      mode_counts,
+    },
   };
 }
 
@@ -75,46 +55,32 @@ export function solveCase(caseData, options = {}) {
   const weights = { ...DEFAULT_WEIGHTS, ...(options.weights || {}) };
   const groupedEvents = groupEventsByStep(caseData.payload_events || []);
   const solved = deepClone(caseData);
+
   solved.solver = {
-    version: '0.1.0',
-    mode: 'derived',
-    weights
+    version: '0.2.0',
+    mode: 'canon-locked-runtime',
+    weights,
   };
 
   const timeline = Array.isArray(solved.timeline) ? solved.timeline : [];
+  const previousParticipants = new Map();
+
   for (let stepIndex = 0; stepIndex < timeline.length; stepIndex += 1) {
     const step = timeline[stepIndex];
     const stepEvents = groupedEvents.get(stepIndex) || [];
-    const participants = step.participants || {};
-    for (const [pid, participantData] of Object.entries(participants)) {
-      participantData.id = pid;
-      participantData.axes = ensureAxesContainer(participantData.axes);
-      participants[pid] = solveParticipantStep(participantData, stepEvents, weights);
+    const stepParticipants = step.participants || {};
+
+    for (const [participantId, participantData] of Object.entries(stepParticipants)) {
+      const merged = mergeParticipantBase(previousParticipants.get(participantId), participantData, participantId);
+      const solvedParticipant = solveParticipantStep(merged, stepEvents, weights);
+      stepParticipants[participantId] = solvedParticipant;
+      previousParticipants.set(participantId, solvedParticipant);
     }
   }
 
   solved.envelope_summary = buildEnvelopeSummary(solved);
+  solved.cascade_summary = buildCascadeSummary(solved);
   return solved;
 }
 
-export function buildEnvelopeSummary(caseData) {
-  const summary = [];
-  for (const step of caseData.timeline || []) {
-    const row = { timestep_label: step.timestep_label, participants: {} };
-    for (const [pid, participantData] of Object.entries(step.participants || {})) {
-      const axes = participantData.axes || {};
-      row.participants[pid] = {
-        Adm: axes.Cfg?.A ?? 0,
-        Bear: axes.Emb?.A ?? 0,
-        Coh: axes.Org?.A ?? 0,
-        Envelope: Math.min(
-          axes.Cfg?.A ?? 0,
-          axes.Emb?.A ?? 0,
-          axes.Org?.A ?? 0
-        )
-      };
-    }
-    summary.push(row);
-  }
-  return summary;
-}
+export { buildEnvelopeSummary, buildCascadeSummary, cfgGate, _legacySolveParticipantStep };
