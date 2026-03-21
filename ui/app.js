@@ -5,6 +5,7 @@ import { renderAll, jumpTo, focusP, switchSession, removeSession } from './rende
 import { connectRepo, switchBranch, loadRepoCase, onRepoFilterChange, resetRepoFilters, loadRepoConfig } from './repo.js';
 import { saveCurrentCaseJson, saveCurrentAnalysisMd, saveBothToRepo } from './save.js';
 import { onConstellationClick, zoomTo, zoomToSub } from './constellation.js';
+import { validateCase, solveCase, buildDashboardChunks } from '../solver/index.js';
 
 export function loadFromPaste() {
   const raw = document.getElementById('paste-area')?.value.trim() || '';
@@ -52,6 +53,76 @@ function readFile(file) {
   reader.readAsText(file);
 }
 
+function runSolverPipeline(session) {
+  const validation = validateCase(session);
+  const solved = solveCase(session);
+  const dashboardChunks = buildDashboardChunks(solved);
+
+  solved.solver = {
+    ...(solved.solver || {}),
+    validation,
+    dashboard_chunk_count: dashboardChunks.length,
+    last_run_at: new Date().toISOString()
+  };
+  solved.dashboard_chunks = dashboardChunks;
+
+  return { solved, validation, dashboardChunks };
+}
+
+function formatSolverMessage(session, validation, dashboardChunks) {
+  const name = session.system_name || session.case_id || 'unnamed';
+  const errors = validation.issues.filter(issue => issue.level === 'error').length;
+  const warnings = validation.issues.filter(issue => issue.level === 'warning').length;
+  const core = `Solver run: ${name} — ${dashboardChunks.length} chunks`;
+  if (errors > 0) return `${core}, ${errors} errors, ${warnings} warnings`;
+  if (warnings > 0) return `${core}, ${warnings} warnings`;
+  return `${core}, validation ok`;
+}
+
+function recomputeSessionAtIndex(index) {
+  const session = state.sessions[index];
+  if (!session) return null;
+
+  const originalId = session._id ?? (Date.now() + index);
+  const originalType = session._type ?? 'new';
+  const { solved, validation, dashboardChunks } = runSolverPipeline(session);
+
+  solved._id = originalId;
+  solved._type = originalType;
+  state.sessions[index] = solved;
+
+  return { solved, validation, dashboardChunks };
+}
+
+function recomputeStoredSessions() {
+  if (!state.sessions.length) return;
+
+  for (let index = 0; index < state.sessions.length; index += 1) {
+    recomputeSessionAtIndex(index);
+  }
+
+  if (state.currentIdx >= state.sessions.length) {
+    state.currentIdx = Math.max(0, state.sessions.length - 1);
+  }
+
+  saveToStorage();
+}
+
+export function runCurrentSolver() {
+  const result = recomputeSessionAtIndex(state.currentIdx);
+  if (!result) {
+    showMsg('No case loaded.', 'error');
+    return;
+  }
+
+  saveToStorage();
+  renderAll();
+  showMsg(
+    formatSolverMessage(result.solved, result.validation, result.dashboardChunks),
+    result.validation.ok ? 'info' : 'error'
+  );
+}
+
 export function ingestCase(data) {
   data = normalizeSchema(data);
   const type = detectType(data);
@@ -68,12 +139,21 @@ export function ingestCase(data) {
     state.zoomStack = [];
   }
 
+  const result = recomputeSessionAtIndex(state.currentIdx);
+  if (!result) {
+    showMsg('Could not run solver.', 'error');
+    return;
+  }
+
   state.systemTab = 'overview';
   state.rightTab = 'axes';
 
   saveToStorage();
   renderAll();
-  showMsg('Case loaded: ' + (data.system_name || data.case_id || 'unnamed'), 'info');
+  showMsg(
+    formatSolverMessage(result.solved, result.validation, result.dashboardChunks),
+    result.validation.ok ? 'info' : 'error'
+  );
 }
 
 export function clearAll() {
@@ -155,7 +235,10 @@ export function initApp() {
     console.error('URL load error:', e);
   }
 
-  loadFromStorage(renderAll);
+  loadFromStorage(() => {
+    recomputeStoredSessions();
+    renderAll();
+  });
 }
 
 window.loadFromPaste = loadFromPaste;
@@ -173,6 +256,7 @@ window.zoomTo = i => zoomTo(i, renderAll);
 window.zoomToSub = pid => zoomToSub(pid, renderAll);
 window.setTab = setTab;
 window.toggleC = toggleC;
+window.runCurrentSolver = runCurrentSolver;
 window.saveCurrentCaseJson = saveCurrentCaseJson;
 window.saveCurrentAnalysisMd = saveCurrentAnalysisMd;
 window.saveBothToRepo = saveBothToRepo;
