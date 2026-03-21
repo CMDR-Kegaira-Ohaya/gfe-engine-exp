@@ -18,6 +18,7 @@
 }
 
 * { box-sizing: border-box; }
+html, body { min-height: 100%; }
 body {
   margin: 0;
   background: linear-gradient(180deg, #0d1015 0%, #111520 100%);
@@ -57,30 +58,37 @@ button:disabled {
 }
 .file-btn input { display: none; }
 
-.shell {
-  display: grid;
-  grid-template-columns: 340px 1fr;
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
   min-height: 100vh;
-}
-.sidebar {
   padding: 18px;
-  border-right: 1px solid var(--line);
-  background: rgba(12, 15, 21, 0.82);
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap);
 }
-.main {
-  padding: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap);
+.masthead {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.9fr) minmax(320px, 1.1fr) auto;
+  gap: 18px;
+  align-items: start;
 }
-.brand h1 {
+.masthead-brand h1 {
   margin: 0 0 6px;
-  font-size: 1.45rem;
+  font-size: 1.55rem;
 }
-.brand p, .workspace-subtitle, .eyebrow, .empty, .muted {
+.masthead-workspace {
+  padding-top: 6px;
+}
+.workspace-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+.masthead-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.workspace-subtitle, .eyebrow, .empty, .muted, .masthead-brand p {
   color: var(--muted);
 }
 .eyebrow {
@@ -98,7 +106,7 @@ button:disabled {
 .card, .panel, .tab-pane {
   padding: 14px;
 }
-.section-head, .panel-head, .topbar {
+.section-head, .panel-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -108,6 +116,22 @@ button:disabled {
   margin: 0;
   font-size: 0.98rem;
 }
+
+.control-deck {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.85fr) minmax(360px, 1.35fr) minmax(300px, 1fr);
+  gap: 14px;
+  align-items: stretch;
+}
+.deck-card {
+  min-height: 100%;
+}
+.load-group {
+  display: grid;
+  gap: 12px;
+  min-height: 100%;
+}
+
 .mode-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -137,28 +161,16 @@ input, textarea, select {
 }
 textarea {
   resize: vertical;
-  min-height: 110px;
+  min-height: 126px;
 }
 .row {
   display: flex;
   gap: 10px;
-  margin-top: 12px;
 }
 .row > * {
   flex: 1;
 }
-.topbar {
-  align-items: flex-start;
-}
-.workspace-title {
-  font-size: 1.15rem;
-  font-weight: 700;
-}
-.topbar-actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
+
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -176,11 +188,19 @@ textarea {
   font-size: 1.3rem;
   font-weight: 700;
 }
-.workspace-grid {
+
+.workstage {
   display: grid;
-  grid-template-columns: 1.3fr 1fr 0.9fr;
-  gap: 12px;
+  grid-template-columns: minmax(360px, 1.1fr) minmax(540px, 1.45fr) minmax(280px, 0.85fr);
+  gap: 14px;
+  align-items: start;
 }
+.center-stage {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
 .badge {
   display: inline-flex;
   align-items: center;
@@ -198,6 +218,18 @@ textarea {
   flex-direction: column;
   gap: 10px;
   min-height: 120px;
+}
+.panel-sources .source-list,
+.panel-participants .participant-list {
+  max-height: 960px;
+  overflow: auto;
+  padding-right: 4px;
+}
+.panel-timeline .timeline-list,
+.repo-list {
+  max-height: 320px;
+  overflow: auto;
+  padding-right: 4px;
 }
 .source-item, .repo-item, .timeline-item, .participant-item {
   border: 1px solid var(--line);
@@ -226,6 +258,7 @@ textarea {
 .source-controls input {
   padding: 8px 10px;
 }
+
 .tabs {
   display: flex;
   flex-wrap: wrap;
@@ -235,7 +268,7 @@ textarea {
   background: #1c2230;
 }
 .tab-content {
-  min-height: 340px;
+  min-height: 420px;
 }
 .tab-pane {
   display: grid;
@@ -243,7 +276,7 @@ textarea {
 }
 .overview-grid, .derived-grid {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
+  grid-template-columns: 1.15fr 1fr;
   gap: 14px;
 }
 .kv-grid, .axis-grid, .layer-grid {
@@ -324,16 +357,39 @@ pre {
 a {
   color: var(--accent);
 }
-@media (max-width: 1280px) {
+
+@media (max-width: 1440px) {
+  .control-deck {
+    grid-template-columns: 1fr 1.2fr;
+  }
+  .repo-card {
+    grid-column: 1 / -1;
+  }
   .summary-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .workspace-grid, .overview-grid, .derived-grid { grid-template-columns: 1fr; }
+  .workstage { grid-template-columns: minmax(320px, 1fr) minmax(440px, 1.3fr); }
+  .panel-participants { grid-column: 1 / -1; }
 }
-@media (max-width: 980px) {
-  .shell { grid-template-columns: 1fr; }
-  .sidebar { border-right: 0; border-bottom: 1px solid var(--line); }
+@media (max-width: 1080px) {
+  .masthead {
+    grid-template-columns: 1fr;
+  }
+  .masthead-actions {
+    justify-content: flex-start;
+  }
+  .control-deck,
+  .workstage,
+  .overview-grid,
+  .derived-grid {
+    grid-template-columns: 1fr;
+  }
   .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 640px) {
-  .summary-grid, .kv-grid, .axis-grid, .layer-grid, .mode-grid, .source-controls { grid-template-columns: 1fr; }
-  .row, .topbar-actions, .tabs { flex-direction: column; }
+  .summary-grid, .kv-grid, .axis-grid, .layer-grid, .mode-grid, .source-controls {
+    grid-template-columns: 1fr;
+  }
+  .row, .masthead-actions, .tabs {
+    flex-direction: column;
+  }
+  .app-shell { padding: 12px; }
 }
