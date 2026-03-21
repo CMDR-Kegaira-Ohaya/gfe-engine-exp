@@ -20,9 +20,7 @@ export function renderAll() {
 
   show('right-empty', !hasData);
   show('right-content', hasData);
-
-  ['sessions-section','envelope-section','constellation-section','timeline-section','strips-section']
-    .forEach(id => show(id, hasData));
+  ['sessions-section', 'envelope-section', 'constellation-section', 'timeline-section', 'strips-section'].forEach(id => show(id, hasData));
 
   if (!hasData) return;
 
@@ -70,6 +68,7 @@ export function getEnvelope(s) {
 export function renderEnvelope(s) {
   const ev = getEnvelope(s);
   if (!ev) return;
+
   const score = document.getElementById('env-score');
   const status = document.getElementById('env-status');
   const comps = document.getElementById('env-components');
@@ -80,7 +79,7 @@ export function renderEnvelope(s) {
   }
 
   if (status) {
-    status.textContent = ev.env < 10 ? '⬛ COLLAPSE' : ev.env < 30 ? '⚠ CRITICAL' : ev.env < 60 ? '◈ STRAINED' : '◉ HOLDING';
+    status.textContent = ev.env < 10 ? '⬛ COLLAPSE' : ev.env < 30 ? '₠ CRITICAL' : ev.env < 60 ? '◈ STRAINED' : '❉ HOLDING';
     status.style.color = ev.env < 30 ? 'var(--dst)' : ev.env < 60 ? 'var(--mis)' : 'var(--al)';
   }
 
@@ -88,7 +87,8 @@ export function renderEnvelope(s) {
     comps.innerHTML = `
       <div class="env-comp"><div class="env-comp-val" style="color:var(--gold)">${ev.adm}</div><span class="env-comp-label">Adm·Cfg</span></div>
       <div class="env-comp"><div class="env-comp-val" style="color:var(--gold)">${ev.bear}</div><span class="env-comp-label">Bear·Emb</span></div>
-      <div class="env-comp"><div class="env-comp-val" style="color:var(--teal)">${ev.coh}</div><span class="env-comp-label">Coh·Org</span></div>`;
+      <div class="env-comp"><div class="env-comp-val" style="color:var(--teal)">${ev.coh}</div><span class="env-comp-label">Coh·Org</span></div>
+    `;
   }
 }
 
@@ -96,6 +96,7 @@ export function renderTimeline(s) {
   const tl = s.timeline || [];
   const slider = document.getElementById('tl-slider');
   if (!slider) return;
+
   slider.max = Math.max(0, tl.length - 1);
   slider.value = state.currentT;
   slider.oninput = () => {
@@ -133,15 +134,17 @@ export function renderStrips(s) {
     const comp = pdata.compensation;
 
     const miniAxes = AXES.map(d => {
-      const ax = axes[d] || { A:0, R:0, I:0, sigma:'L' };
+      const ax = axes[d] || { A: 0, R: 0, I: 0, sigma: 'L' };
       const sc = SIGMA_COLORS[ax.sigma] || SIGMA_COLORS.L;
-      return `<div>
-        <div class="mini-axis-label">${d}</div>
-        <div class="mini-bar">
-          <div class="mini-bar-a" style="width:${ax.A}%;background:${sc.bar};"></div>
-          <div class="mini-bar-r" style="width:${ax.R}%;background:${sc.barBright};"></div>
+      return `
+        <div>
+          <div class="mini-axis-label">${d}</div>
+          <div class="mini-bar">
+            <div class="mini-bar-a" style="width:${ax.A}%;background:${sc.bar};"></div>
+            <div class="mini-bar-r" style="width:${ax.R}%;background:${sc.barBright};"></div>
+          </div>
         </div>
-      </div>`;
+      `;
     }).join('');
 
     let indicators = '';
@@ -151,24 +154,24 @@ export function renderStrips(s) {
         const psc = SIGMA_COLORS[prev.family] || SIGMA_COLORS.L;
         inds.push(`<span class="strip-ind" style="background:${psc.bg};color:${psc.fg};">prev:${prev.family}</span>`);
       }
-      if (theta?.active) inds.push(`<span class="strip-ind" style="background:var(--dst-pale);color:var(--dst);">Θ</span>`);
+      if (theta?.active) inds.push(`<span class="strip-ind" style="background:var(--dst-pale);color:var(--dst);">Β</span>`);
       if (comp?.active) {
-        const cc = comp.type === 'maladaptive'
-          ? 'background:var(--mis-pale);color:var(--mis)'
-          : 'background:var(--al-pale);color:var(--al)';
+        const cc = comp.type === 'maladaptive' ? 'background:var(--mis-pale);color:var(--mis)' : 'background:var(--al-pale);color:var(--al)';
         inds.push(`<span class="strip-ind" style="${cc}">comp</span>`);
       }
       indicators = `<div class="strip-indicators">${inds.join('')}</div>`;
     }
 
-    return `<div class="strip ${state.focusedPid === p.id ? 'focused' : ''}" onclick="focusP('${p.id}')">
-      <div class="strip-header">
-        <span class="strip-name">${esc(p.name || p.id)}</span>
-        <span class="strip-locus">${esc(p.address || p.locus || 'local')}</span>
+    return `
+      <div class="strip ${state.focusedPid === p.id ? 'focused' : ''}" onclick="focusP('${p.id}')">
+        <div class="strip-header">
+          <span class="strip-name">${esc(p.name || p.id)}</span>
+          <span class="strip-locus">${esc(p.address || p.locus || 'local')}</span>
+        </div>
+        <div class="mini-axes">${miniAxes}</div>
+        ${indicators}
       </div>
-      <div class="mini-axes">${miniAxes}</div>
-      ${indicators}
-    </div>`;
+    `;
   }).join('');
 }
 
@@ -182,15 +185,17 @@ export function switchSession(i) {
   state.currentT = 0;
   state.focusedPid = null;
   state.zoomStack = [];
+  state.systemTab = 'overview';
+  state.rightTab = 'axes';
   renderAll();
 }
 
 export function removeSession(e, i) {
   e.stopPropagation();
+  const removed = state.sessions[i];
+  if (removed?._id) delete state.sessionReports[removed._id];
   state.sessions.splice(i, 1);
-  if (state.currentIdx >= state.sessions.length) {
-    state.currentIdx = Math.max(0, state.sessions.length - 1);
-  }
+  if (state.currentIdx >= state.sessions.length) state.currentIdx = Math.max(0, state.sessions.length - 1);
   saveToStorage();
   renderAll();
 }
