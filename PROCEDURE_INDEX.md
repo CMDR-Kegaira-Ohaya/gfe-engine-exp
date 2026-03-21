@@ -1,6 +1,6 @@
 # PROCEDURE_INDEX
 
-This file records stable procedures for repository troubleshooting and write-path recovery.
+This file records stable procedures for repository troubleshooting, write-path recovery, and repeatable operational workflows.
 Add new entries here when a failure mode becomes repeatable and a working procedure is confirmed.
 
 ## Known likely errors
@@ -40,7 +40,28 @@ If edits are required and they touch workflow behavior or workflow files, includ
 
 - `permissions: workflows: write`
 
-For `.github/workflows/*` edits specifically, verify that workflow write capability exists before attempting the commit.
+For `/.github/workflows/*` edits specifically, verify that workflow write capability exists before attempting the commit.
+
+## Procedure: operational instruction surfaces
+
+When a repo-useful tool or repeatable operational capability is added:
+1. place its operational summary in `/main/INSTRUCTIONS_INDEX.md`
+2. link it from `/main/TOC.md`
+3. keep low-level usage details in the relevant tool README if needed
+4. avoid burying boot-relevant knowledge in isolated README files only
+
+## Procedure: JavaScript structural inspection
+
+Repo-local JS inspection tooling lives under `/tools/js/`.
+
+Primary commands:
+- `npm run js:check -- <file>`
+- `npm run js:symbols -- <file>`
+- `npm run js:deps -- <file>`
+- `npm run js:find -- <file> <name>`
+- `npm run js:summary-all`
+
+Use this tooling when structural certainty is needed before JS edits.
 
 ## Fallback plan
 
