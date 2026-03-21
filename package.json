@@ -7,7 +7,8 @@
     "js:ast": "node ./tools/js/parse.mjs ast",
     "js:symbols": "node ./tools/js/parse.mjs symbols",
     "js:deps": "node ./tools/js/parse.mjs deps",
-    "js:find": "node ./tools/js/parse.mjs find"
+    "js:find": "node ./tools/js/parse.mjs find",
+    "js:summary-all": "node ./tools/js/summary-all.mjs"
   },
   "dependencies": {
     "acorn": "^8.16.0",
