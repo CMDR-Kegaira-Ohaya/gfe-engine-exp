@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GFE Workbench v3</title>
+  <link rel="stylesheet" href="./ui-v3/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="masthead">
+      <div class="brand-block">
+        <div class="eyebrow">GFE Experimental</div>
+        <h1>Workbench v3</h1>
+        <p>Case-first reader for canonical case, case encoding, and case reading.</p>
+      </div>
+      <div class="actions">
+        <button id="clear-btn" class="ghost">Clear</button>
+        <button id="delete-btn" class="ghost">Delete</button>
+      </div>
+    </header>
+
+    <div class="notice-bar" id="notice">V3 is running in parallel with v2.</div>
+
+    <section class="topside-rail" id="topside-rail">
+      <button class="topbtn active" data-top="open">Open case</button>
+      <button class="topbtn" data-top="load">Load case package</button>
+      <button class="topbtn" data-top="reading">Generate reading</button>
+    </section>
+
+    <section class="grid">
+      <aside class="panel left-panel">
+        <div class="panel-head">
+          <h2>Open case</h2>
+          <button id="reload-catalog" class="ghost">Reload</button>
+        </div>
+        <p class="panel-intro">Browse canonical cases from the live catalog.</p>
+        <div id="catalog-list" class="catalog-list empty">Loading catalog… </div>
+      </aside>
+
+      <section class="center-panel">
+        <div class="case-header">
+          <div>
+            <div class="eyebrow" id="current-slug">No case open</div>
+            <h2 id="current-title">Open a case to begin</h2>
+            <p class="subtitle" id="current-subtitle">Case, case encoding, and reading will appear here.</p>
+          </div>
+          <div class="badge-row">
+            <span class="badge" id="status-badge">No case</span>
+            <span class="badge" id="validation-badge">Validation unknown</span>
+          </div>
+        </div>
+
+        <section class="tabs" id="tabs">
+          <button class="tab-btn active" data-tab="case">Case</button>
+          <button class="tab-btn" data-tab="encoding">Case encoding</button>
+          <button class="tab-btn" data-tab="reading">Case reading</button>
+        </section>
+
+        <section id="tab-content" class="tab-content"></section>
+
+        <section class="bottom-row">
+          <div class="panel timeline-panel">
+            <div class="panel-head">
+              <h3>Timeline</h3>
+              <span class="badge" id="timestep-badge">0</span>
+            </div>
+            <div id="timeline" class="timeline empty">No timeline loaded.</div>
+          </div>
+          <div class="panel atlas-panel">
+            <div class="panel-head">
+              <h3>Relation Atlas</h3>
+              <span class="badge">Placeholder</span>
+            </div>
+            <div id="atlas" class="atlas empty">Vertical, horizontal, and radial relations will be rendered here in later iterations. For now, this panel shows step-level actors and actions.</div>
+          </div>
+        </section>
+      </section>
+    </section>
+  </div>
+
+  <script type="module" src="./ui-v3/app.js"></script>
+</body>
+</html>
