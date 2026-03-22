@@ -6,10 +6,10 @@ on:
       create_drafts:
         description: 'Create drafts branch'
         required: true
-        default: 'true'
+        default: 'false'
         type: boolean
-      project_branches:
-        description: 'Comma-separated branch names (auto-prefixed with cases/ if needed). For user branches: users/alice, users/bob'
+      user_lanes:
+        description: 'Comma-separated work lane branch names (auto-prefixed with users/ if needed). Examples: alice, bob, users/research'
         required: false
         type: string
 
@@ -32,13 +32,13 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Ensure cases directory exists on main
+      - name: Ensure canonical repo roots exist on main
         run: |
-          mkdir -p cases
-          if [ ! -f cases/.gitkeep ]; then
-            touch cases/.gitkeep
-            git add cases/.gitkeep
-            git diff --cached --quiet || git commit -m "Initialize cases directory"
+          mkdir -p cases catalog users
+          touch cases/.gitkeep catalog/.gitkeep users/.gitkeep
+          git add cases/.gitkeep catalog/.gitkeep users/.gitkeep
+          if ! git diff --cached --quiet; then
+            git commit -m "Initialize canonical repo roots"
             git push
           fi
 
@@ -50,36 +50,41 @@ jobs:
             git push origin drafts
             echo "✅ Created 'drafts' branch"
           else
-            echo "ℹ️ 'drafts' branch already exists"
+            echo "ℹ羏 'drafts' branch already exists"
           fi
           git checkout main
 
-      - name: Create project branches
-        if: ${{ inputs.project_branches != '' }}
+      - name: Create user work lanes
+        if: ${{ inputs.user_lanes != '' }}
         run: |
-          IFS=',' read -ra BRANCHES <<< "${{ inputs.project_branches }}"
-          for branch in "${BRANCHES[@]}"; do
-            branch=$(echo "$branch" | xargs)
-            if [ -z "$branch" ]; then continue; fi
-            if [[ "$branch" != cases/* ]]; then
-              branch="cases/$branch"
+          IFS=',' read -ra LANES <<< "${{ inputs.user_lanes }}"
+          for lane in "${LANES[@]}"; do
+            lane=$(echo "$lane" | xargs)
+            if [ -z "$lane" ]; then continue; fi
+            if [[ "$lane" != users/* ]]; then
+              lane="users/$lane"
             fi
-            if ! git ls-remote --heads origin "$branch" | grep -q "$branch"; then
+            if ! git ls-remote --heads origin "$lane" | grep -q "$lane"; then
               git checkout main
-              git checkout -b "$branch"
-              mkdir -p cases
-              touch cases/.gitkeep
-              git add cases/.gitkeep
-              git diff --cached --quiet || git commit -m "Initialize $branch"
-              git push origin "$branch"
-              echo "✅ Created '$branch' branch"
+              git checkout -b "$lane"
+              mkdir -p users
+              touch users/.gitkeep
+              git add users/.gitkeep
+              git diff --cached --quiet || git commit -m "Initialize $lane"
+              git push origin "$lane"
+              echo "✅ Created '$lane' branch"
             else
-              echo "ℹ️ '$branch' already exists"
+              echo "ℹ羏 '$lane' branch already exists"
             fi
           done
+          git checkout main
 
       - name: Summary
         run: |
-          echo "## Repository Branches" >> $GITHUB_STEP_SUMMARY
+          echo "## Repository Setup" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Canonical roots: `/cases/`, `/catalog/`, `/users/`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Remote branches" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           git ls-remote --heads origin | awk '{print "- `" $2 "`"}' | sed 's|refs/heads/||' >> $GITHUB_STEP_SUMMARY
