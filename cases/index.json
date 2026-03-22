@@ -1,26 +1,5 @@
 {
-  "branch": "main",
-  "count": 1,
-  "cases": [
-    {
-      "filename": "_seed.json",
-      "size": 194,
-      "system_name": "Seed",
-      "case_id": "seed",
-      "description": "seed file to trigger indexer",
-      "participants": 0,
-      "timesteps": 0,
-      "modified": "2026-03-20T21:43:01+02:00",
-      "locus": "local",
-      "payload_events": 0,
-      "payload_primitives": 0,
-      "uses_payload_bundle": false,
-      "payload_sigmas": [],
-      "payload_axes": [],
-      "payload_modes": [],
-      "payload_registers": [],
-      "payload_unfoldings": [],
-      "has_epsilon": false
-    }
-  ]
+  "deprecated": true,
+  "note": "This flat cases index is deprecated. Use /catalog/index.json for the canonical case artifact catalog.",
+  "replacement": "/catalog/index.json"
 }
