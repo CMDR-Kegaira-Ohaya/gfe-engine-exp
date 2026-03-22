@@ -11,6 +11,7 @@ Operational control layer for GPT re-entry:
 - `GPT_OPERATOR_MANUAL.md` = session operating logic
 - `SYSTEM_MAP.md` = structural map
 - `INSTRUCTIONS_INDEX.md` = operational tooling and helper workflows
+- `GPT_CAPABILITY_SURFACE.md` = GPT action surface, token capability surface, and repo-control caveats
 - `EDIT_RULES.md` = edit boundaries and workflow constraints
 - `REPO_SCHEMA.json` = machine-readable directory and file-role map
 
@@ -26,7 +27,7 @@ No automatic process may modify this layer.
 
 ### `/ui-v2/`
 Active frontend workbench modules for rendering, workspace assembly, repo case loading, timeline/participant focus, derived-state inspection, salience styling, and polish behavior.
-`/ui-v2/app.js`  is the active ingest entry point for running validation and solver runtime on loaded cases.
+`/ui-v2/app.js` is the active ingest entry point for running validation and solver runtime on loaded cases.
 
 ### `/cases/`
 Repository-level case storage for public/shared/demo/smoke-test data.
@@ -45,6 +46,7 @@ Operational JavaScript inspection tooling for syntax checks, AST parsing, symbol
 - workbench surfaces = `index.html` + `/ui-v2/*`, with `workbench-v2.html` as a compatibility route to the same v2 workbench
 - workflow surfaces = `/.github/workflows/*` for validation, selftest, and repo maintenance
 - inspection/tooling surfaces = `/tools/js/*` for JavaScript structure inspection and `/main/INSTRUCTIONS_INDEX.md` + `/PROCEDURE_INDEX.md` for operational guidance
+- GPT repo-control surface = `/main/GPT_CAPABILITY_SURFACE.md` for custom action capabilities, token permissions, and repo-policy caveats
 
 ## Conceptual flow
 1. Operator or GPT enters through `/main/TOC.md`
