@@ -1,6 +1,25 @@
 {
   "branch": "main",
-  "generated_at": "2026-03-22T16:37:14.312Z",
-  "count": 0,
-  "cases": []
+  "generated_at": "2026-03-22T16:37:54.461Z",
+  "count": 1,
+  "cases": [
+    {
+      "case_id": "seed",
+      "title": "Seed",
+      "slug": "seed",
+      "has_case": true,
+      "has_encoding": true,
+      "has_reading": false,
+      "participants": 0,
+      "timesteps": 0,
+      "modified": "2026-03-22T18:37:44+02:00",
+      "synopsis": "This is the canonical seed case used to exercise the case-folder workflows and GUI catalog.",
+      "paths": {
+        "case": "/cases/seed/case.md",
+        "encoding": "/cases/seed/encoding.json",
+        "reading": "",
+        "manifest": "/cases/seed/manifest.json"
+      }
+    }
+  ]
 }
