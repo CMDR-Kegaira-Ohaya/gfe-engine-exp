@@ -26,6 +26,7 @@ Read these next when the task concerns how this repository is organized or how t
 4. `/main/INSTRUCTIONS_INDEX.md`
 5. `/main/REPO_SCHEMA.json`
 6. `/PROCEDURE_INDEX.md`
+7. `/main/GPT_CAPABILITY_SURFACE.md`
 
 ### Layer 3 — Solver implementation
 Read these when the task concerns executable math, validation, normalization, dashboard shaping, or future runtime implementation.
@@ -67,7 +68,7 @@ Read these when the task concerns saved cases, case indexes, smoke tests, or mar
 ### Repo debugging / UI bugs / Pages issues
 - Start with `/main/SYSTEM_MAP.md`
 - Then `/main/EDIT_RULES.md`
-- Then relevant files in `index.html`, `workbench-v2.html`, `/ui-v2/`, and `.github/`
+- Then relevant files in `index.html`, `workbench-v2.html`, `/ui-v2/*`, `.github/`
 
 ### Save/load flow or schema issues
 - Start with `/main/REPO_SCHEMA.json`
@@ -87,6 +88,7 @@ Read these when the task concerns saved cases, case indexes, smoke tests, or mar
 
 ## Operational cross-links
 - Instructions and tooling: `/main/INSTRUCTIONS_INDEX.md`
+- GPT repo-control capabilities: `/main/GPT_CAPABILITY_SURFACE.md`
 - Troubleshooting and repo-write recovery: `/PROCEDURE_INDEX.md`
 - JS parser tooling: `/tools/js/README.md`
 
@@ -114,14 +116,6 @@ Read these when the task concerns saved cases, case indexes, smoke tests, or mar
 - **Executable**: runnable implementation
 - **Implementation**: UI/app behavior
 - **Data**: saved cases and generated companions
-
-## File status summary
-- `/engine/*` = Canonical
-- `/main/*` = Operational
-- `/solver/*` = Executable
-- `/index.html`, `/workbench-v2.html`, `/ui-v2/*`, `.github/*` = Implementation
-- `/cases/*` = Data
-- `/tools/js/*` = Operational inspection tooling
 
 ## Starter prompt for future sessions
 Use repo-control first. Start at `/main/TOC.md`. Follow the authority order exactly. Do not infer structure outside mapped files.
