@@ -1,0 +1,51 @@
+name: Index Case Artifacts
+
+on:
+  push:
+    paths:
+      - 'cases/**'
+      - 'tools/cases/**'
+      - '.github/workflows/index-case-artifacts.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: index-case-artifacts-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-catalog:
+    if: github.actor != 'github-actions[bot]' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      CATALOG_PATH: catalog/index.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Build canonical case artifact catalog
+        run: node tools/cases/build-catalog.mjs "${GITHUB_REF_NAME}"
+
+      - name: Commit catalog
+        run: |
+          git add catalog/index.json
+          if git diff --cached --quiet; then
+            echo "No catalog changes to commit."
+            exit 0
+          fi
+          git commit -m "Auto-index case artifacts on ${GITHUB_REF_NAME}"
+          git push
