@@ -79,7 +79,7 @@ for (const caseDirName of caseFolders) {
       case: hasCase ? `/${toRepoPath(paths.casePath)}` : '',
       encoding: hasEncoding ? `/${toRepoPath(paths.encodingPath)}` : '',
       reading: hasReading ? `/${toRepoPath(paths.readingPath)}` : '',
-      manifest: `/${toRepoPath(paths.casePath)}` ? `/${toRepoPath(paths.manifestPath)}` : `/${toRepoPath(paths.manifestPath)}`
+      manifest: `/${toRepoPath(paths.manifestPath)}`
     }
   });
 }
