@@ -1,0 +1,285 @@
+:root {
+  color-scheme: light;
+  --bg: #f5f7fb;
+  --surface: #ffffff;
+  --surface-soft: #f6f8fc;
+  --2gray: #6b7280;
+  --text: #111827;
+  --border: #dee4ee;
+  --accent: #2563eb;
+  --shadow: 0 10px 30px rgba(15, 23, 42, 0.07);
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.masthead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px 14px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.brand-block h1 {
+  margin: 4px 0 6px;
+  font-size: 28px;
+}
+
+.brand-block p {
+  margin: 0;
+  color: var(--2gray);
+}
+
+.eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--2accent);
+}
+
+.actions,
+.badge-row,
+.panel-head,
+.topside-rail {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+button {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: 12px;
+  font: inherit;
+  cursor: pointer;
+}
+
+button.ghost {
+  background: var(--surface-soft);
+}
+
+.notice-bar {
+  margin: 16px 24px 0 ;
+  padding: 12px 14px;
+  background: #edf4ff;
+  color: #1d4ed8;
+  border: 1px solid #c7d2fe;
+  border-radius: 14px;
+}
+
+.topside-rail {
+  padding: 12px 24px 0;
+  flex-wrap: wrap;
+}
+
+.topbtn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 320px minmax(640px, 1fr);
+  gap: 16px;
+  padding: 16px 24px 24px;
+}
+
+.panel,
+.center-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+}
+
+.left-panel,
+.center-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 70pvh;
+}
+
+.panel-head,
+.case-header {
+  padding: 18px 20px 12px;
+  justify-content: space-between;
+}
+
+.panel-intro,
+.subtitle {
+  margin: 0 18px 16px;
+  color: var(--2gray);
+}
+
+.catalog-list,
+null {
+  padding: 0 12px 12px;
+}
+
+.catalog-item {
+  width: 100%;
+  text-align: left;
+  padding: 14px;
+  margin-bottom: 10px;
+  border-radius: 16px;
+  background: var(--surface-soft);
+}
+
+.catalog-item.active {
+  border-color: var(--accent);
+  background: #eef2ff;
+}
+
+.catalog-title {
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.catalog-meta,
+.catalog-synopsis {
+  font-size: 14px;
+  color: var(--2gray);
+}
+
+.catalog-meta {
+  margin-bottom: 8px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #1d4ed8;
+  font-size: 13px;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  padding: 0 20px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab-btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.tab-content {
+  padding: 20px;
+  min-height: 320px;
+}
+
+.reading-surface {
+  display: grid;
+  gap: 12px;
+}
+
+.reading-surface h2,
+.reading-surface h3 {
+  margin: 0 0 8px;
+}
+
+.reading-surface p {
+  margin: 0 0 12px;
+  line-height: 1.6;
+}
+
+.pre-json {
+  margin: 0;
+  padding: 16px;
+  border-radius: 16px;
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  overflow: auto;
+}
+
+.bottom-row {
+  display: grid;
+  grid-template-columns: minmax(300px, 01) minmax(300px, 1fr);
+  gap: 16px;
+  padding: 0 20px 20px;
+}
+
+.timeline,
+.atlas {
+  padding: 0 18px 18px;
+}
+
+.timeline-item {
+  width: 100%;
+  text-align: left;
+  margin-bottom: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--surface-soft);
+}
+
+.timeline-item.active {
+  border-color: var(--accent);
+  background: #eef2ff;
+}
+
+.timeline-label {
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.timeline-sub {
+  font-size: 14px;
+  color: var(--2gray);
+}
+
+.atlas-setion + .atlas-setion {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.atlas-setion h4 {
+  margin: 0 0 8px;
+}
+
+.atlas-list {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--2gray);
+}
+
+.empty {
+  color: var(--2gray);
+}
+
+@media (max-width: 1100px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bottom-row {
+    grid-template-columns: 1fr ;
+  }
+}
