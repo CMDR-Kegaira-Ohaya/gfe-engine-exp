@@ -1,0 +1,10 @@
+{
+  "case_id": "seed",
+  "title": "Seed",
+  "slug": "seed",
+  "artifacts": {
+    "case": true,
+    "encoding": true,
+    "reading": false
+  }
+}
