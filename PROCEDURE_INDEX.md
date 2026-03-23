@@ -34,6 +34,11 @@ Use this as the default procedure unless a smaller direct path is clearly safe:
 3. pass the encoded string as `content`
 4. include `sha` when updating an existing file
 
+Precision note:
+- if repeated `422` errors say `content is not valid Base64`, first suspect corruption in the encoded payload itself
+- common causes are accidental whitespace inside the Base64 string, truncation, or mixed raw text and encoded text in the same payload
+- the successful recovery pattern is: use one exact replacement payload generated mechanically from the final UTF-8 file text, then retry the write
+
 ## Procedure: workflow-related edits
 
 If edits are required and they touch workflow behavior or workflow files, include:
