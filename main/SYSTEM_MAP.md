@@ -1,6 +1,8 @@
 # System Map
+[RID_SELFREF_SYSTEM_MAP]
 
 ## Top-level role split
+[RID_SYSTEM_TOP_LEVEL_SPLIT]
 
 ### `/engine/`
 Canonical GFE source stack copied into the repository so sessions can bootstrap from repo state rather than hidden GPT memory.
@@ -11,7 +13,8 @@ Operational control layer for GPT re-entry:
 - `GPT_OPERATOR_MANUAL.md` = session operating logic
 - `SYSTEM_MAP.md` = structural map
 - `INSTRUCTIONS_INDEX.md` = operational tooling and helper workflows
-- `GPT_CAPABILITY_SURFACE.md` = GPT action surface, token capability surface, and repo-control caveats
+- `GPT_CAPABILITY_SURFACE.md` = GPT action surface for custom connector capabilities and repo-control caveats
+- `TOKEN_PERMISSION_SURFACE.md` = live token permission surface
 - `EDIT_RULES.md` = edit boundaries and workflow constraints
 - `REPO_SCHEMA.json` = machine-readable directory and file-role map
 
@@ -43,12 +46,15 @@ Currently includes at least:
 Operational JavaScript inspection tooling for syntax checks, AST parsing, symbol summaries, dependency edges, identifier lookup, and batch summaries.
 
 ## Self-referential capability map
-- workbench surfaces = `index.html` + `/ui-v2/*`, with `workbench-v2.html` as a compatibility route to the same v2 workbench
+[RID_SYSTEM_SELFREF_CAPABILITY_MAP]
+- workbench surfaces = `/index.html` + `/ui-v2/*`, with `workbench-v2.html` as a compatibility route to the same v2 workbench
 - workflow surfaces = `/.github/workflows/*` for validation, selftest, and repo maintenance
 - inspection/tooling surfaces = `/tools/js/*` for JavaScript structure inspection and `/main/INSTRUCTIONS_INDEX.md` + `/PROCEDURE_INDEX.md` for operational guidance
-- GPT repo-control surface = `/main/GPT_CAPABILITY_SURFACE.md` for custom action capabilities, token permissions, and repo-policy caveats
+- GPT repo-control connector surface = `/main/GPT_CAPABILITY_SURFACE.md` for custom connector capabilities and repo-control caveats
+- live token permission surface = `/main/TOKEN_PERMISSION_SURFACE.md` for current token authority width
 
 ## Conceptual flow
+[RID_SYSTEM_CONCEPTUAL_FLOW]
 1. Operator or GPT enters through `/main/TOC.md`
 2. Canonical meaning comes from `/engine/*`
 3. Repo operating behavior comes from `/main/*`
@@ -58,6 +64,7 @@ Operational JavaScript inspection tooling for syntax checks, AST parsing, symbol
 7. Cases live under `/cases/*`
 
 ## Governance rules
+[RID_SYSTEM_GOVERNANCE_RULES]
 - `/engine/` is canonical and human-maintained only.
 - `/solver/` is executable and human-approved only.
 - No automatic process may modify `/engine/` or `/solver/`.
