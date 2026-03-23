@@ -1,9 +1,12 @@
 # Edit Rules
+[RID_SELFREF_EDIT_RULES]
 
 ## Core rule
+[RID_EDIT_CORE_RULE]
 Edit the narrowest file set that can truthfully solve the task.
 
 ## Governance rule
+[RID_EDIT_GOVERNANCE_RULE]
 No automatic process may modify `/engine/` or `/solver/`.
 The assistant may inspect, analyze, compare, test, and report findings, but any repository change requires explicit human approval.
 
@@ -14,6 +17,7 @@ The assistant may inspect, analyze, compare, test, and report findings, but any 
 - Do not use `/cases/*` as a substitute for documentation.
 
 ## Allowed edit zones by task
+[RID_EDIT_ALLOWED_ZONES]
 
 ### Engine/doctrine tasks
 Editable only with explicit human approval:
@@ -35,8 +39,7 @@ Editable only with explicit human approval:
 - `privacy.html`
 - `/ui/*`
 - relevant workflow files under `.github/`
-
-Avoid touching `/engine/*` unless the issue is actually doctrinal.
+Aoid touching `/engine/*` unless the issue is actually doctrinal.
 
 ### Data/case tasks
 Editable only with explicit human approval:
@@ -49,6 +52,7 @@ Editable only with explicit human approval:
 - Keep commit messages descriptive and local.
 
 ## Bootstrap discipline
+[RID_EDIT_BOOTSTRAP_DISCIPLINE]
 When asked to “inspect the repo” or “Start from the TOC”:
 - read `/main/TOC.md` first
 - do not jump straight into code unless the task is already code-specific
