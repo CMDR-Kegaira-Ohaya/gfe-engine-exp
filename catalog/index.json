@@ -1,6 +1,6 @@
 {
   "branch": "main",
-  "generated_at": "2026-03-23T06:02:55.893Z",
+  "generated_at": "2026-03-23T06:05:32.744Z",
   "count": 2,
   "cases": [
     {
@@ -14,10 +14,10 @@
       "reading_count": 0,
       "participants": 0,
       "timesteps": 5,
-      "modified": "2026-03-22T19:20:49+02:00",
+      "modified": "2026-03-23T08:05:24+02:00",
       "synopsis": "This case examines a long historical pattern in medicine: some of the most important breakthroughs were accompanied by methods that were personally harmful, coercive, or morally deeply contested.",
       "paths": {
-        "case": "/cases/medical_breakthroughs_controversial_methods/case.md",
+        "case": "/cases/medical_breakthroughs_controversial_methods/source/case.md",
         "manifest": "/cases/medical_breakthroughs_controversial_methods/manifest.json",
         "encoding": "/cases/medical_breakthroughs_controversial_methods/encoding.json",
         "reading": ""
@@ -34,10 +34,10 @@
       "reading_count": 0,
       "participants": 0,
       "timesteps": 0,
-      "modified": "2026-03-22T18:37:44+02:00",
+      "modified": "2026-03-23T08:05:17+02:00",
       "synopsis": "This is the canonical seed case used to exercise the case-folder workflows and GUI catalog.",
       "paths": {
-        "case": "/cases/seed/case.md",
+        "case": "/cases/seed/source/case.md",
         "manifest": "/cases/seed/manifest.json",
         "encoding": "/cases/seed/encoding.json",
         "reading": ""
