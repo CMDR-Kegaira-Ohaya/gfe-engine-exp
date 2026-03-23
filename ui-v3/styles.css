@@ -53,13 +53,14 @@ body {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--2accent);
+  color: var(--accent);
 }
 
 .actions,
 .badge-row,
 .panel-head,
-.topside-rail {
+.topside-rail,
+.placeholder-actions {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -80,7 +81,7 @@ button.ghost {
 }
 
 .notice-bar {
-  margin: 16px 24px 0 ;
+  margin: 16px 24px 0;
   padding: 12px 14px;
   background: #edf4ff;
   color: #1d4ed8;
@@ -93,7 +94,8 @@ button.ghost {
   flex-wrap: wrap;
 }
 
-.topbtn.active {
+.topbtn.active,
+.tab-btn.active {
   border-color: var(--accent);
   color: var(--accent);
 }
@@ -118,7 +120,7 @@ button.ghost {
 .center-panel {
   display: flex;
   flex-direction: column;
-  min-height: 70pvh;
+  min-height: 70vh;
 }
 
 .panel-head,
@@ -133,8 +135,7 @@ button.ghost {
   color: var(--2gray);
 }
 
-.catalog-list,
-null {
+.panel-body {
   padding: 0 12px 12px;
 }
 
@@ -184,11 +185,6 @@ null {
   border-bottom: 1px solid var(--border);
 }
 
-.tab-btn.active {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
 .tab-content {
   padding: 20px;
   min-height: 320px;
@@ -209,6 +205,32 @@ null {
   line-height: 1.6;
 }
 
+.encoding-summary {
+  display: grid;
+  gap: 16px;
+}
+
+.summary-list {
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.summary-list div {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 12px;
+}
+
+.summary-list dt {
+  font-weight: 700;
+  color: var(--2gray);
+}
+
+.summary-list dd {
+  margin: 0;
+}
+
 .pre-json {
   margin: 0;
   padding: 16px;
@@ -218,9 +240,33 @@ null {
   overflow: auto;
 }
 
+.placeholder-card {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface-soft);
+  padding: 16px;
+}
+
+.placeholder-card h3 {
+  margin: 0 0 10px;
+}
+
+.placeholder-card p {
+  margin: 0 0 10px;
+  line-height: 1.5;
+}
+
+.placeholder-note {
+  color: var(--2gray);
+}
+
+.hidden {
+  display: none !important;
+}
+
 .bottom-row {
   display: grid;
-  grid-template-columns: minmax(300px, 01) minmax(300px, 1fr);
+  grid-template-columns: minmax(300px, 1fr) minmax(300px, 1fr);
   gap: 16px;
   padding: 0 20px 20px;
 }
@@ -254,13 +300,13 @@ null {
   color: var(--2gray);
 }
 
-.atlas-setion + .atlas-setion {
+.atlas-section + .atlas-section {
   margin-top: 14px;
   padding-top: 14px;
   border-top: 1px solid var(--border);
 }
 
-.atlas-setion h4 {
+.atlas-section h4 {
   margin: 0 0 8px;
 }
 
@@ -280,6 +326,6 @@ null {
   }
 
   .bottom-row {
-    grid-template-columns: 1fr ;
+    grid-template-columns: 1fr;
   }
 }
