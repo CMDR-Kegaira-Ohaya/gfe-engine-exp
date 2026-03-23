@@ -1,0 +1,89 @@
+name: migrate-case
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_path:
+        description: 'Repo-relative intake or working-lane case root folder'
+        required: true
+        type: string
+      target_slug:
+        description: 'Canonical case slug under /cases/'
+        required: true
+        type: string
+      case_id:
+        description: 'Stable case_id for the canonical case'
+        required: true
+        type: string
+      mode:
+        description: 'Migration mode'
+        required: true
+        type: choice
+        default: create
+        options:
+          - create
+          - update
+
+permissions:
+  contents: write
+
+jobs:
+  migrate-case:
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      SOURCE_PATH: ${{ inputs.source_path }}
+      TARGET_SLUG: ${{ inputs.target_slug }}
+      CASE_ID: ${{ inputs.case_id }}
+      MODE: ${{ inputs.mode }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create migration branch
+        env:
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          BRANCH_NAME="migration/${TARGET_SLUG}-${RUN_ID}"
+          git switch -c "${BRANCH_NAME}"
+          echo "MIGRATION_BRANCH=${BRANCH_NAME}" >> "$GITHUB_ENV"
+
+      - name: Migrate canonical case
+        run: node tools/cases/migrate-case.mjs --source-path "$SOURCE_PATH" --target-slug "$TARGET_SLUG" --case-id "$CASE_ID" --mode "$MODE"
+
+      - name: Validate canonical case folders
+        run: node tools/cases/validate-case-folders.mjs
+
+      - name: Validate canonical encodings
+        run: node tools/cases/validate-encodings.mjs
+
+      - name: Rebuild canonical case catalog
+        run: node tools/cases/build-catalog.mjs "${MIGRATION_BRANCH}"
+
+      - name: Commit migration
+        run: |
+          git add cases catalog
+          if git diff --cached --quiet; then
+            echo "No migration changes to commit."
+            exit 0
+          fi
+          git commit -m "Migrate case ${TARGET_SLUG} into canonical structure"
+          git push --set-upstream origin "${MIGRATION_BRANCH}"
+
+      - name: Summary
+        run: |
+          echo "Migration branch: ${MIGRATION_BRANCH}"
+          echo "Source path: ${SOURCE_PATH}"
+          echo "Target slug: ${TARGET_SLUG}"
+          echo "Case id: ${CASE_ID}"
