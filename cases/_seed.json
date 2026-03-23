@@ -1,5 +1,0 @@
-{
-  "deprecated": true,
-  "note": "This flat seed artifact is deprecated. Use /cases/seed/ as the canonical case folder.",
-  "replacement": "/cases/seed/encoding.json"
-}
