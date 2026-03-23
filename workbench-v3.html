@@ -20,22 +20,22 @@
       </div>
     </header>
 
-    <div class="notice-bar" id="notice">V3 is running in parallel with v2.</div>
+    <div class="notice-bar" id="notice">Canonical catalog is live. Package loading/import is reserved here.</div>
 
     <section class="topside-rail" id="topside-rail">
       <button class="topbtn active" data-top="open">Open case</button>
-      <button class="topbtn" data-top="load">Load case package</button>
+      <button class="topbtn" data-top="package">Open case package</button>
       <button class="topbtn" data-top="reading">Generate reading</button>
     </section>
 
     <section class="grid">
       <aside class="panel left-panel">
         <div class="panel-head">
-          <h2>Open case</h2>
+          <h2 id="side-panel-title">Open case</h2>
           <button id="reload-catalog" class="ghost">Reload</button>
         </div>
-        <p class="panel-intro">Browse canonical cases from the live catalog.</p>
-        <div id="catalog-list" class="catalog-list empty">Loading catalog… </div>
+        <p class="panel-intro" id="side-panel-intro">Browse canonical cases from the live catalog.</p>
+        <div id="side-panel-body" class="panel-body empty">Loading catalog…</div>
       </aside>
 
       <section class="center-panel">
