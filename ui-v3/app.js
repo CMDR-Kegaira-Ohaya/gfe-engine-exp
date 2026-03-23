@@ -1,3 +1,4 @@
+
 import { validateCase, solveCase } from '../solver/index.js';
 
 const state = {
@@ -99,7 +100,7 @@ function renderMarkdown(markdown) {
 }
 
 function getActiveCaseEntry() {
-  return state.catalog.find((caseEntry) => caseEntry.slug === state.activeSlug) || null;
+  return state.catalog.find((entry) => entry.slug === state.activeSlug) || null;
 }
 
 async function fetchJson(path) {
@@ -120,7 +121,6 @@ async function fetchText(path) {
 
 async function loadCatalog() {
   setNotice('Loading canonical catalog…');
-
   try {
     const catalogData = await fetchJson('./catalog/index.json');
     state.catalog = Array.isArray(catalogData.cases) ? catalogData.cases : [];
@@ -145,25 +145,24 @@ async function loadCatalog() {
 async function loadCase(slug, { resetTab = true } = {}) {
   state.activeSlug = slug;
   state.activeStep = 0;
-
   if (resetTab) {
     state.activeTab = 'case';
   }
 
-  const caseEntry = getActiveCaseEntry();
-  if (!caseEntry) {
+  const entry = getActiveCaseEntry();
+  if (!entry) {
     renderAll();
     return;
   }
 
-  setNotice(`Loading “${caseEntry.title}”…`);
+  setNotice(`Loading “${entry.title}”…`);
   renderAll();
 
   try {
     const [caseMarkdown, encoding, readingMarkdown] = await Promise.all([
-      caseEntry.paths.case ? fetchText(`.${caseEntry.paths.case}`) : Promise.resolve(''),
-      caseEntry.paths.encoding ? fetchJson(`.${caseEntry.paths.encoding}`) : Promise.resolve(null),
-      caseEntry.paths.reading ? fetchText(`.${caseEntry.paths.reading}`) : Promise.resolve(''),
+      entry.paths.case ? fetchText(`.${entry.paths.case}`) : Promise.resolve(''),
+      entry.paths.encoding ? fetchJson(`.${entry.paths.encoding}`) : Promise.resolve(null),
+      entry.paths.reading ? fetchText(`.${entry.paths.reading}`) : Promise.resolve(''),
     ]);
 
     state.caseMarkdown = caseMarkdown;
@@ -173,15 +172,16 @@ async function loadCase(slug, { resetTab = true } = {}) {
     state.solved = encoding ? solveCase(encoding) : null;
 
     renderAll();
-    setNotice(`“${caseEntry.title}” loaded.`);
+    setNotice(“${entry.title}” loaded.`);
   } catch (error) {
     state.caseMarkdown = '';
     state.encoding = null;
     state.readingMarkdown = '';
     state.validation = null;
     state.solved = null;
+
     renderAll();
-    setNotice(`Could not load “${caseEntry.title}”: ${error.message}`);
+    setNotice(`Could not load “${entry.title}”: ${error.message}`);
   }
 }
 
@@ -191,12 +191,12 @@ function renderCatalogList() {
   }
 
   return state.catalog
-    .map((caseEntry) => {
-      const active = caseEntry.slug === state.activeSlug ? ' active' : '';
-      return `<button class="catalog-item${active}" data-slug="${escapeHtml(caseEntry.slug)}">
-        <div class="catalog-title">${escapeHtml(caseEntry.title)}</div>
-        <div class="catalog-meta">${caseEntry.timesteps} steps · ${caseEntry.participants} participants</div>
-        <div class="catalog-synopsis">${escapeHtml(caseEntry.synopsis || 'No preview yet.')}</div>
+    .map((entry) => {
+      const active = entry.slug === state.activeSlug ? ' active' : '';
+      return `<button class="catalog-item${active}" data-slug="${escapeHtml(entry.slug)}">
+        <div class="catalog-title">${escapeHtml(entry.title)}</div>
+        <div class="catalog-meta">${entry.timesteps} steps · ${entry.participants} participants</div>
+        <div class="catalog-synopsis">${escapeHtml(entry.synopsis || 'No preview yet.')}</div>
       </button>`;
     })
     .join('');
@@ -255,9 +255,9 @@ function renderSidePanel() {
 }
 
 function renderHeader() {
-  const caseEntry = getActiveCaseEntry();
+  const entry = getActiveCaseEntry();
 
-  if (!caseEntry) {
+  if (!entry) {
     els.currentSlug.textContent = 'No case open';
     els.currentTitle.textContent = 'Open a case to begin';
     els.currentSubtitle.textContent = 'Case, case encoding, and reading will appear here.';
@@ -267,14 +267,13 @@ function renderHeader() {
     return;
   }
 
-  els.currentSlug.textContent = caseEntry.slug;
-  els.currentTitle.textContent = caseEntry.title;
-  els.currentSubtitle.textContent = caseEntry.has_reading
+  els.currentSlug.textContent = entry.slug;
+  els.currentTitle.textContent = entry.title;
+  els.currentSubtitle.textContent = entry.has_reading
     ? 'Case, case encoding, and saved reading are available.'
     : 'Case and case encoding are available. No saved reading yet.';
-
   els.sourceBadge.textContent = 'Canonical repo case';
-  els.statusBadge.textContent = caseEntry.has_reading ? 'Reading available' : 'Reading missing';
+  els.statusBadge.textContent = entry.has_reading ? 'Reading available' : 'Reading missing';
 
   if (!state.validation) {
     els.validationBadge.textContent = 'Validation unknown';
@@ -283,7 +282,11 @@ function renderHeader() {
 
   const errors = state.validation.issues.filter((issue) => issue.level === 'error').length;
   const warnings = state.validation.issues.filter((issue) => issue.level === 'warning').length;
-  els.validationBadge.textContent = errors ? `Validation errors: ${errors}` : `Warnings: ${warnings}`;
+  els.validationBadge.textContent = errors
+    ? `Validation errors: ${errors}`
+    : warnings
+      ? `Warnings: ${warnings}`
+      : 'Validation clean';
 }
 
 function renderEncodingSummary() {
@@ -445,12 +448,13 @@ function bindEvents() {
     const button = event.target.closest('[data-top]');
     if (!button) return;
 
-    state.topMode = button.dataset.top;
+    const topMode = button.dataset.top;
+    state.topMode = topMode;
 
-    if (state.topMode === 'reading') {
+    if (topMode === 'reading') {
       state.activeTab = 'reading';
       setNotice('Use GPT to generate reading.');
-    } else if (state.topMode === 'package') {
+    } else if (topMode === 'package') {
       setNotice('Case package support is not fully wired yet.');
     } else {
       setNotice('Browse canonical cases from the live catalog.');
