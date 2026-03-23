@@ -3,8 +3,11 @@ import {
   CATALOG_PATH,
   discoverCaseFolders,
   fileExists,
+  firstHeading,
   firstMeaningfulLine,
   getCaseArtifactPaths,
+  getRevisionEncodingRecords,
+  getSolveReadingRecords,
   gitLastModifiedIso,
   readJson,
   readText,
@@ -28,58 +31,81 @@ for (const caseDirName of caseFolders) {
   try {
     manifest = readJson(paths.manifestPath);
   } catch (error) {
-    console.warn(`[build-catalog] Skipping ${caseDirName}: manifest.json could not be parsed (${error instanceof Error ? error.message : String(error)}).`);
+    console.warn(
+      `[build-catalog] Skipping ${caseDirName}: manifest.json could not be parsed (${error instanceof Error ? error.message : String(error)}).`
+    );
     continue;
   }
 
-  const hasCase = fileExists(paths.casePath);
-  const hasEncoding = fileExists(paths.encodingPath);
-  const hasReading = fileExists(paths.readingPath);
+  const casePath = fileExists(paths.casePath)
+    ? paths.casePath
+    : fileExists(paths.legacyCasePath)
+      ? paths.legacyCasePath
+      : '';
+  const encodingRecords = getRevisionEncodingRecords(caseDirName);
+  const solveRecords = getSolveReadingRecords(caseDirName);
+
+  const hasCase = Boolean(casePath);
+  const hasEncoding = encodingRecords.length > 0;
+  const hasReading = solveRecords.some((record) => record.hasReading) || fileExists(paths.legacyReadingPath);
 
   let participants = 0;
   let timesteps = 0;
   let systemName = '';
   let caseIdFromEncoding = '';
+  let latestEncodingPath = '';
 
-  if (hasEncoding) {
+  if (encodingRecords.length) {
+    latestEncodingPath = encodingRecords[0].encodingPath;
     try {
-      const encoding = readJson(paths.encodingPath);
+      const encoding = readJson(latestEncodingPath);
       participants = Array.isArray(encoding.participants) ? encoding.participants.length : 0;
       timesteps = Array.isArray(encoding.timeline) ? encoding.timeline.length : 0;
       systemName = typeof encoding.system_name === 'string' ? encoding.system_name : '';
       caseIdFromEncoding = typeof encoding.case_id === 'string' ? encoding.case_id : '';
     } catch (error) {
-      console.warn(`[build-catalog] ${caseDirName}: encoding.json metadata extraction failed (${error instanceof Error ? error.message : String(error)}).`);
+      console.warn(
+        `[build-catalog] ${caseDirName}: encoding metadata extraction failed (${error instanceof Error ? error.message : String(error)}).`
+      );
     }
   }
 
   let synopsis = '';
   if (hasCase) {
     try {
-      synopsis = firstMeaningfulLine(readText(paths.casePath)).slice(0, 200);
+      const caseText = readText(casePath);
+      synopsis = firstMeaningfulLine(caseText).slice(0, 200) || firstHeading(caseText).slice(0, 200);
     } catch (error) {
-      console.warn(`[build-catalog] ${caseDirName}: case.md synopsis extraction failed (${error instanceof Error ? error.message : String(error)}).`);
+      console.warn(
+        `[build-catalog] ${caseDirName}: case synopsis extraction failed (${error instanceof Error ? error.message : String(error)}).`
+      );
     }
   }
 
   const caseRepoDir = toRepoPath(paths.caseDir);
 
+  const currentCasePath = manifest.current_case_source
+    ? path.join(paths.caseDir, manifest.current_case_source.replace(/^\.\//, ''))
+    : casePath;
+
   entries.push({
     case_id: manifest.case_id || caseIdFromEncoding || caseDirName,
     title: manifest.title || systemName || caseDirName,
-    slug: caseDirName,
+    slug: manifest.slug || caseDirName,
     has_case: hasCase,
     has_encoding: hasEncoding,
     has_reading: hasReading,
+    revision_count: encodingRecords.length,
+    reading_count: solveRecords.filter((record) => record.hasReading).length,
     participants,
     timesteps,
     modified: gitLastModifiedIso(caseRepoDir),
     synopsis,
     paths: {
-      case: hasCase ? `/${toRepoPath(paths.casePath)}` : '',
-      encoding: hasEncoding ? `/${toRepoPath(paths.encodingPath)}` : '',
-      reading: hasReading ? `/${toRepoPath(paths.readingPath)}` : '',
-      manifest: `/${toRepoPath(paths.manifestPath)}`
+      case: hasCase ? `/${toRepoPath(currentCasePath || casePath)}` : '',
+      manifest: `/${toRepoPath(paths.manifestPath)}`,
+      encoding: latestEncodingPath ? `/${toRepoPath(latestEncodingPath)}` : '',
+      reading: ''
     }
   });
 }
@@ -93,4 +119,6 @@ writeJson(CATALOG_PATH, {
   cases: entries
 });
 
-console.log(`[build-catalog] Wrote ${entries.length} case entr${entries.length === 1 ? 'y' : 'ies'} to ${toRepoPath(CATALOG_PATH)}.`);
+console.log(
+  `[build-catalog] Wrote ${entries.length} case entr${entries.length === 1 ? 'y' : 'ies'} to ${toRepoPath(CATALOG_PATH)}.`
+);
