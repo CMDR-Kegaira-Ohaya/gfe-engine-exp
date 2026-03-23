@@ -1,13 +1,13 @@
 # GPT Capability Surface
 [RID_SELFREF_GPT_CAPABILITY_SURFACE]
 
-This file records the current **GPT Builder connector / API action surface** available in this repository context.
+This file records the current **custom GPT API action surface** available in this repository context.
 It is operational, not canonical engine doctrine.
 
 This file covers:
-- what the custom connector exposes
-- which operation families exist through the connector
-- practical connector-path implications for repo work
+- what the active custom GPT API action exposes
+- which operation families exist through that action
+- practical action-path implications for repo work
 
 This file does **not** define:
 - the effective token permission surface
@@ -15,7 +15,7 @@ This file does **not** define:
 - branch protection or repository policy behavior
 
 Do not collapse those layers.
-A connector endpoint may exist while the live token or repo policy still blocks the action.
+An action endpoint may exist while the live token or repo policy still blocks the action.
 
 ## Capability layers
 [RID_CAPABILITY_LAYERS]
@@ -23,69 +23,96 @@ A connector endpoint may exist while the live token or repo policy still blocks 
 Distinguish three layers:
 
 1. **Connector action surface**
-   - which operations the custom GPT connector exposes
+   - which operations the current custom GPT API action exposes
 2. **Token permission surface**
    - which of those operations the currently configured token is authorized to perform
 3. **Repo policy surface**
    - which operations still depend on branch protection, workflow settings, merge policy, or other repository rules
 
-This file covers **layer 1 only**.
-Read `/main/TOKEN_PERMISSION_SURFACE.md` for layer 2.
-Read `/main/EDIT_RULES.md` and related repo-operating docs for layer 3.
+This file covers **Layer 1 only**.
+Read `/main/TOKEN_PERMISSION_SURFACE.md` for Layer 2.
+Read `/main/EDIT_RULES.md` and related repo-operating docs for Layer 3.
 
-## Current connector action surface
+## Current active GFE custom GPT Action
 [RID_CAPABILITY_CONNECTOR_SURFACE]
 
-The current custom GPT connector exposes broad repo-control operations, including:
+The current active custom GPT API action for this repo targets:
+- `https://api.github.com/repos/CMDR-Kegaira-Ohaya/gfe-engine-exp`
 
-- repository contents inspection
-- arbitrary path read / write / delete through contents endpoints
-- legacy `/cases/*` convenience helpers
-- branch and ref inspection
-- branch creation and ref update
-- git-object operations:
-  - blob creation
-  - tree creation
-  - commit creation
-- promotion / merge-style branch flows
-- Pages inspection
-- workflow inspection
-- workflow run inspection
-- workflow dispatch
+The current active operation set is:
+
+### Contents and path operations
+- `listRoot` — `GET /contents`
+- `getPath` — `GET /contents/{path}`
+- `saveFile` — `PUT /contents/{path}`
+- `deleteFile` — `DELETE /contents/{path}`
+- `listCases` — `GET /contents/cases`
+
+### Branch and ref operations
+- `listBranches` — `GET /branches`
+- `getBranchRef` — `GET /git/ref/heads/{branch}`
+- `getRef` — `GET /git/ref/{ref}`
+- `createBranch` — `POST /git/refs`
+- `updateRef` — `PATCH /git/refs/{ref}`
+
+### Git object operations
+- `getTree` — `GET /git/trees/{tree_sha}`
+- `createBlob` — `POST /git/blobs`
+- `createTree` — `POST /git/trees`
+- `getCommit` — `GET /git/commits/{commit_sha}`
+- `createCommit` — `POST /git/commits`
+
+### Merge and promotion operations
+- `promoteCases` — `POST /merges`
+
+### Pages operations
+- `getPagesSite` — `GET /pages`
+
+### Workflow and run operations
+- `listWorkflows` — `GET /actions/workflows`
+- `listWorkflowRuns` — `GET /actions/workflows/{workflow_id}/runs`
+- `getWorkflowRun` — `GET /actions/runs/{run_id}`
+- `dispatchWorkflow` — `POST /actions/workflows/{workflow_id}/dispatches`
 
 ## Practical implications
 [RID_CAPABILITY_PRACTICAL_IMPLICATIONS]
 
 ### General repo work
-The connector surface can support:
-- multi-file repository edits
-- arbitrary-path file creation
-- arbitrary-path file deletion
-- branch-based experimental work
-- workflow inspection and dispatch
-- Pages-aware repository maintenance
-- structural repo reorganization
+The current action surface supports:
+- root and arbitrary-path repository inspection
+- arbitrary-path file create / update / delete through contents endpoints
+- top-level case listing through `/contents/cases`
+- branch listing, branch creation, and ref inspection/update
+- lower-level git-object fallback work through blob / tree / commit operations
+- merge-style promotion flows
+- Pages inspection
+- workflow inspection and workflow dispatch
 
-### Legacy helper caution
-The older flat `/cases/{filename}` helper pattern should be treated as a narrow convenience surface, not as the full capability model.
+### Current path model note
+The active file surface is the generic `/contents/{path}` model.
+That means nested repository paths are part of the intended working surface.
+`listCases` remains a convenience helper for top-level `/cases` inspection, not the full file-capability model.
 
-When a task needs nested case folders, manifests, catalogs, or broader repo structure work, prefer the general path-based file operations and, if needed, the lower-level git-object path.
+### Ref-path note
+Use `getBranchRef` for simple `heads/{branch}` lookups.
+Use `getRef` and `updateRef` when the ref path itself matters more generally.
 
-### Write-path fallback note
-If direct `saveFile`-style writes become unstable, the lower-level git-object path is part of the current connector surface and may be used as a repo-control fallback.
+### Legacy-surface note
+This active GFE action surface does **not** rely on older flat case-helper write/read/delete operations.
+The generic path-based contents endpoints and the git-object endpoints are the primary control surface.
 
 ### Browser app caution
 Repo-control capability available to the GPT/operator is not the same thing as a safe browser-app feature.
-Do not automatically assume that because the GPT can mutate or delete stored artifacts, the public app should expose the same operation in the same way.
+Do not automatically assume that because the GPT  can mutate or delete stored artifacts, the public app should expose the same operation in the same way.
 
 ## How to use this file
 [RID_CAPABILITY_USAGE]
 
 Read this file:
 - after `/main/TOC.md`
-- when connector/API capability is relevant to the task
+- when custom GPT API action capability is relevant to the task
 - before assuming a repo limitation that may no longer be true
-- before designing around outdated helper-only assumptions
+- before designing around outdated or legacy-helper-only assumptions
 
 Cross-check with:
 - `/main/TOKEN_PERMISSION_SURFACE.md` for the live token permission surface
@@ -96,6 +123,7 @@ Cross-check with:
 ## Update rule
 
 Update this file when:
-- the custom GPT connector surface changes materially
-- new connector operation families are added or removed
-- helper-path assumptions used by operators would otherwise drift out of date
+- the active custom GPT API action surface changes materially
+- operation families are added or removed
+- endpoint assumptions used by operators would otherwise drift out of date
+- the active repo target changes
