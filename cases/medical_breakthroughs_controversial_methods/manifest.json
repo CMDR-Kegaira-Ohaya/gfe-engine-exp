@@ -2,9 +2,5 @@
   "case_id": "medical_breakthroughs_controversial_methods",
   "title": "Medical breakthroughs and controversial methods",
   "slug": "medical_breakthroughs_controversial_methods",
-  "artifacts": {
-    "case": true,
-    "encoding": true,
-    "reading": false
-  }
+  "current_case_source": "./source/case.md"
 }
