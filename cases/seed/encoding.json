@@ -1,9 +1,0 @@
-{
-  "case_id": "seed",
-  "system_name": "Seed",
-  "locus_of_analysis": "local",
-  "description": "seed file to trigger indexer",
-  "participants": [],
-  "timeline": [],
-  "payload_events": []
-}
