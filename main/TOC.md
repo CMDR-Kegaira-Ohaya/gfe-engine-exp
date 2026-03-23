@@ -27,6 +27,7 @@ Read these next when the task concerns how this repository is organized or how t
 5. `/main/REPO_SCHEMA.json`
 6. `/PROCEDURE_INDEX.md`
 7. `/main/GPT_CAPABILITY_SURFACE.md`
+8. `/main/TOKEN_PERMISSION_SURFACE.md`
 
 ### Layer 3 — Solver implementation
 Read these when the task concerns executable math, validation, normalization, dashboard shaping, or future runtime implementation.
@@ -88,7 +89,8 @@ Read these when the task concerns saved cases, case indexes, smoke tests, or mar
 
 ## Operational cross-links
 - Instructions and tooling: `/main/INSTRUCTIONS_INDEX.md`
-- GPT repo-control capabilities: `/main/GPT_CAPABILITY_SURFACE.md`
+- GPT connector/API action surface: `/main/GPT_CAPABILITY_SURFACE.md`
+- Live token permission surface: `/main/TOKEN_PERMISSION_SURFACE.md`
 - Troubleshooting and repo-write recovery: `/PROCEDURE_INDEX.md`
 - JS parser tooling: `/tools/js/README.md`
 
