@@ -1,5 +1,0 @@
-{
-  "deprecated": true,
-  "note": "This flat cases index is deprecated. Use /catalog/index.json for the canonical case artifact catalog.",
-  "replacement": "/catalog/index.json"
-}
