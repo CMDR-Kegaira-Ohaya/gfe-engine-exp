@@ -15,18 +15,31 @@
         <p>Case-first reader for canonical case, case encoding, and case reading.</p>
       </div>
       <div class="actions">
+        <button id="actions-toggle" class="ghost" aria-expanded="false" aria-controls="actions-panel">Actions</button>
         <button id="clear-btn" class="ghost">Clear</button>
         <button id="delete-btn" class="ghost">Delete</button>
       </div>
     </header>
 
-    <div class="notice-bar" id="notice">Canonical catalog is live. Package loading/import is reserved here.</div>
-
-    <section class="topside-rail" id="topside-rail">
-      <button class="topbtn active" data-top="open">Open case</button>
-      <button class="topbtn" data-top="package">Open case package</button>
-      <button class="topbtn" data-top="reading">Generate reading</button>
+    <section class="actions-popover-shell">
+      <div id="actions-panel" class="actions-panel hidden" role="menu" aria-label="Actions">
+        <section class="action-group">
+          <div class="group-label">Open</div>
+          <button class="action-btn active" data-action-mode="open">Open case</button>
+          <button class="action-btn" data-action-mode="package">Open case package</button>
+        </section>
+        <section class="action-group">
+          <div class="group-label">Read</div>
+          <button class="action-btn" data-action-mode="reading">Generate reading</button>
+        </section>
+        <section class="action-group action-group-muted">
+          <div class="group-label">Inspect</div>
+          <p class="group-note">Timeline, encoding summary, and the atlas stay on screen.</p>
+        </section>
+      </div>
     </section>
+
+    <div class="notice-bar" id="notice">Canonical catalog is live. Package loading/import is reserved here.</div>
 
     <section class="grid">
       <aside class="panel left-panel">
@@ -68,6 +81,7 @@
             </div>
             <div id="timeline" class="timeline empty">No timeline loaded.</div>
           </div>
+
           <div class="panel atlas-panel">
             <div class="panel-head">
               <h3>Relation Atlas</h3>
