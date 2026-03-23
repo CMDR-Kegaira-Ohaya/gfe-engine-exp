@@ -1,28 +1,29 @@
 import { validateCase, solveCase } from '../../solver/index.js';
-import { discoverCaseFolders, fileExists, getCaseArtifactPaths, readJson } from './common.mjs';
+import { discoverCaseFolders, getRevisionEncodingRecords, readJson, toRepoPath } from './common.mjs';
 
-const caseFolders = discoverCaseFolders().filter(caseDirName => fileExists(getCaseArtifactPaths(caseDirName).encodingPath));
+const records = discoverCaseFolders().flatMap((caseDirName) =>
+  getRevisionEncodingRecords(caseDirName).map((record) => ({ caseDirName, ...record }))
+);
 
-if (!caseFolders.length) {
+if (!records.length) {
   console.log('[validate-encodings] No canonical encodings found under /cases.');
   process.exit(0);
 }
 
 let hasErrors = false;
 
-for (const caseDirName of caseFolders) {
-  const { encodingPath } = getCaseArtifactPaths(caseDirName);
-
+for (const record of records) {
   try {
-    const encoding = readJson(encodingPath);
+    const encoding = readJson(record.encodingPath);
     const validation = validateCase(encoding);
     const solved = solveCase(encoding);
 
-    const errors = validation.issues.filter(issue => issue.level === 'error');
-    const warnings = validation.issues.filter(issue => issue.level === 'warning');
+    const errors = validation.issues.filter((issue) => issue.level === 'error');
+    const warnings = validation.issues.filter((issue) => issue.level === 'warning');
     const timesteps = Array.isArray(solved.timeline) ? solved.timeline.length : 0;
 
-    console.log(`\n[validate-encodings] ${caseDirName}`);
+    console.log(`\n[validate-encodings] ${record.caseDirName} :: ${record.revisionId}`);
+    console.log(`  path: ${toRepoPath(record.encodingPath)}`);
     console.log(`  timesteps: ${timesteps}`);
     console.log(`  errors: ${errors.length}`);
     console.log(`  warnings: ${warnings.length}`);
@@ -40,8 +41,10 @@ for (const caseDirName of caseFolders) {
     }
   } catch (error) {
     hasErrors = true;
-    console.error(`\n[validate-encodings] ${caseDirName}`);
-    console.error(`  [error] encoding.json could not be validated: ${error instanceof Error ? error.message : String(error)}`);
+    console.error(`\n[validate-encodings] ${record.caseDirName} :: ${record.revisionId}`);
+    console.error(
+      `  [error] ${toRepoPath(record.encodingPath)} could not be validated: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
 }
 
