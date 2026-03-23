@@ -1,101 +1,123 @@
 # GPT Capability Surface
 [RID_SELFREF_GPT_CAPABILITY_SURFACE]
 
-This file records the current **GPT Builder connector / API action surface** available in this repository context.
+This file records the current **custom GPT API action surface** available in this repository context.
 It is operational, not canonical engine doctrine.
 
 This file covers:
-- what the custom connector exposes
-- which operation families exist through the connector
-- practical connector-path implications for repo work
+- what the current custom GPT API action exposes
+- which operation families exist through that action
+- practical action-path implications for repo work
 
 This file does **not** define:
 - the effective token permission surface
 - repo governance doctrine
 - branch protection or repository policy behavior
 
-Do not collapse those layers.
-A connector endpoint may exist while the live token or repo policy still blocks the action.
-
 ## Capability layers
 [RID_CAPABILITY_LAYERS]
 
 Distinguish three layers:
-
 1. **Connector action surface**
-   - which operations the custom GPT connector exposes
+   - which operations the custom GPT API action exposes
 2. **Token permission surface**
    - which of those operations the currently configured token is authorized to perform
 3. **Repo policy surface**
    - which operations still depend on branch protection, workflow settings, merge policy, or other repository rules
 
-This file covers **layer 1 only**.
-Read `/main/TOKEN_PERMISSION_SURFACE.md` for layer 2.
-Read `/main/EDIT_RULES.md` and related repo-operating docs for layer 3.
+This file covers **Layer 1 only**.
+Read `/main/TOKEN_PERMISSION_SURFACE.md` for Layer 2.
+Read `/main/EDIT_RULES.md` and related repo-operating docs for Layer 3.
 
-## Current connector action surface
+## Current working custom GPT API action
 [RID_CAPABILITY_CONNECTOR_SURFACE]
 
-The current custom GPT connector exposes broad repo-control operations, including:
+As currently configured, the custom GPT API action:
+- is titled **TARS GitHub Repo Connector**
+- targets **CMDR-Kegaira-Ohaya/tars-memory-vault**, not this repository by default
+- uses `servers: - url: https://api.github.com`
+- is intended for GPT Actions with **API Key -> Bearer** authentication
+- specifies that the PAT should be stored in the GPT Action editor, not in the OPENAPI file
 
-- repository contents inspection
-- arbitrary path read / write / delete through contents endpoints
-- legacy `/cases/*` convenience helpers
-- branch and ref inspection
-- branch creation and ref update
-- git-object operations:
-  - blob creation
-  - tree creation
-  - commit creation
-- promotion / merge-style branch flows
-- Pages inspection
-- workflow inspection
-- workflow run inspection
-- workflow dispatch
+This file must not collapse the custom GPT Action repo target with the current chat repo target. They are separate surfaces.
+
+## Current action operation families
+
+The current working custom GPT API action exposes at least these operation families:
+
+- **Auth/identity**
+  - `getAuthenticatedUser`
+  - `getRepository`
+
+- **Contents/path operations**
+  - `listRoot`
+  - `getPath`
+  - `saveFile`
+  - `deleteFile`
+
+- **Branches/refs**
+  - `listBranches`
+  - `getBranchRef`
+  - `createBranch`
+  - `getGitRefFresh`
+  - `updateGitRefFresh`
+
+- **Git objects**
+  - `getTree`
+  - `createBlob`
+  - `createTree`
+  - `getCommit`
+  - `createCommit`
+
+- **Pull requests and merges**
+  - `listPullRequests`
+  - `createPullRequest`
+  - `getPullRequest`
+  - `updatePullRequest`
+  - `mergePullRequest`
+  - `mergeBranch`
+
+- **Actions/workflows/runs**
+  - `listWorkflows`
+  - `listWorkflowRuns`
+  - `getWorkflowRun`
+  - `rerunWorkflowRun`
+  - `cancelWorkflowRun`
+  - `dispatchWorkflow`
+
+- **Repository_dispatch**
+  - `repositoryDispatch`
+
+- **Pages**
+  - `getPagesSite`
+
+## Current action structural notes
+
+- Legacy ref operations are explicitly removed. Use ``getGitRefFresh`` and ``updateGitRefFresh` only.
+- Ganeric path-based contents operations are the primary file surface.
+  They are not restricted to a case-only helper pattern.
+- The `getPath` path parameter is marked ``allowReserved: true`` in the custom GPT Action spec, so nested paths are intended to be supported by the action surface.
+- The action surface now includes PR/merge control and both workflow_dispatch and repository_dispatch surfaces.
 
 ## Practical implications
-[RID_CAPABILITY_PRACTICAL_IMPLICATIONS]
 
-### General repo work
-The connector surface can support:
-- multi-file repository edits
-- arbitrary-path file creation
-- arbitrary-path file deletion
-- branch-based experimental work
-- workflow inspection and dispatch
-- Pages-aware repository maintenance
-- structural repo reorganization
-
-### Legacy helper caution
-The older flat `/cases/{filename}` helper pattern should be treated as a narrow convenience surface, not as the full capability model.
-
-When a task needs nested case folders, manifests, catalogs, or broader repo structure work, prefer the general path-based file operations and, if needed, the lower-level git-object path.
-
-### Write-path fallback note
-If direct `saveFile`-style writes become unstable, the lower-level git-object path is part of the current connector surface and may be used as a repo-control fallback.
-
-### Browser app caution
-Repo-control capability available to the GPT/operator is not the same thing as a safe browser-app feature.
-Do not automatically assume that because the GPT can mutate or delete stored artifacts, the public app should expose the same operation in the same way.
+- Do not assume that the current custom GPT Action writes to this repository by default. It currently targets `CMDR-Kegaira-Ohaya/tars-memory-vault`.
+- When a task concerns this repo specifically, prefer the active repo-control surface that targets this repo directly.
+- When a task concerns the TARS repo, the custom GPT API action is now broad enough for contents, branches, refs, git objects, PRs, merges, workflows, dispatches, and Pages inspection.
+- Connector capability alone does not prove that an operation is permitted. Cross-check the token permission surface and repo policy surface before assuming a write, merge, or dispatch should succeed.
 
 ## How to use this file
-[RID_CAPABILITY_USAGE]
 
 Read this file:
 - after `/main/TOC.md`
-- when connector/API capability is relevant to the task
-- before assuming a repo limitation that may no longer be true
-- before designing around outdated helper-only assumptions
-
-Cross-check with:
-- `/main/TOKEN_PERMISSION_SURFACE.md` for the live token permission surface
-- `/main/SYSTEM_MAP.md` for structural role mapping
-- `/main/EDIT_RULES.md` for governance and edit boundaries
-- `/PROCEDURE_INDEX.md` for write-path recovery and stable procedures
+- when custom GPT API Action capability is relevant to the task
+- before assuming that a repo limitation is tooling-wide when it may actually be repo-target specific
+- before designing around outdated or legacy-helper-only assumptions
 
 ## Update rule
 
 Update this file when:
-- the custom GPT connector surface changes materially
-- new connector operation families are added or removed
-- helper-path assumptions used by operators would otherwise drift out of date
+- the custom GPT API action surface changes materially
+- the action's repo target changes
+- legacy/fresh ref assumptions change
+- operator assumptions about which GPT Action surface is current would otherwise drift out of date
