@@ -1,4 +1,5 @@
 # GFE Repository TOC
+[RID_TOC_ROOT]
 
 This file is the canonical bootstrap entrypoint for GPT sessions and operator re-entry.
 
@@ -9,6 +10,7 @@ Read in this order unless the task explicitly requires a narrower path.
 ## Authority and traversal order
 
 ### Layer 1 — Canonical engine doctrine
+[RID_TOC_ENGINE_LAYER]
 Read these first when the task concerns model meaning, doctrine, case analysis rules, payload structure, dashboard semantics, or anti-drift constraints.
 
 1. `/engine/formed_existence_model_v15_7.md`
@@ -18,6 +20,7 @@ Read these first when the task concerns model meaning, doctrine, case analysis r
 5. `/engine/gfe_exp_engine_core_v15_7.md`
 
 ### Layer 2 — Repo operating map
+[RID_TOC_MAIN_LAYER]
 Read these next when the task concerns how this repository is organized or how the GPT should operate inside it.
 
 1. `/main/GPT_OPERATOR_MANUAL.md`
@@ -27,14 +30,16 @@ Read these next when the task concerns how this repository is organized or how t
 5. `/main/REPO_SCHEMA.json`
 6. `/PROCEDURE_INDEX.md`
 7. `/main/GPT_CAPABILITY_SURFACE.md`
-8. `/main/TOKEN_PERMISSION_SURFACE.md`
+8. `/main/TOKEN_PERMISSION_SURFACE.md
 
 ### Layer 3 — Solver implementation
+[RID_TOC_SOLVER_LAYER]
 Read these when the task concerns executable math, validation, normalization, dashboard shaping, or future runtime implementation.
 
 - `/solver/`
 
 ### Layer 4 — Application implementation
+[RID_TOC_APP_LAYER]
 Read these when the task concerns the workbench UI, rendering, repo connection logic, or Pages behavior.
 
 - `/index.html`
@@ -44,6 +49,7 @@ Read these when the task concerns the workbench UI, rendering, repo connection l
 - `/.github/workflows/`
 
 ### Layer 5 — Case payloads
+[RID_TOC_CASE_LAYER]
 Read these when the task concerns saved cases, case indexes, smoke tests, or markdown companions.
 
 - `/cases/`
@@ -69,7 +75,7 @@ Read these when the task concerns saved cases, case indexes, smoke tests, or mar
 ### Repo debugging / UI bugs / Pages issues
 - Start with `/main/SYSTEM_MAP.md`
 - Then `/main/EDIT_RULES.md`
-- Then relevant files in `index.html`, `workbench-v2.html`, `/ui-v2/*`, `.github/`
+- Then relevant files in `/index.html`, `workbench-v2.html`, `/ui-v2/*`, `.github/`
 
 ### Save/load flow or schema issues
 - Start with `/main/REPO_SCHEMA.json`
