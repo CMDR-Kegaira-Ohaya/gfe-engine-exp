@@ -1,4 +1,5 @@
 # GPT Capability Surface
+[RID_SELFREF_GPT_CAPABILITY_SURFACE]
 
 This file records the current **GPT Builder connector / API action surface** available in this repository context.
 It is operational, not canonical engine doctrine.
@@ -17,6 +18,7 @@ Do not collapse those layers.
 A connector endpoint may exist while the live token or repo policy still blocks the action.
 
 ## Capability layers
+[RID_CAPABILITY_LAYERS]
 
 Distinguish three layers:
 
@@ -32,6 +34,7 @@ Read `/main/TOKEN_PERMISSION_SURFACE.md` for layer 2.
 Read `/main/EDIT_RULES.md` and related repo-operating docs for layer 3.
 
 ## Current connector action surface
+[RID_CAPABILITY_CONNECTOR_SURFACE]
 
 The current custom GPT connector exposes broad repo-control operations, including:
 
@@ -51,6 +54,7 @@ The current custom GPT connector exposes broad repo-control operations, includin
 - workflow dispatch
 
 ## Practical implications
+[RID_CAPABILITY_PRACTICAL_IMPLICATIONS]
 
 ### General repo work
 The connector surface can support:
@@ -75,6 +79,7 @@ Repo-control capability available to the GPT/operator is not the same thing as a
 Do not automatically assume that because the GPT can mutate or delete stored artifacts, the public app should expose the same operation in the same way.
 
 ## How to use this file
+[RID_CAPABILITY_USAGE]
 
 Read this file:
 - after `/main/TOC.md`
