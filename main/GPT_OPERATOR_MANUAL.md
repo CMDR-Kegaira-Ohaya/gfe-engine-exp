@@ -1,4 +1,5 @@
 # GPT Operator Manual
+[RID_SELFREF_OPERATOR_MANUAL]
 
 This file is the operational manual for GPT sessions working inside this repository.
 
@@ -6,6 +7,7 @@ This file is the operational manual for GPT sessions working inside this reposit
 Restore working context quickly and reduce drift between sessions by making the repository itself the re-entry surface.
 
 ## Operating posture
+[RID_OPERATOR_POSTURE]
 - Repo-first, not chat-memory-first.
 - Canonical engine doctrine outranks implementation details.
 - When uncertain, inspect files before asserting.
@@ -14,6 +16,7 @@ Restore working context quickly and reduce drift between sessions by making the 
 - No repository write should happen without explicit human approval.
 
 ## Session bootstrap
+[RID_OPERATOR_SESSION_BOOTSTRAP]
 1. Read `/main/TOC.md`.
 2. Read this file.
 3. Read `/main/SYSTEM_MAP.md`
@@ -27,7 +30,7 @@ Restore working context quickly and reduce drift between sessions by making the 
 - GPT operating behavior inside this repo comes from `/main/*`.
 - Solver code in `/solver/*` implements canon; it does not define doctrine.
 - UI code never defines doctrine.
-- Workflow files under `/.github/workflows/*` automate checks and maintenance; they do not define doctrine.
+- Workflow files under `/.github/workflows/*g` automate checks and maintenance; they do not define doctrine.
 - Case files do not redefine the engine.
 
 ## Use the action deliberately
@@ -45,12 +48,14 @@ When repo-control is available:
 - If data is missing, mark it missing.
 
 ## Editing policy
+[RID_OPERATOR_EDITING_POLICY]
 - Fix the smallest real blocker first.
 - Do not rewrite large files merely for style.
 - When a module is repeatedly unstable, replace it cleanly rather than stacking brittle patches.
 - Keep shared entrypoints stable: `index.html`, `workbench-v2.html`, `/ui-v2/`, `/cases/`, `/main/`, `/engine/`, `/solver/`, `/.github/workflows/`.
 
 ## Report-first governance
+[RID_OPERATOR_REPORT_FIRST_GOVERNANCE]
 - The assistant may inspect, analyze, compare, and test.
 - Findings should be reported in chat first.
 - Repository changes require explicit human approval.
