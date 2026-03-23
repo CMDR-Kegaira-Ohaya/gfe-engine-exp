@@ -34,6 +34,12 @@ Use this as the default procedure unless a smaller direct path is clearly safe:
 3. pass the encoded string as `content`
 4. include `sha` when updating an existing file
 
+Markdown default:
+- for `.md` files, prefer one exact replacement payload generated mechanically from the final Markdown text
+- do not hand-edit Base64 for Markdown writes
+- do not mix raw Markdown text and encoded payload text in the same write path unless the tool explicitly requires it
+- prefer this Markdown rule even when the file is small, because it reduces payload corruption risk and keeps repo behavior consistent
+
 Precision note:
 - if repeated `422` errors say `content is not valid Base64`, first suspect corruption in the encoded payload itself
 - common causes are accidental whitespace inside the Base64 string, truncation, or mixed raw text and encoded text in the same payload
