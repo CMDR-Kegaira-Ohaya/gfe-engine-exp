@@ -1,6 +1,6 @@
 {
   "branch": "main",
-  "generated_at": "2026-03-23T06:06:14.912Z",
+  "generated_at": "2026-03-23T06:06:39.078Z",
   "count": 2,
   "cases": [
     {
@@ -14,12 +14,12 @@
       "reading_count": 0,
       "participants": 0,
       "timesteps": 5,
-      "modified": "2026-03-23T08:06:05+02:00",
+      "modified": "2026-03-23T08:06:31+02:00",
       "synopsis": "This case examines a long historical pattern in medicine: some of the most important breakthroughs were accompanied by methods that were personally harmful, coercive, or morally deeply contested.",
       "paths": {
         "case": "/cases/medical_breakthroughs_controversial_methods/source/case.md",
         "manifest": "/cases/medical_breakthroughs_controversial_methods/manifest.json",
-        "encoding": "/cases/medical_breakthroughs_controversial_methods/encoding.json",
+        "encoding": "/cases/medical_breakthroughs_controversial_methods/revisions/rev_migrated_root/encoding.json",
         "reading": ""
       }
     },
