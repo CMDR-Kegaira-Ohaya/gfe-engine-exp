@@ -1,36 +1,43 @@
 # GPT Capability Surface
 
-This file records the current repo-control capability surface available to the GPT in this repository context.
+This file records the current **GPT Builder connector / API action surface** available in this repository context.
 It is operational, not canonical engine doctrine.
 
-Use it when the task concerns:
-- what the GPT can inspect or mutate in the repo
-- whether a planned repo operation is supported by the custom action surface
-- how token permissions differ from repo protections or branch policy
-- whether to prefer general-path repo operations over narrower legacy helpers
+This file covers:
+- what the custom connector exposes
+- which operation families exist through the connector
+- practical connector-path implications for repo work
+
+This file does **not** define:
+- the effective token permission surface
+- repo governance doctrine
+- branch protection or repository policy behavior
+
+Do not collapse those layers.
+A connector endpoint may exist while the live token or repo policy still blocks the action.
 
 ## Capability layers
 
 Distinguish three layers:
 
-1. **Action surface**
-   - which operations the custom GPT action exposes
+1. **Connector action surface**
+   - which operations the custom GPT connector exposes
 2. **Token permission surface**
-   - which of those operations the configured token is authorized to perform
+   - which of those operations the currently configured token is authorized to perform
 3. **Repo policy surface**
    - which operations still depend on branch protection, workflow settings, merge policy, or other repository rules
 
-Do not collapse these layers.
-An endpoint may exist but still fail because of token scope or repo policy.
-A token may allow an operation that the current repository settings still block.
+This file covers **layer 1 only**.
+Read `/main/TOKEN_PERMISSION_SURFACE.md` for layer 2.
+Read `/main/EDIT_RULES.md` and related repo-operating docs for layer 3.
 
-## Current action surface
+## Current connector action surface
 
-The custom GPT action surface currently exposes broad repo-control operations, including:
+The current custom GPT connector exposes broad repo-control operations, including:
 
 - repository contents inspection
-- arbitrary path read / write / delete
-- legacy `/cases` convenience helpers
+- arbitrary path read / write / delete through contents endpoints
+- legacy `/cases/*` convenience helpers
 - branch and ref inspection
 - branch creation and ref update
 - git-object operations:
@@ -43,28 +50,10 @@ The custom GPT action surface currently exposes broad repo-control operations, i
 - workflow run inspection
 - workflow dispatch
 
-## Current token permission surface
-
-As reported from the active configuration in this deployment, the token capability surface is broad and includes at least:
-
-- **Actions**: read / write
-- **Commit statuses**: read / write
-- **Contents**: read / write
-- **Custom properties**: read / write
-- **Deployments**: read / write
-- **Issues**: read / write
-- **Merge queues**: read / write
-- **Pages**: read / write
-- **Pull requests**: read / write
-- **Workflows**: read / write
-- **Metadata**: read-only
-
-This means the GPT should not assume a narrow read-only or file-only token by default.
-
 ## Practical implications
 
 ### General repo work
-The GPT can usually plan around:
+The connector surface can support:
 - multi-file repository edits
 - arbitrary-path file creation
 - arbitrary-path file deletion
@@ -78,11 +67,8 @@ The older flat `/cases/{filename}` helper pattern should be treated as a narrow 
 
 When a task needs nested case folders, manifests, catalogs, or broader repo structure work, prefer the general path-based file operations and, if needed, the lower-level git-object path.
 
-### Delete caution
-Repo deletion is possible in principle through the repo-control surface, but destructive actions should still be treated as:
-- explicitly scoped
-- confirmed
-- aware of repo policy and branch protections
+### Write-path fallback note
+If direct `saveFile`-style writes become unstable, the lower-level git-object path is part of the current connector surface and may be used as a repo-control fallback.
 
 ### Browser app caution
 Repo-control capability available to the GPT/operator is not the same thing as a safe browser-app feature.
@@ -92,18 +78,19 @@ Do not automatically assume that because the GPT can mutate or delete stored art
 
 Read this file:
 - after `/main/TOC.md`
-- when repo-control capability is relevant to the task
+- when connector/API capability is relevant to the task
 - before assuming a repo limitation that may no longer be true
-- before designing around outdated flat-storage assumptions
+- before designing around outdated helper-only assumptions
 
 Cross-check with:
+- `/main/TOKEN_PERMISSION_SURFACE.md` for the live token permission surface
 - `/main/SYSTEM_MAP.md` for structural role mapping
-- `/main/INSTRUCTIONS_INDEX.md` for operational helper surfaces
-- `/PROCEDURE_INDEX.md` for stable procedures and recovery paths
+- `/main/EDIT_RULES.md` for governance and edit boundaries
+- `/PROCEDURE_INDEX.md` for write-path recovery and stable procedures
 
 ## Update rule
 
 Update this file when:
-- the custom GPT action surface changes materially
-- the token permission surface changes materially
-- repo-control assumptions used by operators or future GPT sessions would otherwise drift out of date
+- the custom GPT connector surface changes materially
+- new connector operation families are added or removed
+- helper-path assumptions used by operators would otherwise drift out of date
