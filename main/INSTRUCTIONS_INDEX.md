@@ -15,7 +15,8 @@ It is not canonical engine doctrine. It supplements `/main/TOC.md` and `/main/GP
 - Edit governance: `/main/EDIT_RULES.md`
 - Troubleshooting and repo recovery: `/PROCEDURE_INDEX.md`
 - JavaScript tools usage: `/tools/js/README.md`
-- GPT repo-control capabilities: `/main/GPT_CAPABILITY_SURFACE.md`
+- GPT connector/API action surface: `/main/GPT_CAPABILITY_SURFACE.md`
+- Live token permission surface: `/main/TOKEN_PERMISSION_SURFACE.md`
 
 ## Operational tools
 
@@ -37,7 +38,7 @@ npm run js:summary-all
 ```
 
 What it gives:
-- syntax check via Node `racheck`
+- syntax check via Node `--check`
 - full AST parsing via Acorn
 - import/export summaries
 - dependency edges
@@ -49,22 +50,24 @@ Boundaries:
 - it does not replace canonical engine files
 - it does not yet cover JSX or TypeScript
 
-### GPT repo-control capability surface
-Use this when the task concerns what the GPT can actually do to the repository through the custom action and token configuration.
+### GPT repo-control connector and token surfaces
+Use this when the task concerns what the GPT can actually do to the repository through the custom connector and the current token configuration.
 
 Read `/main/GPT_CAPABILITY_SURFACE.md` for:
-- action surface
-- token permission surface
-- repo-policy caveats
+- connector / API action surface
 - guidance on when to prefer general path-based repo operations over narrower legacy helpers
 
-Use this before assuming:
+Read `/main/TOKEN_PERMISSION_SURFACE.md` for:
+- live token permission surface
+- practical authority width of the current token
+
+Use these before assuming:
 - the GPT is limited to flat `/cases/*.json` helpers
 - the GPT is read-only
 - workflow dispatch or arbitrary-path writes are unavailable
 
 Boundaries:
-- exposed action surface does not guarantee success
+- exposed connector/action surface does not guarantee success
 - token permissions do not override branch protection or repo rules
 - browser-app features should not be inferred automatically from GPT/operator repo-control capability
 
