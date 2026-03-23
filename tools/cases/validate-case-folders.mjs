@@ -1,4 +1,12 @@
-import { discoverCaseFolders, fileExists, getCaseArtifactPaths, safeReadJson } from './common.mjs';
+import {
+  dirExists,
+  discoverCaseFolders,
+  fileExists,
+  getCaseArtifactPaths,
+  getRevisionEncodingRecords,
+  getSolveReadingRecords,
+  safeReadJson
+} from './common.mjs';
 
 function isNonEmptyString(value) {
   return typeof value === 'string' && value.trim().length > 0;
@@ -19,22 +27,13 @@ for (const caseDirName of caseFolders) {
   const errors = [];
   const warnings = [];
 
-  const actual = {
-    case: fileExists(paths.casePath),
-    encoding: fileExists(paths.encodingPath),
-    reading: fileExists(paths.readingPath)
-  };
+  const hasSourceCase = fileExists(paths.casePath);
+  const hasLegacyCase = fileExists(paths.legacyCasePath);
+  const encodingRecords = getRevisionEncodingRecords(caseDirName);
+  const solveRecords = getSolveReadingRecords(caseDirName);
 
   if (!fileExists(paths.manifestPath)) {
     errors.push('manifest.json is required.');
-  }
-
-  if (!actual.encoding) {
-    errors.push('encoding.json is required.');
-  }
-
-  if (!actual.case) {
-    warnings.push('case.md is recommended but currently missing.');
   }
 
   let manifest = null;
@@ -47,6 +46,22 @@ for (const caseDirName of caseFolders) {
     }
   }
 
+  if (!hasSourceCase && !hasLegacyCase) {
+    warnings.push('No case source was found. Canonical source/case.md is preferred.');
+  }
+
+  if (hasLegacyCase && !hasSourceCase) {
+    warnings.push('Legacy root case.md is present. Migrate it to source/case.md.');
+  }
+
+  if (fileExists(paths.legacyEncodingPath) && !dirExists(paths.revisionsDir)) {
+    warnings.push('Legacy root encoding.json is present. Migrate it under revisions/<case_revision_id>/encoding.json.');
+  }
+
+  if (fileExists(paths.legacyReadingPath)) {
+    warnings.push('Legacy root reading.md is present. Reading artifacts should live under revisions/<case_revision_id>/solves/<solve_id>/.');
+  }
+
   if (manifest) {
     if (!isNonEmptyString(manifest.case_id)) {
       errors.push('manifest.case_id must be a non-empty string.');
@@ -56,29 +71,31 @@ for (const caseDirName of caseFolders) {
       errors.push('manifest.title must be a non-empty string.');
     }
 
-    if (!manifest.artifacts || typeof manifest.artifacts !== 'object' || Array.isArray(manifest.artifacts)) {
-      errors.push('manifest.artifacts must be an object with boolean presence flags.');
-    } else {
-      for (const key of ['case', 'encoding', 'reading']) {
-        if (typeof manifest.artifacts[key] !== 'boolean') {
-          errors.push(`manifest.artifacts.${key} must be a boolean.`);
-          continue;
-        }
-
-        if (manifest.artifacts[key] !== actual[key]) {
-          errors.push(
-            `manifest.artifacts.${key}=${manifest.artifacts[key]} does not match actual file presence (${actual[key]}).`
-          );
-        }
-      }
+    if (!isNonEmptyString(manifest.slug)) {
+      errors.push('manifest.slug must be a non-empty string.');
+    } else if (manifest.slug !== caseDirName) {
+      errors.push(`manifest.slug (${manifest.slug}) does not match folder name (${caseDirName}).`);
     }
 
-    if (Object.prototype.hasOwnProperty.call(manifest, 'slug')) {
-      if (!isNonEmptyString(manifest.slug)) {
-        errors.push('manifest.slug, if present, must be a non-empty string.');
-      } else if (manifest.slug !== caseDirName) {
-        errors.push(`manifest.slug (${manifest.slug}) does not match folder name (${caseDirName}).`);
-      }
+    if (!isNonEmptyString(manifest.current_case_source)) {
+      errors.push('manifest.current_case_source must be a non-empty string.');
+    } else if (!['./source/case.md', './case.md'].includes(manifest.current_case_source)) {
+      warnings.push(`manifest.current_case_source (${manifest.current_case_source}) is unusual. Preferred value is ./source/case.md.`);
+    }
+  }
+
+  for (const record of encodingRecords) {
+    if (!isNonEmptyString(record.revisionId)) {
+      errors.push('Each revision folder with encoding.json must have a non-empty revision folder name.');
+    }
+  }
+
+  for (const record of solveRecords) {
+    if (!record.hasSolve && !record.hasReading) {
+      warnings.push(`Solve folder ${record.revisionId}/${record.solveId} contains neither solve.json nor reading.md.`);
+    }
+    if (!record.hasSolve && record.hasReading) {
+      warnings.push(`Solve folder ${record.revisionId}/${record.solveId} has reading.md without solve.json.`);
     }
   }
 
