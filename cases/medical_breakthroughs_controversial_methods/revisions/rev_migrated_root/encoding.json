@@ -1,0 +1,80 @@
+{
+  "case_id": "medical_breakthroughs_controversial_methods",
+  "system_name": "Medical breakthroughs and controversial methods",
+  "locus_of_analysis": "personal",
+  "description": "Medical breakthroughs and controversial methods in the past centuries. Did the ends justify the means on the personal level?",
+  "participants": [],
+  "timeline": [
+    {
+      "timestep_label": "Early pressures for progress",
+      "participants": {
+        "historical_actors": {
+          "axes": {
+            "body": { "A": 65, "R": 40, "I": 55 },
+            "mind": { "A": 70, "R": 45, "I": 60 },
+            "social": { "A": 55, "R": 50, "I": 50 },
+            "ethics": { "A": 50, "R": 35, "I": 65 },
+            "time": { "A": 60, "R": 55, "I": 45 }
+          }
+        }
+      }
+    },
+    {
+      "timestep_label": "Controversial methods are applied",
+      "participants": {
+        "subjects_and_patients": {
+          "axes": {
+            "body": { "A": 85, "R": 20, "I": 80 },
+            "mind": { "A": 75, "R": 25, "I": 85 },
+            "social": { "A": 70, "R": 30, "I": 75 },
+            "ethics": { "A": 90, "R": 15, "I": 90 },
+            "time": { "A": 65, "R": 35, "I": 70 }
+          }
+        }
+      }
+    },
+    {
+      "timestep_label": "Breakthroughs become visible",
+      "participants": {
+        "medical_establishment": {
+          "axes": {
+            "body": { "A": 50, "R": 65, "I": 40 },
+            "mind": { "A": 55, "R": 70, "I": 45 },
+            "social": { "A": 60, "R": 65, "I": 45 },
+            "ethics": { "A": 45, "R": 60, "I": 55 },
+            "time": { "A": 40, "R": 75, "I": 35 }
+          }
+        }
+      }
+    },
+    {
+      "timestep_label": "Personal costs are reappraised",
+      "participants": {
+        "witnesses_and_later_generations": {
+          "axes": {
+            "body": { "A": 40, "R": 60, "I": 35 },
+            "mind": { "A": 70, "R": 50, "I": 70 },
+            "social": { "A": 65, "R": 55, "I": 60 },
+            "ethics": { "A": 80, "R": 45, "I": 80 },
+            "time": { "A": 45, "R": 70, "I": 40 }
+          }
+        }
+      }
+    },
+    {
+      "timestep_label": "Did the ends justify the means?",
+      "participants": {
+        "personal_judgment": {
+          "axes": {
+            "body": { "A": 50, "R": 50, "I": 50 },
+            "mind": { "A": 75, "R": 55, "I": 75 },
+            "social": { "A": 60, "R": 55, "I": 65 },
+            "ethics": { "A": 85, "R": 50, "I": 85 },
+            "time": { "A": 55, "R": 60, "I": 55 }
+          }
+        }
+      }
+    }
+  ],
+  "payload_events": []
+}
