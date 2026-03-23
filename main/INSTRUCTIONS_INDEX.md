@@ -1,15 +1,18 @@
 # Instructions Index
+[RID_SELFREF_INSTRUCTIONS_INDEX]
 
 This file is the operational instructions surface for repo-useful tools, procedures, and operator conventions.
 It is not canonical engine doctrine. It supplements `/main/TOC.md` and `/main/GPT_OPERATOR_MANUAL.md`.
 
 ## Use from boot
+[RID_INSTRUCTIONS_USE_FROM_BOOT]
 - Start at `/main/TOC.md`
 - Then read `/main/GPT_OPERATOR_MANUAL.md`
 - Then use this file for tooling, procedures, and operational helpers
 - Use `/PROCEDURE_INDEX.md` for troubleshooting and repo-write recovery
 
 ## Cross-links
+[RID_INSTRUCTIONS_CROSS_LINKS]
 - Bootstrap: `/main/TOC.md`
 - Operator manual: `/main/GPT_OPERATOR_MANUAL.md`
 - Edit governance: `/main/EDIT_RULES.md`
@@ -19,6 +22,7 @@ It is not canonical engine doctrine. It supplements `/main/TOC.md` and `/main/GP
 - Live token permission surface: `/main/TOKEN_PERMISSION_SURFACE.md`
 
 ## Operational tools
+[RID_INSTRUCTIONS_OPERATIONAL_TOOLS]
 
 ### JavaScript parser tooling
 Use this when the task concerns imports, exports, syntax validity, dependency edges, or JS structure.
@@ -43,7 +47,7 @@ What it gives:
 - import/export summaries
 - dependency edges
 - identifier lookup
-- batch summaries across `ui/`, `ui-v2/`, and `/solver/`
+- batch summaries across `/ui/`, `/ui-v2/`, and `/solver/`
 
 Boundaries:
 - this is for structural inspection, not for doctrine
@@ -51,6 +55,7 @@ Boundaries:
 - it does not yet cover JSX or TypeScript
 
 ### GPT repo-control connector and token surfaces
+[RID_INSTRUCTIONS_REPO_CONTROL_SURFACES]
 Use this when the task concerns what the GPT can actually do to the repository through the custom connector and the current token configuration.
 
 Read `/main/GPT_CAPABILITY_SURFACE.md` for:
@@ -76,6 +81,6 @@ Boundaries:
 - when a repo capability is operational, repeatable, and not canonical doctrine
 - when usage should be cross-linked with procedures or tooling
 
-```
+````
 If a new repo-useful tool is added, list it here and add a cross-link from `/main/TOC.md`.
-```
+````
