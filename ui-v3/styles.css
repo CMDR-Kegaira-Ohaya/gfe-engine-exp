@@ -59,7 +59,6 @@ body {
 .actions,
 .badge-row,
 .panel-head,
-.topside-rail,
 .placeholder-actions {
   display: flex;
   align-items: center;
@@ -89,15 +88,57 @@ button.ghost {
   border-radius: 14px;
 }
 
-.topside-rail {
+.actions-popover-shell {
+  display: flex;
+  justify-content: flex-end;
   padding: 12px 24px 0;
-  flex-wrap: wrap;
 }
 
-.topbtn.active,
-.tab-btn.active {
+.actions-panel {
+  width: min(360px, 100%);
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+}
+
+.action-group {
+  display: grid;
+  gap: 10px;
+}
+
+.action-group + .action-group {
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.group-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--2gray);
+}
+
+.action-btn {
+  width: 100%;
+  text-align: left;
+  background: var(--surface-soft);
+}
+
+.action-btn.active {
   border-color: var(--accent);
   color: var(--accent);
+  background: #eef2ff;
+}
+
+.group-note {
+  margin: 0;
+  color: var(--2gray);
+  line-height: 1.5;
 }
 
 .grid {
@@ -183,6 +224,11 @@ button.ghost {
   gap: 8px;
   padding: 0 20px 12px;
   border-bottom: 1px solid var(--border);
+}
+
+.tab-btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .tab-content {
@@ -327,5 +373,13 @@ button.ghost {
 
   .bottom-row {
     grid-template-columns: 1fr;
+  }
+
+  .actions-popover-shell {
+    justify-content: stretch;
+  }
+
+  .actions-panel {
+    width: 100%;
   }
 }

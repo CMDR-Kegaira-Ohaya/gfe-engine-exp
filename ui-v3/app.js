@@ -2,7 +2,8 @@
 import { validateCase, solveCase } from '../solver/index.js';
 
 const state = {
-  topMode: 'open',
+  currentMode: 'open',
+  actionsOpen: false,
   catalog: [],
   activeTab: 'case',
   activeSlug: null,
@@ -19,7 +20,8 @@ const $ = (id) => document.getElementById(id);
 
 const els = {
   notice: $('notice'),
-  topsideRail: $('topside-rail'),
+  actionsToggle: $('actions-toggle'),
+  actionsPanel: $('actions-panel'),
   sidePanelTitle: $('side-panel-title'),
   sidePanelIntro: $('side-panel-intro'),
   sidePanelBody: $('side-panel-body'),
@@ -121,6 +123,7 @@ async function fetchText(path) {
 
 async function loadCatalog() {
   setNotice('Loading canonical catalog…');
+
   try {
     const catalogData = await fetchJson('./catalog/index.json');
     state.catalog = Array.isArray(catalogData.cases) ? catalogData.cases : [];
@@ -145,6 +148,7 @@ async function loadCatalog() {
 async function loadCase(slug, { resetTab = true } = {}) {
   state.activeSlug = slug;
   state.activeStep = 0;
+
   if (resetTab) {
     state.activeTab = 'case';
   }
@@ -172,7 +176,7 @@ async function loadCase(slug, { resetTab = true } = {}) {
     state.solved = encoding ? solveCase(encoding) : null;
 
     renderAll();
-    setNotice(“${entry.title}” loaded.`);
+    setNotice(`“${entry.title}” loaded.`);
   } catch (error) {
     state.caseMarkdown = '';
     state.encoding = null;
@@ -183,6 +187,27 @@ async function loadCase(slug, { resetTab = true } = {}) {
     renderAll();
     setNotice(`Could not load “${entry.title}”: ${error.message}`);
   }
+}
+
+function setMode(mode) {
+  state.currentMode = mode;
+  state.actionsOpen = false;
+
+  if (mode === 'reading') {
+    state.activeTab = 'reading';
+    setNotice('Use GPT to generate reading.');
+    renderAll();
+    return;
+  }
+
+  if (mode === 'package') {
+    setNotice('Case package support is not fully wired yet.');
+    renderAll();
+    return;
+  }
+
+  setNotice('Browse canonical cases from the live catalog.');
+  renderAll();
 }
 
 function renderCatalogList() {
@@ -229,7 +254,7 @@ function renderReadingPlaceholder() {
 }
 
 function renderSidePanel() {
-  if (state.topMode === 'open') {
+  if (state.currentMode === 'open') {
     els.sidePanelTitle.textContent = 'Open case';
     els.sidePanelIntro.textContent = 'Browse canonical cases from the live catalog.';
     els.reloadCatalog.classList.remove('hidden');
@@ -238,7 +263,7 @@ function renderSidePanel() {
     return;
   }
 
-  if (state.topMode === 'package') {
+  if (state.currentMode === 'package') {
     els.sidePanelTitle.textContent = 'Open case package';
     els.sidePanelIntro.textContent = 'Load/import entry is reserved here. Full package workflow is not wired yet.';
     els.reloadCatalog.classList.add('hidden');
@@ -391,15 +416,21 @@ function renderAtlas() {
     .join('');
 }
 
-function renderAll() {
-  document.querySelectorAll('.topbtn').forEach((button) => {
-    button.classList.toggle('active', button.dataset.top === state.topMode);
-  });
+function renderActionsPanel() {
+  els.actionsToggle.setAttribute('aria-expanded', String(state.actionsOpen));
+  els.actionsPanel.classList.toggle('hidden', !state.actionsOpen);
 
+  document.querySelectorAll('[data-action-mode]').forEach((button) => {
+    button.classList.toggle('active', button.dataset.actionMode === state.currentMode);
+  });
+}
+
+function renderAll() {
   document.querySelectorAll('.tab-btn').forEach((button) => {
     button.classList.toggle('active', button.dataset.tab === state.activeTab);
   });
 
+  renderActionsPanel();
   renderSidePanel();
   renderHeader();
   renderTabContent();
@@ -424,6 +455,7 @@ function handleReadingAction() {
 
 function handleClear() {
   if (!confirm('Are you sure?')) return;
+
   state.activeSlug = null;
   state.activeStep = 0;
   state.caseMarkdown = '';
@@ -432,6 +464,7 @@ function handleClear() {
   state.validation = null;
   state.solved = null;
   state.activeTab = 'case';
+
   renderAll();
   setNotice('Current loaded items cleared.');
 }
@@ -442,26 +475,28 @@ function handleDelete() {
 }
 
 function bindEvents() {
-  els.reloadCatalog.addEventListener('click', loadCatalog);
-
-  els.topsideRail.addEventListener('click', (event) => {
-    const button = event.target.closest('[data-top]');
-    if (!button) return;
-
-    const topMode = button.dataset.top;
-    state.topMode = topMode;
-
-    if (topMode === 'reading') {
-      state.activeTab = 'reading';
-      setNotice('Use GPT to generate reading.');
-    } else if (topMode === 'package') {
-      setNotice('Case package support is not fully wired yet.');
-    } else {
-      setNotice('Browse canonical cases from the live catalog.');
-    }
-
-    renderAll();
+  els.actionsToggle.addEventListener('click', (event) => {
+    event.stopPropagation();
+    state.actionsOpen = !state.actionsOpen;
+    renderActionsPanel();
   });
+
+  document.addEventListener('click', (event) => {
+    const insidePanel = els.actionsPanel.contains(event.target);
+    const isToggle = els.actionsToggle.contains(event.target);
+    if (insidePanel || isToggle) return;
+    if (!state.actionsOpen) return;
+    state.actionsOpen = false;
+    renderActionsPanel();
+  });
+
+  els.actionsPanel.addEventListener('click', (event) => {
+    const modeButton = event.target.closest('[data-action-mode]');
+    if (!modeButton) return;
+    setMode(modeButton.dataset.actionMode);
+  });
+
+  els.reloadCatalog.addEventListener('click', loadCatalog);
 
   els.sidePanelBody.addEventListener('click', (event) => {
     const caseButton = event.target.closest('[data-slug]');
