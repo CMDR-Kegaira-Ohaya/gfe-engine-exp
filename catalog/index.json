@@ -1,6 +1,6 @@
 {
   "branch": "main",
-  "generated_at": "2026-03-23T06:06:39.078Z",
+  "generated_at": "2026-03-23T06:46:51.246Z",
   "count": 2,
   "cases": [
     {
@@ -34,7 +34,7 @@
       "reading_count": 0,
       "participants": 0,
       "timesteps": 0,
-      "modified": "2026-03-23T08:05:42+02:00",
+      "modified": "2026-03-23T08:46:44+02:00",
       "synopsis": "This is the canonical seed case used to exercise the case-folder workflows and GUI catalog.",
       "paths": {
         "case": "/cases/seed/source/case.md",
