@@ -1,0 +1,63 @@
+/* Stable atlas / reader split
+   Keeps the left atlas as a permanent equal partner to the right reader column.
+   This is a layout override only; content and behavior remain unchanged.
+*/
+
+.grid {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: stretch;
+}
+
+.left-panel,
+.center-panel {
+  min-width: 0;
+  min-height: calc(100vh - 210px);
+}
+
+.left-panel {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) minmax(220px, auto);
+  align-content: stretch;
+}
+
+.atlas-shell {
+  min-height: 0;
+}
+
+.aux-shell {
+  max-height: none;
+  min-height: 220px;
+}
+
+.center-panel {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) minmax(240px, auto);
+}
+
+.tab-content {
+  min-height: 0;
+  overflow: auto;
+}
+
+.bottom-row {
+  padding-top: 0;
+}
+
+.timeline-panel {
+  min-height: 240px;
+}
+
+@media (max-width: 1180px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .left-panel,
+  .center-panel {
+    min-height: auto;
+  }
+
+  .left-panel {
+    grid-template-rows: auto auto;
+  }
+}
