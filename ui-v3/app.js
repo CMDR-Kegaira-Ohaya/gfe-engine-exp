@@ -1,4 +1,26 @@
+
 import { validateCase, solveCase, groupEventsByStep } from '../solver/index.js';
+
+const ATLAS_LENSES = [
+  {
+    id: 'structure',
+    short: 'V',
+    label: 'Structure (V)',
+    note: 'Where this sits in the selected moment.',
+  },
+  {
+    id: 'relations',
+    short: 'H',
+    label: 'Relations (H)',
+    note: 'Who meets whom and how links are routed here.',
+  },
+  {
+    id: 'expression',
+    short: 'R',
+    label: 'Expression (R)',
+    note: 'What is surfaced here as state, face, and payload.',
+  },
+];
 
 const state = {
   currentMode: 'open',
@@ -7,6 +29,7 @@ const state = {
   activeTab: 'case',
   activeSlug: null,
   activeStep: 0,
+  atlasLens: 'structure',
   participantFocus: null,
   encounterFocus: null,
   caseMarkdown: '',
@@ -67,6 +90,16 @@ function pluralize(count, singular, plural = `${singular}s`) {
   return `${count} ${count === 1 ? singular : plural}`;
 }
 
+function getAtlasLensMeta(lens = state.atlasLens) {
+  return ATLAS_LENSES.find((item) => item.id === lens) || ATLAS_LENSES[0];
+}
+
+function setAtlasLens(lens) {
+  if (ATLAS_LENSES.some((item) => item.id === lens)) {
+    state.atlasLens = lens;
+  }
+}
+
 function renderMarkdown(markdown) {
   if (!markdown.trim()) {
     return '<div class="empty">Nothing to show yet.</div>';
@@ -92,7 +125,7 @@ function renderMarkdown(markdown) {
 
     if (line.startsWith('### ')) {
       flushParagraph();
-      html.push(`<h3>${escapeHtml(line.slice(4))}</h3>`);
+      html.push(`<3h3>${escapeHtml(line.slice(4))}</h3>`);
       continue;
     }
 
@@ -135,6 +168,46 @@ function getEncounterEvent(focus = state.encounterFocus) {
   if (!focus) return null;
   const events = getStepEvents(focus.stepIndex);
   return events[focus.encounterIndex] || null;
+}
+
+function eventTouchesParticipant(event, participantId) {
+  return (
+    event?.sourceParticipantId === participantId
+    || event?.receivingParticipantId === participantId
+    || event?.mediumParticipantId === participantId
+    || event?.alpha_source === participantId
+    || event?.alpha_receiving === participantId
+    || event?.alpha_medium === participantId
+  );
+}
+
+function getParticipantEvents(stepIndex, participantId) {
+  return getStepEvents(stepIndex).filter((event) => eventTouchesParticipant(event, participantId));
+}
+
+function getRoleCounts(events, participantId) {
+  return events.reduce(
+    (acc, event) => {
+      if (event.sourceParticipantId === participantId || event.alpha_source === participantId) acc.source += 1;
+      if (event.receivingParticipantId === participantId || event.alpha_receiving === participantId) acc.receiving += 1;
+      if (event.mediumParticipantId === participantId || event.alpha_medium === participantId) acc.medium += 1;
+      return acc;
+    },
+    { source: 0, receiving: 0, medium: 0 },
+  );
+}
+
+function buildAxisSignature(axisData = {}) {
+  return [`A:${axisData.A ?? '—'}`, `R:${axisData.R ?? '—'}`, `I:${axisData.I ?? '—'}`];
+}
+
+function buildExpressionSummary(event) {
+  const parts = [];
+  if (event?.face) parts.push(`Face ${prettyLabel(event.face)}`);
+  if (event?.interference) parts.push(`Interference ${event.interference}`);
+  const primitiveCount = Array.isArray(event?.payload_bundle) ? event.payload_bundle.length : 0;
+  parts.push(pluralize(primitiveCount, 'primitive'));
+  return parts;
 }
 
 function clearFocus() {
@@ -220,8 +293,8 @@ async function loadCase(slug, { resetTab = true } = {}) {
 
   try {
     const [caseMarkdown, encoding, readingMarkdown] = await Promise.all([
-      entry.paths.case ? fetchText(`.${entry.paths.case}`) : Promise.resolve(''),
-      entry.paths.encoding ? fetchJson(`.${entry.paths.encoding}`) : Promise.resolve(null),
+      entry.paths.case ? fetchText(.${entry.paths.case}) : Promise.resolve(''),
+      entry.paths.encoding ? fetchJson(.${entry.paths.encoding}) : Promise.resolve(null),
       entry.paths.reading ? fetchText(`.${entry.paths.reading}`) : Promise.resolve(''),
     ]);
 
@@ -235,7 +308,7 @@ async function loadCase(slug, { resetTab = true } = {}) {
     state.groupedEvents = groupEventsByStep((encoding && encoding.payload_events) || []);
 
     renderAll();
-    setNotice(`“${entry.title}” loaded.`);
+    setNotice(`x“${entry.title}” loaded.`);
   } catch (error) {
     state.caseMarkdown = '';
     state.encoding = null;
@@ -277,7 +350,7 @@ function renderCatalogList() {
   return state.catalog
     .map((entry) => {
       const active = entry.slug === state.activeSlug ? ' active' : '';
-      return `<button class="catalog-item${active}" data-slug="${escapeHtml(entry.slug)}">
+      return `<bsutton class="catalog-item${active}" data-slug="${escapeHtml(entry.slug)}">
         <div class="catalog-title">${escapeHtml(entry.title)}</div>
         <div class="catalog-meta">${entry.timesteps} steps · ${entry.participants} participants</div>
         <div class="catalog-synopsis">${escapeHtml(entry.synopsis || 'No preview yet.')}</div>
@@ -425,6 +498,8 @@ function renderContextBanner() {
     contextLines.push('Step overview is active.');
   }
 
+  contextLines.push(`Atlas lens: ${getAtlasLensMeta().label}`);
+
   return `<section class="context-banner">
     <div class="context-kicker">Reader context</div>
     <div class="context-copy">${escapeHtml(contextLines.join(' · '))}</div>
@@ -492,7 +567,7 @@ function buildEncounterLabel(event) {
 }
 
 function renderParticipantChips(stepIndex, step) {
-  const participants = Object.keys(step.participants || {});
+  const participants = Object.keys(step.participants || []);
   if (!participants.length) {
     return '<div class="inline-empty">No actors are encoded for this step yet.</div>';
   }
@@ -528,7 +603,7 @@ function renderEncounterButtons(stepIndex, events) {
         const faceText = event.face ? ` · ${prettyLabel(event.face)}` : '';
         const subtitle = `${prettyLabel(event.axis || 'axis')} axis${faceText} · ${pluralize(primitiveCount, 'primitive')}`;
 
-        return `<button
+        return `<bsutton
           class="encounter-btn${isActive ? ' active' : ''}"
           data-encounter-focus="${encounterIndex}"
           data-step-index="${stepIndex}"
@@ -593,96 +668,235 @@ function renderTimeline() {
     .join('');
 }
 
-function renderAxisCards(axes = {}) {
-  const entries = Object.entries(axes);
-  if (!entries.length) {
-    return '<div class="inline-empty">No axis data is available here yet.</div>';
+function renderPillRow(values, extraClass = '') {
+  if (!values.length) return '';
+  const className = extraClass ? `atlas-pill-row ${extraClass}` : 'atlas-pill-row';
+  return `<div class="${className}">${values
+    .map((value) => `<span class="atlas-pill">${escapeHtml(value)}</span>`)
+    .join('')}</div>`;
+}
+
+function renderAtlasLensSwitch() {
+  const lensMeta = getAtlasLensMeta();
+  return `<section class="atlas-lens-shell">
+    <div class="lens-row">
+      <div class="group-label">Lens</div>
+      <div class="lens-btn-row">
+        ${ATLAS_LENSES
+          .map((lens) => `<button
+            class="lens-btn${state.atlasLens === lens.id ? ' active' : ''}"
+            data-atlas-lens="${lens.id}"
+            aria-pressed="${String(state.atlasLens === lens.id)}"
+          >${escapeHtml(lens.label)}</button>`)
+          .join('')}
+      </div>
+    </div>
+    <p class="lens-note">${escapeHtml(lensMeta.note)}</p>
+  </section>`;
+}
+
+function renderEventCards(events, { emptyMessage = 'No relation events are encoded here yet.' } = {}) {
+  if (!events.length) {
+    return `<div class="inline-empty">${escapeHtml(emptyMessage)}</div>`;
   }
 
-  return `<div class="atlas-axis-grid">
-    ${entries
-      .map(([name, axisData]) => `<section class="axis-card">
-        <h4>${escapeHtml(prettyLabel(name))}</h4>
-        <dl class="axis-values">
-          <div><dt>A</dt><dd>${escapeHtml(axisData.A ?? '—')}</dd></div>
-          <div><dt>R</dt><dd>${escapeHtml(axisData.R ?? '—')}</dd></div>
-          <div><dt>I</dt><dd>${escapeHtml(axisData.I ?? '—')}</dd></div>
-        </dl>
+  return `<div class="event-card-stack">
+    ${events
+      .map((event) => {
+        const primitiveCount = Array.isArray(event.payload_bundle) ? event.payload_bundle.length : 0;
+        const pills = [
+          `${prettyLabel(event.axis || 'axis')} axis`,
+          event.face ? `Face ${prettyLabel(event.face)}` : null,
+          `Source ${prettyLabel(event.sourceParticipantId || event.alpha_source || '—')}`,
+          `Receiving ${prettyLabel(event.receivingParticipantId || event.alpha_receiving || '—')}`,
+          event.mediumParticipantId || event.alpha_medium
+            ? `Medium ${prettyLabel(event.mediumParticipantId || event.alpha_medium)}`
+            : null,
+          pluralize(primitiveCount, 'primitive'),
+        ].filter(Boolean);
+
+        return `<section class="event-card">
+          <div class="event-card-title">${escapeHtml(buildEncounterLabel(event))}</div>
+          ${renderPillRow(pills, 'compact')}
+        </section>`;
+      })
+      .join('')}
+  </div>`;
+}
+
+function renderStructureOverview(step) {
+  const participants = Object.entries(step.participants || {});
+  if (!participants.length) {
+    return '<div class="inline-empty">This step has no actor entries to display yet.</div>';
+  }
+
+  return `<div class="atlas-section-stack">
+    ${participants
+      .map([ participantId, participantData ] => `<section class="atlas-section">
+        <div class="section-heading-row">
+          <h5>${escapeHtml(prettyLabel(participantId))}</h5>
+          ${renderPillRow(buildAxisSignature(participantData.axes?.identity || {}), 'compact')}
+        </div>
+        ${renderAxisCards(participantData.axes || {})}
       </section>`)
       .join('')}
   </div>`;
 }
 
-function renderAtlasOverview(step) {
-  const participants = Object.entries(step.participants || {});
+function renderStructureParticipant(stepIndex, participantId, participantData) {
+  const participantEvents = getParticipantEvents(stepIndex, participantId);
+  const roleCounts = getRoleCounts(participantEvents, participantId);
 
-  if (!participants.length) {
-    return `<div class="atlas-overview">
-      <p class="atlas-note">This step has no actor entries to display yet.</p>
-    </div>`;
-  }
-
-  return `<div class="atlas-overview">
-    <div class="focus-row">
-      <div>
-        <div class="context-kicker">Relation Atlas</div>
-        <h4 class="atlas-heading">${escapeHtml(prettyLabel(step.timestep_label || `Step ${state.activeStep + 1}`))}</h4>
-      </div>
-    </div>
-    <p class="atlas-note">Step overview is active. Click an actor or action in the timeline to focus this atlas.</p>
-    <div class="atlas-section-stack">
-      ${participants
-        .map(([participantId, participantData]) => `<section class="atlas-section">
-          <h5>${escapeHtml(prettyLabel(participantId))}</h5>
-          ${renderAxisCards(participantData.axes || {})}
-        </section>`)
-        .join('')}
-    </div>
-  </div>`;
-}
-
-function renderParticipantFocus(step, participantId) {
-  const participantData = step.participants?.[participantId];
-
-  if (!participantData) {
-    return '<div class="empty">The selected participant is not available in this step.</div>';
-  }
-
-  return `<div class="atlas-focus">
-    <div class="focus-row">
-      <div>
-        <div class="context-kicker">Participant focus</div>
-        <h4 class="atlas-heading">${escapeHtml(prettyLabel(participantId))}</h4>
-      </div>
-      <button class="ghost subtle-btn" data-clear-focus="true">Clear focus</button>
-    </div>
-    <p class="atlas-note">This view stays anchored to the selected moment and narrows the atlas to one participant.</p>
+  return `<div class="atlas-section-stack">
+    ${renderPillRow([
+      pluralize(participantEvents.length, 'linked action'),
+      `Source ${roleCounts.source}`,
+      `Receiving ${roleCounts.receiving}`,
+      `Medium ${roleCounts.medium}`,
+    ])}
     ${renderAxisCards(participantData.axes || {})}
   </div>`;
 }
 
-function renderEncounterFocus(event) {
-  if (!event) {
-    return '<div class="empty">The selected encounter is not available in this step.</div>';
-  }
-
-  const primitives = Array.isArray(event.payload_bundle) ? event.payload_bundle : [];
-
-  return `<div class="atlas-focus">
-    <div class="focus-row">
-      <div>
-        <div class="context-kicker">Encounter focus</div>
-        <h4 class="atlas-heading">${escapeHtml(buildEncounterLabel(event))}</h4>
-      </div>
-      <button class="ghost subtle-btn" data-clear-focus="true">Clear focus</button>
-    </div>
+function renderStructureEncounter(event) {
+  return `<div class="atlas-section-stack">
+    ${renderPillRow([
+      `Source ${prettyLabel(event.sourceParticipantId || event.alpha_source || '—')}`,
+      `Receiving ${prettyLabel(event.receivingParticipantId || event.alpha_receiving || '—')}`,
+      `Medium ${prettyLabel(event.mediumParticipantId || event.alpha_medium || '—')}`,
+      `${prettyLabel(event.axis || 'axis')} axis`,
+    ])}
     <dl class="encounter-detail-list">
       <div><dt>Source</dt><dd>${escapeHtml(prettyLabel(event.sourceParticipantId || event.alpha_source || '—'))}</dd></div>
       <div><dt>Receiving</dt><dd>${escapeHtml(prettyLabel(event.receivingParticipantId || event.alpha_receiving || '—'))}</dd></div>
       <div><dt>Medium</dt><dd>${escapeHtml(prettyLabel(event.mediumParticipantId || event.alpha_medium || '—'))}</dd></div>
       <div><dt>Axis</dt><dd>${escapeHtml(prettyLabel(event.axis || '—'))}</dd></div>
+    </dl>
+  </div>`;
+}
+
+function renderRelationsOverview(stepIndex, step) {
+  const events = getStepEvents(stepIndex);
+  const participantCount = Object.keys(step.participants || {}).length;
+
+  return `<div class="atlas-section-stack">
+    ${renderPillRow([
+      pluralize(participantCount, 'participant'),
+      pluralize(events.length, 'encounter'),
+    ])}
+    ${renderEventCards(events)}
+  </div>`;
+}
+
+function renderRelationsParticipant(stepIndex, participantId) {
+  const events = getParticipantEvents(stepIndex, participantId);
+  const roleCounts = getRoleCounts(events, participantId);
+
+  return `<div class="atlas-section-stack">
+    ${renderPillRow([
+      pluralize(events.length, 'linked encounter'),
+      `Source ${roleCounts.source}`,
+      `Receiving ${roleCounts.receiving}`,
+      `Medium ${roleCounts.medium}`,
+    ])}
+    ${renderEventCards(events, { emptyMessage: 'No encounters in this step include the focused participant yet.' })}
+  </div>`;
+}
+
+function renderRelationsEncounter(event) {
+  return `<div class="atlas-section-stack">
+    ${renderPillRow([
+      `Route ${prettyLabel(event.sourceParticipantId || event.alpha_source || '—')} → ${prettyLabel(event.receivingParticipantId || event.alpha_receiving || '—')}`,
+      event.mediumParticipantId || event.alpha_medium
+        ? `Medium ${prettyLabel(event.mediumParticipantId || event.alpha_medium)}`
+        : 'No medium',
+      `${prettyLabel(event.axis || 'axis')} axis`,
+    ])}
+    ${renderEventCards([event])}
+  </div>`;
+}
+
+function renderExpressionParticipantCard(participantId, participantData) {
+  const axisEntries = Object.entries(participantData.axes || {});
+  return `<section class="expression-card">
+    <div class="section-heading-row">
+      <h5>${escapeHtml(prettyLabel(participantId))}</h5>
+      <span class="badge">State</span>
+    </div>
+    ${axisEntries.length
+      ? `<div class="expression-grid">
+          ${axisEntries
+            .map(([axisName, axisData]) => `<div class="expression-row">
+              <div class="expression-name">${escapeHtml(prettyLabel(axisName))}</div>
+              ${renderPillRow(buildAxisSignature(axisData), 'compact')}
+            </div>`)
+            .join('')}
+        </div>`
+      : '<div class="inline-empty">No axis state is available for this participant yet.</div>'
+    }
+  </section>`;
+}
+
+function renderExpressionOverview(step) {
+  const participants = Object.entries(step.participants || []);
+  const events = getStepEvents();
+
+  return `<div class="atlas-section-stack">
+    ${renderPillRow([
+      pluralize(participants.length, 'participant state'),
+      pluralize(events.length, 'encounter expression'),
+    ])}
+    ${participants.length
+      ? participants.map(([participantId, participantData]) => renderExpressionParticipantCard(participantId, participantData)).join('')
+      : '<div class="inline-empty">No participant expression state is available for this step yet.</div>'
+    }
+    ${events.length
+      ? `<section class="atlas-section">
+          <h5>Encounter expression</h5>
+          <div class="event-card-stack">
+            ${events
+              .map((event) => `<section class="event-card">
+                <div class="event-card-title">${escapeHtml(buildEncounterLabel(event))}</div>
+                ${renderPillRow(buildExpressionSummary(event), 'compact')}
+              </section>`)
+              .join('')}
+          </div>
+        </section>`
+      : ''
+    }
+  </div>`;
+}
+
+function renderExpressionParticipant(stepIndex, participantId, participantData) {
+  const events = getParticipantEvents(stepIndex, participantId);
+
+  return `<div class="atlas-section-stack">
+    ${renderExpressionParticipantCard(participantId, participantData)}
+    <section class="atlas-section">
+      <h5>Expression links</h5>
+      ${avents.length
+        ? `<div class="event-card-stack">
+            ${events
+              .map((event) => `<section class="event-card">
+                <div class="event-card-title">${escapeHtml(buildEncounterLabel(event))}</div>
+                ${renderPillRow(buildExpressionSummary(event), 'compact')}
+              </section>`)
+              .join('')}
+          </div>`
+        : '<div class="inline-empty">No expression-linked encounters include this participant in the selected step yet.</div>'
+      }
+    </section>
+  </div>`;
+}
+
+function renderExpressionEncounter(event) {
+  const primitives = Array.isArray(event.payload_bundle) ? event.payload_bundle : [];
+  return `<div class="atlas-section-stack">
+    ${renderPillRow(buildExpressionSummary(event))}
+    <dl class="encounter-detail-list">
       <div><dt>Face</dt><dd>${escapeHtml(prettyLabel(event.face || '—'))}</dd></div>
       <div><dt>Interference</dt><dd>${escapeHtml(event.interference || '—')}</dd></div>
+      <div><dt>Axis</dt><dd>${escapeHtml(prettyLabel(event.axis || '—'))}</dd></div>
     </dl>
     <section class="atlas-section">
       <h5>Payload bundle</h5>
@@ -697,13 +911,148 @@ function renderEncounterFocus(event) {
               </div>`)
               .join('')}
           </div>`
-        : '<div class="inline-empty">No payload bundle detail is attached to this encounter.</div>'}
+        : '<div class="inline-empty">No payload bundle detail is attached to this encounter.</div>'
+      }
     </section>
   </div>`;
 }
 
+function renderAxisCards(axes = {}) {
+  const entries = Object.entries(axes);
+  if (!entries.length) {
+    return '<div class="inline-empty">No axis data is available here yet.</div>';
+  }
+
+  return `<div class="atlas-axis-grid">
+    ${entries
+      .map([name, axisData] => `<section class="axis-card">
+        <h4>${escapeHtml(prettyLabel(name))}</h4>
+        <dl class="axis-values">
+          <div><dt>A</dt><dd>${escapeHtml(axisData.A ?? '—')}</dd></div>
+          <div><dt>R</dt><dd>${escapeHtml(axisData.R ?? '—')}</dd></div>
+          <div><dt>I</dt><dd>${escapeHtml(axisData.I ?? '—')}</dd></div>
+        </dl>
+      </section>`)
+      .join('')}
+  </div>`;
+}
+
+function renderAtlasShell({ kicker, heading, note, body, showClearFocus = false }) {
+  return `<div class="atlas-view">
+    <div class="focus-row atlas-top-row">
+      <div>
+        <div class="context-kicker">${escapeHtml(kicker)}</div>
+        <h4 class="atlas-heading">${escapeHtml(heading)}</h4>
+      </div>
+      ${showClearFocus ? '<button class="ghost subtle-btn" data-clear-focus="true">Clear focus</button>' : ''}
+    </div>
+    ${renderAtlasLensSwitch()}
+    <p class="atlas-note">${escapeHtml(note)}</p>
+    ${body}
+  </div>`;
+}
+
+function renderAtlasOverview(stepIndex, step) {
+  if (state.atlasLens === 'relations') {
+    return renderAtlasShell({
+      kicker: 'Relation Atlas',
+      heading: prettyLabel(step.timestep_label || `Step ${stepIndex + 1}`),
+      note: 'Step overview is active. The relations lens surfaces encounter routing for the selected moment.',
+      body: renderRelationsOverview(stepIndex, step),
+    });
+  }
+
+  if (state.atlasLens === 'expression') {
+    return renderAtlasShell({
+      kicker: 'Relation Atlas',
+      heading: prettyLabel(step.timestep_label || `Step ${stepIndex + 1}`),
+      note: 'Step overview is active. The expression lens surfaces compact state and face summaries for this moment.',
+      body: renderExpressionOverview(step),
+    });
+  }
+
+  return renderAtlasShell({
+    kicker: 'Relation Atlas',
+    heading: prettyLabel(step.timestep_label || `Step ${stepIndex + 1}`),
+    note: 'Step overview is active. The structure lens shows how encoded state is arranged across the selected moment.',
+    body: renderStructureOverview(step),
+  });
+}
+
+function renderParticipantFocus(stepIndex, step, participantId) {
+  const participantData = step.participants?.[participantId];
+
+  if (!participantData) {
+    return '<div class="empty">The selected participant is not available in this step.</div>';
+  }
+
+  if (state.atlasLens === 'relations') {
+    return renderAtlasShell({
+      kicker: 'Participant focus',
+      heading: prettyLabel(participantId),
+      note: 'Focus stays anchored to the selected moment while the relations lens narrows to linked encounters.',
+      body: renderRelationsParticipant(stepIndex, participantId),
+      showClearFocus: true,
+    });
+  }
+
+  if (state.atlasLens === 'expression') {
+    return renderAtlasShell({
+      kicker: 'Participant focus',
+      heading: prettyLabel(participantId),
+      note: 'Focus stays anchored to the selected moment while the expression lens narrows to state and face signatures.',
+      body: renderExpressionParticipant(stepIndex, participantId, participantData),
+      showClearFocus: true,
+    });
+  }
+
+  return renderAtlasShell({
+    kicker: 'Participant focus',
+    heading: prettyLabel(participantId),
+    note: 'Focus stays anchored to the selected moment while the structure lens narrows to one participant.',
+    body: renderStructureParticipant(stepIndex, participantId, participantData),
+    showClearFocus: true,
+  });
+}
+
+function renderEncounterFocus(event) {
+  if (!event) {
+    return '<div class="empty">The selected encounter is not available in this step.</div>';
+  }
+
+  if (state.atlasLens === 'relations') {
+    return renderAtlasShell({
+      kicker: 'Encounter focus',
+      heading: buildEncounterLabel(event),
+      note: 'The relations lens emphasizes who meets whom here and how the route is carried.',
+      body: renderRelationsEncounter(event),
+      showClearFocus: true,
+    });
+  }
+
+  if (state.atlasLens === 'expression') {
+    return renderAtlasShell({
+      kicker: 'Encounter focus',
+      heading: buildEncounterLabel(event),
+      note: 'The expression lens emphasizes face, interference, and payload details attached to this encounter.',
+      body: renderExpressionEncounter(event),
+      showClearFocus: true,
+    });
+  }
+
+  return renderAtlasShell({
+    kicker: 'Encounter focus',
+    heading: buildEncounterLabel(event),
+    note: 'The structure lens emphasizes how this encounter is wired across the selected moment.',
+    body: renderStructureEncounter(event),
+    showClearFocus: true,
+  });
+}
+
 function renderAtlas() {
-  const step = getStep();
+  const stepIndex = state.activeStep;
+  const step = getStep(stepIndex);
+  const lensMeta = getAtlasLensMeta();
 
   if (!step) {
     els.atlasStatusBadge.textContent = 'No step';
@@ -712,19 +1061,19 @@ function renderAtlas() {
   }
 
   if (state.participantFocus) {
-    els.atlasStatusBadge.textContent = 'Participant focus';
-    els.atlas.innerHTML = renderParticipantFocus(step, state.participantFocus);
+    els.atlasStatusBadge.textContent = `Participant · ${lensMeta.short}`;
+    els.atlas.innerHTML = renderParticipantFocus(stepIndex, step, state.participantFocus);
     return;
   }
 
   if (state.encounterFocus) {
-    els.atlasStatusBadge.textContent = 'Encounter focus';
+    els.atlasStatusBadge.textContent = `Encounter · ${lensMeta.short}`;
     els.atlas.innerHTML = renderEncounterFocus(getEncounterEvent());
     return;
   }
 
-  els.atlasStatusBadge.textContent = 'Step overview';
-  els.atlas.innerHTML = renderAtlasOverview(step);
+  els.atlasStatusBadge.textContent = `Step · ${lensMeta.short}`;
+  els.atlas.innerHTML = renderAtlasOverview(stepIndex, step);
 }
 
 function renderActionsPanel() {
@@ -858,6 +1207,14 @@ function bindEvents() {
   });
 
   els.atlas.addEventListener('click', (event) => {
+    const lensButton = event.target.closest('[data-atlas-lens]');
+    if (lensButton) {
+      setAtlasLens(lensButton.dataset.atlasLens);
+      renderAtlas();
+      renderTabContent();
+      return;
+    }
+
     const clearButton = event.target.closest('[data-clear-focus]');
     if (!clearButton) return;
     clearFocus();
