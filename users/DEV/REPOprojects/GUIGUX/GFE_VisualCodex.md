@@ -2,40 +2,36 @@
 
 Status: working codex for GFE visual concepts.
 
-Purpose
-- Keep visual concepts, art-direction notes, palette logic, and interaction-display rules in one working place.
-- Separate visual doctrine from engine canon and from narrow implementation notes.
-- Serve as the design-side reference for future GUI refinement.
+Purpose:
+- keep visual doctrine, palette logic, interaction-display rules, and atlas-facing design notes in one working place
+- separate visual working doctrine from engine canon
+- avoid long implementation archaeology here
 
-Scope
-- Terminal art direction
-- Color systems
-- State grammar
-- Atlas visual logic
-- Motion for understanding interactions
-- Symbols and operators like Θ
+Boundary:
+- this file is visual working doctrine, not engine canon
+- this file should hold locked visual rules and near-term design notes
+- avoid stale option lists once decisions are made
 
-Boundary
-- This file is working-lane visual documentation, not engine canon.
- - This file does not define repo mutation doctrine.
-- This file should hold visual rules and concepts, not long implementation diffs.
+---
 
 ## 1. Current art-direction base
 
-- Overall feel: calm research terminal
-- Glow: restrained
-- Contrast: soft, readable
-- Geometry: slightly softened
-- Status language: clear, not overwhelming
-- Texture: simple, clear
-- Motion: instructional, not decorative
+- overall feel: calm research terminal
+- glow: restrained
+- contrast: soft, readable
+- geometry: slightly softened
+- status language: clear, not overwhelming
+- texture: simple, clear
+- motion: instructional, not decorative
+
+---
 
 ## 2. Color doctrine
 
 ### 15 + 1 system logic
-- Axis = hue
-- Family = hue treatment
-- System = L Leg
+- axis = hue family
+- family = hue treatment
+- system = L Leg
 
 ### L family
 - L Cfg = `#00FFF1`
@@ -62,54 +58,88 @@ Boundary
 - Ruin = `#000000`
 - Θ = no color assignment
 - Θ = bare glyph with strict typography
-- Θ = bidirectional reversal gate
+- Θ = bidirectional inversion gate
+- final Θ UI behavior must follow canon, not free visual invention
+
+---
 
 ## 3. Color usage rules
 
-- Go broad with System / L Leg, rather than all 15 at once.
-- Use L/M/D in small atlas-level elements before broad shell surfaces.
-- Do not use color to add analysis beyond categorical/state distinction.
-- Do not give Θ a family color.
-- Do not give Ruin a live chroma.
+- use system / L Leg broadly before spreading full 15-state coding everywhere
+- use L / M / D in semantically tight surfaces first
+- do not use color to add analysis beyond categorical/state distinction
+- do not give Θ a family color
+- do not give Ruin live chroma
 
-## 4. Motion doctrine
+---
 
-- Motion exists to make atlas interactions easier to understand.
-- Motion is instructional, not atmospheric.
-- State is static; motion explains transitions.
-- Use motion to explain:
-  - focus acquisition
-  - direction confirmation
-  - handoff
-  - scope filtering
-  - sequence reveal
-- Avoid continuous animation, decorative pulsing, and idle shimmering.
+## 4. Atlas doctrine
 
-## 5. Atlas-specific notes
+- atlas is the primary visual instrument
+- atlas should evolve as a **semantic map**, not a card stack
+- atlas should be spatial without becoming scenic or illustrative fantasy
+- preferred map logic:
+  - points
+  - vectors
+  - areas
+  - shapes
+- fixed detail dock is preferred over popup-heavy interaction
+- stable split: atlas keeps permanent equal screen presence
 
-- Atlas owns the deeper interpretive fisual language.
- - Atlas motion should follow focus and encounter changes.
-- Direction should be shown primarily by structure and motion, not color alone.
-- Ruin and Θ should probably appear here before they appear anywhere else.
+### Reading posture
+- same instrument, different reading states
+- overview / participant / encounter should feel strongly related, lightly distinct
+- meaning should gather, not scatter
+- eye travel should feel natural and low-chaos
 
-## 6. Implementation state (live v3)
+---
 
-- The current live palette foundation is loaded through `ui-v3/palette.css`.
-- `workbench-v3.html` loads `palette.css` last so it can override earlier styles safely.
- - The current pass remaps the shell-visible accent system to L Leg / System.
- - L / M / D / Ruin tokens exist in the palette file, but only the shell/active-state layer is partially threaded into the UI sofar.
-- Θ remains intentionally colorless and should be rendered by glyph treatment, not palette tokens.
-- The next palette-level work should move into atlas/detail semantics rather than broader shell chroma.
+## 5. Detail dock doctrine
 
-## 7. Open questions
+Stable rhythm should remain even when content changes.
+Working order:
+1. context
+2. summary
+3. structure
+4. relations
+5. expression
+6. payload
 
-- Where should L M / D first appear inside atlas details?
-- How should Θ be placed in route diagramming contexts?
-- How should Ruin be rendered on dark surfaces without losing separation or legibility?
-- Which exact interactions should get motion first?
+---
 
-## 8. Change log
+## 6. Motion doctrine
 
-- Initial codex created.
-- Included current art-direction brief, color system, Ruin π notes, and motion doctrine.
-- Added live v3 palette implementation state notes.
+- motion exists to make interactions easier to understand
+- motion is instructional, not atmospheric
+- state is mostly static; motion explains transfer and change
+- motion priority belongs to payload behavior
+
+Use motion to explain:
+- direction / travel
+- impact / arrival
+- handoff
+- buildup / retention
+- persistence traces
+
+Avoid:
+- continuous decorative animation
+- idle shimmer
+- motion that covers semantic incompleteness
+
+---
+
+## 7. Current implementation-facing notes
+
+- current atlas-map field is still staged in implementation terms
+- native renderer migration is the next architectural direction
+- current family rendering is still staged; target direction is native
+- Θ remains visually constrained until canon-faithful UI translation is explicit
+
+---
+
+## 8. Near-term design notes
+
+- keep the atlas calm while migrating to native structure
+- cleaner semantic labels for field markers will help readability
+- payload motion should arrive only after native atlas structure is in place
+- avoid accumulating visual notes that belong in obsolete staged phases
