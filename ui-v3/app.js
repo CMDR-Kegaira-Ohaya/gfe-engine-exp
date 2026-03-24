@@ -34,6 +34,7 @@ const els = {
   sourceBadge: $('source-badge'),
   statusBadge: $('status-badge'),
   validationBadge: $('validation-badge'),
+  atlasStatusBadge: $('atlas-status-badge'),
   tabs: $('tabs'),
   tabContent: $('tab-content'),
   timestepBadge: $('timestep-badge'),
@@ -144,8 +145,7 @@ function clearFocus() {
 function resetLoadedState() {
   state.activeSlug = null;
   state.activeStep = 0;
-  state.participantFocus = null;
-  state.encounterFocus = null;
+  clearFocus();
   state.caseMarkdown = '';
   state.encoding = null;
   state.readingMarkdown = '';
@@ -177,7 +177,7 @@ async function fetchText(path) {
 }
 
 async function loadCatalog() {
-  setNotice('Loading canonical catalog…");
+  setNotice('Loading canonical catalog…');
 
   try {
     const catalogData = await fetchJson('./catalog/index.json');
@@ -215,7 +215,7 @@ async function loadCase(slug, { resetTab = true } = {}) {
     return;
   }
 
-  setNotice(`Loading “${entry.title}”…');
+  setNotice(`Loading “${entry.title}”…`);
   renderAll();
 
   try {
@@ -235,7 +235,7 @@ async function loadCase(slug, { resetTab = true } = {}) {
     state.groupedEvents = groupEventsByStep((encoding && encoding.payload_events) || []);
 
     renderAll();
-    setNotice(`x“${entry.title}” loaded.`);
+    setNotice(`“${entry.title}” loaded.`);
   } catch (error) {
     state.caseMarkdown = '';
     state.encoding = null;
@@ -254,7 +254,6 @@ function setMode(mode) {
   state.actionsOpen = false;
 
   if (mode === 'reading') {
-    state.activeTab = 'reading';
     setNotice('Use GPT to generate reading.');
     renderAll();
     return;
@@ -278,7 +277,7 @@ function renderCatalogList() {
   return state.catalog
     .map((entry) => {
       const active = entry.slug === state.activeSlug ? ' active' : '';
-      return `<bsutton class="catalog-item${active}" data-slug="${escapeHtml(entry.slug)}">
+      return `<button class="catalog-item${active}" data-slug="${escapeHtml(entry.slug)}">
         <div class="catalog-title">${escapeHtml(entry.title)}</div>
         <div class="catalog-meta">${entry.timesteps} steps · ${entry.participants} participants</div>
         <div class="catalog-synopsis">${escapeHtml(entry.synopsis || 'No preview yet.')}</div>
@@ -374,6 +373,7 @@ function renderHeader() {
 
   const errors = state.validation.issues.filter((issue) => issue.level === 'error').length;
   const warnings = state.validation.issues.filter((issue) => issue.level === 'warning').length;
+
   els.validationBadge.textContent = errors
     ? `Validation errors: ${errors}`
     : warnings
@@ -520,10 +520,9 @@ function renderEncounterButtons(stepIndex, events) {
   return `<div class="encounter-list">
     ${events
       .map((event, encounterIndex) => {
-        const isActive =
-          state.encounterFocus &&
-          state.encounterFocus.stepIndex === stepIndex &&
-          state.encounterFocus.encounterIndex === encounterIndex;
+        const isActive = state.encounterFocus
+          && state.encounterFocus.stepIndex === stepIndex
+          && state.encounterFocus.encounterIndex === encounterIndex;
 
         const primitiveCount = Array.isArray(event.payload_bundle) ? event.payload_bundle.length : 0;
         const faceText = event.face ? ` · ${prettyLabel(event.face)}` : '';
@@ -633,7 +632,7 @@ function renderAtlasOverview(step) {
     <p class="atlas-note">Step overview is active. Click an actor or action in the timeline to focus this atlas.</p>
     <div class="atlas-section-stack">
       ${participants
-        .map([ participantId, participantData ] => `<section class="atlas-section">
+        .map(([participantId, participantData]) => `<section class="atlas-section">
           <h5>${escapeHtml(prettyLabel(participantId))}</h5>
           ${renderAxisCards(participantData.axes || {})}
         </section>`)
@@ -698,8 +697,7 @@ function renderEncounterFocus(event) {
               </div>`)
               .join('')}
           </div>`
-        : '<div class="inline-empty">No payload bundle detail is attached to this encounter.</div>'
-      }
+        : '<div class="inline-empty">No payload bundle detail is attached to this encounter.</div>'}
     </section>
   </div>`;
 }
@@ -708,20 +706,24 @@ function renderAtlas() {
   const step = getStep();
 
   if (!step) {
+    els.atlasStatusBadge.textContent = 'No step';
     els.atlas.innerHTML = '<div class="empty">No relation atlas data yet.</div>';
     return;
   }
 
   if (state.participantFocus) {
+    els.atlasStatusBadge.textContent = 'Participant focus';
     els.atlas.innerHTML = renderParticipantFocus(step, state.participantFocus);
     return;
   }
 
   if (state.encounterFocus) {
+    els.atlasStatusBadge.textContent = 'Encounter focus';
     els.atlas.innerHTML = renderEncounterFocus(getEncounterEvent());
     return;
   }
 
+  els.atlasStatusBadge.textContent = 'Step overview';
   els.atlas.innerHTML = renderAtlasOverview(step);
 }
 
@@ -742,9 +744,9 @@ function renderAll() {
   renderActionsPanel();
   renderSidePanel();
   renderHeader();
+  renderAtlas();
   renderTabContent();
   renderTimeline();
-  renderAtlas();
 }
 
 function handlePackageAction(action) {

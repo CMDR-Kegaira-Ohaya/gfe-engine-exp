@@ -107,7 +107,7 @@ button.ghost {
 }
 
 .eyebrow,
-.context.kicker,
+.context-kicker,
 .group-label,
 .step-detail-label {
   font-size: 11px;
@@ -189,7 +189,7 @@ button.ghost {
 .grid {
   flex: 1;
   display: grid;
-  grid-template-columns: 320px minmax(640px, 1fr);
+  grid-template-columns: 360px minmax(680px, 1fr);
   gap: 16px;
   padding: 16px 24px 24px;
 }
@@ -217,23 +217,76 @@ button.ghost {
 .center-panel {
   display: flex;
   flex-direction: column;
-  min-height: 70vh;
+  min-height: 74vh;
+}
+
+.left-panel {
+  gap: 14px;
+  padding: 14px;
+}
+
+.atlas-shell {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(10, 22, 14, 0.8);
+}
+
+.aux-shell {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  max-height: 34vh;
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+}
+
+.panel-head,
+.case-header {
+  justify-content: space-between;
 }
 
 .panel-head,
 .case-header {
   padding: 18px 20px 12px;
-  justify-content: space-between;
+}
+
+.aux-head {
+  padding: 0 6px 8px;
+}
+
+.panel-head h2,
+.panel-head h3,
+.case-header h2 {
+  margin: 0;
 }
 
 .panel-intro,
 .subtitle {
-  margin: 0 18px 16px;
+  margin: 0 20px 16px;
   color: var(--muted);
 }
 
+.atlas-intro {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
 .panel-body {
-  padding: 0 12px 12px;
+  padding: 0 6px 6px;
+  overflow: auto;
+}
+
+.center-panel {
+  overflow: hidden;
+}
+
+.case-header {
+  display: flex;
+  gap: 16px;
 }
 
 .catalog-item {
@@ -400,7 +453,7 @@ button.ghost {
 
 .bottom-row {
   display: grid;
-  grid-template-columns: minmax(300px, 1fr) minmax(300px, 1fr);
+  grid-template-columns: 1fr;
   gap: 16px;
   padding: 0 20px 20px;
 }
@@ -408,6 +461,12 @@ button.ghost {
 .timeline,
 .atlas {
   padding: 0 18px 18px;
+}
+
+.atlas {
+  overflow: auto;
+  padding-top: 0;
+  min-height: 0;
 }
 
 .timeline {
@@ -565,13 +624,17 @@ button.ghost {
   color: var(--muted);
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1180px) {
   .grid {
     grid-template-columns: 1fr;
   }
 
-  .bottom-row {
-    grid-template-columns: 1fr;
+  .left-panel {
+    min-height: auto;
+  }
+
+  .aux-shell {
+    max-height: none;
   }
 
   .actions-popover-shell {

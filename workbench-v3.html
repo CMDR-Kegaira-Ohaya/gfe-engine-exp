@@ -43,12 +43,28 @@
 
     <section class="grid">
       <aside class="panel left-panel">
-        <div class="panel-head">
-          <h2 id="side-panel-title">Open case</h2>
-          <button id="reload-catalog" class="ghost">Reload</button>
-        </div>
-        <p class="panel-intro" id="side-panel-intro">Browse canonical cases from the live catalog.</p>
-        <div id="side-panel-body" class="panel-body empty">Loading catalog…</div>
+        <section class="atlas-shell">
+          <div class="panel-head">
+            <div>
+              <div class="eyebrow">Persistent left system</div>
+              <h2>Relation Atlas</h2>
+            </div>
+            <span class="badge" id="atlas-status-badge">Step overview</span>
+          </div>
+          <p class="panel-intro atlas-intro">
+            The atlas stays local to the selected moment. Focus follows actor and action clicks from the timeline.
+          </p>
+          <div id="atlas" class="atlas empty">No relation atlas data yet.</div>
+        </section>
+
+        <section class="aux-shell">
+          <div class="panel-head aux-head">
+            <h3 id="side-panel-title">Open case</h3>
+            <button id="reload-catalog" class="ghost">Reload</button>
+          </div>
+          <p class="panel-intro" id="side-panel-intro">Browse canonical cases from the live catalog.</p>
+          <div id="side-panel-body" class="panel-body empty">Loading catalog…</div>
+        </section>
       </aside>
 
       <section class="center-panel">
@@ -80,14 +96,6 @@
               <span class="badge" id="timestep-badge">0</span>
             </div>
             <div id="timeline" class="timeline empty">No timeline loaded.</div>
-          </div>
-
-          <div class="panel atlas-panel">
-            <div class="panel-head">
-              <h3>Relation Atlas</h3>
-              <span class="badge">Placeholder</span>
-            </div>
-            <div id="atlas" class="atlas empty">Vertical, horizontal, and radial relations will be rendered here in later iterations. For now, this panel shows step-level actors and actions.</div>
           </div>
         </section>
       </section>
