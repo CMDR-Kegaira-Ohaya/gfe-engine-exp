@@ -198,7 +198,7 @@
   min-height: 34px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02), 0 0 10px rgba(246, 173, 255, 0.08);
   cursor: pointer;
-  transition: border-color 120ms ease, box-shadow 120ms ease, background 120ms ease, transform 120ms ease, top 140ms ease, left 140ms ease, opacity 140ms ease;
+  transition: border-color 120ms ease, box-shadow 120ms ease, background 120ms ease, transform 120ms ease, top 140ms ease, left 140ms ease, opacity 140ms ease, filter 140ms ease;
 }
 
 .atlas-map-marker::before {
@@ -223,6 +223,20 @@
 .atlas-map-marker:hover,
 .atlas-map-marker:focus-visible {
   transform: translateY(-1px);
+}
+
+.atlas-map-marker.is-muted {
+  opacity: 0.34;
+  filter: saturate(0.7);
+}
+
+.atlas-map-marker.is-secondary {
+  opacity: 0.64;
+}
+
+.atlas-map-marker.is-active {
+  opacity: 1;
+  filter: none;
 }
 
 .atlas-map-marker[data-axis='cfg']::before { background: var(--l-cfg); box-shadow: 0 0 0 3px color-mix(in srgb, var(--l-cfg) 18%, transparent); }
@@ -391,6 +405,8 @@
     position: relative !important;
     inset: auto !important;
     transform: none !important;
+    opacity: 1 !important;
+    filter: none !important;
   }
 
   .atlas-detail-dock-body {

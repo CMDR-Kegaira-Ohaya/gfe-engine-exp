@@ -88,12 +88,40 @@ function syncActiveZone(field, kind) {
   });
 }
 
+function applyMarkerEmphasis(field, activeMarker) {
+  const viewKind = field.dataset.viewKind || 'overview';
+  const activeKind = activeMarker?.dataset.kind || 'default';
+
+  field.querySelectorAll('.atlas-map-marker').forEach((marker) => {
+    marker.classList.remove('is-muted', 'is-secondary');
+    if (marker === activeMarker) return;
+
+    if (viewKind === 'overview') {
+      if (marker.dataset.kind !== activeKind) marker.classList.add('is-secondary');
+      return;
+    }
+
+    if (viewKind === 'participant') {
+      if (marker.dataset.kind === activeKind) marker.classList.add('is-secondary');
+      else marker.classList.add('is-muted');
+      return;
+    }
+
+    if (viewKind === 'encounter') {
+      marker.classList.add('is-muted');
+      if (marker.dataset.kind === activeKind) marker.classList.remove('is-muted');
+      if (marker.dataset.kind === activeKind) marker.classList.add('is-secondary');
+    }
+  });
+}
+
 function activateMarker(field, dockBody, marker, target) {
   field.querySelectorAll('.atlas-map-marker').forEach((node) => node.classList.remove('is-active'));
   clearTargeted(dockBody);
   marker.classList.add('is-active');
   target.classList.add('is-targeted');
   syncActiveZone(field, marker.dataset.kind || 'default');
+  applyMarkerEmphasis(field, marker);
   target.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
 
