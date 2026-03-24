@@ -134,6 +134,8 @@
   border-radius: 18px;
   background: linear-gradient(180deg, rgba(246, 173, 255, 0.04), rgba(246, 173, 255, 0.015));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.015);
+  transition: border-color 120ms ease, background 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+  opacity: 0.82;
 }
 
 .atlas-map-zone::before {
@@ -158,6 +160,13 @@
 
 .atlas-map-zone--expression {
   inset: 46% 18% 8% 18%;
+}
+
+.atlas-map-zone.is-active {
+  border-color: rgba(246, 173, 255, 0.26);
+  background: linear-gradient(180deg, rgba(246, 173, 255, 0.08), rgba(246, 173, 255, 0.03));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02), 0 0 0 1px rgba(246, 173, 255, 0.08), 0 0 18px rgba(246, 173, 255, 0.08);
+  opacity: 1;
 }
 
 .atlas-map-focus-node,

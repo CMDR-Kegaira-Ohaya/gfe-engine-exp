@@ -77,11 +77,18 @@ function clearTargeted(dockBody) {
   dockBody.querySelectorAll('.is-targeted').forEach((node) => node.classList.remove('is-targeted'));
 }
 
+function syncActiveZone(field, kind) {
+  field.querySelectorAll('.atlas-map-zone').forEach((zone) => {
+    zone.classList.toggle('is-active', zone.dataset.kind === kind);
+  });
+}
+
 function activateMarker(field, dockBody, marker, target) {
   field.querySelectorAll('.atlas-map-marker').forEach((node) => node.classList.remove('is-active'));
   clearTargeted(dockBody);
   marker.classList.add('is-active');
   target.classList.add('is-targeted');
+  syncActiveZone(field, marker.dataset.kind || 'default');
   target.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
 
@@ -101,6 +108,7 @@ function buildZoneLayer(groups) {
     const zone = document.createElement('div');
     zone.className = `atlas-map-zone atlas-map-zone--${kind}`;
     zone.dataset.zoneLabel = label;
+    zone.dataset.kind = kind;
     zones.appendChild(zone);
   });
 
