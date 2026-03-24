@@ -251,6 +251,7 @@ button.ghost {
   position: relative;
   overflow: visible;
   isolation: isolate;
+  transition: border-color 140ms ease, box-shadow 140ms ease, background 140ms ease;
 }
 
 .atlas-shell::before {
@@ -264,6 +265,7 @@ button.ghost {
   background: var(--accent-strong);
   box-shadow: 0 0 0 4px rgba(60, 255, 143, 0.12), 0 0 18px rgba(60, 255, 143, 0.18);
   pointer-events: none;
+  transition: width 140ms ease, height 140ms ease, box-shadow 140ms ease, opacity 140ms ease, transform 140ms ease;
 }
 
 .atlas-shell::after {
@@ -277,6 +279,54 @@ button.ghost {
   background: linear-gradient(180deg, rgba(60, 255, 143, 0.55), rgba(103, 247, 161, 0.12));
   opacity: 0.9;
   pointer-events: none;
+  transition: width 140ms ease, opacity 140ms ease, box-shadow 140ms ease, background 140ms ease;
+}
+
+.atlas-shell:has(.atlas-view--overview)::before {
+  opacity: 0.8;
+  box-shadow: 0 0 0 3px rgba(60, 255, 143, 0.08), 0 0 12px rgba(60, 255, 143, 0.14);
+}
+
+.atlas-shell:has(.atlas-view--overview)::after {
+  opacity: 0.72;
+  box-shadow: 0 0 10px rgba(60, 255, 143, 0.08);
+}
+
+.atlas-shell:has(.atlas-view--participant) {
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(103, 247, 161, 0.18);
+}
+
+.atlas-shell:has(.atlas-view--participant)::before {
+  width: 11px;
+  height: 11px;
+  transform: translateX(-1px);
+  box-shadow: 0 0 0 4px rgba(60, 255, 143, 0.16), 0 0 22px rgba(60, 255, 143, 0.24);
+}
+
+.atlas-shell:has(.atlas-view--participant)::after {
+  width: 3px;
+  opacity: 1;
+  background: linear-gradient(180deg, rgba(60, 255, 143, 0.2), rgba(60, 255, 143, 0.78), rgba(60, 255, 143, 0.18));
+  box-shadow: 0 0 14px rgba(60, 255, 143, 0.16);
+}
+
+.atlas-shell:has(.atlas-view--encounter) {
+  border-color: rgba(103, 247, 161, 0.28);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(103, 247, 161, 0.24), 0 0 18px rgba(60, 255, 143, 0.1);
+}
+
+.atlas-shell:has(.atlas-view--encounter)::before {
+  width: 12px;
+  height: 12px;
+  transform: translateX(-1px);
+  box-shadow: 0 0 0 5px rgba(60, 255, 143, 0.18), 0 0 28px rgba(60, 255, 143, 0.3);
+}
+
+.atlas-shell:has(.atlas-view--encounter)::after {
+  width: 4px;
+  opacity: 1;
+  background: linear-gradient(180deg, rgba(60, 255, 143, 0.22), rgba(60, 255, 143, 0.92), rgba(60, 255, 143, 0.22));
+  box-shadow: 0 0 18px rgba(60, 255, 143, 0.2);
 }
 
 .aux-shell {
@@ -559,6 +609,7 @@ button.ghost {
   overflow: hidden;
   position: relative;
   isolation: isolate;
+  transition: border-color 140ms ease, box-shadow 140ms ease, background 140ms ease;
 }
 
 .timeline-step-card.active {
@@ -578,6 +629,7 @@ button.ghost {
   background: linear-gradient(180deg, rgba(60, 255, 143, 0.12), rgba(60, 255, 143, 0.6), rgba(60, 255, 143, 0.12));
   box-shadow: 0 0 12px rgba(60, 255, 143, 0.18);
   pointer-events: none;
+  transition: width 140ms ease, box-shadow 140ms ease, background 140ms ease, opacity 140ms ease;
 }
 
 .timeline-step-card.active::after {
@@ -592,6 +644,53 @@ button.ghost {
   background: var(--accent-strong);
   box-shadow: 0 0 0 4px rgba(60, 255, 143, 0.12), 0 0 18px rgba(60, 255, 143, 0.18);
   pointer-events: none;
+  transition: width 140ms ease, height 140ms ease, box-shadow 140ms ease, opacity 140ms ease;
+}
+
+.timeline:has(.step-chip.active) .timeline-step-card.active {
+  border-color: rgba(103, 247, 161, 0.56);
+  box-shadow: var(--glow), 0 0 0 1px rgba(103, 247, 161, 0.14);
+}
+
+.timeline:has(.step-chip.active) .timeline-step-card.active::before {
+  width: 3px;
+  background: linear-gradient(180deg, rgba(60, 255, 143, 0.16), rgba(60, 255, 143, 0.82), rgba(60, 255, 143, 0.16));
+  box-shadow: 0 0 16px rgba(60, 255, 143, 0.22);
+}
+
+.timeline:has(.step-chip.active) .timeline-step-card.active::after {
+  width: 11px;
+  height: 11px;
+  box-shadow: 0 0 0 4px rgba(60, 255, 143, 0.16), 0 0 22px rgba(60, 255, 143, 0.24);
+}
+
+.timeline:has(.step-chip.active) .timeline-step-card.active .timeline-summary-kicker {
+  background: rgba(103, 247, 161, 0.1);
+  border-color: rgba(103, 247, 161, 0.44);
+  box-shadow: 0 0 0 1px rgba(103, 247, 161, 0.12);
+}
+
+.timeline:has(.encounter-btn.active) .timeline-step-card.active {
+  border-color: rgba(103, 247, 161, 0.62);
+  box-shadow: var(--glow), 0 0 0 1px rgba(103, 247, 161, 0.18), 0 0 18px rgba(60, 255, 143, 0.08);
+}
+
+.timeline:has(.encounter-btn.active) .timeline-step-card.active::before {
+  width: 4px;
+  background: linear-gradient(180deg, rgba(60, 255, 143, 0.2), rgba(60, 255, 143, 0.94), rgba(60, 255, 143, 0.2));
+  box-shadow: 0 0 20px rgba(60, 255, 143, 0.26);
+}
+
+.timeline:has(.encounter-btn.active) .timeline-step-card.active::after {
+  width: 12px;
+  height: 12px;
+  box-shadow: 0 0 0 5px rgba(60, 255, 143, 0.18), 0 0 28px rgba(60, 255, 143, 0.3);
+}
+
+.timeline:has(.encounter-btn.active) .timeline-step-card.active .timeline-summary-kicker {
+  background: rgba(103, 247, 161, 0.14);
+  border-color: rgba(103, 247, 161, 0.52);
+  box-shadow: 0 0 0 1px rgba(103, 247, 161, 0.16), 0 0 12px rgba(60, 255, 143, 0.08);
 }
 
 .timeline-step-select {
@@ -640,6 +739,7 @@ button.ghost {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   line-height: 1;
+  transition: border-color 140ms ease, background 140ms ease, box-shadow 140ms ease;
 }
 
 .timeline-step-card.active .timeline-summary-kicker {
@@ -758,6 +858,16 @@ button.ghost {
   border-color: var(--border-strong);
 }
 
+.atlas-view--participant .atlas-mode-tag {
+  background: rgba(103, 247, 161, 0.12);
+  box-shadow: 0 0 0 1px rgba(103, 247, 161, 0.1);
+}
+
+.atlas-view--encounter .atlas-mode-tag {
+  background: rgba(103, 247, 161, 0.16);
+  box-shadow: 0 0 0 1px rgba(103, 247, 161, 0.14), 0 0 12px rgba(60, 255, 143, 0.08);
+}
+
 .atlas-mode-tag {
   display: inline-flex;
   align-items: center;
@@ -770,6 +880,7 @@ button.ghost {
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  transition: background 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
 }
 
 .atlas-state-heading {
