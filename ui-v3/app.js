@@ -99,6 +99,36 @@ function getEntry() {
   return state.catalog.find((entry) => entry.slug === state.activeSlug) || null;
 }
 
+function getSourceMeta(entry = getEntry()) {
+  return entry
+    ? { label: 'Source', text: 'Canonical repo case', tone: 'ok' }
+    : { label: 'Source', text: 'Source zone unknown', tone: 'neutral' };
+}
+
+function getReadingMeta(entry = getEntry()) {
+  if (!entry) return { label: 'Reading', text: 'No case', tone: 'neutral' };
+  return entry.has_reading
+    ? { label: 'Reading', text: 'Reading available', tone: 'ok' }
+    : { label: 'Reading', text: 'Reading missing', tone: 'warn' };
+}
+
+function getValidationMeta() {
+  if (!state.validation) return { label: 'Validation', text: 'Validation unknown', tone: 'neutral' };
+
+  const errors = state.validation.issues.filter((issue) => issue.level === 'error').length;
+  const warnings = state.validation.issues.filter((issue) => issue.level === 'warning').length;
+
+  if (errors) return { label: 'Validation', text: `Validation errors: ${errors}`, tone: 'error' };
+  if (warnings) return { label: 'Validation', text: `Warnings: ${warnings}`, tone: 'warn' };
+  return { label: 'Validation', text: 'Validation clean', tone: 'ok' };
+}
+
+function getCaseMeta(entry = getEntry()) {
+  return entry
+    ? { label: 'Case', text: entry.slug, tone: 'neutral' }
+    : { label: 'Case', text: 'No case', tone: 'neutral' };
+}
+
 function getTimeline() {
   return state.solved?.timeline || state.encoding?.timeline || [];
 }
@@ -421,14 +451,17 @@ function renderSidePanel() {
 
 function renderHeader() {
   const entry = getEntry();
+  const sourceMeta = getSourceMeta(entry);
+  const readingMeta = getReadingMeta(entry);
+  const validationMeta = getValidationMeta();
 
   if (!entry) {
     els.currentSlug.textContent = 'No case open';
     els.currentTitle.textContent = 'Open a case to begin';
     els.currentSubtitle.textContent = 'Case, case encoding, and reading will appear here.';
-    els.sourceBadge.textContent = 'Source zone unknown';
-    els.statusBadge.textContent = 'No case';
-    els.validationBadge.textContent = 'Validation unknown';
+    els.sourceBadge.textContent = sourceMeta.text;
+    els.statusBadge.textContent = readingMeta.text;
+    els.validationBadge.textContent = validationMeta.text;
     return;
   }
 
@@ -440,21 +473,9 @@ function renderHeader() {
     : entry.has_reading
       ? 'Case, case encoding, and saved reading are available.'
       : 'Case and case encoding are available. No saved reading yet.';
-  els.sourceBadge.textContent = 'Canonical repo case';
-  els.statusBadge.textContent = entry.has_reading ? 'Reading available' : 'Reading missing';
-
-  if (!state.validation) {
-    els.validationBadge.textContent = 'Validation unknown';
-    return;
-  }
-
-  const errors = state.validation.issues.filter((issue) => issue.level === 'error').length;
-  const warnings = state.validation.issues.filter((issue) => issue.level === 'warning').length;
-  els.validationBadge.textContent = errors
-    ? `Validation errors: ${errors}`
-    : warnings
-      ? `Warnings: ${warnings}`
-      : 'Validation clean';
+  els.sourceBadge.textContent = sourceMeta.text;
+  els.statusBadge.textContent = readingMeta.text;
+  els.validationBadge.textContent = validationMeta.text;
 }
 
 function renderEncodingSummary() {
@@ -718,6 +739,28 @@ function renderAtlasStateStrip(viewKind) {
   </section>`;
 }
 
+function renderAtlasProvenanceStrip() {
+  const entry = getEntry();
+  const items = [
+    getCaseMeta(entry),
+    getSourceMeta(entry),
+    getReadingMeta(entry),
+    getValidationMeta(),
+  ];
+
+  return `<section class="atlas-provenance-strip">
+    <div class="atlas-provenance-head">
+      <div class="group-label">Artifact status</div>
+    </div>
+    <div class="atlas-provenance-grid">
+      ${items.map((item) => `<div class="atlas-provenance-item atlas-provenance-item--${item.tone}">
+        <div class="atlas-provenance-label">${esc(item.label)}</div>
+        <div class="atlas-provenance-value">${esc(item.text)}</div>
+      </div>`).join('')}
+    </div>
+  </section>`;
+}
+
 function atlasShell(viewKind, kicker, heading, note, body, showClearFocus = false) {
   return `<div class="atlas-view atlas-view--${viewKind}">
     <div class="focus-row atlas-top-row">
@@ -728,6 +771,7 @@ function atlasShell(viewKind, kicker, heading, note, body, showClearFocus = fals
       ${showClearFocus ? '<button class="ghost subtle-btn" data-clear-focus="true">Clear focus</button>' : ''}
     </div>
     ${renderAtlasStateStrip(viewKind)}
+    ${renderAtlasProvenanceStrip()}
     ${renderAtlasLensSwitch()}
     <p class="atlas-note">${esc(note)}</p>
     ${body}
