@@ -178,6 +178,17 @@ function roleCounts(events, participantId) {
   );
 }
 
+function countPrimitives(events = []) {
+  return events.reduce(
+    (sum, event) => sum + (Array.isArray(event.payload_bundle) ? event.payload_bundle.length : 0),
+    0,
+  );
+}
+
+function countFaces(events = []) {
+  return events.filter((event) => event.face).length;
+}
+
 function encounterLabel(event) {
   if (!event) return 'No encounter selected';
 
@@ -191,6 +202,82 @@ function encounterLabel(event) {
   if (event.receivingParticipantId) return `${receiving} receives on ${axis}`;
   if (event.mediumParticipantId) return `${medium} mediates on ${axis}`;
   return `Encounter on ${axis}`;
+}
+
+function getTimelineSummary(stepIndex, step) {
+  const events = getStepEvents(stepIndex);
+  const participants = Object.keys(step.participants || {});
+  const primitiveCount = countPrimitives(events);
+  const faceCount = countFaces(events);
+  const lens = lensMeta();
+  const isActive = stepIndex === state.activeStep;
+
+  if (isActive && state.encounterFocus) {
+    const event = getEncounterEvent();
+    if (event) {
+      if (lens.id === 'relations') {
+        return {
+          kicker: `${lens.short} focus`,
+          text: `${encounterLabel(event)} · route in focus`,
+        };
+      }
+      if (lens.id === 'expression') {
+        return {
+          kicker: `${lens.short} focus`,
+          text: `${encounterLabel(event)} · ${pluralize(Array.isArray(event.payload_bundle) ? event.payload_bundle.length : 0, 'primitive')}${event.face ? ` · face ${label(event.face)}` : ''}`,
+        };
+      }
+      return {
+        kicker: `${lens.short} focus`,
+        text: `${encounterLabel(event)} · ${label(event.axis || 'axis')} axis`,
+      };
+    }
+  }
+
+  if (isActive && state.participantFocus) {
+    const participantId = state.participantFocus;
+    const linkedEvents = participantEvents(stepIndex, participantId);
+    const roles = roleCounts(linkedEvents, participantId);
+    const axisCount = Object.keys(step.participants?.[participantId]?.axes || {}).length;
+
+    if (lens.id === 'relations') {
+      return {
+        kicker: `${lens.short} focus`,
+        text: `${label(participantId)} · ${pluralize(linkedEvents.length, 'linked encounter')} · S${roles.source}/R${roles.receiving}/M${roles.medium}`,
+      };
+    }
+
+    if (lens.id === 'expression') {
+      return {
+        kicker: `${lens.short} focus`,
+        text: `${label(participantId)} · ${pluralize(linkedEvents.length, 'linked expression')} · ${pluralize(countFaces(linkedEvents), 'face')}`,
+      };
+    }
+
+    return {
+      kicker: `${lens.short} focus`,
+      text: `${label(participantId)} · ${pluralize(linkedEvents.length, 'linked action')} · ${pluralize(axisCount, 'axis')}`,
+    };
+  }
+
+  if (lens.id === 'relations') {
+    return {
+      kicker: 'H routes',
+      text: `${pluralize(events.length, 'route')} across ${pluralize(participants.length, 'actor')}`,
+    };
+  }
+
+  if (lens.id === 'expression') {
+    return {
+      kicker: 'R signal',
+      text: `${pluralize(faceCount, 'face')} · ${pluralize(primitiveCount, 'primitive')}`,
+    };
+  }
+
+  return {
+    kicker: 'V map',
+    text: `${pluralize(participants.length, 'actor')} staged · ${pluralize(events.length, 'linked action')}`,
+  };
 }
 
 function focusSummary() {
@@ -611,6 +698,7 @@ function renderEncounterButtons(stepIndex, events) {
 function renderTimelineStepCard(step, stepIndex) {
   const active = stepIndex === state.activeStep;
   const events = getStepEvents(stepIndex);
+  const summary = getTimelineSummary(stepIndex, step);
 
   return `<section class="timeline-step-card${active ? ' active' : ''}">
     <button class="timeline-step-select" data-step-select="${stepIndex}" aria-expanded="${String(active)}">
@@ -618,6 +706,10 @@ function renderTimelineStepCard(step, stepIndex) {
         <div>
           <div class="timeline-label">${esc(step.timestep_label || `Step ${stepIndex + 1}`)}</div>
           <div class="timeline-sub">${esc(`${pluralize(Object.keys(step.participants || {}).length, 'actor')} · ${pluralize(events.length, 'action')}`)}</div>
+          <div class="timeline-summary-row">
+            <span class="timeline-summary-kicker">${esc(summary.kicker)}</span>
+            <span class="timeline-summary-copy">${esc(summary.text)}</span>
+          </div>
         </div>
         <span class="badge">${active ? 'Selected' : `Step ${stepIndex + 1}`}</span>
       </div>

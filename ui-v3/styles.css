@@ -136,7 +136,8 @@ button.ghost {
 .focus-strip-shell,
 .focus-strip-meta,
 .atlas-state-heading,
-.atlas-provenance-head {
+.atlas-provenance-head,
+.timeline-summary-row {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -338,7 +339,8 @@ button.ghost {
 .event-card-route,
 .axis-values,
 .encounter-detail-list,
-.atlas-provenance-label {
+.atlas-provenance-label,
+.timeline-summary-copy {
   font-size: 13px;
   color: var(--muted);
 }
@@ -560,6 +562,36 @@ button.ghost {
 .atlas-state-context,
 .atlas-provenance-value {
   font-weight: 700;
+}
+
+.timeline-summary-row {
+  align-items: flex-start;
+  margin-top: 8px;
+}
+
+.timeline-summary-kicker {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(103, 247, 161, 0.06);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.timeline-summary-copy {
+  flex: 1 1 220px;
+  min-width: 0;
+  line-height: 1.4;
+}
+
+.timeline-step-card.active .timeline-summary-copy {
+  color: var(--text);
 }
 
 .timeline-step-detail {
@@ -841,7 +873,8 @@ button.ghost {
   .lens-row,
   .focus-strip-shell,
   .atlas-state-heading,
-  .atlas-provenance-head {
+  .atlas-provenance-head,
+  .timeline-summary-row {
     align-items: stretch;
   }
 
