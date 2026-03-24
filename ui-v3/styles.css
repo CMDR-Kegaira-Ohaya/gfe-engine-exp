@@ -48,7 +48,8 @@ body {
   color: var(--2gray);
 }
 
-.eyebrow {
+.eyebrow,
+.context-kicker {
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
@@ -59,10 +60,13 @@ body {
 .actions,
 .badge-row,
 .panel-head,
-.placeholder-actions {
+.placeholder-actions,
+.focus-row,
+.chip-row {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 button {
@@ -77,6 +81,10 @@ button {
 
 button.ghost {
   background: var(--surface-soft);
+}
+
+.subtle-btn {
+  padding: 8px 12px;
 }
 
 .notice-bar {
@@ -115,7 +123,8 @@ button.ghost {
   border-top: 1px solid var(--border);
 }
 
-.group-label {
+.group-label,
+.step-detail-label {
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -236,6 +245,20 @@ button.ghost {
   min-height: 320px;
 }
 
+.context-banner {
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface-soft);
+}
+
+.context-copy {
+  margin-top: 6px;
+  color: var(--2gray);
+  line-height: 1.5;
+}
+
 .reading-surface {
   display: grid;
   gap: 12px;
@@ -322,18 +345,37 @@ button.ghost {
   padding: 0 18px 18px;
 }
 
-.timeline-item {
-  width: 100%;
-  text-align: left;
-  margin-bottom: 10px;
-  padding: 12px 14px;
-  border-radius: 14px;
-  background: var(--surface-soft);
+.timeline {
+  display: grid;
+  gap: 12px;
 }
 
-.timeline-item.active {
+.timeline-step-card {
+  border": 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface-soft);
+  overflow: hidden;
+}
+
+.timeline-step-card.active {
   border-color: var(--accent);
-  background: #eef2ff;
+  background: #f8fbff;
+}
+
+.timeline-step-select {
+  width: 100%;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  text-align: left;
+  padding: 14px 16px;
+}
+
+.timeline-step-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .timeline-label {
@@ -341,25 +383,150 @@ button.ghost {
   margin-bottom: 4px;
 }
 
-.timeline-sub {
+.timeline-sub,
+.encounter-sub,
+.atlas-note,
+.inline-empty {
   font-size: 14px;
   color: var(--2gray);
 }
 
-.atlas-section + .atlas-section {
-  margin-top: 14px;
-  padding-top: 14px;
+.timeline-step-detail {
+  display: grid;
+  gap: 14px;
+  padding: 0 16px 16px;
   border-top: 1px solid var(--border);
 }
 
-.atlas-section h4 {
-  margin: 0 0 8px;
+.step-detail-summary {
+  margin: 0;
+  color: var(--2gray);
+  line-height: 1.5;
+  padding-top: 14px;
 }
 
-.atlas-list {
+.step-detail-block {
+  display: grid;
+  gap: 10px;
+}
+
+.step-chip {
+  padding: 8px 12px;
+  background: var(--surface);
+}
+
+.step-chip.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: #eef2ff;
+}
+
+.encounter-list {
+  display: grid;
+  gap: 10px;
+}
+
+.encounter-btn {
+  width: 100%;
+  text-align: left;
+  background: var(--surface);
+  padding: 12px 14px;
+  border-radius: 14px;
+}
+
+.encounter-btn.active {
+  border-color: var(--accent);
+  background: #eef2ff;
+}
+
+.encounter-title {
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.atlas-overview,
+.atlas-focus {
+  display: grid;
+  gap: 14px;
+}
+
+.atlas-heading {
+  margin: 4px 0 0;
+  font-size: 20px;
+}
+
+.atlas-section-stack {
+  display: grid;
+  gap: 16px;
+}
+
+.atlas-section {
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+}
+
+.atlas-section h5 {
+  margin: 0 0 10px;
+  font-size: 15px;
+}
+
+.atlas-axis-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.axis-card {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-soft);
+  padding: 12px;
+}
+
+.axis-card h4 {
+  margin: 0 0 10px;
+  font-size: 15px;
+}
+
+.axis-values,
+.encounter-detail-list {
   margin: 0;
-  padding-left: 20px;
+  display: grid;
+  gap: 8px;
+}
+
+.axis-values div,
+.encounter-detail-list div {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 10px;
+}
+
+.axis-values dt,
+.encounter-detail-list dt {
+  font-weight: 700;
   color: var(--2gray);
+}
+
+.axis-values dd,
+.encounter-detail-list dd {
+  margin: 0;
+}
+
+.primitive-list {
+  display: frid;
+  gap: 8px;
+}
+
+.primitive-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-soft);
 }
 
 .empty {
