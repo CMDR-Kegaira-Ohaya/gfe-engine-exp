@@ -65,6 +65,11 @@ function sectionKind(section) {
   return 'default';
 }
 
+function viewKindFromAtlasView(view) {
+  const match = Array.from(view.classList).find((cls) => cls.startsWith('atlas-view--'));
+  return match ? match.replace('atlas-view--', '') : 'overview';
+}
+
 function groupedTargets(targets) {
   const groups = { expression: [], relations: [], structure: [], default: [] };
   targets.forEach((target) => {
@@ -181,6 +186,7 @@ function applyAtlasMapStage(root = document) {
 
     const field = document.createElement('section');
     field.className = 'atlas-map-field';
+    field.dataset.viewKind = viewKindFromAtlasView(view);
     field.innerHTML = `
       <div class="atlas-map-field-head">
         <div class="group-label">Atlas field</div>
