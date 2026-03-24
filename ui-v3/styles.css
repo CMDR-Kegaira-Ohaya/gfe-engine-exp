@@ -248,6 +248,35 @@ button.ghost {
   border: 1px solid var(--border);
   border-radius: 14px;
   background: rgba(10, 22, 14, 0.8);
+  position: relative;
+  overflow: visible;
+  isolation: isolate;
+}
+
+.atlas-shell::before {
+  content: '';
+  position: absolute;
+  left: -7px;
+  top: 28px;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--accent-strong);
+  box-shadow: 0 0 0 4px rgba(60, 255, 143, 0.12), 0 0 18px rgba(60, 255, 143, 0.18);
+  pointer-events: none;
+}
+
+.atlas-shell::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 22px;
+  bottom: 22px;
+  width: 2px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(60, 255, 143, 0.55), rgba(103, 247, 161, 0.12));
+  opacity: 0.9;
+  pointer-events: none;
 }
 
 .aux-shell {
@@ -528,12 +557,41 @@ button.ghost {
   border-radius: 14px;
   background: rgba(12, 23, 15, 0.9);
   overflow: hidden;
+  position: relative;
+  isolation: isolate;
 }
 
 .timeline-step-card.active {
   border-color: rgba(103, 247, 161, 0.46);
   box-shadow: var(--glow);
   background: rgba(13, 28, 18, 0.98);
+}
+
+.timeline-step-card.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 14px;
+  bottom: 14px;
+  width: 2px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(60, 255, 143, 0.12), rgba(60, 255, 143, 0.6), rgba(60, 255, 143, 0.12));
+  box-shadow: 0 0 12px rgba(60, 255, 143, 0.18);
+  pointer-events: none;
+}
+
+.timeline-step-card.active::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--accent-strong);
+  box-shadow: 0 0 0 4px rgba(60, 255, 143, 0.12), 0 0 18px rgba(60, 255, 143, 0.18);
+  pointer-events: none;
 }
 
 .timeline-step-select {
@@ -582,6 +640,11 @@ button.ghost {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   line-height: 1;
+}
+
+.timeline-step-card.active .timeline-summary-kicker {
+  border-color: var(--border-strong);
+  box-shadow: 0 0 0 1px rgba(103, 247, 161, 0.1);
 }
 
 .timeline-summary-copy {
