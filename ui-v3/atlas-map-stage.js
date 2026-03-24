@@ -92,6 +92,21 @@ function placeMarker(marker, kind, localIndex, globalIndex) {
   marker.style.left = pos.left;
 }
 
+function buildZoneLayer(groups) {
+  const zones = document.createElement('div');
+  zones.className = 'atlas-map-zones';
+
+  [['structure', 'Structure'], ['relations', 'Relations'], ['expression', 'Expression']].forEach(([kind, label]) => {
+    if (!groups[kind].length) return;
+    const zone = document.createElement('div');
+    zone.className = `atlas-map-zone atlas-map-zone--${kind}`;
+    zone.dataset.zoneLabel = label;
+    zones.appendChild(zone);
+  });
+
+  return zones;
+}
+
 function buildMarkers(field, dockBody, targets) {
   const interactives = document.createElement('div');
   interactives.className = 'atlas-map-interactives';
@@ -103,6 +118,7 @@ function buildMarkers(field, dockBody, targets) {
 
   const groups = groupedTargets(targets);
   let globalIndex = 0;
+  let firstMarker = null;
 
   ['structure', 'relations', 'expression', 'default'].forEach((kind) => {
     groups[kind].forEach((target, localIndex) => {
@@ -126,11 +142,12 @@ function buildMarkers(field, dockBody, targets) {
       `;
 
       marker.addEventListener('click', () => activateMarker(field, dockBody, marker, target));
+      if (!firstMarker) firstMarker = { marker, target };
       interactives.appendChild(marker);
     });
   });
 
-  return interactives;
+  return { interactives, zones: buildZoneLayer(groups), firstMarker };
 }
 
 function applyAtlasMapStage(root = document) {
@@ -189,7 +206,10 @@ function applyAtlasMapStage(root = document) {
 
     const targets = Array.from(dockBody.querySelectorAll(':scope > .atlas-section, :scope > .expression-card'));
     if (targets.length) {
-      field.appendChild(buildMarkers(field, dockBody, targets));
+      const { interactives, zones, firstMarker } = buildMarkers(field, dockBody, targets);
+      field.appendChild(zones);
+      field.appendChild(interactives);
+      if (firstMarker) activateMarker(field, dockBody, firstMarker.marker, firstMarker.target);
     }
 
     view.appendChild(shell);
