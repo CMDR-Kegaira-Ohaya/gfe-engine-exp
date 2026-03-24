@@ -1,0 +1,197 @@
+/* Atlas map-stage scaffold
+   Introduces a stable field + fixed detail dock inside the atlas without inventing map objects yet.
+*/
+
+.atlas-map-shell {
+  display: grid;
+  grid-template-rows: minmax(180px, 0.9fr) minmax(0, 1.1fr);
+  gap: 12px;
+  min-height: 100%;
+}
+
+.atlas-map-field,
+.atlas-detail-dock {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(9, 12, 16, 0.7);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  min-height: 0;
+}
+
+.atlas-map-field {
+  position: relative;
+  overflow: hidden;
+  padding: 14px;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  background:
+    linear-gradient(rgba(246, 173, 255, 0.04), rgba(246, 173, 255, 0.01)),
+    linear-gradient(90deg, transparent 0 31px, rgba(246, 173, 255, 0.05) 32px, transparent 33px),
+    linear-gradient(transparent 0 31px, rgba(246, 173, 255, 0.05) 32px, transparent 33px),
+    rgba(9, 12, 16, 0.82);
+  background-size: auto, 32px 32px, 32px 32px, auto;
+}
+
+.atlas-map-field::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 18% 28%, rgba(246, 173, 255, 0.12), transparent 24%),
+    radial-gradient(circle at 72% 62%, rgba(22, 154, 255, 0.09), transparent 22%),
+    radial-gradient(circle at 52% 38%, rgba(0, 255, 241, 0.06), transparent 20%);
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.atlas-map-field-head,
+.atlas-map-field-meta {
+  position: relative;
+  z-index: 1;
+}
+
+.atlas-map-field-head {
+  display: grid;
+  gap: 6px;
+}
+
+.atlas-map-field-title {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.1;
+}
+
+.atlas-map-field-note {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+  max-width: 46ch;
+}
+
+.atlas-map-field-meta {
+  margin-top: auto;
+}
+
+.atlas-map-placeholder {
+  position: absolute;
+  inset: 52px 14px 14px 14px;
+  pointer-events: none;
+}
+
+.atlas-map-ring,
+.atlas-map-node,
+.atlas-map-vector {
+  position: absolute;
+  border-radius: 999px;
+}
+
+.atlas-map-ring {
+  border: 1px dashed rgba(246, 173, 255, 0.22);
+  box-shadow: 0 0 0 1px rgba(246, 173, 255, 0.04);
+}
+
+.atlas-map-ring--a {
+  inset: 14% 18% 26% 14%;
+}
+
+.atlas-map-ring--b {
+  inset: 28% 34% 16% 26%;
+}
+
+.atlas-map-node {
+  width: 10px;
+  height: 10px;
+  background: rgba(246, 173, 255, 0.72);
+  box-shadow: 0 0 0 4px rgba(246, 173, 255, 0.08), 0 0 14px rgba(246, 173, 255, 0.18);
+}
+
+.atlas-map-node--focus {
+  top: 34%;
+  left: 48%;
+}
+
+.atlas-map-node--anchor-a {
+  top: 22%;
+  left: 24%;
+}
+
+.atlas-map-node--anchor-b {
+  top: 58%;
+  left: 70%;
+}
+
+.atlas-map-vector {
+  height: 2px;
+  background: linear-gradient(90deg, rgba(246, 173, 255, 0.18), rgba(246, 173, 255, 0.5), rgba(246, 173, 255, 0.14));
+  transform-origin: left center;
+  box-shadow: 0 0 12px rgba(246, 173, 255, 0.12);
+}
+
+.atlas-map-vector--a {
+  width: 124px;
+  top: 38%;
+  left: 26%;
+  transform: rotate(14deg);
+}
+
+.atlas-map-vector--b {
+  width: 112px;
+  top: 54%;
+  left: 49%;
+  transform: rotate(-18deg);
+}
+
+.atlas-detail-dock {
+  padding: 12px;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 10px;
+}
+
+.atlas-detail-dock-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.atlas-detail-dock-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.atlas-detail-dock-title {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.1;
+}
+
+.atlas-detail-dock-note {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.atlas-detail-dock-body {
+  min-height: 0;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+@media (max-width: 1180px) {
+  .atlas-map-shell {
+    grid-template-rows: auto auto;
+    min-height: auto;
+  }
+
+  .atlas-map-placeholder {
+    display: none;
+  }
+
+  .atlas-detail-dock-body {
+    overflow: visible;
+  }
+}
