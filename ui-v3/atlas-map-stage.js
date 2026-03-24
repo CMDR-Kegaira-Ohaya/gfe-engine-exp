@@ -107,9 +107,7 @@ function targetPriority(field, marker) {
   const targetText = normalizeText(marker.dataset.targetText || '');
   const anchor = focusAnchor(field);
 
-  if (viewKind === 'overview') {
-    return 'broad';
-  }
+  if (viewKind === 'overview') return 'broad';
 
   if (viewKind === 'participant') {
     if (anchor && (markerText.includes(anchor) || targetText.includes(anchor))) return 'primary';
@@ -142,11 +140,7 @@ function applyMarkerEmphasis(field, activeMarker) {
     }
 
     const priority = targetPriority(field, marker);
-    if (priority === 'primary') {
-      marker.classList.add('is-secondary');
-      return;
-    }
-    if (priority === 'secondary') {
+    if (priority === 'primary' || priority === 'secondary') {
       marker.classList.add('is-secondary');
       return;
     }
@@ -154,14 +148,14 @@ function applyMarkerEmphasis(field, activeMarker) {
   });
 }
 
-function activateMarker(field, dockBody, marker, target) {
+function activateMarker(field, dockBody, marker, target, options = {}) {
   field.querySelectorAll('.atlas-map-marker').forEach((node) => node.classList.remove('is-active'));
   clearTargeted(dockBody);
   marker.classList.add('is-active');
   target.classList.add('is-targeted');
   syncActiveZone(field, marker.dataset.kind || 'default');
   applyMarkerEmphasis(field, marker);
-  target.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  if (options.scroll !== false) target.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
 
 function placeMarker(marker, kind, localIndex, globalIndex) {
@@ -197,6 +191,7 @@ function buildMarkers(field, dockBody, targets) {
   interactives.appendChild(focusNode);
 
   const groups = groupedTargets(targets);
+  const markerMap = new Map();
   let globalIndex = 0;
   let firstMarker = null;
 
@@ -204,6 +199,7 @@ function buildMarkers(field, dockBody, targets) {
     groups[kind].forEach((target, localIndex) => {
       globalIndex += 1;
       target.dataset.mapTarget = `atlas-target-${globalIndex}`;
+      target.tabIndex = 0;
 
       const marker = document.createElement('button');
       marker.type = 'button';
@@ -224,9 +220,28 @@ function buildMarkers(field, dockBody, targets) {
       `;
 
       marker.addEventListener('click', () => activateMarker(field, dockBody, marker, target));
+      markerMap.set(target.dataset.mapTarget, { marker, target });
       if (!firstMarker) firstMarker = { marker, target };
       interactives.appendChild(marker);
     });
+  });
+
+  dockBody.addEventListener('click', (event) => {
+    const target = event.target.closest('.atlas-section, .expression-card');
+    if (!target?.dataset.mapTarget) return;
+    const pair = markerMap.get(target.dataset.mapTarget);
+    if (!pair) return;
+    activateMarker(field, dockBody, pair.marker, pair.target, { scroll: false });
+  });
+
+  dockBody.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    const target = event.target.closest('.atlas-section, .expression-card');
+    if (!target?.dataset.mapTarget) return;
+    const pair = markerMap.get(target.dataset.mapTarget);
+    if (!pair) return;
+    event.preventDefault();
+    activateMarker(field, dockBody, pair.marker, pair.target, { scroll: false });
   });
 
   return { interactives, zones: buildZoneLayer(groups), firstMarker };
