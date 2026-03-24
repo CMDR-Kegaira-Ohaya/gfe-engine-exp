@@ -16,22 +16,36 @@
 
 .left-panel {
   display: grid;
-  grid-template-rows: minmax(0, 1fr) minmax(220px, auto);
+  grid-template-rows: minmax(0, 1fr) minmax(180px, 24vh);
   align-content: stretch;
+  gap: 12px;
 }
 
 .atlas-shell {
   min-height: 0;
+  overflow: hidden;
+}
+
+.atlas {
+  height: 100%;
+  min-height: 0;
+  overflow: auto;
 }
 
 .aux-shell {
   max-height: none;
-  min-height: 220px;
+  min-height: 180px;
+  overflow: hidden;
+}
+
+.aux-shell .panel-body {
+  min-height: 0;
+  overflow: auto;
 }
 
 .center-panel {
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr) minmax(240px, auto);
+  grid-template-rows: auto auto minmax(0, 1fr) minmax(220px, 30vh);
 }
 
 .tab-content {
@@ -41,10 +55,19 @@
 
 .bottom-row {
   padding-top: 0;
+  min-height: 0;
 }
 
 .timeline-panel {
-  min-height: 240px;
+  min-height: 220px;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.timeline {
+  height: 100%;
+  min-height: 0;
+  overflow: auto;
 }
 
 @media (max-width: 1180px) {
@@ -59,5 +82,13 @@
 
   .left-panel {
     grid-template-rows: auto auto;
+  }
+
+  .atlas,
+  .timeline,
+  .aux-shell .panel-body,
+  .tab-content {
+    height: auto;
+    overflow: visible;
   }
 }
