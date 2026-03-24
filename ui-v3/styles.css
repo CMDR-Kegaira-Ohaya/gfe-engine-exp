@@ -1185,3 +1185,101 @@ button.ghost {
   line-height: 1.5;
   color: rgba(141, 179, 157, 0.86);
 }
+
+/* center reader terminal grammar refinement */
+.center-panel .case-header {
+  align-items: flex-start;
+  gap: 18px;
+  padding-bottom: 10px;
+}
+
+.center-panel .case-header > div:first-child {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.center-panel .case-header h2 {
+  font-size: 24px;
+  line-height: 1.08;
+  letter-spacing: 0.01em;
+  color: var(--text);
+}
+
+.center-panel .subtitle {
+  margin-top: 0;
+  margin-bottom: 14px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: rgba(141, 179, 157, 0.88);
+  max-width: 56ch;
+}
+
+.center-panel .badge-row {
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.center-panel .badge {
+  padding: 4px 8px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(216, 255, 231, 0.84);
+  border-color: rgba(112, 255, 174, 0.14);
+  background: rgba(103, 247, 161, 0.06);
+}
+
+.center-panel .tabs {
+  gap: 6px;
+  padding-top: 2px;
+  padding-bottom: 10px;
+  border-bottom-color: rgba(112, 255, 174, 0.12);
+}
+
+.center-panel .tab-btn {
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(141, 179, 157, 0.86);
+  border-color: rgba(112, 255, 174, 0.1);
+  background: rgba(8, 17, 11, 0.34);
+}
+
+.center-panel .tab-btn:hover {
+  color: rgba(216, 255, 231, 0.9);
+  border-color: rgba(103, 247, 161, 0.22);
+  background: rgba(12, 31, 21, 0.62);
+}
+
+.center-panel .tab-btn.active {
+  color: var(--accent);
+  border-color: rgba(103, 247, 161, 0.42);
+  background: rgba(12, 31, 21, 0.88);
+  box-shadow: 0 0 0 1px rgba(103, 247, 161, 0.12), 0 0 14px rgba(60, 255, 143, 0.06);
+}
+
+.center-panel .tab-content {
+  padding-top: 18px;
+}
+
+.center-panel .context-banner {
+  padding: 12px 14px;
+  border-color: rgba(112, 255, 174, 0.12);
+  background: rgba(10, 22, 14, 0.78);
+}
+
+.center-panel .context-kicker {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: rgba(141, 179, 157, 0.82);
+}
+
+.center-panel .context-copy {
+  margin-top: 5px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: rgba(216, 255, 231, 0.8);
+}
