@@ -70,6 +70,14 @@ function viewKindFromAtlasView(view) {
   return match ? match.replace('atlas-view--', '') : 'overview';
 }
 
+function normalizeText(value) {
+  return String(value || '').toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+function sectionSearchText(section) {
+  return normalizeText(section.textContent || '');
+}
+
 function groupedTargets(targets) {
   const groups = { expression: [], relations: [], structure: [], default: [] };
   targets.forEach((target) => {
@@ -88,6 +96,38 @@ function syncActiveZone(field, kind) {
   });
 }
 
+function focusAnchor(field) {
+  return normalizeText(field.dataset.focusAnchor || field.querySelector('.atlas-map-field-title')?.textContent || '');
+}
+
+function targetPriority(field, marker) {
+  const viewKind = field.dataset.viewKind || 'overview';
+  const activeKind = marker.dataset.kind || 'default';
+  const markerText = normalizeText(marker.dataset.text || '');
+  const targetText = normalizeText(marker.dataset.targetText || '');
+  const anchor = focusAnchor(field);
+
+  if (viewKind === 'overview') {
+    return 'broad';
+  }
+
+  if (viewKind === 'participant') {
+    if (anchor && (markerText.includes(anchor) || targetText.includes(anchor))) return 'primary';
+    if (activeKind === 'structure' || activeKind === 'relations') return 'secondary';
+    return 'muted';
+  }
+
+  if (viewKind === 'encounter') {
+    const encounterWords = ['encounter', 'route', 'payload', 'current primitives', 'current inspection'];
+    if (anchor && (markerText.includes(anchor) || targetText.includes(anchor))) return 'primary';
+    if (encounterWords.some((word) => markerText.includes(word) || targetText.includes(word))) return 'secondary';
+    if (activeKind === 'relations' || activeKind === 'expression') return 'secondary';
+    return 'muted';
+  }
+
+  return 'broad';
+}
+
 function applyMarkerEmphasis(field, activeMarker) {
   const viewKind = field.dataset.viewKind || 'overview';
   const activeKind = activeMarker?.dataset.kind || 'default';
@@ -101,17 +141,16 @@ function applyMarkerEmphasis(field, activeMarker) {
       return;
     }
 
-    if (viewKind === 'participant') {
-      if (marker.dataset.kind === activeKind) marker.classList.add('is-secondary');
-      else marker.classList.add('is-muted');
+    const priority = targetPriority(field, marker);
+    if (priority === 'primary') {
+      marker.classList.add('is-secondary');
       return;
     }
-
-    if (viewKind === 'encounter') {
-      marker.classList.add('is-muted');
-      if (marker.dataset.kind === activeKind) marker.classList.remove('is-muted');
-      if (marker.dataset.kind === activeKind) marker.classList.add('is-secondary');
+    if (priority === 'secondary') {
+      marker.classList.add('is-secondary');
+      return;
     }
+    marker.classList.add('is-muted');
   });
 }
 
@@ -172,6 +211,8 @@ function buildMarkers(field, dockBody, targets) {
       marker.dataset.target = target.dataset.mapTarget;
       marker.dataset.axis = axisFromSection(target);
       marker.dataset.kind = kind;
+      marker.dataset.text = markerTextFromSection(target);
+      marker.dataset.targetText = sectionSearchText(target);
 
       placeMarker(marker, kind, localIndex, globalIndex - 1);
 
@@ -215,6 +256,7 @@ function applyAtlasMapStage(root = document) {
     const field = document.createElement('section');
     field.className = 'atlas-map-field';
     field.dataset.viewKind = viewKindFromAtlasView(view);
+    field.dataset.focusAnchor = fieldTitleFromView(view);
     field.innerHTML = `
       <div class="atlas-map-field-head">
         <div class="group-label">Atlas field</div>
