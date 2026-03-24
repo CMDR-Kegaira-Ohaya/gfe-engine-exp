@@ -1,5 +1,5 @@
 
-import { validateCase, solveCase } from '../solver/index.js';
+import { validateCase, solveCase, groupEventsByStep } from '../solver/index.js';
 
 const state = {
   currentMode: 'open',
@@ -8,11 +8,14 @@ const state = {
   activeTab: 'case',
   activeSlug: null,
   activeStep: 0,
+  participantFocus: null,
+  encounterFocus: null,
   caseMarkdown: '',
   encoding: null,
   readingMarkdown: '',
   validation: null,
   solved: null,
+  groupedEvents: new Map(),
   notice: 'Canonical catalog is live. Package loading/import is reserved here.',
 };
 
@@ -50,7 +53,18 @@ function escapeHtml(value) {
   return String(value ?? '')
     .replaceAll('&', '&amp;')
     .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;');
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function prettyLabel(value) {
+  if (!value) return 'Unknown';
+  return String(value).replaceAll('_', ' ');
+}
+
+function pluralize(count, singular, plural = `${singular}s`) {
+  return `${count} ${count === 1 ? singular : plural}`;
 }
 
 function renderMarkdown(markdown) {
@@ -105,6 +119,48 @@ function getActiveCaseEntry() {
   return state.catalog.find((entry) => entry.slug === state.activeSlug) || null;
 }
 
+function getTimeline() {
+  return state.solved?.timeline || state.encoding?.timeline || [];
+}
+
+function getStep(stepIndex = state.activeStep) {
+  return getTimeline()[stepIndex] || null;
+}
+
+function getStepEvents(stepIndex = state.activeStep) {
+  return state.groupedEvents.get(stepIndex) || [];
+}
+
+function getEncounterEvent(focus = state.encounterFocus) {
+  if (!focus) return null;
+  const events = getStepEvents(focus.stepIndex);
+  return events[focus.encounterIndex] || null;
+}
+
+function clearFocus() {
+  state.participantFocus = null;
+  state.encounterFocus = null;
+}
+
+function resetLoadedState() {
+  state.activeSlug = null;
+  state.activeStep = 0;
+  state.participantFocus = null;
+  state.encounterFocus = null;
+  state.caseMarkdown = '';
+  state.encoding = null;
+  state.readingMarkdown = '';
+  state.validation = null;
+  state.solved = null;
+  state.groupedEvents = new Map();
+  state.activeTab = 'case';
+}
+
+function setActiveStep(stepIndex) {
+  state.activeStep = Number.isInteger(stepIndex) ? stepIndex : 0;
+  clearFocus();
+}
+
 async function fetchJson(path) {
   const response = await fetch(path, { cache: 'no-store' });
   if (!response.ok) {
@@ -148,6 +204,7 @@ async function loadCatalog() {
 async function loadCase(slug, { resetTab = true } = {}) {
   state.activeSlug = slug;
   state.activeStep = 0;
+  clearFocus();
 
   if (resetTab) {
     state.activeTab = 'case';
@@ -164,25 +221,29 @@ async function loadCase(slug, { resetTab = true } = {}) {
 
   try {
     const [caseMarkdown, encoding, readingMarkdown] = await Promise.all([
-      entry.paths.case ? fetchText(`.${entry.paths.case}`) : Promise.resolve(''),
-      entry.paths.encoding ? fetchJson(`.${entry.paths.encoding}`) : Promise.resolve(null),
+      entry.paths.case ? fetchText(.${entry.paths.case}) : Promise.resolve(''),
+      entry.paths.encoding ? fetchJson(.${entry.paths.encoding}) : Promise.resolve(null),
       entry.paths.reading ? fetchText(`.${entry.paths.reading}`) : Promise.resolve(''),
     ]);
+
+    const solved = encoding ? solveCase(encoding) : null;
 
     state.caseMarkdown = caseMarkdown;
     state.encoding = encoding;
     state.readingMarkdown = readingMarkdown;
     state.validation = encoding ? validateCase(encoding) : null;
-    state.solved = encoding ? solveCase(encoding) : null;
+    state.solved = solved;
+    state.groupedEvents = groupEventsByStep((encoding && encoding.payload_events) || []);
 
     renderAll();
-    setNotice(`“${entry.title}” loaded.`);
+    setNotice(`x“${entry.title}” loaded.`);
   } catch (error) {
     state.caseMarkdown = '';
     state.encoding = null;
     state.readingMarkdown = '';
     state.validation = null;
     state.solved = null;
+    state.groupedEvents = new Map();
 
     renderAll();
     setNotice(`Could not load “${entry.title}”: ${error.message}`);
@@ -218,7 +279,7 @@ function renderCatalogList() {
   return state.catalog
     .map((entry) => {
       const active = entry.slug === state.activeSlug ? ' active' : '';
-      return `<button class="catalog-item${active}" data-slug="${escapeHtml(entry.slug)}">
+      return `<bstton class="catalog-item${active}" data-slug="${escapeHtml(entry.slug)}">
         <div class="catalog-title">${escapeHtml(entry.title)}</div>
         <div class="catalog-meta">${entry.timesteps} steps · ${entry.participants} participants</div>
         <div class="catalog-synopsis">${escapeHtml(entry.synopsis || 'No preview yet.')}</div>
@@ -292,11 +353,16 @@ function renderHeader() {
     return;
   }
 
+  const step = getStep();
+  const stepLabel = step?.timestep_label ? `Selected moment: ${step.timestep_label}` : null;
+
   els.currentSlug.textContent = entry.slug;
   els.currentTitle.textContent = entry.title;
-  els.currentSubtitle.textContent = entry.has_reading
-    ? 'Case, case encoding, and saved reading are available.'
-    : 'Case and case encoding are available. No saved reading yet.';
+  els.currentSubtitle.textContent = stepLabel
+    ? stepLabel
+    : entry.has_reading
+      ? 'Case, case encoding, and saved reading are available.'
+      : 'Case and case encoding are available. No saved reading yet.';
   els.sourceBadge.textContent = 'Canonical repo case';
   els.statusBadge.textContent = entry.has_reading ? 'Reading available' : 'Reading missing';
 
@@ -339,33 +405,176 @@ function renderEncodingSummary() {
   </section>`;
 }
 
+function renderContextBanner() {
+  const entry = getActiveCaseEntry();
+  const step = getStep();
+
+  if (!entry || !step) return '';
+
+  const contextLines = [`Selected moment: ${prettyLabel(step.timestep_label || `Step ${state.activeStep + 1}`))}];
+
+  if (state.participantFocus) {
+    contextLines.push(`Participant focus: ${prettyLabel(state.participantFocus)}`);
+  } else if (state.encounterFocus) {
+    const event = getEncounterEvent();
+    contextLines.push(`Encounter focus: ${buildEncounterLabel(event)}`);
+  } else {
+    contextLines.push('Step overview is active.');
+  }
+
+  return `<section class="context-banner">
+    <div class="context.kicker">Reader context</div>
+    <div class="context-copy">${escapeHtml(contextLines.join(' · '))}</div>
+  </section>`;
+}
+
 function renderTabContent() {
   if (!state.activeSlug) {
     els.tabContent.innerHTML = '<div class="empty">Open a case to show the v3 reader.</div>';
     return;
   }
 
+  const contextBanner = renderContextBanner();
+
   if (state.activeTab === 'case') {
-    els.tabContent.innerHTML = `<div class="reading-surface">${renderMarkdown(state.caseMarkdown)}</div>`;
+    els.tabContent.innerHTML = `${contextBanner}<div class="reading-surface">${renderMarkdown(state.caseMarkdown)}</div>`;
     return;
   }
 
   if (state.activeTab === 'encoding') {
-    els.tabContent.innerHTML = renderEncodingSummary();
+    els.tabContent.innerHTML = `${contextBanner}${renderEncodingSummary()}`;
     return;
   }
 
   els.tabContent.innerHTML = state.readingMarkdown.trim()
-    ? `<div class="reading-surface">${renderMarkdown(state.readingMarkdown)}</div>`
-    : `<section class="placeholder-card">
+    ? `${contextBanner}<div class="reading-surface">${renderMarkdown(state.readingMarkdown)}</div>`
+    : `${contextBanner}<section class="placeholder-card">
         <h3>No case reading saved yet</h3>
         <p>The canonical case and case encoding are available, but no saved case reading is attached yet.</p>
         <p class="placeholder-note">Use GPT to generate reading.</p>
       </section>`;
 }
 
+function buildStepSummary(step, events) {
+  const participantCount = Object.keys(step.participants || {}).length;
+  const actionCount = events.length;
+  return `${pluralize(participantCount, 'actor')} · ${pluralize(actionCount, 'action')}`;
+}
+
+function buildEncounterLabel(event) {
+  if (!event) return 'No encounter selected';
+
+  const source = prettyLabel(event.sourceParticipantId || event.alpha_source || '');
+  const receiving = prettyLabel(event.receivingParticipantId || event.alpha_receiving || '');
+  const medium = prettyLabel(event.mediumParticipantId || event.alpha_medium || '');
+  const axis = prettyLabel(event.axis || 'axis');
+
+  if (event.sourceParticipantId && event.receivingParticipantId) {
+    return `${source} → ${receiving} (${axis})`;
+  }
+
+  if (event.sourceParticipantId) {
+    return `${source} emits on ${axis}`;
+  }
+
+  if (event.receivingParticipantId) {
+    return `${receiving} receives on ${axis}`;
+  }
+
+  if (event.mediumParticipantId) {
+    return `${medium} mediates on ${axis}`;
+  }
+
+  return `Encounter on ${axis}`;
+}
+
+function renderParticipantChips(stepIndex, step) {
+  const participants = Object.keys(step.participants || {});
+  if (!participants.length) {
+    return '<div class="inline-empty">No actors are encoded for this step yet.</div>';
+  }
+
+  return `<div class="chip-row">
+    ${participants
+      .map((participantId) => {
+        const active = state.participantFocus === participantId ? ' active' : '';
+        return `<button
+          class="step-chip${active}"
+          data-participant-focus="${escapeHtml(participantId)}"
+          data-step-index="${stepIndex}"
+          aria-pressed="${String(state.participantFocus === participantId)}"
+        >${escapeHtml(prettyLabel(participantId))}</button>`;
+      })
+      .join('')}
+  </div>`;
+}
+
+function renderEncounterButtons(stepIndex, events) {
+  if (!events.length) {
+    return '<div class="inline-empty">No actions are encoded for this step yet.</div>';
+  }
+
+  return `<div class="encounter-list">
+    ${events
+      .map((event, encounterIndex) => {
+        const isActive =
+          state.encounterFocus &&
+          state.encounterFocus.stepIndex === stepIndex &&
+          state.encounterFocus.encounterIndex === encounterIndex;
+
+        const primitiveCount = Array.isArray(event.payload_bundle) ? event.payload_bundle.length : 0;
+        const faceText = event.face ? ` · ${prettyLabel(event.face)}` : '';
+        const subtitle = `${prettyLabel(event.axis || 'axis')} axis${faceText} · ${pluralize(primitiveCount, 'primitive')}`;
+
+        return `<bstton
+          class="encounter-btn${isActive ? ' active' : ''}"
+          data-encounter-focus="${encounterIndex}"
+          data-step-index="${stepIndex}"
+          aria-pressed="${String(Boolean(isActive))}"
+        >
+          <div class="encounter-title">${escapeHtml(buildEncounterLabel(event))}</div>
+          <div class="encounter-sub">${escapeHtml(subtitle)}</div>
+        </button>`;
+      })
+      .join('')}
+  </div>`;
+}
+
+function renderTimelineStepCard(step, stepIndex) {
+  const active = stepIndex === state.activeStep;
+  const events = getStepEvents(stepIndex);
+  const cardClass = active ? 'timeline-step-card active' : 'timeline-step-card';
+
+  return `<section class="${cardClass}">
+    <button
+      class="timeline-step-select"
+      data-step-select="${stepIndex}"
+      aria-expanded="${String(active)}"
+    >
+      <div class="timeline-step-header">
+        <div>
+          <div class="timeline-label">${escapeHtml(step.timestep_label || `Step ${stepIndex + 1}`)}</div>
+          <div class="timeline-sub">${escapeHtml(buildStepSummary(step, events))}</div>
+        </div>
+        <span class="badge">${active ? 'Selected' : `Step ${stepIndex + 1}`}</span>
+      </div>
+    </button>
+    ${active ? `<div class="timeline-step-detail">
+      <p class="step-detail-summary">Click an actor to set participant focus. Click an action to set encounter focus. The atlas responds without changing the selected moment.</p>
+      <section class="step-detail-block">
+        <div class="step-detail-label">Actors</div>
+        ${renderParticipantChips(stepIndex, step)}
+      </section>
+      <section class="step-detail-block">
+        <div class="step-detail-label">Actions</div>
+        ${renderEncounterButtons(stepIndex, events)}
+      </section>
+    </div>` : ''}
+  </section>`;
+}
+
 function renderTimeline() {
-  const timeline = state.encoding?.timeline || [];
+  const timeline = getTimeline();
   els.timestepBadge.textContent = String(timeline.length);
 
   if (!timeline.length) {
@@ -374,46 +583,143 @@ function renderTimeline() {
   }
 
   if (state.activeStep >= timeline.length) {
-    state.activeStep = 0;
+    setActiveStep(0);
   }
 
   els.timeline.innerHTML = timeline
-    .map((step, stepIndex) => {
-      const active = stepIndex === state.activeStep ? ' active' : '';
-      const participantCount = Object.keys(step.participants || {}).length;
-      return `<button class="timeline-item${active}" data-step="${stepIndex}">
-        <div class="timeline-label">${escapeHtml(step.timestep_label || `Step ${stepIndex + 1}`)}</div>
-        <div class="timeline-sub">${participantCount} actors in this step</div>
-      </button>`;
-    })
+    .map((step, stepIndex) => renderTimelineStepCard(step, stepIndex))
     .join('');
 }
 
+function renderAxisCards(axes = {}) {
+  const entries = Object.entries(axes);
+  if (!entries.length) {
+    return '<div class="inline-empty">No axis data is available here yet.</div>';
+  }
+
+  return `<div class="atlas-axis-grid">
+    ${entries
+      .map((name, axisData]) => `<section class="axis-card">
+        <h4>${escapeHtml(prettyLabel(name))}</h4>
+        <dl class="axis-values">
+          <div><dt>A</dt><dd>${escapeHtml(axisData.A ?? '—')}</dd></div>
+          <div><dt>R</dt><dd>${escapeHtml(axisData.R ?? '—')}</dd></div>
+          <div><dt>I</dt><dd>${escapeHtml(axisData.I ?? '—')}</dd></div>
+        </dl>
+      </section>`)
+      .join('')}
+  </div>`;
+}
+
+function renderAtlasOverview(step) {
+  const participants = Object.entries(step.participants || {});
+
+  if (!participants.length) {
+    return `<div class="atlas-overview">
+      <p class="atlas-note">This step has no actor entries to display yet.</p>
+    </div>`;
+  }
+
+  return `<div class="atlas-overview">
+    <div class="focus-row">
+      <div>
+        <div class="context.kicker">Relation Atlas</div>
+        <h4 class="atlas-heading">${escapeHtml(prettyLabel(step.timestep_label || `Step ${state.activeStep + 1}`))}</h4>
+      </div>
+    </div>
+    <p class="atlas-note">Step overview is active. Click an actor or action in the timeline to focus this atlas.</p>
+    <div class="atlas-section-stack">
+      ${participants
+        .map((participantId, participantData]) => `<section class="atlas-section">
+          <h5>${escapeHtml(prettyLabel(participantId))}</h5>
+          ${renderAxisCards(participantData.axes || {})}
+        </section>`)
+        .join('')}
+    </div>
+  </div>`;
+}
+
+function renderParticipantFocus(step, participantId) {
+  const participantData = step.participants?.[participantId];
+
+  if (!participantData) {
+    return '<div class="empty">The selected participant is not available in this step.</div>';
+  }
+
+  return `<div class="atlas-focus">
+    <div class="focus-row">
+      <div>
+        <div class="context-kicker">Participant focus</div>
+        <h4 class="atlas-heading">${escapeHtml(prettyLabel(participantId))}</h4>
+      </div>
+      <button class="ghost subtle-btn" data-clear-focus="true">Clear focus</button>
+    </div>
+    <p class="atlas-note">This view stays anchored to the selected moment and narrows the atlas to one participant.</p>
+    ${renderAxisCards(participantData.axes || {})}
+  </div>`;
+}
+
+function renderEncounterFocus(event) {
+  if (!event) {
+    return '<div class="empty">The selected encounter is not available in this step.</div>';
+  }
+
+  const primitives = Array.isArray(event.payload_bundle) ? event.payload_bundle : [];
+
+  return `<div class="atlas-focus">
+    <div class="focus-row">
+      <div>
+        <div class="context-kicker">Encounter focus</div>
+        <h4 class="atlas-heading">${escapeHtml(buildEncounterLabel(event))}</h4>
+      </div>
+      <button class="ghost subtle-btn" data-clear-focus="true">Clear focus</button>
+    </div>
+    <dl class="encounter-detail-list">
+      <div><dt>Source</dt><dd>${escapeHtml(prettyLabel(event.sourceParticipantId || event.alpha_source || '—'))}</dd></div>
+      <div><dt>Receiving</dt><dd>${escapeHtml(prettyLabel(event.receivingParticipantId || event.alpha_receiving || '—'))}</dd></div>
+      <div><dt>Medium</dt><dd>${escapeHtml(prettyLabel(event.mediumParticipantId || event.alpha_medium || '—'))}</dd></div>
+      <div><dt>Axis</dt><dd>${escapeHtml(prettyLabel(event.axis || '—'))}</dd></div>
+      <div><dt>Face</dt><dd>${escapeHtml(prettyLabel(event.face || '—'))}</dd></div>
+      <div><dt>Interference</dt><dd>${escapeHtml(event.interference || '—')}</dd></div>
+    </dl>
+    <section class="atlas-section">
+      <h5>Payload bundle</h5>
+      ${ primitives.length
+          ? `<div class="primitive-list">
+              ${primitives
+                .map((primitive, index) => `<div class="primitive-chip">
+                  <b>${index + 1}.</b>
+                  <span>${escapeHtml(prettyLabel(primitive.sigma || 'L'))}</span>
+                  <span>${escapeHtml(prettyLabel(primitive.mode || primitive.mu || 'load'))}</span>
+                  <span>${escapeHtml(prettyLabel(primitive.register || 'retained'))}</span>
+                </div>`)
+                .join('')}
+            </div>`
+          : '<div class="inline-empty">No payload bundle detail is attached to this encounter.</div>'
+      }
+    </section>
+  </div>`;
+}
+
 function renderAtlas() {
-  const step = state.encoding?.timeline?.[state.activeStep];
+  const step = getStep();
+
   if (!step) {
     els.atlas.innerHTML = '<div class="empty">No relation atlas data yet.</div>';
     return;
   }
 
-  const participantEntries = Object.entries(step.participants || {});
-  if (!participantEntries.length) {
-    els.atlas.innerHTML = '<div class="empty">This step has no actor entries to display yet.</div>';
+  if (state.participantFocus) {
+    els.atlas.innerHTML = renderParticipantFocus(step, state.participantFocus);
     return;
   }
 
-  els.atlas.innerHTML = participantEntries
-    .map(([actorId, actorData]) => {
-      const axes = Object.entries(actorData.axes || {})
-        .map(([axisName, axisData]) => `<li>${escapeHtml(axisName)}: A ${axisData.A ?? '—'} · R ${axisData.R ?? '—'} · I ${axisData.I ?? '—'}</li>`)
-        .join('');
+  if (state.encounterFocus) {
+    els.atlas.innerHTML = renderEncounterFocus(getEncounterEvent());
+    return;
+  }
 
-      return `<section class="atlas-section">
-        <h4>${escapeHtml(actorId)}</h4>
-        <ul class="atlas-list">${axes}</ul>
-      </section>`;
-    })
-    .join('');
+  els.atlas.innerHTML = renderAtlasOverview(step);
 }
 
 function renderActionsPanel() {
@@ -456,15 +762,7 @@ function handleReadingAction() {
 function handleClear() {
   if (!confirm('Are you sure?')) return;
 
-  state.activeSlug = null;
-  state.activeStep = 0;
-  state.caseMarkdown = '';
-  state.encoding = null;
-  state.readingMarkdown = '';
-  state.validation = null;
-  state.solved = null;
-  state.activeTab = 'case';
-
+  resetLoadedState();
   renderAll();
   setNotice('Current loaded items cleared.');
 }
@@ -525,9 +823,39 @@ function bindEvents() {
   });
 
   els.timeline.addEventListener('click', (event) => {
-    const button = event.target.closest('[data-step]');
-    if (!button) return;
-    state.activeStep = Number(button.dataset.step) || 0;
+    const participantButton = event.target.closest('[data-participant-focus]');
+    if (participantButton) {
+      state.participantFocus = participantButton.dataset.participantFocus;
+      state.encounterFocus = null;
+      renderAll();
+      return;
+    }
+
+    const encounterButton = event.target.closest('[data-encounter-focus]');
+    if (encounterButton) {
+      const stepIndex = Number(encounterButton.dataset.stepIndex) || 0;
+      const encounterIndex = Number(encounterButton.dataset.encounterFocus) || 0;
+      state.activeStep = stepIndex;
+      state.participantFocus = null;
+      state.encounterFocus = { stepIndex, encounterIndex };
+      renderAll();
+      return;
+    }
+
+    const stepButton = event.target.closest('[data-step-select]');
+    if (!stepButton) return;
+
+    const nextStep = Number(stepButton.dataset.stepSelect) || 0;
+    if (nextStep !== state.activeStep) {
+      setActiveStep(nextStep);
+    }
+    renderAll();
+  });
+
+  els.atlas.addEventListener('click', (event) => {
+    const clearButton = event.target.closest('[data-clear-focus]');
+    if (!clearButton) return;
+    clearFocus();
     renderAll();
   });
 
