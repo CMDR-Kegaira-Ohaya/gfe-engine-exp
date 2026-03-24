@@ -1,0 +1,228 @@
+/* v3 semantic palette foundation
+   L family = aligned axis colors
+   M family = intensified/opposed axis colors
+   D family = gray-faded axis colors
+   Ruin = absolute void
+   Theta intentionally has no color token; it should remain a strict glyph operator.
+*/
+
+:root {
+  --bg: #0d0811;
+  --bg-grid: rgb(246 173 255 / 0.045);
+  --surface: #15101b;
+  --surface-soft: #191321;
+  --surface-raised: #21182b;
+  --surface-panel-top: rgb(19 14 25 / 0.96);
+  --surface-panel-bottom: rgb(11 9 16 / 0.96);
+  --text: #f6eff9;
+  --muted: #b9adc0;
+  --border: rgb(246 173 255 / 0.18);
+  --border-strong: rgb(246 173 255 / 0.34);
+  --accent: #f6adff;
+  --accent-strong: #f6adff;
+  --warning: #ff7b00;
+  --danger: #ff000e;
+  --shadow: 0 18px 50px rgb(0 0 0 / 0.48);
+  --glow: 0 0 0 1px rgb(246 173 255 / 0.22), 0 0 18px rgb(246 173 255 / 0.09);
+
+  --accent-rgb: 246 173 255;
+  --warning-rgb: 255 123 0;
+  --danger-rgb: 255 0 14;
+
+  --l-cfg: #00fff1;
+  --l-emb: #15bf25;
+  --l-org: #169aff;
+  --l-dir: #f46f8c;
+  --l-leg: #f6adff;
+
+  --m-cfg: #fff199;
+  --m-emb: #ffff00;
+  --m-org: #ff7b00;
+  --m-dir: #ff000e;
+  --m-leg: #95007a;
+
+  --d-cfg: #a2aead;
+  --d-emb: #979e97;
+  --d-org: #939da7;
+  --d-dir: #a89da0;
+  --d-leg: #a79fa8;
+
+  --ruin: #000000;
+}
+
+body {
+  background:
+    linear-gradient(rgb(13 8 17 / 0.95), rgb(10 7 14 / 0.985)),
+    linear-gradient(90deg, transparent 0 23px, var(--bg-grid) 24px, transparent 25px),
+    linear-gradient(transparent 0 23px, var(--bg-grid) 24px, transparent 25px),
+    var(--bg);
+}
+
+.panel,
+.center-panel {
+  background: linear-gradient(180deg, var(--surface-panel-top), var(--surface-panel-bottom));
+}
+
+.masthead {
+  background: rgb(12 9 17 / 0.93);
+}
+
+.notice-bar,
+.actions-panel,
+.atlas-provenance-strip {
+  box-shadow: var(--shadow), var(--glow);
+}
+
+button:hover {
+  border-color: rgb(var(--accent-rgb) / 0.34);
+}
+
+button:focus-visible {
+  box-shadow: 0 0 0 2px rgb(var(--accent-rgb) / 0.26), 0 0 0 4px rgb(10 7 14 / 0.9);
+}
+
+.eyebrow,
+.context-kicker,
+.group-label,
+.step-detail-label,
+.event-card-kicker,
+.timeline-summary-kicker,
+.atlas-mode-tag,
+.badge,
+.atlas-pill,
+.timeline-step-card.active .timeline-summary-copy,
+.action-btn.active,
+.tab-btn.active,
+.step-chip.active,
+.encounter-btn.active,
+.lens-btn.active {
+  color: var(--accent);
+}
+
+.notice-bar,
+.badge,
+.timeline-summary-kicker,
+.atlas-mode-tag,
+.atlas-pill,
+.timeline-step-card.active,
+.action-btn.active,
+.tab-btn.active,
+.step-chip.active,
+.encounter-btn.active,
+.lens-btn.active,
+.atlas-view--participant .atlas-state-strip,
+.atlas-view--encounter .atlas-state-strip,
+.atlas-provenance-strip,
+.timeline-step-card.active .timeline-summary-kicker,
+.timeline:has(.step-chip.active) .timeline-step-card.active .timeline-summary-kicker,
+.timeline:has(.encounter-btn.active) .timeline-step-card.active .timeline-summary-kicker {
+  border-color: rgb(var(--accent-rgb) / 0.42);
+}
+
+.badge,
+.atlas-pill,
+.timeline-summary-kicker,
+.atlas-mode-tag,
+.atlas-view--participant .atlas-mode-tag,
+.atlas-view--encounter .atlas-mode-tag,
+.timeline:has(.step-chip.active) .timeline-step-card.active .timeline-summary-kicker,
+.timeline:has(.encounter-btn.active) .timeline-step-card.active .timeline-summary-kicker,
+.step-chip.active,
+.encounter-btn.active,
+.lens-btn.active,
+.action-btn.active,
+.tab-btn.active {
+  background: rgb(var(--accent-rgb) / 0.1);
+}
+
+.notice-bar {
+  border-color: rgb(var(--accent-rgb) / 0.2);
+  color: var(--accent);
+}
+
+.action-btn.active,
+.tab-btn.active,
+.step-chip.active,
+.encounter-btn.active,
+.lens-btn.active,
+.timeline-step-card.active {
+  box-shadow: var(--glow);
+}
+
+.atlas-shell::before,
+.timeline-step-card.active::after {
+  background: var(--accent-strong);
+  box-shadow: 0 0 0 4px rgb(var(--accent-rgb) / 0.13), 0 0 18px rgb(var(--accent-rgb) / 0.18);
+}
+
+.atlas-shell::after,
+.timeline-step-card.active::before {
+  background: linear-gradient(180deg, rgb(var(--accent-rgb) / 0.2), rgb(var(--accent-rgb) / 0.82), rgb(var(--accent-rgb) / 0.18));
+  box-shadow: 0 0 14px rgb(var(--accent-rgb) / 0.16);
+}
+
+.atlas-shell:has(.atlas-view--overview)::before {
+  box-shadow: 0 0 0 3px rgb(var(--accent-rgb) / 0.08), 0 0 12px rgb(var(--accent-rgb) / 0.14);
+}
+
+.atlas-shell:has(.atlas-view--overview)::after {
+  box-shadow: 0 0 10px rgb(var(--accent-rgb) / 0.08);
+}
+
+.atlas-shell:has(.atlas-view--participant) {
+  box-shadow: var(--shadow), 0 0 0 1px rgb(var(--accent-rgb) / 0.18);
+}
+
+.atlas-shell:has(.atlas-view--participant)::before,
+.timeline:has(.step-chip.active) .timeline-step-card.active::after {
+  box-shadow: 0 0 0 4px rgb(var(--accent-rgb) / 0.16), 0 0 22px rgb(var(--accent-rgb) / 0.24);
+}
+
+.atlas-shell:has(.atlas-view--participant)::after,
+.timeline:has(.step-chip.active) .timeline-step-card.active::before {
+  background: linear-gradient(180deg, rgb(var(--accent-rgb) / 0.18), rgb(var(--accent-rgb) / 0.78), rgb(var(--accent-rgb) / 0.18));
+  box-shadow: 0 0 16px rgb(var(--accent-rgb) / 0.18);
+}
+
+.atlas-shell:has(.atlas-view--encounter) {
+  border-color: rgb(var(--accent-rgb) / 0.28);
+  box-shadow: var(--shadow), 0 0 0 1px rgb(var(--accent-rgb) / 0.24), 0 0 18px rgb(var(--accent-rgb) / 0.1);
+}
+
+.atlas-shell:has(.atlas-view--encounter)::before,
+.timeline:has(.encounter-btn.active) .timeline-step-card.active::after {
+  box-shadow: 0 0 0 5px rgb(var(--accent-rgb) / 0.18), 0 0 28px rgb(var(--accent-rgb) / 0.3);
+}
+
+.atlas-shell:has(.atlas-view--encounter)::after,
+.timeline:has(.encounter-btn.active) .timeline-step-card.active::before {
+  background: linear-gradient(180deg, rgb(var(--accent-rgb) / 0.22), rgb(var(--accent-rgb) / 0.92), rgb(var(--accent-rgb) / 0.22));
+  box-shadow: 0 0 20px rgb(var(--accent-rgb) / 0.22);
+}
+
+.timeline:has(.step-chip.active) .timeline-step-card.active,
+.timeline:has(.encounter-btn.active) .timeline-step-card.active {
+  border-color: rgb(var(--accent-rgb) / 0.56);
+}
+
+.timeline:has(.encounter-btn.active) .timeline-step-card.active {
+  box-shadow: var(--glow), 0 0 0 1px rgb(var(--accent-rgb) / 0.18), 0 0 18px rgb(var(--accent-rgb) / 0.08);
+}
+
+.atlas-provenance-item--ok .atlas-provenance-value {
+  color: var(--l-org);
+}
+
+.atlas-provenance-item--warn .atlas-provenance-value {
+  color: var(--warning);
+}
+
+.atlas-provenance-item--error .atlas-provenance-value {
+  color: var(--danger);
+}
+
+#delete-btn:hover,
+#delete-btn:focus-visible {
+  border-color: rgb(var(--danger-rgb) / 0.4);
+  color: var(--danger);
+}
