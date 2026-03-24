@@ -1,11 +1,33 @@
-const MARKER_POSITIONS = [
-  { top: '18%', left: '18%' },
-  { top: '26%', left: '66%' },
-  { top: '48%', left: '20%' },
-  { top: '58%', left: '66%' },
-  { top: '72%', left: '36%' },
-  { top: '40%', left: '44%' },
-];
+const POSITION_GROUPS = {
+  expression: [
+    { top: '18%', left: '20%' },
+    { top: '28%', left: '68%' },
+    { top: '56%', left: '24%' },
+    { top: '68%', left: '64%' },
+    { top: '44%', left: '46%' },
+  ],
+  relations: [
+    { top: '22%', left: '22%' },
+    { top: '26%', left: '70%' },
+    { top: '52%', left: '18%' },
+    { top: '62%', left: '68%' },
+    { top: '42%', left: '48%' },
+  ],
+  structure: [
+    { top: '18%', left: '28%' },
+    { top: '24%', left: '60%' },
+    { top: '48%', left: '24%' },
+    { top: '60%', left: '58%' },
+    { top: '72%', left: '40%' },
+  ],
+  default: [
+    { top: '20%', left: '20%' },
+    { top: '28%', left: '66%' },
+    { top: '50%', left: '22%' },
+    { top: '62%', left: '66%' },
+    { top: '42%', left: '44%' },
+  ],
+};
 
 function fieldTitleFromView(view) {
   const heading = view.querySelector('.atlas-heading')?.textContent?.trim();
@@ -33,6 +55,24 @@ function markerTextFromSection(section) {
   return label || 'Detail';
 }
 
+function sectionKind(section) {
+  const kicker = section.querySelector('.group-label')?.textContent?.trim().toLowerCase() || '';
+  const heading = section.querySelector('h5')?.textContent?.trim().toLowerCase() || '';
+  const text = `${kicker} ${heading}`;
+  if (text.includes('expression') || section.classList.contains('expression-card')) return 'expression';
+  if (text.includes('relation') || text.includes('route') || text.includes('encounter')) return 'relations';
+  if (text.includes('state') || text.includes('participant')) return 'structure';
+  return 'default';
+}
+
+function groupedTargets(targets) {
+  const groups = { expression: [], relations: [], structure: [], default: [] };
+  targets.forEach((target) => {
+    groups[sectionKind(target)].push(target);
+  });
+  return groups;
+}
+
 function clearTargeted(dockBody) {
   dockBody.querySelectorAll('.is-targeted').forEach((node) => node.classList.remove('is-targeted'));
 }
@@ -45,6 +85,13 @@ function activateMarker(field, dockBody, marker, target) {
   target.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
 
+function placeMarker(marker, kind, localIndex, globalIndex) {
+  const pool = POSITION_GROUPS[kind] || POSITION_GROUPS.default;
+  const pos = pool[localIndex % pool.length] || POSITION_GROUPS.default[globalIndex % POSITION_GROUPS.default.length];
+  marker.style.top = pos.top;
+  marker.style.left = pos.left;
+}
+
 function buildMarkers(field, dockBody, targets) {
   const interactives = document.createElement('div');
   interactives.className = 'atlas-map-interactives';
@@ -54,28 +101,33 @@ function buildMarkers(field, dockBody, targets) {
   focusNode.setAttribute('aria-hidden', 'true');
   interactives.appendChild(focusNode);
 
-  targets.forEach((target, index) => {
-    target.dataset.mapTarget = `atlas-target-${index + 1}`;
+  const groups = groupedTargets(targets);
+  let globalIndex = 0;
 
-    const marker = document.createElement('button');
-    marker.type = 'button';
-    marker.className = 'atlas-map-marker';
-    marker.dataset.target = target.dataset.mapTarget;
-    marker.dataset.axis = axisFromSection(target);
+  ['structure', 'relations', 'expression', 'default'].forEach((kind) => {
+    groups[kind].forEach((target, localIndex) => {
+      globalIndex += 1;
+      target.dataset.mapTarget = `atlas-target-${globalIndex}`;
 
-    const pos = MARKER_POSITIONS[index % MARKER_POSITIONS.length];
-    marker.style.top = pos.top;
-    marker.style.left = pos.left;
+      const marker = document.createElement('button');
+      marker.type = 'button';
+      marker.className = 'atlas-map-marker';
+      marker.dataset.target = target.dataset.mapTarget;
+      marker.dataset.axis = axisFromSection(target);
+      marker.dataset.kind = kind;
 
-    marker.innerHTML = `
-      <span class="atlas-map-label">
-        <span class="atlas-map-index">${index + 1}</span>
-        <span class="atlas-map-text">${markerTextFromSection(target)}</span>
-      </span>
-    `;
+      placeMarker(marker, kind, localIndex, globalIndex - 1);
 
-    marker.addEventListener('click', () => activateMarker(field, dockBody, marker, target));
-    interactives.appendChild(marker);
+      marker.innerHTML = `
+        <span class="atlas-map-label">
+          <span class="atlas-map-index">${globalIndex}</span>
+          <span class="atlas-map-text">${markerTextFromSection(target)}</span>
+        </span>
+      `;
+
+      marker.addEventListener('click', () => activateMarker(field, dockBody, marker, target));
+      interactives.appendChild(marker);
+    });
   });
 
   return interactives;
