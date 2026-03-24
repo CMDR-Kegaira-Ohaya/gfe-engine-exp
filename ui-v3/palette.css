@@ -366,3 +366,64 @@ button:focus-visible {
 .axis-pill-row--identity {
   --axis-color: var(--l-leg);
 }
+
+.primitive-chip {
+  transition: border-color 140ms ease, background 140ms ease, box-shadow 140ms ease, color 140ms ease;
+}
+
+.primitive-family {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--family-color, var(--axis-color, var(--border-strong))) 32%, transparent);
+  background: color-mix(in srgb, var(--family-color, var(--axis-color, var(--accent))) 12%, transparent);
+  color: var(--family-color, var(--axis-color, var(--accent)));
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.primitive-chip[data-family] {
+  border-color: color-mix(in srgb, var(--family-color, var(--axis-color, var(--border-strong))) 26%, var(--border));
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--family-color, var(--axis-color, var(--accent))) 10%, transparent), transparent 44%),
+    rgb(11 21 14 / 0.82);
+}
+
+.primitive-chip[data-family] b {
+  color: var(--family-color, var(--axis-color, var(--accent)));
+}
+
+.primitive-chip[data-family='l'] {
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.03);
+}
+
+.primitive-chip[data-family='m'] {
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.02), 0 0 0 1px color-mix(in srgb, var(--family-color) 16%, transparent);
+}
+
+.primitive-chip[data-family='d'] {
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.015);
+}
+
+.primitive-list[data-axis='cfg'] .primitive-chip[data-family='l'] { --family-color: var(--l-cfg); }
+.primitive-list[data-axis='cfg'] .primitive-chip[data-family='m'] { --family-color: var(--m-cfg); }
+.primitive-list[data-axis='cfg'] .primitive-chip[data-family='d'] { --family-color: var(--d-cfg); }
+
+.primitive-list[data-axis='emb'] .primitive-chip[data-family='l'] { --family-color: var(--l-emb); }
+.primitive-list[data-axis='emb'] .primitive-chip[data-family='m'] { --family-color: var(--m-emb); }
+.primitive-list[data-axis='emb'] .primitive-chip[data-family='d'] { --family-color: var(--d-emb); }
+
+.primitive-list[data-axis='org'] .primitive-chip[data-family='l'] { --family-color: var(--l-org); }
+.primitive-list[data-axis='org'] .primitive-chip[data-family='m'] { --family-color: var(--m-org); }
+.primitive-list[data-axis='org'] .primitive-chip[data-family='d'] { --family-color: var(--d-org); }
+
+.primitive-list[data-axis='dir'] .primitive-chip[data-family='l'] { --family-color: var(--l-dir); }
+.primitive-list[data-axis='dir'] .primitive-chip[data-family='m'] { --family-color: var(--m-dir); }
+.primitive-list[data-axis='dir'] .primitive-chip[data-family='d'] { --family-color: var(--d-dir); }
+
+.primitive-list[data-axis='leg'] .primitive-chip[data-family='l'] { --family-color: var(--l-leg); }
+.primitive-list[data-axis='leg'] .primitive-chip[data-family='m'] { --family-color: var(--m-leg); }
+.primitive-list[data-axis='leg'] .primitive-chip[data-family='d'] { --family-color: var(--d-leg); }
