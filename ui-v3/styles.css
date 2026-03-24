@@ -1056,3 +1056,132 @@ button.ghost {
     grid-template-columns: 1fr;
   }
 }
+
+/* atlas typography grammar refinement */
+.atlas-view {
+  gap: 8px;
+}
+
+.atlas-top-row {
+  align-items: flex-start;
+  gap: 12px;
+  padding-bottom: 2px;
+}
+
+.atlas-top-row > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.atlas-view .context-kicker {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: rgba(141, 179, 157, 0.8);
+}
+
+.atlas-heading {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.08;
+  letter-spacing: 0.01em;
+  color: var(--text);
+}
+
+.atlas-note {
+  max-width: 44ch;
+  font-size: 12px;
+  line-height: 1.55;
+  color: rgba(141, 179, 157, 0.88);
+}
+
+.atlas-state-strip {
+  gap: 8px;
+  padding: 9px 11px;
+}
+
+.atlas-state-heading {
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.atlas-state-context {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: rgba(216, 255, 231, 0.88);
+}
+
+.atlas-mode-tag {
+  padding: 4px 7px;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+}
+
+.atlas-state-pills .atlas-pill {
+  padding: 4px 7px;
+  font-size: 11px;
+  color: rgba(216, 255, 231, 0.82);
+  border-color: rgba(112, 255, 174, 0.14);
+  background: rgba(103, 247, 161, 0.06);
+}
+
+.atlas-provenance-strip {
+  gap: 8px;
+  padding: 9px 11px;
+}
+
+.atlas-provenance-head .group-label,
+.atlas-lens-shell .group-label {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: rgba(141, 179, 157, 0.82);
+}
+
+.atlas-provenance-grid {
+  gap: 7px;
+}
+
+.atlas-provenance-item {
+  gap: 3px;
+  padding: 7px 8px;
+}
+
+.atlas-provenance-label {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(141, 179, 157, 0.8);
+}
+
+.atlas-provenance-value {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.atlas-lens-shell {
+  gap: 8px;
+  padding-top: 2px;
+}
+
+.lens-row {
+  align-items: center;
+  gap: 8px;
+}
+
+.lens-btn-row {
+  gap: 8px;
+}
+
+.lens-btn {
+  padding: 6px 9px;
+  font-size: 11px;
+}
+
+.lens-note {
+  max-width: 46ch;
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgba(141, 179, 157, 0.86);
+}
