@@ -226,3 +226,61 @@ button:focus-visible {
   border-color: rgb(var(--danger-rgb) / 0.4);
   color: var(--danger);
 }
+
+.axis-card[data-axis],
+.event-card[data-axis],
+.expression-row[data-axis] {
+  position: relative;
+}
+
+.axis-card[data-axis]::before,
+.event-card[data-axis]::before,
+.expression-row[data-axis]::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 2px;
+  border-radius: 999px;
+  background: var(--axis-color, rgb(var(--accent-rgb) / 0.28));
+  box-shadow: 0 0 10px color-mix(in srgb, var(--axis-color, var(--accent)) 28%, transparent);
+  opacity: 0.95;
+}
+
+.axis-card[data-axis] .group-label,
+.event-card[data-axis] .event-card-kicker,
+.expression-row[data-axis] .expression-name {
+  color: var(--axis-color, var(--accent));
+}
+
+.axis-pill-row .atlas-pill {
+  border-color: color-mix(in srgb, var(--axis-color, var(--accent)) 34%, transparent);
+  background: color-mix(in srgb, var(--axis-color, var(--accent)) 10%, transparent);
+  color: color-mix(in srgb, var(--axis-color, var(--accent)) 78%, var(--text));
+}
+
+[data-axis='cfg'],
+.axis-pill-row--cfg {
+  --axis-color: var(--l-cfg);
+}
+
+[data-axis='emb'],
+.axis-pill-row--emb {
+  --axis-color: var(--l-emb);
+}
+
+[data-axis='org'],
+.axis-pill-row--org {
+  --axis-color: var(--l-org);
+}
+
+[data-axis='dir'],
+.axis-pill-row--dir {
+  --axis-color: var(--l-dir);
+}
+
+[data-axis='leg'],
+.axis-pill-row--leg {
+  --axis-color: var(--l-leg);
+}

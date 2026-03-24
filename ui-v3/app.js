@@ -78,6 +78,17 @@ function label(value) {
   return value ? String(value).replaceAll('_', ' ') : 'Unknown';
 }
 
+function axisToken(value) {
+  const raw = String(value ?? '').trim().toLowerCase();
+  if (!raw) return 'unknown';
+  if (raw === 'cfg') return 'cfg';
+  if (raw === 'emb') return 'emb';
+  if (raw === 'org') return 'org';
+  if (raw === 'dir') return 'dir';
+  if (raw === 'leg') return 'leg';
+  return raw.replaceAll(/[^a-z0-9_-]/g, '-') || 'unknown';
+}
+
 function pluralize(count, singular, plural = `${singular}s`) {
   return `${count} ${count === 1 ? singular : plural}`;
 }
@@ -747,7 +758,7 @@ function renderAxisCards(axes = {}) {
   if (!entries.length) return '<div class="inline-empty">No axis data is available here yet.</div>';
 
   return `<div class="atlas-axis-grid">
-    ${entries.map(([name, axis]) => `<section class="axis-card">
+    ${entries.map(([name, axis]) => `<section class="axis-card" data-axis="${esc(axisToken(name))}">
       <div class="axis-card-top">
         <div class="group-label">State</div>
         <h4>${esc(label(name))}</h4>
@@ -768,16 +779,18 @@ function renderEventCards(events, emptyMessage = 'No relation events are encoded
     ${events.map((event) => {
       const primitiveCount = Array.isArray(event.payload_bundle) ? event.payload_bundle.length : 0;
       const route = `${label(event.sourceParticipantId || event.alpha_source || '—')} → ${label(event.receivingParticipantId || event.alpha_receiving || '—')}`;
-      return `<section class="event-card">
+      const axis = event.axis || 'axis';
+      const axisKey = axisToken(axis);
+      return `<section class="event-card" data-axis="${esc(axisKey)}">
         <div class="event-card-kicker">Route</div>
         <div class="event-card-title">${esc(encounterLabel(event))}</div>
         <div class="event-card-route">${esc(route)}</div>
         ${pillRow([
-          `${label(event.axis || 'axis')} axis`,
+          `${label(axis)} axis`,
           event.face ? `Face ${label(event.face)}` : null,
           (event.mediumParticipantId || event.alpha_medium) ? `Medium ${label(event.mediumParticipantId || event.alpha_medium)}` : null,
           pluralize(primitiveCount, 'primitive'),
-        ].filter(Boolean), 'compact')}
+        ].filter(Boolean), `compact axis-pill-row axis-pill-row--${esc(axisKey)}`)}
       </section>`;
     }).join('')}
   </div>`;
@@ -793,7 +806,7 @@ function renderExpressionParticipantCard(participantId, participantData) {
       </div>
       <span class="badge">State</span>
     </div>
-    ${axisEntries.length ? `<div class="expression-grid">${axisEntries.map(([axisName, axisData]) => `<div class="expression-row"><div class="expression-name">${esc(label(axisName))}</div>${pillRow([`A:${axisData.A ?? '—'}`, `R:${axisData.R ?? '—'}`, `I:${axisData.I ?? '—'}`], 'compact')}</div>`).join('')}</div>` : '<div class="inline-empty">No axis state is available for this participant yet.</div>'}
+    ${axisEntries.length ? `<div class="expression-grid">${axisEntries.map(([axisName, axisData]) => `<div class="expression-row" data-axis="${esc(axisToken(axisName))}"><div class="expression-name">${esc(label(axisName))}</div>${pillRow([`A:${axisData.A ?? '—'}`, `R:${axisData.R ?? '—'}`, `I:${axisData.I ?? '—'}`], 'compact')}</div>`).join('')}</div>` : '<div class="inline-empty">No axis state is available for this participant yet.</div>'}
   </section>`;
 }
 
@@ -970,11 +983,11 @@ function renderExpressionOverview(stepIndex, step) {
       pluralize(events.length, 'encounter expression'),
     ])}
     ${participants.length ? participants.map(([participantId, participantData]) => renderExpressionParticipantCard(participantId, participantData)).join('') : '<div class="inline-empty">No participant expression state is available for this step yet.</div>'}
-    ${events.length ? `<section class="atlas-section"><div class="group-label">Encounter expression</div><h5>Current encounter surfaces</h5><div class="event-card-stack">${events.map((event) => `<section class="event-card"><div class="event-card-kicker">Expression</div><div class="event-card-title">${esc(encounterLabel(event))}</div>${pillRow([
+    ${events.length ? `<section class="atlas-section"><div class="group-label">Encounter expression</div><h5>Current encounter surfaces</h5><div class="event-card-stack">${events.map((event) => `<section class="event-card" data-axis="${esc(axisToken(event.axis || 'axis'))}"><div class="event-card-kicker">Expression</div><div class="event-card-title">${esc(encounterLabel(event))}</div>${pillRow([
       event.face ? `Face ${label(event.face)}` : null,
       event.interference ? `Interference ${event.interference}` : null,
       pluralize(Array.isArray(event.payload_bundle) ? event.payload_bundle.length : 0, 'primitive'),
-    ].filter(Boolean), 'compact')}</section>`).join('')}</div></section>` : ''}
+    ].filter(Boolean), `compact axis-pill-row axis-pill-row--${esc(axisToken(event.axis || 'axis'))}`)}</section>`).join('')}</div></section>` : ''}
   </div>`;
 }
 
@@ -986,11 +999,11 @@ function renderExpressionParticipant(stepIndex, participantId, participantData) 
     <section class="atlas-section">
       <div class="group-label">Expression links</div>
       <h5>Current linked encounters</h5>
-      ${events.length ? `<div class="event-card-stack">${events.map((event) => `<section class="event-card"><div class="event-card-kicker">Expression</div><div class="event-card-title">${esc(encounterLabel(event))}</div>${pillRow([
+      ${events.length ? `<div class="event-card-stack">${events.map((event) => `<section class="event-card" data-axis="${esc(axisToken(event.axis || 'axis'))}"><div class="event-card-kicker">Expression</div><div class="event-card-title">${esc(encounterLabel(event))}</div>${pillRow([
         event.face ? `Face ${label(event.face)}` : null,
         event.interference ? `Interference ${event.interference}` : null,
         pluralize(Array.isArray(event.payload_bundle) ? event.payload_bundle.length : 0, 'primitive'),
-      ].filter(Boolean), 'compact')}</section>`).join('')}</div>` : '<div class="inline-empty">No expression-linked encounters include this participant in the selected step yet.</div>'}
+      ].filter(Boolean), `compact axis-pill-row axis-pill-row--${esc(axisToken(event.axis || 'axis'))}`)}</section>`).join('')}</div>` : '<div class="inline-empty">No expression-linked encounters include this participant in the selected step yet.</div>'}
     </section>
   </div>`;
 }
