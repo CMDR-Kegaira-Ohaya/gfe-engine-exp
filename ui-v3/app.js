@@ -1,4 +1,3 @@
-
 import { validateCase, solveCase, groupEventsByStep } from '../solver/index.js';
 
 const state = {
@@ -178,7 +177,7 @@ async function fetchText(path) {
 }
 
 async function loadCatalog() {
-  setNotice('Loading canonical catalog…');
+  setNotice('Loading canonical catalog…");
 
   try {
     const catalogData = await fetchJson('./catalog/index.json');
@@ -216,13 +215,13 @@ async function loadCase(slug, { resetTab = true } = {}) {
     return;
   }
 
-  setNotice(`Loading “${entry.title}”…`);
+  setNotice(`Loading “${entry.title}”…');
   renderAll();
 
   try {
     const [caseMarkdown, encoding, readingMarkdown] = await Promise.all([
-      entry.paths.case ? fetchText(.${entry.paths.case}) : Promise.resolve(''),
-      entry.paths.encoding ? fetchJson(.${entry.paths.encoding}) : Promise.resolve(null),
+      entry.paths.case ? fetchText(`.${entry.paths.case}`) : Promise.resolve(''),
+      entry.paths.encoding ? fetchJson(`.${entry.paths.encoding}`) : Promise.resolve(null),
       entry.paths.reading ? fetchText(`.${entry.paths.reading}`) : Promise.resolve(''),
     ]);
 
@@ -279,7 +278,7 @@ function renderCatalogList() {
   return state.catalog
     .map((entry) => {
       const active = entry.slug === state.activeSlug ? ' active' : '';
-      return `<bstton class="catalog-item${active}" data-slug="${escapeHtml(entry.slug)}">
+      return `<bsutton class="catalog-item${active}" data-slug="${escapeHtml(entry.slug)}">
         <div class="catalog-title">${escapeHtml(entry.title)}</div>
         <div class="catalog-meta">${entry.timesteps} steps · ${entry.participants} participants</div>
         <div class="catalog-synopsis">${escapeHtml(entry.synopsis || 'No preview yet.')}</div>
@@ -354,7 +353,9 @@ function renderHeader() {
   }
 
   const step = getStep();
-  const stepLabel = step?.timestep_label ? `Selected moment: ${step.timestep_label}` : null;
+  const stepLabel = step?.timestep_label
+    ? `Selected moment: ${prettyLabel(step.timestep_label)}`
+    : null;
 
   els.currentSlug.textContent = entry.slug;
   els.currentTitle.textContent = entry.title;
@@ -411,7 +412,9 @@ function renderContextBanner() {
 
   if (!entry || !step) return '';
 
-  const contextLines = [`Selected moment: ${prettyLabel(step.timestep_label || `Step ${state.activeStep + 1}`))}];
+  const contextLines = [
+    `Selected moment: ${prettyLabel(step.timestep_label || `Step ${state.activeStep + 1}`)}`,
+  ];
 
   if (state.participantFocus) {
     contextLines.push(`Participant focus: ${prettyLabel(state.participantFocus)}`);
@@ -423,7 +426,7 @@ function renderContextBanner() {
   }
 
   return `<section class="context-banner">
-    <div class="context.kicker">Reader context</div>
+    <div class="context-kicker">Reader context</div>
     <div class="context-copy">${escapeHtml(contextLines.join(' · '))}</div>
   </section>`;
 }
@@ -526,7 +529,7 @@ function renderEncounterButtons(stepIndex, events) {
         const faceText = event.face ? ` · ${prettyLabel(event.face)}` : '';
         const subtitle = `${prettyLabel(event.axis || 'axis')} axis${faceText} · ${pluralize(primitiveCount, 'primitive')}`;
 
-        return `<bstton
+        return `<button
           class="encounter-btn${isActive ? ' active' : ''}"
           data-encounter-focus="${encounterIndex}"
           data-step-index="${stepIndex}"
@@ -599,7 +602,7 @@ function renderAxisCards(axes = {}) {
 
   return `<div class="atlas-axis-grid">
     ${entries
-      .map((name, axisData]) => `<section class="axis-card">
+      .map(([name, axisData]) => `<section class="axis-card">
         <h4>${escapeHtml(prettyLabel(name))}</h4>
         <dl class="axis-values">
           <div><dt>A</dt><dd>${escapeHtml(axisData.A ?? '—')}</dd></div>
@@ -623,14 +626,14 @@ function renderAtlasOverview(step) {
   return `<div class="atlas-overview">
     <div class="focus-row">
       <div>
-        <div class="context.kicker">Relation Atlas</div>
+        <div class="context-kicker">Relation Atlas</div>
         <h4 class="atlas-heading">${escapeHtml(prettyLabel(step.timestep_label || `Step ${state.activeStep + 1}`))}</h4>
       </div>
     </div>
     <p class="atlas-note">Step overview is active. Click an actor or action in the timeline to focus this atlas.</p>
     <div class="atlas-section-stack">
       ${participants
-        .map((participantId, participantData]) => `<section class="atlas-section">
+        .map([ participantId, participantData ] => `<section class="atlas-section">
           <h5>${escapeHtml(prettyLabel(participantId))}</h5>
           ${renderAxisCards(participantData.axes || {})}
         </section>`)
@@ -684,18 +687,18 @@ function renderEncounterFocus(event) {
     </dl>
     <section class="atlas-section">
       <h5>Payload bundle</h5>
-      ${ primitives.length
-          ? `<div class="primitive-list">
-              ${primitives
-                .map((primitive, index) => `<div class="primitive-chip">
-                  <b>${index + 1}.</b>
-                  <span>${escapeHtml(prettyLabel(primitive.sigma || 'L'))}</span>
-                  <span>${escapeHtml(prettyLabel(primitive.mode || primitive.mu || 'load'))}</span>
-                  <span>${escapeHtml(prettyLabel(primitive.register || 'retained'))}</span>
-                </div>`)
-                .join('')}
-            </div>`
-          : '<div class="inline-empty">No payload bundle detail is attached to this encounter.</div>'
+      ${primitives.length
+        ? `<div class="primitive-list">
+            ${primitives
+              .map((primitive, index) => `<div class="primitive-chip">
+                <b>${index + 1}.</b>
+                <span>${escapeHtml(prettyLabel(primitive.sigma || 'L'))}</span>
+                <span>${escapeHtml(prettyLabel(primitive.mode || primitive.mu || 'load'))}</span>
+                <span>${escapeHtml(prettyLabel(primitive.register || 'retained'))}</span>
+              </div>`)
+              .join('')}
+          </div>`
+        : '<div class="inline-empty">No payload bundle detail is attached to this encounter.</div>'
       }
     </section>
   </div>`;
