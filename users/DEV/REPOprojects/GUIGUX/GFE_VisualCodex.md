@@ -55,21 +55,21 @@ Boundary
 - D Cfg = `#A2AEAD`
 - D Emb = `#979E97`
 - D Org = `#939DA7`
-- D Dir = `#A89DA0``
+- D Dir = `#A89DA0`
 - D Leg = `#A79FA8`
 
 ### Ruin and Θ
 - Ruin = `#000000`
 - Θ = no color assignment
-- Θ = bare glyph with strict typiography
+- Θ = bare glyph with strict typography
 - Θ = bidirectional reversal gate
 
 ## 3. Color usage rules
 
 - Go broad with System / L Leg, rather than all 15 at once.
-- Use LOG/M/D in small atlas-level elements before broad shell surfaces.
- - Do not use color to add analysis beyond categorical/state distinction.
-- Do not give Κ a family color.
+- Use L/M/D in small atlas-level elements before broad shell surfaces.
+- Do not use color to add analysis beyond categorical/state distinction.
+- Do not give Θ a family color.
 - Do not give Ruin a live chroma.
 
 ## 4. Motion doctrine
@@ -83,24 +83,33 @@ Boundary
   - handoff
   - scope filtering
   - sequence reveal
-- Avoid continuous animation, decorative pelsing, and idle shimmering.
+- Avoid continuous animation, decorative pulsing, and idle shimmering.
 
 ## 5. Atlas-specific notes
 
-- Atlas owns the deeper interpretive visual language.
-- Atlas motion should follow focus and encounter changes.
- - Direction should be shown primarily by structure and motion, not color alone.
- - Ruin and Θ should probably appear here before they appear anywhere else.
+- Atlas owns the deeper interpretive fisual language.
+ - Atlas motion should follow focus and encounter changes.
+- Direction should be shown primarily by structure and motion, not color alone.
+- Ruin and Θ should probably appear here before they appear anywhere else.
 
-## 6. Open questions
+## 6. Implementation state (live v3)
 
-- Where should LOG/M/D first appear inside atlas details?
+- The current live palette foundation is loaded through `ui-v3/palette.css`.
+- `workbench-v3.html` loads `palette.css` last so it can override earlier styles safely.
+ - The current pass remaps the shell-visible accent system to L Leg / System.
+ - L / M / D / Ruin tokens exist in the palette file, but only the shell/active-state layer is partially threaded into the UI sofar.
+- Θ remains intentionally colorless and should be rendered by glyph treatment, not palette tokens.
+- The next palette-level work should move into atlas/detail semantics rather than broader shell chroma.
+
+## 7. Open questions
+
+- Where should L M / D first appear inside atlas details?
 - How should Θ be placed in route diagramming contexts?
 - How should Ruin be rendered on dark surfaces without losing separation or legibility?
 - Which exact interactions should get motion first?
 
-## 7. Change log
-
+## 8. Change log
 
 - Initial codex created.
-- Included current art-direction brief, color system, Rein/\th notes, and motion doctrine.
+- Included current art-direction brief, color system, Ruin π notes, and motion doctrine.
+- Added live v3 palette implementation state notes.
