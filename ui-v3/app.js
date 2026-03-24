@@ -806,7 +806,7 @@ function renderExpressionParticipantCard(participantId, participantData) {
       </div>
       <span class="badge">State</span>
     </div>
-    ${axisEntries.length ? `<div class="expression-grid">${axisEntries.map(([axisName, axisData]) => `<div class="expression-row" data-axis="${esc(axisToken(axisName))}"><div class="expression-name">${esc(label(axisName))}</div>${pillRow([`A:${axisData.A ?? '—'}`, `R:${axisData.R ?? '—'}`, `I:${axisData.I ?? '—'}`], 'compact')}</div>`).join('')}</div>` : '<div class="inline-empty">No axis state is available for this participant yet.</div>'}
+    ${axisEntries.length ? `<div class="expression-grid">${axisEntries.map(([axisName, axisData]) => `<div class="expression-row" data-axis="${esc(axisToken(axisName))}"><div class="expression-name">${esc(label(axisName))}</div>${pillRow([`A:${axisData.A ?? '—'}`, `R:${axisData.R ?? '—'}`, `I:${axisData.I ?? '—'}`], `compact axis-pill-row axis-pill-row--${esc(axisToken(axisName))}`)}</div>`).join('')}</div>` : '<div class="inline-empty">No axis state is available for this participant yet.</div>'}
   </section>`;
 }
 
@@ -898,7 +898,7 @@ function renderStructureOverview(step) {
           `A:${participantData.axes?.identity?.A ?? '—'}`,
           `R:${participantData.axes?.identity?.R ?? '—'}`,
           `I:${participantData.axes?.identity?.I ?? '—'}`,
-        ], 'compact')}
+        ], `compact axis-pill-row axis-pill-row--identity`)}
       </div>
       ${renderAxisCards(participantData.axes || {})}
     </section>`).join('')}
@@ -921,14 +921,15 @@ function renderStructureParticipant(stepIndex, participantId, participantData) {
 }
 
 function renderStructureEncounter(event) {
+  const axisKey = axisToken(event.axis || 'axis');
   return `<div class="atlas-section-stack">
     ${pillRow([
       `Source ${label(event.sourceParticipantId || event.alpha_source || '—')}`,
       `Receiving ${label(event.receivingParticipantId || event.alpha_receiving || '—')}`,
       `Medium ${label(event.mediumParticipantId || event.alpha_medium || '—')}`,
       `${label(event.axis || 'axis')} axis`,
-    ])}
-    <dl class="encounter-detail-list">
+    ], `axis-pill-row axis-pill-row--${esc(axisKey)}`)}
+    <dl class="encounter-detail-list" data-axis="${esc(axisKey)}">
       <div><dt>Source</dt><dd>${esc(label(event.sourceParticipantId || event.alpha_source || '—'))}</dd></div>
       <div><dt>Receiving</dt><dd>${esc(label(event.receivingParticipantId || event.alpha_receiving || '—'))}</dd></div>
       <div><dt>Medium</dt><dd>${esc(label(event.mediumParticipantId || event.alpha_medium || '—'))}</dd></div>
@@ -968,7 +969,7 @@ function renderRelationsEncounter(event) {
       `Route ${label(event.sourceParticipantId || event.alpha_source || '—')} → ${label(event.receivingParticipantId || event.alpha_receiving || '—')}`,
       (event.mediumParticipantId || event.alpha_medium) ? `Medium ${label(event.mediumParticipantId || event.alpha_medium)}` : 'No medium',
       `${label(event.axis || 'axis')} axis`,
-    ])}
+    ], `axis-pill-row axis-pill-row--${esc(axisToken(event.axis || 'axis'))}`)}
     ${renderEventCards([event])}
   </div>`;
 }
@@ -1010,22 +1011,23 @@ function renderExpressionParticipant(stepIndex, participantId, participantData) 
 
 function renderExpressionEncounter(event) {
   const primitives = Array.isArray(event.payload_bundle) ? event.payload_bundle : [];
+  const axisKey = axisToken(event.axis || 'axis');
 
   return `<div class="atlas-section-stack">
     ${pillRow([
       event.face ? `Face ${label(event.face)}` : 'Face —',
       event.interference ? `Interference ${event.interference}` : 'Interference —',
       pluralize(primitives.length, 'primitive'),
-    ])}
-    <dl class="encounter-detail-list">
+    ], `axis-pill-row axis-pill-row--${esc(axisKey)}`)}
+    <dl class="encounter-detail-list" data-axis="${esc(axisKey)}">
       <div><dt>Face</dt><dd>${esc(label(event.face || '—'))}</dd></div>
       <div><dt>Interference</dt><dd>${esc(event.interference || '—')}</dd></div>
       <div><dt>Axis</dt><dd>${esc(label(event.axis || '—'))}</dd></div>
     </dl>
-    <section class="atlas-section">
+    <section class="atlas-section" data-axis="${esc(axisKey)}">
       <div class="group-label">Payload bundle</div>
       <h5>Current primitives</h5>
-      ${primitives.length ? `<div class="primitive-list">${primitives.map((primitive, index) => `<div class="primitive-chip"><b>${index + 1}.</b><span>${esc(label(primitive.sigma || 'L'))}</span><span>${esc(label(primitive.mode || primitive.mu || 'load'))}</span><span>${esc(label(primitive.register || 'retained'))}</span></div>`).join('')}</div>` : '<div class="inline-empty">No payload bundle detail is attached to this encounter.</div>'}
+      ${primitives.length ? `<div class="primitive-list" data-axis="${esc(axisKey)}">${primitives.map((primitive, index) => `<div class="primitive-chip"><b>${index + 1}.</b><span>${esc(label(primitive.sigma || 'L'))}</span><span>${esc(label(primitive.mode || primitive.mu || 'load'))}</span><span>${esc(label(primitive.register || 'retained'))}</span></div>`).join('')}</div>` : '<div class="inline-empty">No payload bundle detail is attached to this encounter.</div>'}
     </section>
   </div>`;
 }
