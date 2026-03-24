@@ -8,6 +8,7 @@
   --text: #d8ffe7;
   --muted: #8db39d;
   --border: rgba(112, 255, 174, 0.18);
+  --border-strong: rgba(103, 247, 161, 0.34);
   --accent: #67f7a1;
   --accent-strong: #3cff8f;
   --shadow: 0 18px 50px rgba(0, 0, 0, 0.42);
@@ -70,6 +71,11 @@ button.ghost {
   background: transparent;
 }
 
+.subtle-btn {
+  padding: 7px 10px;
+  border-radius: 999px;
+}
+
 .app-shell {
   min-height: 100vh;
   display: flex;
@@ -106,7 +112,8 @@ button.ghost {
 .eyebrow,
 .context-kicker,
 .group-label,
-.step-detail-label {
+.step-detail-label,
+.event-card-kicker {
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -125,7 +132,8 @@ button.ghost {
 .section-heading-row,
 .atlas-pill-row,
 .focus-strip-shell,
-.focus-strip-meta {
+.focus-strip-meta,
+.atlas-state-heading {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -323,8 +331,11 @@ button.ghost {
 .context-copy,
 .lens-note,
 .expression-name,
-.focus-strip-note {
-  font-size: 14px;
+.focus-strip-note,
+.event-card-route,
+.axis-values,
+.encounter-detail-list {
+  font-size: 13px;
   color: var(--muted);
 }
 
@@ -537,7 +548,12 @@ button.ghost {
 
 .timeline-label,
 .encounter-title,
-.event-card-title {
+.event-card-title,
+.axis-card h4,
+.section-heading-row h5,
+.atlas-section h5,
+.focus-strip-title,
+.atlas-state-context {
   font-weight: 700;
 }
 
@@ -581,10 +597,11 @@ button.ghost {
 .primitive-list,
 .axis-values,
 .encounter-detail-list,
-.atlas-overview,
-.atlas-focus,
 .atlas-view,
-.atlas-lens-shell {
+.atlas-lens-shell,
+.axis-card-top,
+.atlas-state-strip,
+.focus-strip-copy {
   display: grid;
   gap: 10px;
 }
@@ -594,7 +611,7 @@ button.ghost {
   width: 100%;
   text-align: left;
   background: rgba(8, 17, 11, 0.8);
-  padding: 12px 14px;
+  padding: 11px 13px;
   border-radius: 12px;
 }
 
@@ -608,19 +625,16 @@ button.ghost {
   border-radius: 999px;
 }
 
-.lens-row {
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.lens-note {
-  margin: 0;
-  line-height: 1.45;
-}
-
+.lens-row,
 .atlas-top-row {
   justify-content: space-between;
   align-items: flex-start;
+}
+
+.lens-note,
+.atlas-note {
+  margin: 0;
+  line-height: 1.45;
 }
 
 .atlas-heading {
@@ -628,14 +642,51 @@ button.ghost {
   font-size: 18px;
 }
 
-.section-heading-row {
+.atlas-state-strip {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(8, 17, 11, 0.66);
+  box-shadow: inset 0 1px 0 rgba(216, 255, 231, 0.02);
+}
+
+.atlas-view--participant .atlas-state-strip,
+.atlas-view--encounter .atlas-state-strip {
+  border-color: var(--border-strong);
+}
+
+.atlas-mode-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  background: rgba(103, 247, 161, 0.08);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.atlas-state-heading {
   justify-content: space-between;
   align-items: center;
 }
 
+.atlas-state-pills {
+  justify-content: flex-start;
+}
+
+.section-heading-row {
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
 .section-heading-row h5,
-.atlas-section h5 {
-  margin: 0;
+.atlas-section h5,
+.axis-card h4 {
+  margin: 2px 0 0;
   font-size: 14px;
 }
 
@@ -662,36 +713,39 @@ button.ghost {
 .event-card,
 .expression-card,
 .axis-card {
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: rgba(11, 21, 14, 0.88);
-  padding: 12px;
+  border: 1px solid rgba(112, 255, 174, 0.12);
+  border-radius: 10px;
+  background: rgba(11, 21, 14, 0.82);
+  padding: 10px;
 }
 
 .event-card {
   display: grid;
-  gap: 8px;
+  gap: 7px;
+}
+
+.event-card-route {
+  margin-top: -2px;
 }
 
 .expression-row {
   display: grid;
-  gap: 8px;
+  gap: 7px;
 }
 
 .atlas-section {
-  border-top: 1px solid var(--border);
-  padding-top: 14px;
+  border-top: 1px solid rgba(112, 255, 174, 0.12);
+  padding-top: 10px;
 }
 
 .atlas-axis-grid {
   display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
 }
 
-.axis-card h4 {
-  margin: 0 0 10px;
-  font-size: 14px;
+.axis-card-top {
+  gap: 4px;
 }
 
 .primitive-chip {
@@ -699,10 +753,10 @@ button.ghost {
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: rgba(11, 21, 14, 0.88);
+  padding: 8px 10px;
+  border: 1px solid rgba(112, 255, 174, 0.12);
+  border-radius: 9px;
+  background: rgba(11, 21, 14, 0.82);
 }
 
 .empty {
@@ -731,7 +785,8 @@ button.ghost {
   }
 
   .lens-row,
-  .focus-strip-shell {
+  .focus-strip-shell,
+  .atlas-state-heading {
     align-items: stretch;
   }
 }
