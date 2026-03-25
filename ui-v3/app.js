@@ -1,6 +1,5 @@
 import { validateCase, solveCase, groupEventsByStep } from '../solver/index.js';
 import { renderAtlas as renderAtlasModule, renderTimeline as renderTimelineModule } from './atlas-renderer.js';
-import { enhanceAtlasMap } from './atlas-map-enhancer.js';
 
 const LENSES = [
   {
@@ -677,9 +676,7 @@ function renderTimeline() {
 }
 
 function renderAtlas() {
-  const result = renderAtlasModule(atlasRendererContext());
-  enhanceAtlasMap(els.atlas);
-  return result;
+  return renderAtlasModule(atlasRendererContext());
 }
 
 function renderActionsPanel() {
