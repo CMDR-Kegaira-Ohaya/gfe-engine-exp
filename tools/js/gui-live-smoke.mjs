@@ -45,6 +45,49 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function applyGlobalBinding(previous, key, value) {
+  const descriptor = Object.getOwnPropertyDescriptor(globalThis, key);
+  previous.set(key, {
+    descriptor,
+    value: globalThis[key],
+    applied: false,
+  });
+
+  if (!descriptor || descriptor.configurable) {
+    Object.defineProperty(globalThis, key, {
+      configurable: true,
+      enumerable: descriptor?.enumerable ?? true,
+      writable: true,
+      value,
+    });
+    previous.get(key).applied = true;
+    return;
+  }
+
+  if ((Object.prototype.hasOwnProperty.call(descriptor, 'writable') && descriptor.writable) || descriptor.set) {
+    globalThis[key] = value;
+    previous.get(key).applied = true;
+  }
+}
+
+function restoreGlobalBinding(key, snapshot) {
+  if (!snapshot?.applied) return;
+
+  if (!snapshot.descriptor) {
+    delete globalThis[key];
+    return;
+  }
+
+  if (snapshot.descriptor.configurable) {
+    Object.defineProperty(globalThis, key, snapshot.descriptor);
+    return;
+  }
+
+  if ((Object.prototype.hasOwnProperty.call(snapshot.descriptor, 'writable') && snapshot.descriptor.writable) || snapshot.descriptor.set) {
+    globalThis[key] = snapshot.value;
+  }
+}
+
 function installDomGlobals(window, fetchImpl) {
   const previous = new Map();
   const bindings = {
@@ -68,16 +111,10 @@ function installDomGlobals(window, fetchImpl) {
     self: window,
   };
 
-  Object.entries(bindings).forEach(([key, value]) => {
-    previous.set(key, globalThis[key]);
-    globalThis[key] = value;
-  });
+  Object.entries(bindings).forEach(([key, value]) => applyGlobalBinding(previous, key, value));
 
   return () => {
-    for (const [key, value] of previous.entries()) {
-      if (typeof value === 'undefined') delete globalThis[key];
-      else globalThis[key] = value;
-    }
+    for (const [key, snapshot] of previous.entries()) restoreGlobalBinding(key, snapshot);
   };
 }
 
