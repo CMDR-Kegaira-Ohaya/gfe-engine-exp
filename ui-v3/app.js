@@ -648,6 +648,7 @@ function atlasRendererContext() {
     label,
     axisToken,
     pluralize,
+    LENSES,
     lensMeta,
     getEntry,
     getSourceMeta,

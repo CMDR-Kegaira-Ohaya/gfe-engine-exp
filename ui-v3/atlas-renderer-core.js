@@ -6,6 +6,7 @@ function buildAtlasRenderer(ctx) {
     label,
     axisToken,
     pluralize,
+    LENSES,
     lensMeta,
     getEntry,
     getSourceMeta,
@@ -119,7 +120,7 @@ function renderTimelineStepCard(step, stepIndex) {
       <div class="timeline-step-header">
         <div>
           <div class="timeline-label">${esc(step.timestep_label || `Step ${stepIndex + 1}`)}</div>
-          <div class="timeline-sub">${esc(`${pluralize(Object.keys(step.participants || {}).length, 'actor')} · ${pluralize(events.length, 'action')}`)</div>
+          <div class="timeline-sub">${esc(`${pluralize(Object.keys(step.participants || {}).length, 'actor')} · ${pluralize(events.length, 'action')}`)}</div>
           <div class="timeline-summary-row">
             <span class="timeline-summary-kicker">${esc(summary.kicker)}</span>
             <span class="timeline-summary-copy">${esc(summary.text)}</span>
@@ -168,7 +169,7 @@ function renderAxisCards(axes = {}) {
       </div>
       <dl class="axis-values">
         <div><dt>A</dt><dd>${esc(axis.A ?? '—')}</dd></div>
-        <div><dt>R</dt><dd>${esc(axis.R ?? '—'}</dd></div>
+        <div><dt>R</dt><dd>${esc(axis.R ?? '—')}</dd></div>
         <div><dt>I</dt><dd>${esc(axis.I ?? '—')}</dd></div>
       </dl>
     </section>`).join('')}
@@ -342,7 +343,7 @@ function renderStructureEncounter(event) {
         <div><dt>Medium</dt><dd>${esc(label(event.mediumParticipantId || event.alpha_medium || '—'))}</dd></div>
         <div><dt>Axis</dt><dd>${esc(label(event.axis || '—'))}</dd></div>
       </dl>`,
-      { axis: axisKey, pillClass: `axis-pill-row axis-pill-row--${esc(exisKey)}` },
+      { axis: axisKey, pillClass: `axis-pill-row axis-pill-row--${esc(axisKey)}` },
     )}
   </div>`;
 }
