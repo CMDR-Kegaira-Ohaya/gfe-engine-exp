@@ -34,8 +34,7 @@ npm run gui:slice -- ui-v3/app.js renderAtlas
 npm run gui:entry-audit -- workbench-v3.html
 npm run gui:copy-scan -- workbench-v3.html ui-v3
 npm run gui:cut-check -- workbench-v3.html
-npm run gui:symbol-move -- enhanceAtlasMap ui-v3/atlas-map-enhancer.js ui-v3/atlas-renderer.js ui-v3
-npm run gui:rewrite -- remove-import-symbol ui-v3/app.js ./atlas-map-enhancer.js enhanceAtlasMap
+npm run gui:symbol-move -- renderAtlas ui-v3/atlas-renderer.js ui-v3/atlas-renderer-core.js ui-v3
 npm run gui:rewrite -- remove-call ui-v3/app.js enhanceAtlasMap
 npm run gui:live-smoke -- workbench-v3.html
 npm run gui:repo-diff -- --base-ref HEAD~1 --head-ref HEAD
@@ -58,7 +57,7 @@ npm run gui:validate-chain -- --base-ref HEAD~1 --head-ref HEAD --copy-scan
 - `gui:slice` prints one symbol slice: declaration, code body, direct callees, direct callers, imports, and exports.
 - `gui:entry-audit` starts from the canonical `workbench-v3.html` entrypoint and reports CSS, JS module entrypoints, module graph edges, and duplicate ownership warnings.
 - `gui:copy-scan` clusters user-visible strings across `workbench-v3.html` and `ui-v3/**` so wording drift and duplicates are visible.
-- `gui:cut-check` smoke-checks the Workbench v3 cut for missing imports, missing local stylesheets, and leftover enhancer ownership outside the renderer path.
+- `gui:cut-check` smoke-checks the Workbench v3 cut for missing imports, missing local stylesheets, and leftover renderer ownership duplication.
 - `gui:symbol-move` inspects a symbol across source, target, and nearby GUI files and emits a move checklist with suggested import paths.
 - `gui:rewrite` performs narrow file rewrites for import retargeting, import-symbol removal, and standalone call removal.
 - `gui:live-smoke` loads the canonical Workbench v3 HTML in a local DOM harness, imports the module entrypoint, stubs local file fetches, and reports runtime errors, missing DOM targets, and whether atlas/timeline actually render.
@@ -80,6 +79,7 @@ npm run gui:validate-chain -- --base-ref HEAD~1 --head-ref HEAD --copy-scan
 - The canonical live GUI entry is `workbench-v3.html`.
 - Root `index.html` now redirects to `./workbench-v3.html`.
 - `ui-v3/**`, `tools/js/gui-*`, and the `gui-*` workflows are the canonical live GUI support surface.
+- The atlas map enhancer file has been removed; atlas shell creation and interaction wiring now live in `ui-v3/atlas-renderer.js`.
 - These tools assume ECMAScript modules and parse with `sourceType: "module"`.
 - They are for structural inspection and migration aid, not canonical doctrine.
 - They do not yet cover JSX or TypeScript.

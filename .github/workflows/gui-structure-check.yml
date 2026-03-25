@@ -35,7 +35,6 @@ jobs:
           npm run js:check -- ui-v3/app.js
           npm run js:check -- ui-v3/atlas-renderer.js
           npm run js:check -- ui-v3/atlas-renderer-core.js
-          npm run js:check -- ui-v3/atlas-map-enhancer.js
 
       - name: Audit Workbench v3 entry path
         run: npm run gui:entry-audit -- workbench-v3.html > gui-entry-audit.json
