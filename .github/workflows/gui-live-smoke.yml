@@ -1,0 +1,51 @@
+name: gui-live-smoke
+
+on:
+  push:
+    paths:
+      - 'workbench-v3.html'
+      - 'ui-v3/**'
+      - 'tools/js/**'
+      - 'package.json'
+      - '.github/workflows/gui-live-smoke.yml'
+  pull_request:
+    paths:
+      - 'workbench-v3.html'
+      - 'ui-v3/**'
+      - 'tools/js/**'
+      - 'package.json'
+      - '.github/workflows/gui-live-smoke.yml'
+  workflow_dispatch:
+
+jobs:
+  live-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install repo-local tool dependencies
+        run: npm install
+
+      - name: Run local live GUI smoke harness
+        run: npm run gui:live-smoke -- workbench-v3.html > gui-live-smoke.json
+
+      - name: Require successful live smoke result
+        run: jq -e '.ok == true' gui-live-smoke.json > /dev/null
+
+      - name: Upload live smoke report
+        uses: actions/upload-artifact@v4
+        with:
+          name: gui-live-smoke-report
+          path: gui-live-smoke.json
+
+      - name: Summarize live smoke check
+        run: |
+          echo '## GUI live smoke' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '- local DOM harness loaded `workbench-v3.html`' >> "$GITHUB_STEP_SUMMARY"
+          echo '- no runtime errors were reported' >> "$GITHUB_STEP_SUMMARY"
+          echo '- atlas and timeline rendered in the smoke harness' >> "$GITHUB_STEP_SUMMARY"

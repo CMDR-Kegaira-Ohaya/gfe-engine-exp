@@ -1,0 +1,67 @@
+name: gui-structure-check
+
+on:
+  push:
+    paths:
+      - 'workbench-v3.html'
+      - 'ui-v3/**'
+      - 'tools/js/**'
+      - 'package.json'
+      - '.github/workflows/gui-structure-check.yml'
+  pull_request:
+    paths:
+      - 'workbench-v3.html'
+      - 'ui-v3/**'
+      - 'tools/js/**'
+      - 'package.json'
+      - '.github/workflows/gui-structure-check.yml'
+  workflow_dispatch:
+
+jobs:
+  structure-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install repo-local tool dependencies
+        run: npm install
+
+      - name: Syntax-check live GUI modules
+        run: |
+          npm run js:check -- ui-v3/app.js
+          npm run js:check -- ui-v3/atlas-renderer.js
+          npm run js:check -- ui-v3/atlas-renderer-core.js
+          npm run js:check -- ui-v3/atlas-map-enhancer.js
+
+      - name: Audit live GUI entry path
+        run: npm run gui:entry-audit -- workbench-v3.html > gui-entry-audit.json
+
+      - name: Cut-check live GUI path
+        run: npm run gui:cut-check -- workbench-v3.html > gui-cut-check.json
+
+      - name: Require clean cut-check result
+        run: jq -e '.ok == true' gui-cut-check.json > /dev/null
+
+      - name: Scan visible-copy clusters
+        run: npm run gui:copy-scan -- workbench-v3.html ui-v3 > gui-copy-scan.json
+
+      - name: Upload GUI structure reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: gui-structure-reports
+          path: |
+            gui-entry-audit.json
+            gui-cut-check.json
+            gui-copy-scan.json
+
+      - name: Summarize GUI structure check
+        run: |
+          echo '## GUI structure check' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '- entry audit generated: `gui-entry-audit.json`' >> "$GITHUB_STEP_SUMMARY"
+          echo '- cut-check passed' >> "$GITHUB_STEP_SUMMARY"
+          echo '- copy scan generated: `gui-copy-scan.json`' >> "$GITHUB_STEP_SUMMARY"
