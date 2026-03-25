@@ -36,7 +36,7 @@ function fieldTitleFromView(view) {
 
 function mapNoteFromView(view) {
   const note = view.querySelector('.atlas-note')?.textContent?.trim();
-  return note || 'Semantic field map.';
+  return note || 'Atlas field view.';
 }
 
 function fieldPillsFromView(view) {
@@ -132,7 +132,7 @@ function targetPriority(field, marker) {
   }
 
   if (viewKind === 'encounter') {
-    const encounterWords = ['encounter', 'route', 'payload', 'current primitives', 'current inspection'];
+    const encounterWords = ['encounter', 'route', 'payload', 'current primitives', 'current detail'];
     if (anchor && (markerText.includes(anchor) || targetText.includes(anchor))) return 'primary';
     if (encounterWords.some((word) => markerText.includes(word) || targetText.includes(word))) return 'secondary';
     if (activeKind === 'relations' || activeKind === 'expression') return 'secondary';
@@ -300,8 +300,8 @@ export function enhanceAtlasMap(root = document) {
       <div class="atlas-detail-dock-head">
         <div class="atlas-detail-dock-copy">
           <div class="group-label">Atlas detail</div>
-          <h5 class="atlas-detail-dock-title">Current inspection</h5>
-          <p class="atlas-detail-dock-note">Click markers in the field to move through the current atlas detail.</p>
+          <h5 class="atlas-detail-dock-title">Current detail</h5>
+          <p class="atlas-detail-dock-note">Select a marker in the field to inspect the matching atlas detail.</p>
         </div>
       </div>
       <div class="atlas-detail-dock-body"></div>
