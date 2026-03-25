@@ -74,10 +74,12 @@ Read these when the task concerns saved cases, case indexes, smoke tests, or mar
 - Then `/solver/`
 
 ### Workflows / automation
-- Start with `/.github/workflows/`
+- Start with `/main/INSTRUCTIONS_INDEX.md`
+- Then read `/.github/workflows/`
+- For canonical GUI workflow decisions, use the Workbench v3 GUI validation subsection in `/main/INSTRUCTIONS_INDEX.md`
 - Check `solver-selftest.yml`
 - Check `validate-cases.yml`
-- Then relevant `/solver/` scripts
+- Then relevant `/solver/` scripts or `tools/js/gui-*` tooling as appropriate
 
 ### Repo debugging / UI bugs / Pages issues
 - Start with `/main/SYSTEM_MAP.md`
@@ -98,6 +100,7 @@ Read these when the task concerns saved cases, case indexes, smoke tests, or mar
 - Read this file
 - Read `/main/GPT_OPERATOR_MANUAL.md`
 - Read `/main/SYSTEM_MAP.md`
+- If the next task concerns workflows or GUI validation, read `/main/INSTRUCTIONS_INDEX.md` before opening workflow files
 - Only then branch into engine, solver, UI, workflow, or case files
 
 ## Operational cross-links
@@ -123,6 +126,7 @@ Read these when the task concerns saved cases, case indexes, smoke tests, or mar
 - The canonical live GUI surface is `workbench-v3.html`.
 - Root `/index.html` now redirects to `./workbench-v3.html` for operator convenience.
 - `ui-v3/**`, `tools/js/gui-*`, and the `gui-*` workflows are the canonical live GUI support surface.
+- Workflow decisions affecting the canonical GUI lane should read `/main/INSTRUCTIONS_INDEX.md` before editing `gui-*` workflows.
 - `ui-v2/**` and the former v2 root workbench are no longer treated as the active live GUI surface.
 - If a large file write fails through the assistant tool path, prefer manual paste or git-object write paths rather than redefining architecture.
 - JavaScript structural inspection tooling exists under `/tools/js/` and should be discoverable from boot via `/main/INSTRUCTIONS_INDEX.md`.
