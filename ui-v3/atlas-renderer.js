@@ -328,9 +328,6 @@ function wireAtlasMap(root = document) {
     const dockBody = dock?.querySelector(':scope > .atlas-detail-dock-body');
     if (!mapShell || !field || !dockBody) return;
 
-    field.dataset.viewKind = view.dataset.mapViewKind || 'overview';
-    field.dataset.focusAnchor = view.dataset.mapFocusAnchor || field.querySelector('.atlas-map-field-title')?.textContent?.trim() || '';
-
     field.querySelectorAll('.atlas-map-zones, .atlas-map-interactives').forEach((node) => node.remove());
     dockBody.replaceChildren();
 
