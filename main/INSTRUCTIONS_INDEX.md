@@ -59,6 +59,32 @@ Boundaries:
 - it does not replace canonical engine files
 - it does not yet cover JSX or TypeScript
 
+### Workbench v3 GUI validation tooling
+[RID_INSTRUCTIONS_GUI_V3_VALIDATION]
+Use this when the task concerns the canonical live GUI surface, local GUI smoke validation, deployed Pages smoke validation, or workflow-backed GUI verification.
+
+Canonical live surface:
+- `/workbench-v3.html`
+- `/ui-v3/**`
+- `/tools/js/gui-*`
+- `/.github/workflows/gui-*`
+
+Canonical operator command:
+```bash
+npm run gui:validate-chain -- --base-ref HEAD~1 --head-ref HEAD --copy-scan
+```
+
+Operational notes:
+- `tools/js/gui-live-smoke.mjs` is the canonical local smoke harness for Workbench v3.
+- The Workbench v3 smoke harness is hardened for Node 24-era globals with descriptor-aware global binding and restoration.
+- Node 24 is the canonical runtime assumption for the `gui-*` workflow lane.
+- Use `gui:pages-live-smoke` and `gui:pages-artifact-verify` for deployed-output evidence beyond the local harness.
+
+Boundaries:
+- the local smoke harness is operational evidence, not final proof of deployed browser state
+- deployed Pages smoke is still the required check for the live Pages surface
+- this tooling does not outrank engine doctrine or solver doctrine
+
 ### GPT repo-control connector and token surfaces
 [RID_INSTRUCTIONS_REPO_CONTROL_SURFACES]
 Use this when the task concerns what the GPT can actually do to the repository through the custom connector and the current token configuration.
