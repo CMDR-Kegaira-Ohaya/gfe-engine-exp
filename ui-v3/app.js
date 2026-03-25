@@ -1,12 +1,12 @@
 import { validateCase, solveCase, groupEventsByStep } from '../solver/index.js';
 import { renderAtlas as renderAtlasModule, renderTimeline as renderTimelineModule } from './atlas-renderer.js';
-import { applyAtlasMapStage } from './atlas-map-stage.js';
+import { enhanceAtlasMap } from './atlas-map-enhancer.js';
 
 const LENSES = [
   {
     id: 'structure',
     short: 'V',
-    label: 'Structure )V)',
+    label: 'Structure (V)',
     note: 'Shows how encoded state is arranged across the selected moment.',
   },
   {
@@ -289,7 +289,7 @@ function getTimelineSummary(stepIndex, step) {
 
   return {
     kicker: 'V map',
-    text: `${pluralize(participants.length, 'actor')} staged · ${pluralize(events.length, 'linked action')}`,
+    text: `${pluralize(participants.length, 'actor')} mapped · ${pluralize(events.length, 'linked action')}`,
   };
 }
 
@@ -432,7 +432,7 @@ async function loadCase(slug, { resetTab = true } = {}) {
     return;
   }
 
-  setNotice(`Loading “${entry.title~”…`);
+  setNotice(`Loading “${entry.title}”…`);
   renderAll();
 
   try {
@@ -641,7 +641,7 @@ function renderTabContent() {
     : `${banner}<section class="placeholder-card"><h3>No case reading saved yet</h3><p>The canonical case and case encoding are available, but no saved case reading is attached yet.</p><p class="placeholder-note">Use GPT to generate reading.</p></section>`;
 }
 
-function atlasRenderContext() {
+function atlasRendererContext() {
   return {
     state,
     els,
@@ -673,12 +673,12 @@ function atlasRenderContext() {
 }
 
 function renderTimeline() {
-  return renderTimelineModule(atlasRenderContext());
+  return renderTimelineModule(atlasRendererContext());
 }
 
 function renderAtlas() {
   const result = renderAtlasModule(atlasRendererContext());
-  applyAtlasMapStage(els.atlas);
+  enhanceAtlasMap(els.atlas);
   return result;
 }
 

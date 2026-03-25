@@ -34,14 +34,30 @@ function fieldTitleFromView(view) {
   return heading || 'Atlas field';
 }
 
-function fieldNoteFromView(view) {
+function mapNoteFromView(view) {
   const note = view.querySelector('.atlas-note')?.textContent?.trim();
-  return note || 'Semantic field staging area.';
+  return note || 'Semantic field map.';
 }
 
 function fieldPillsFromView(view) {
   const statePills = view.querySelector('.atlas-state-pills');
   return statePills ? statePills.cloneNode(true).outerHTML : '';
+}
+
+function atlasRootFrom(root = document) {
+  return root.matches?.('#atlas') ? root : root.querySelector('#atlas');
+}
+
+function detailNodesFromView(view) {
+  const preservedNodes = [
+    view.querySelector('.atlas-top-row'),
+    view.querySelector('.atlas-state-strip'),
+    view.querySelector('.atlas-provenance-strip'),
+    view.querySelector('.atlas-lens-shell'),
+    view.querySelector('.atlas-note'),
+  ];
+
+  return Array.from(view.children).filter((node) => !preservedNodes.includes(node));
 }
 
 function axisFromSection(section) {
@@ -247,29 +263,17 @@ function buildMarkers(field, dockBody, targets) {
   return { interactives, zones: buildZoneLayer(groups), firstMarker };
 }
 
-export function applyAtlasMapStage(root = document) {
-  const atlasRoot = root.matches?.('#atlas') ? root : root.querySelector('#atlas');
+export function enhanceAtlasMap(root = document) {
+  const atlasRoot = atlasRootFrom(root);
   if (!atlasRoot) return;
 
   atlasRoot.querySelectorAll(':scope > .atlas-view').forEach((view) => {
-    if (view.dataset.mapStaged === 'true') return;
+    if (view.dataset.mapEnhanced === 'true') return;
 
-    const topRow = view.querySelector('.atlas-top-row');
-    const stateStrip = view.querySelector('.atlas-state-strip');
-    const provenance = view.querySelector('.atlas-provenance-strip');
-    const lens = view.querySelector('.atlas-lens-shell');
-    const note = view.querySelector('.atlas-note');
+    const detailNodes = detailNodesFromView(view);
 
-    const detailNodes = Array.from(view.children).filter((node) => ![
-      topRow,
-      stateStrip,
-      provenance,
-      lens,
-      note,
-    ].includes(node));
-
-    const shell = document.createElement('div');
-    shell.className = 'atlas-map-shell';
+    const mapShell = document.createElement('div');
+    mapShell.className = 'atlas-map-shell';
 
     const field = document.createElement('section');
     field.className = 'atlas-map-field';
@@ -279,7 +283,7 @@ export function applyAtlasMapStage(root = document) {
       <div class="atlas-map-field-head">
         <div class="group-label">Atlas field</div>
         <h5 class="atlas-map-field-title">${fieldTitleFromView(view)}</h5>
-        <p class="atlas-map-field-note">${fieldNoteFromView(view)}</p>
+        <p class="atlas-map-field-note">${mapNoteFromView(view)}</p>
       </div>
       <div class="atlas-map-field-meta">${fieldPillsFromView(view)}</div>
       <div class="atlas-map-placeholder" aria-hidden="true">
@@ -314,9 +318,9 @@ export function applyAtlasMapStage(root = document) {
       if (firstMarker) activateMarker(field, dockBody, firstMarker.marker, firstMarker.target);
     }
 
-    view.appendChild(shell);
-    shell.appendChild(field);
-    shell.appendChild(dock);
-    view.dataset.mapStaged = 'true';
+    view.appendChild(mapShell);
+    mapShell.appendChild(field);
+    mapShell.appendChild(dock);
+    view.dataset.mapEnhanced = 'true';
   });
 }
