@@ -18,6 +18,7 @@
     "gui:live-smoke": "node ./tools/js/gui-live-smoke.mjs",
     "gui:repo-diff": "node ./tools/js/gui-repo-diff.mjs",
     "gui:pages-artifact-verify": "node ./tools/js/gui-pages-artifact-verify.mjs",
+    "gui:pages-live-smoke": "node ./tools/js/gui-pages-live-smoke.mjs",
     "gui:force-redeploy": "node ./tools/js/gui-force-redeploy.mjs",
     "gui:validate-chain": "node ./tools/js/gui-validate-chain.mjs"
   },

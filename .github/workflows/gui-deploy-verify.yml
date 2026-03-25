@@ -2,12 +2,6 @@ name: gui-deploy-verify
 
 on:
   push:
-    paths:
-      - 'workbench-v3.html'
-      - 'ui-v3/**'
-      - 'tools/js/**'
-      - 'package.json'
-      - '.github/workflows/gui-deploy-verify.yml'
   workflow_dispatch:
 
 permissions:
@@ -16,7 +10,60 @@ permissions:
   pages: read
 
 jobs:
+  scope:
+    runs-on: ubuntu-latest
+    outputs:
+      gui_changed: ${{ steps.scope.outputs.gui_changed }}
+      runtime_changed: ${{ steps.scope.outputs.runtime_changed }}
+      tooling_only: ${{ steps.scope.outputs.tooling_only }}
+      base_ref: ${{ steps.scope.outputs.base_ref }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: scope
+        shell: bash
+        run: |
+          if git rev-parse --verify HEAD^ >/dev/null 2>&1; then
+            BASE_REF=HEAD^
+          else
+            BASE_REF=HEAD
+          fi
+          echo "base_ref=$BASE_REF" >> "$GITHUB_OUTPUT"
+
+          CHANGED=$(git diff --name-only "$BASE_REF" HEAD || true)
+          printf '%s
+' "$CHANGED" > changed-files.txt
+
+          if grep -E '^(workbench-v3\.html|ui-v3/|tools/js/gui-|\.github/workflows/gui-|package\.json)' changed-files.txt >/dev/null 2>&1; then
+            echo "gui_changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "gui_changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          if grep -E '^(workbench-v3\.html|ui-v3/|package\.json)' changed-files.txt >/dev/null 2>&1; then
+            echo "runtime_changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "runtime_changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          if grep -E '^(tools/js/gui-|\.github/workflows/gui-)' changed-files.txt >/dev/null 2>&1 \
+             && ! grep -E '^(workbench-v3\.html|ui-v3/|package\.json)' changed-files.txt >/dev/null 2>&1; then
+            echo "tooling_only=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "tooling_only=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload changed-file scope
+        uses: actions/upload-artifact@v4
+        with:
+          name: gui-changed-file-scope
+          path: changed-files.txt
+
   validate-and-verify:
+    needs: scope
+    if: needs.scope.outputs.gui_changed == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,23 +77,16 @@ jobs:
       - name: Install repo-local tool dependencies
         run: npm install
 
-      - name: Resolve validation base ref
-        run: |
-          if git rev-parse --verify HEAD^ >/dev/null 2>&1; then
-            echo "BASE_REF=HEAD^" >> "$GITHUB_ENV"
-          else
-            echo "BASE_REF=HEAD" >> "$GITHUB_ENV"
-          fi
-
       - name: Run GUI validation chain
         run: |
-          npm run gui:validate-chain -- \
-            --base-ref "$BASE_REF" \
-            --head-ref HEAD \
-            --pages-verify \
-            --copy-scan \
-            --head-sha "$GITHUB_SHA" \
-            --allow-in-progress > gui-validate-chain.json
+          CMD=(npm run gui:validate-chain -- --base-ref "${{ needs.scope.outputs.base_ref }}" --head-ref HEAD)
+          if [ "${{ needs.scope.outputs.runtime_changed }}" = "true" ]; then
+            CMD+=(--copy-scan)
+          fi
+          printf '%q ' "${CMD[@]}"
+          printf '
+'
+          "${CMD[@]}" > gui-validate-chain.json
 
       - name: Upload GUI validation chain report
         uses: actions/upload-artifact@v4
@@ -59,8 +99,55 @@ jobs:
 
       - name: Summarize GUI validation chain
         run: |
-          echo '## GUI deploy verify' >> "$GITHUB_STEP_SUMMARY"
+          echo '## GUI validation chain' >> "$GITHUB_STEP_SUMMARY"
           echo '' >> "$GITHUB_STEP_SUMMARY"
-          echo '- validation chain completed' >> "$GITHUB_STEP_SUMMARY"
-          echo '- pages/artifact verification executed in best-effort mode for the current head SHA' >> "$GITHUB_STEP_SUMMARY"
-          echo '- see `gui-validate-chain.json` artifact for full details' >> "$GITHUB_STEP_SUMMARY"
+          echo '- diff-aware validation ran on this push' >> "$GITHUB_STEP_SUMMARY"
+          echo '- report uploaded as `gui-validate-chain-report`' >> "$GITHUB_STEP_SUMMARY"
+
+  deployed-pages-smoke:
+    needs: [scope, validate-and-verify]
+    if: needs.scope.outputs.runtime_changed == 'true' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install repo-local tool dependencies
+        run: npm install
+
+      - name: Wait for deployed Pages output and smoke it
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          npm run gui:pages-live-smoke -- --page-path workbench-v3.html --retries 20 --delay-ms 15000 > gui-pages-live-smoke.json
+
+      - name: Upload deployed Pages smoke report
+        uses: actions/upload-artifact@v4
+        with:
+          name: gui-pages-live-smoke-report
+          path: gui-pages-live-smoke.json
+
+      - name: Require deployed Pages smoke success
+        run: jq -e '.ok == true' gui-pages-live-smoke.json > /dev/null
+
+      - name: Summarize deployed Pages smoke
+        run: |
+          echo '## Deployed Pages smoke' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '- deployed workbench page was polled and checked automatically' >> "$GITHUB_STEP_SUMMARY"
+          echo '- report uploaded as `gui-pages-live-smoke-report`' >> "$GITHUB_STEP_SUMMARY"
+
+  no-gui-changes:
+    needs: scope
+    if: needs.scope.outputs.gui_changed != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Summarize skipped GUI validation
+        run: |
+          echo '## GUI validation skipped' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '- no GUI-scope changes were detected on this push' >> "$GITHUB_STEP_SUMMARY"
