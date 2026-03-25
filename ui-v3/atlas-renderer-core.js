@@ -37,7 +37,9 @@ function pillRow(values, extraClass = '') {
 function renderAtlasSummarySection(kicker, heading, pills, body, options = {}) {
   const sectionClass = options.className ? `atlas-section ${options.className}` : 'atlas-section';
   const dataAxis = options.axis ? ` data-axis="${esc(options.axis)}"` : '';
-  return `<section class="${sectionClass}"${dataAxis}>
+  const dataMapKind = options.mapKind ? ` data-map-kind="${esc(options.mapKind)}"` : '';
+  const dataMapLabel = ` data-map-label="${esc(options.mapLabel || heading)}"`;
+  return `<section class="${sectionClass}"${dataAxis}${dataMapKind}${dataMapLabel}>
     <div class="section-heading-row">
       <div>
         <div class="group-label">${esc(kicker)}</div>
@@ -183,14 +185,14 @@ function renderEventCards(events, emptyMessage = 'No relation events are encoded
     ${events.map((event) => {
       const primitiveCount = Array.isArray(event.payload_bundle) ? event.payload_bundle.length : 0;
       const route = `${label(event.sourceParticipantId || event.alpha_source || '—')} → ${label(event.receivingParticipantId || event.alpha_receiving || '—')}`;
-      const axis = event.axis || 'axis';
-      const axisKey = axisToken(axis);
+      const axis = `${label(event.axis || 'axis')} axis`;
+      const axisKey = axisToken(event.axis || 'axis');
       return `<section class="event-card" data-axis="${esc(axisKey)}">
         <div class="event-card-kicker">Route</div>
         <div class="event-card-title">${esc(encounterLabel(event))}</div>
         <div class="event-card-route">${esc(route)}</div>
         ${pillRow([
-          `${label(axis)} axis`,
+          axis,
           event.face ? `Face ${label(event.face)}` : null,
           (event.mediumParticipantId || event.alpha_medium) ? `Medium ${label(event.mediumParticipantId || event.alpha_medium)}` : null,
           pluralize(primitiveCount, 'primitive'),
@@ -202,7 +204,7 @@ function renderEventCards(events, emptyMessage = 'No relation events are encoded
 
 function renderExpressionParticipantCard(participantId, participantData) {
   const axisEntries = Object.entries(participantData.axes || {});
-  return `<section class="expression-card">
+  return `<section class="expression-card" data-map-kind="expression" data-map-label="${esc(label(participantId))}">
     <div class="section-heading-row">
       <div>
         <div class="group-label">Participant state</div>
@@ -301,7 +303,11 @@ function renderStructureOverview(step) {
         `I:${participantData.axes?.identity?.I ?? '—'}`,
       ],
       renderAxisCards(participantData.axes || {}),
-      { pillClass: 'compact axis-pill-row axis-pill-row--identity' },
+      {
+        pillClass: 'compact axis-pill-row axis-pill-row--identity',
+        mapKind: 'structure',
+        mapLabel: label(participantId),
+      },
     )).join('')}
   </div>`;
 }
@@ -321,6 +327,10 @@ function renderStructureParticipant(stepIndex, participantId, participantData) {
         `Medium ${roles.medium}`,
       ],
       renderAxisCards(participantData.axes || {}),
+      {
+        mapKind: 'structure',
+        mapLabel: label(participantId),
+      },
     )}
   </div>`;
 }
@@ -343,7 +353,12 @@ function renderStructureEncounter(event) {
         <div><dt>Medium</dt><dd>${esc(label(event.mediumParticipantId || event.alpha_medium || '—'))}</dd></div>
         <div><dt>Axis</dt><dd>${esc(label(event.axis || '—'))}</dd></div>
       </dl>`,
-      { axis: axisKey, pillClass: `axis-pill-row axis-pill-row--${esc(axisKey)}` },
+      {
+        axis: axisKey,
+        pillClass: `axis-pill-row axis-pill-row--${esc(axisKey)}`,
+        mapKind: 'structure',
+        mapLabel: encounterLabel(event),
+      },
     )}
   </div>`;
 }
@@ -358,6 +373,10 @@ function renderRelationsOverview(stepIndex, step) {
         pluralize(getStepEvents(stepIndex).length, 'encounter'),
       ],
       renderEventCards(getStepEvents(stepIndex)),
+      {
+        mapKind: 'relations',
+        mapLabel: selectedMomentLabel(),
+      },
     )}
   </div>`;
 }
@@ -377,6 +396,10 @@ function renderRelationsParticipant(stepIndex, participantId) {
         `Medium ${roles.medium}`,
       ],
       renderEventCards(events, 'No encounters in this step include the focused participant yet.'),
+      {
+        mapKind: 'relations',
+        mapLabel: label(participantId),
+      },
     )}
   </div>`;
 }
@@ -393,7 +416,12 @@ function renderRelationsEncounter(event) {
         `${label(event.axis || 'axis')} axis`,
       ],
       renderEventCards([event]),
-      { axis: axisKey, pillClass: `axis-pill-row axis-pill-row--${esc(axisKey)}` },
+      {
+        axis: axisKey,
+        pillClass: `axis-pill-row axis-pill-row--${esc(axisKey)}`,
+        mapKind: 'relations',
+        mapLabel: encounterLabel(event),
+      },
     )}
   </div>`;
 }
@@ -420,7 +448,15 @@ function renderExpressionOverview(stepIndex, step) {
           event.interference ? `Interference ${event.interference}` : null,
           pluralize(Array.isArray(event.payload_bundle) ? event.payload_bundle.length : 0, 'primitive'),
         ].filter(Boolean), `compact axis-pill-row axis-pill-row--${esc(axisToken(event.axis || 'axis'))}`)}</section>`).join('')}</div>`,
+        {
+          mapKind: 'expression',
+          mapLabel: 'Current encounter surfaces',
+        },
       ) : ''}`,
+      {
+        mapKind: 'expression',
+        mapLabel: selectedMomentLabel(),
+      },
     )}
   </div>`;
 }
@@ -439,6 +475,10 @@ function renderExpressionParticipant(stepIndex, participantId, participantData) 
         event.interference ? `Interference ${event.interference}` : null,
         pluralize(Array.isArray(event.payload_bundle) ? event.payload_bundle.length : 0, 'primitive'),
       ].filter(Boolean), `compact axis-pill-row axis-pill-row--${esc(axisToken(event.axis || 'axis'))}`)}</section>`).join('')}</div>` : '<div class="inline-empty">No expression-linked encounters include this participant in the selected step yet.</div>',
+      {
+        mapKind: 'expression',
+        mapLabel: 'Current linked encounters',
+      },
     )}
   </div>`;
 }
@@ -461,14 +501,23 @@ function renderExpressionEncounter(event) {
         <div><dt>Interference</dt><dd>${esc(event.interference || '—')}</dd></div>
         <div><dt>Axis</dt><dd>${esc(label(event.axis || '—'))}</dd></div>
       </dl>`,
-      { axis: axisKey, pillClass: `axis-pill-row axis-pill-row--${esc(axisKey)}` },
+      {
+        axis: axisKey,
+        pillClass: `axis-pill-row axis-pill-row--${esc(axisKey)}`,
+        mapKind: 'expression',
+        mapLabel: encounterLabel(event),
+      },
     )}
     ${renderAtlasSummarySection(
       'Payload bundle',
       'Current primitives',
       [],
       primitives.length ? `<div class="primitive-list" data-axis="${esc(axisKey)}">${primitives.map((primitive, index) => `<div class="primitive-chip"><b>${index + 1}.</b><span>${esc(label(primitive.sigma || 'L'))}</span><span>${esc(label(primitive.mode || primitive.mu || 'load'))}</span><span>${esc(label(primitive.register || 'retained'))}</span></div>`).join('')}</div>` : '<div class="inline-empty">No payload bundle detail is attached to this encounter.</div>',
-      { axis: axisKey },
+      {
+        axis: axisKey,
+        mapKind: 'expression',
+        mapLabel: 'Current primitives',
+      },
     )}
   </div>`;
 }
