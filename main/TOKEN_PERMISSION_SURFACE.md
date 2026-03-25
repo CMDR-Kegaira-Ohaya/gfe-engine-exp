@@ -46,6 +46,7 @@ As currently configured, the token has at least:
 - **Pages** — read / write
 - **Pull requests** — read / write
 - **Variables** — read / write
+- **Webhooks** — read / write
 - **Workflows** — read / write
 
 ## Practical implications
@@ -56,11 +57,15 @@ The GPT/operator should not assume a narrow read-only or file-only token by defa
 This does **not** weaken governance.
 Repo rules, edit rules, branch protection, workflow settings, and explicit human approval requirements still matter.
 
+Webhook read/write authority matters especially for live-connected GUI work.
+It removes "token lacks webhook authority" as a valid blocker assumption.
+But it still does not prove that webhook-based GUI integration is already implemented; that remains an architecture and implementation question.
+
 ## How to use this file
 
 Read this file:
 - after `/main/TOC.md` when token authority width matters to the task
-- before assuming the live token lacks workflow, branch, Pages, or repo-write capability
+- before assuming the live token lacks workflow, branch, Pages, webhook, or repo-write capability
 - before designing around outdated narrow-token assumptions
 
 Cross-check with:
