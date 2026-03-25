@@ -273,7 +273,13 @@ function renderAtlasProvenanceStrip() {
 }
 
 function atlasShell(viewKind, kicker, heading, note, body, showClearFocus = false) {
-  return `<div class="atlas-view atlas-view--${viewKind}">
+  return `<div
+    class="atlas-view atlas-view--${viewKind}"
+    data-map-view-kind="${esc(viewKind)}"
+    data-map-heading="${esc(heading)}"
+    data-map-note="${esc(note)}"
+    data-map-focus-anchor="${esc(heading)}"
+  >
     <div class="focus-row atlas-top-row">
       <div>
         <div class="context-kicker">${esc(kicker)}</div>

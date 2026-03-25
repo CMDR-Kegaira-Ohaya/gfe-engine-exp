@@ -156,21 +156,6 @@ function inferMapKind(section, viewKind) {
   return 'default';
 }
 
-function annotateAtlasViewMetadata(root) {
-  if (!root) return;
-
-  root.querySelectorAll(':scope > .atlas-view').forEach((view) => {
-    if (!view.dataset.mapViewKind) view.dataset.mapViewKind = deriveAtlasViewKind(view);
-
-    const heading = view.querySelector('.atlas-heading')?.textContent?.trim();
-    if (heading && !view.dataset.mapHeading) view.dataset.mapHeading = heading;
-    if (heading && !view.dataset.mapFocusAnchor) view.dataset.mapFocusAnchor = heading;
-
-    const note = view.querySelector('.atlas-note')?.textContent?.trim();
-    if (note && !view.dataset.mapNote) view.dataset.mapNote = note;
-  });
-}
-
 function annotateAtlasMapMetadata(root) {
   if (!root) return;
 
@@ -501,7 +486,6 @@ export function renderAtlas(ctx) {
     ATLAS_COPY_RULES,
     ctx,
     (root) => {
-      annotateAtlasViewMetadata(root);
       annotateAtlasMapMetadata(root);
       ensureAtlasMapShells(root);
       wireAtlasMap(root);
