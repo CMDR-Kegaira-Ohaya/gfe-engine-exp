@@ -1,4 +1,4 @@
-name: gui-deploy-verify
+name: gui-v3-deploy-verify
 
 on:
   push:
@@ -45,10 +45,10 @@ jobs:
             echo "runtime_changed=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Upload changed-file scope
+      - name: Upload Workbench v3 changed-file scope
         uses: actions/upload-artifact@v4
         with:
-          name: gui-changed-file-scope
+          name: gui-v3-changed-file-scope
           path: changed-files.txt
 
   validate-and-verify:
@@ -62,12 +62,12 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
-      - name: Install repo-local tool dependencies
+      - name: Install Workbench v3 tool dependencies
         run: npm install
 
-      - name: Run GUI validation chain
+      - name: Run authoritative Workbench v3 validation chain
         shell: bash
         run: |
           if [ "${{ needs.scope.outputs.runtime_changed }}" = "true" ]; then
@@ -76,21 +76,23 @@ jobs:
             npm run gui:validate-chain -- --base-ref "${{ needs.scope.outputs.base_ref }}" --head-ref HEAD > gui-validate-chain.json
           fi
 
-      - name: Upload GUI validation chain report
+      - name: Upload authoritative Workbench v3 validation report
         uses: actions/upload-artifact@v4
         with:
-          name: gui-validate-chain-report
+          name: gui-v3-validate-chain-report
           path: gui-validate-chain.json
 
-      - name: Require GUI validation chain success
+      - name: Require authoritative Workbench v3 validation success
         run: jq -e '.ok == true' gui-validate-chain.json > /dev/null
 
-      - name: Summarize GUI validation chain
+      - name: Summarize authoritative Workbench v3 validation
         run: |
-          echo '## GUI validation chain' >> "$GITHUB_STEP_SUMMARY"
+          echo '## Workbench v3 validation chain' >> "$GITHUB_STEP_SUMMARY"
           echo '' >> "$GITHUB_STEP_SUMMARY"
-          echo '- diff-aware validation ran on this push' >> "$GITHUB_STEP_SUMMARY"
-          echo '- report uploaded as `gui-validate-chain-report`' >> "$GITHUB_STEP_SUMMARY"
+          echo '- authoritative command: `npm run gui:validate-chain -- --base-ref <base> --head-ref HEAD [--copy-scan]`' >> "$GITHUB_STEP_SUMMARY"
+          echo '- canonical entry: `workbench-v3.html`' >> "$GITHUB_STEP_SUMMARY"
+          echo '- canonical runtime: `ui-v3/**`' >> "$GITHUB_STEP_SUMMARY"
+          echo '- report uploaded as `gui-v3-validate-chain-report`' >> "$GITHUB_STEP_SUMMARY"
 
   deployed-pages-smoke:
     needs: [scope, validate-and-verify]
@@ -101,41 +103,42 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
-      - name: Install repo-local tool dependencies
+      - name: Install Workbench v3 tool dependencies
         run: npm install
 
-      - name: Wait for deployed Pages output and smoke it
+      - name: Wait for canonical Workbench v3 Pages output and smoke it
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
           npm run gui:pages-live-smoke -- --page-path workbench-v3.html --retries 20 --delay-ms 15000 > gui-pages-live-smoke.json
 
-      - name: Upload deployed Pages smoke report
+      - name: Upload canonical Workbench v3 Pages smoke report
         uses: actions/upload-artifact@v4
         with:
-          name: gui-pages-live-smoke-report
+          name: gui-v3-pages-live-smoke-report
           path: gui-pages-live-smoke.json
 
-      - name: Require deployed Pages smoke success
+      - name: Require canonical Workbench v3 Pages smoke success
         run: jq -e '.ok == true' gui-pages-live-smoke.json > /dev/null
 
-      - name: Summarize deployed Pages smoke
+      - name: Summarize canonical Workbench v3 Pages smoke
         run: |
-          echo '## Deployed Pages smoke' >> "$GITHUB_STEP_SUMMARY"
+          echo '## Workbench v3 Pages smoke' >> "$GITHUB_STEP_SUMMARY"
           echo '' >> "$GITHUB_STEP_SUMMARY"
-          echo '- deployed workbench page was polled and checked automatically' >> "$GITHUB_STEP_SUMMARY"
-          echo '- report uploaded as `gui-pages-live-smoke-report`' >> "$GITHUB_STEP_SUMMARY"
+          echo '- canonical deployed page polled: `workbench-v3.html`' >> "$GITHUB_STEP_SUMMARY"
+          echo '- root redirect model is accepted only insofar as it lands on Workbench v3' >> "$GITHUB_STEP_SUMMARY"
+          echo '- report uploaded as `gui-v3-pages-live-smoke-report`' >> "$GITHUB_STEP_SUMMARY"
 
   no-gui-changes:
     needs: scope
     if: ${{ needs.scope.outputs.gui_changed != 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Summarize skipped GUI validation
+      - name: Summarize skipped Workbench v3 validation
         run: |
-          echo '## GUI validation skipped' >> "$GITHUB_STEP_SUMMARY"
+          echo '## Workbench v3 validation skipped' >> "$GITHUB_STEP_SUMMARY"
           echo '' >> "$GITHUB_STEP_SUMMARY"
-          echo '- no GUI-scope changes were detected on this push' >> "$GITHUB_STEP_SUMMARY"
+          echo '- no Workbench v3 GUI-scope changes were detected on this push' >> "$GITHUB_STEP_SUMMARY"

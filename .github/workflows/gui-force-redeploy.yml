@@ -1,4 +1,4 @@
-name: gui-force-redeploy
+name: gui-v3-force-redeploy
 
 on:
   workflow_dispatch:
@@ -19,17 +19,18 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Create redeploy marker commit
+      - name: Create Workbench v3 redeploy marker commit
         run: |
           mkdir -p .github/redeploy
-          printf '{"ts":"%s","run_id":"%s","workflow":"gui-force-redeploy"}\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$GITHUB_RUN_ID" > .github/redeploy/gui-force-redeploy.json
+          printf '{"ts":"%s","run_id":"%s","workflow":"gui-force-redeploy","surface":"workbench-v3"}\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$GITHUB_RUN_ID" > .github/redeploy/gui-force-redeploy.json
           git add .github/redeploy/gui-force-redeploy.json
-          git commit -m "chore: force gui redeploy" || exit 0
+          git commit -m "chore: force workbench v3 redeploy" || exit 0
           git push
 
-      - name: Summarize forced redeploy
+      - name: Summarize Workbench v3 forced redeploy
         run: |
-          echo '## GUI force redeploy' >> "$GITHUB_STEP_SUMMARY"
+          echo '## Workbench v3 forced redeploy' >> "$GITHUB_STEP_SUMMARY"
           echo '' >> "$GITHUB_STEP_SUMMARY"
-          echo '- wrote `.github/redeploy/gui-force-redeploy.json`' >> "$GITHUB_STEP_SUMMARY"
-          echo '- pushed a marker commit to invalidate the live deploy path intentionally' >> "$GITHUB_STEP_SUMMARY"
+          echo '- canonical live surface: `workbench-v3.html`' >> "$GITHUB_STEP_SUMMARY"
+          echo '- redeploy marker written to `.github/redeploy/gui-force-redeploy.json`' >> "$GITHUB_STEP_SUMMARY"
+          echo '- marker commit pushed to intentionally invalidate the Workbench v3 deploy path' >> "$GITHUB_STEP_SUMMARY"

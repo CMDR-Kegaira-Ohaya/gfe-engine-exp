@@ -1,18 +1,18 @@
-name: gui-structure-check
+name: gui-v3-structure-check
 
 on:
   push:
     paths:
       - 'workbench-v3.html'
       - 'ui-v3/**'
-      - 'tools/js/**'
+      - 'tools/js/gui-*'
       - 'package.json'
       - '.github/workflows/gui-structure-check.yml'
   pull_request:
     paths:
       - 'workbench-v3.html'
       - 'ui-v3/**'
-      - 'tools/js/**'
+      - 'tools/js/gui-*'
       - 'package.json'
       - '.github/workflows/gui-structure-check.yml'
   workflow_dispatch:
@@ -25,43 +25,44 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
-      - name: Install repo-local tool dependencies
+      - name: Install Workbench v3 tool dependencies
         run: npm install
 
-      - name: Syntax-check live GUI modules
+      - name: Syntax-check Workbench v3 runtime modules
         run: |
           npm run js:check -- ui-v3/app.js
           npm run js:check -- ui-v3/atlas-renderer.js
           npm run js:check -- ui-v3/atlas-renderer-core.js
           npm run js:check -- ui-v3/atlas-map-enhancer.js
 
-      - name: Audit live GUI entry path
+      - name: Audit Workbench v3 entry path
         run: npm run gui:entry-audit -- workbench-v3.html > gui-entry-audit.json
 
-      - name: Cut-check live GUI path
+      - name: Cut-check Workbench v3 path
         run: npm run gui:cut-check -- workbench-v3.html > gui-cut-check.json
 
-      - name: Require clean cut-check result
+      - name: Require clean Workbench v3 cut-check result
         run: jq -e '.ok == true' gui-cut-check.json > /dev/null
 
-      - name: Scan visible-copy clusters
+      - name: Scan Workbench v3 visible-copy clusters
         run: npm run gui:copy-scan -- workbench-v3.html ui-v3 > gui-copy-scan.json
 
-      - name: Upload GUI structure reports
+      - name: Upload Workbench v3 structure reports
         uses: actions/upload-artifact@v4
         with:
-          name: gui-structure-reports
+          name: gui-v3-structure-reports
           path: |
             gui-entry-audit.json
             gui-cut-check.json
             gui-copy-scan.json
 
-      - name: Summarize GUI structure check
+      - name: Summarize Workbench v3 structure check
         run: |
-          echo '## GUI structure check' >> "$GITHUB_STEP_SUMMARY"
+          echo '## Workbench v3 structure check' >> "$GITHUB_STEP_SUMMARY"
           echo '' >> "$GITHUB_STEP_SUMMARY"
-          echo '- entry audit generated: `gui-entry-audit.json`' >> "$GITHUB_STEP_SUMMARY"
-          echo '- cut-check passed' >> "$GITHUB_STEP_SUMMARY"
-          echo '- copy scan generated: `gui-copy-scan.json`' >> "$GITHUB_STEP_SUMMARY"
+          echo '- canonical entry audited: `workbench-v3.html`' >> "$GITHUB_STEP_SUMMARY"
+          echo '- canonical runtime checked: `ui-v3/**`' >> "$GITHUB_STEP_SUMMARY"
+          echo '- cut-check passed for the Workbench v3 surface' >> "$GITHUB_STEP_SUMMARY"
+          echo '- reports uploaded as `gui-v3-structure-reports`' >> "$GITHUB_STEP_SUMMARY"

@@ -120,9 +120,10 @@ Read these when the task concerns saved cases, case indexes, smoke tests, or mar
 ## Current operational facts
 - `/solver/` exists and contains executable runtime modules.
 - `/.github/workflows/` contains useful workflows including `solver-selftest.yml` and `validate-cases.yml`.
-- The public workbench now routes through `/index.html` and the v3 surface.
-- `/workbench-v3.html` is the direct v3 workbench surface.
-- `ui-v3/` is the live frontend implementation layer in the current repo state.
+- The canonical live GUI surface is `workbench-v3.html`.
+- Root `/index.html` now redirects to `./workbench-v3.html` for operator convenience.
+- `ui-v3/**`, `tools/js/gui-*`, and the `gui-*` workflows are the canonical live GUI support surface.
+- `ui-v2/**` and the former v2 root workbench are no longer treated as the active live GUI surface.
 - If a large file write fails through the assistant tool path, prefer manual paste or git-object write paths rather than redefining architecture.
 - JavaScript structural inspection tooling exists under `/tools/js/` and should be discoverable from boot via `/main/INSTRUCTIONS_INDEX.md`.
 
