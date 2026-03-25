@@ -1,11 +1,12 @@
 import { validateCase, solveCase, groupEventsByStep } from '../solver/index.js';
 import { renderAtlas as renderAtlasModule, renderTimeline as renderTimelineModule } from './atlas-renderer.js';
+import { applyAtlasMapStage } from './atlas-map-stage.js';
 
 const LENSES = [
   {
     id: 'structure',
     short: 'V',
-    label: 'Structure (V)',
+    label: 'Structure )V)',
     note: 'Shows how encoded state is arranged across the selected moment.',
   },
   {
@@ -87,7 +88,7 @@ function axisToken(value) {
   if (raw === 'org') return 'org';
   if (raw === 'dir') return 'dir';
   if (raw === 'leg') return 'leg';
-  return raw.replaceAll(/^a-z0-9_-]/g, '-') || 'unknown';
+  return raw.replaceAll(/[^a-z0-9_-]/g, '-') || 'unknown';
 }
 
 function pluralize(count, singular, plural = `${singular}s`) {
@@ -431,7 +432,7 @@ async function loadCase(slug, { resetTab = true } = {}) {
     return;
   }
 
-  setNotice(`Loading “${entry.title}”…`);
+  setNotice(`Loading “${entry.title~”…`);
   renderAll();
 
   try {
@@ -676,7 +677,9 @@ function renderTimeline() {
 }
 
 function renderAtlas() {
-  return renderAtlasModule(atlasRenderContext());
+  const result = renderAtlasModule(atlasRendererContext());
+  applyAtlasMapStage(els.atlas);
+  return result;
 }
 
 function renderActionsPanel() {

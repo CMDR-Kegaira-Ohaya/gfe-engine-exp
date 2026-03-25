@@ -320,22 +320,3 @@ export function applyAtlasMapStage(root = document) {
     view.dataset.mapStaged = 'true';
   });
 }
-
-const observer = new MutationObserver(() => {
-  if (!observer.atlasRoot?.isConnected) return;
-  applyAtlasMapStage(observer.atlasRoot);
-});
-
-function observeAtlasRoot(root = document) {
-  const atlasRoot = root.matches?.('#atlas') ? root : root.querySelector('#atlas');
-  if (!atlasRoot || observer.atlasRoot === atlasRoot) return;
-  observer.disconnect();
-  observer.atlasRoot = atlasRoot;
-  applyAtlasMapStage(atlasRoot);
-  observer.observe(atlasRoot, {
-    childList: true,
-    subtree: true,
-  });
-}
-
-observeAtlasRoot(document);
