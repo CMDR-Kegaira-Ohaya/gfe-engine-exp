@@ -19,6 +19,10 @@ const TIMELINE_COPY_RULES = [
     from: 'No actions are encoded for this step yet.',
     to: 'No encounters are encoded for this step yet.',
   },
+  {
+    selector: '.timeline-sub',
+    transform: (text) => text.replace(/\baction(s)?\b/g, 'encounter$1'),
+  },
 ];
 
 const ATLAS_COPY_RULES = [
@@ -42,13 +46,30 @@ const ATLAS_COPY_RULES = [
     from: 'Current linked encounters',
     to: 'Linked encounter details',
   },
+  {
+    selector: '.context-kicker',
+    from: 'Relation Atlas',
+    to: 'Atlas',
+  },
+  {
+    selector: '.atlas-section-stack .inline-empty',
+    from: 'No relation events are encoded here yet.',
+    to: 'No encounters are encoded here yet.',
+  },
 ];
 
 function applyCopyRules(root, rules) {
   if (!root) return;
-  rules.forEach(({ selector, from, to }) => {
-    root.querySelectorAll(selector).forEach((node) => {
-      if (node.textContent?.trim() === from) node.textContent = to;
+  rules.forEach((rule) => {
+    root.querySelectorAll(rule.selector).forEach((node) => {
+      const current = node.textContent?.trim();
+      if (!current) return;
+      if (rule.transform) {
+        const next = rule.transform(current);
+        if (next && next !== current) node.textContent = next;
+        return;
+      }
+      if (current === rule.from) node.textContent = rule.to;
     });
   });
 }
