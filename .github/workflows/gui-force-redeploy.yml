@@ -1,0 +1,35 @@
+name: gui-force-redeploy
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  force-redeploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create redeploy marker commit
+        run: |
+          mkdir -p .github/redeploy
+          printf '{"ts":"%s","run_id":"%s","workflow":"gui-force-redeploy"}\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$GITHUB_RUN_ID" > .github/redeploy/gui-force-redeploy.json
+          git add .github/redeploy/gui-force-redeploy.json
+          git commit -m "chore: force gui redeploy" || exit 0
+          git push
+
+      - name: Summarize forced redeploy
+        run: |
+          echo '## GUI force redeploy' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '- wrote `.github/redeploy/gui-force-redeploy.json`' >> "$GITHUB_STEP_SUMMARY"
+          echo '- pushed a marker commit to invalidate the live deploy path intentionally' >> "$GITHUB_STEP_SUMMARY"

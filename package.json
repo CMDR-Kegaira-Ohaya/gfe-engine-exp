@@ -15,7 +15,11 @@
     "gui:cut-check": "node ./tools/js/gui-cut-check.mjs",
     "gui:symbol-move": "node ./tools/js/gui-symbol-move.mjs",
     "gui:rewrite": "node ./tools/js/gui-rewrite.mjs",
-    "gui:live-smoke": "node ./tools/js/gui-live-smoke.mjs"
+    "gui:live-smoke": "node ./tools/js/gui-live-smoke.mjs",
+    "gui:repo-diff": "node ./tools/js/gui-repo-diff.mjs",
+    "gui:pages-artifact-verify": "node ./tools/js/gui-pages-artifact-verify.mjs",
+    "gui:force-redeploy": "node ./tools/js/gui-force-redeploy.mjs",
+    "gui:validate-chain": "node ./tools/js/gui-validate-chain.mjs"
   },
   "dependencies": {
     "acorn": "^8.16.0",

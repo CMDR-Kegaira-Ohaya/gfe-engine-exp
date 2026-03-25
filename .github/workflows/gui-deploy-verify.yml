@@ -1,0 +1,66 @@
+name: gui-deploy-verify
+
+on:
+  push:
+    paths:
+      - 'workbench-v3.html'
+      - 'ui-v3/**'
+      - 'tools/js/**'
+      - 'package.json'
+      - '.github/workflows/gui-deploy-verify.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  pages: read
+
+jobs:
+  validate-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install repo-local tool dependencies
+        run: npm install
+
+      - name: Resolve validation base ref
+        run: |
+          if git rev-parse --verify HEAD^ >/dev/null 2>&1; then
+            echo "BASE_REF=HEAD^" >> "$GITHUB_ENV"
+          else
+            echo "BASE_REF=HEAD" >> "$GITHUB_ENV"
+          fi
+
+      - name: Run GUI validation chain
+        run: |
+          npm run gui:validate-chain -- \
+            --base-ref "$BASE_REF" \
+            --head-ref HEAD \
+            --pages-verify \
+            --copy-scan \
+            --head-sha "$GITHUB_SHA" \
+            --allow-in-progress > gui-validate-chain.json
+
+      - name: Upload GUI validation chain report
+        uses: actions/upload-artifact@v4
+        with:
+          name: gui-validate-chain-report
+          path: gui-validate-chain.json
+
+      - name: Require GUI validation chain success
+        run: jq -e '.ok == true' gui-validate-chain.json > /dev/null
+
+      - name: Summarize GUI validation chain
+        run: |
+          echo '## GUI deploy verify' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '- validation chain completed' >> "$GITHUB_STEP_SUMMARY"
+          echo '- pages/artifact verification executed in best-effort mode for the current head SHA' >> "$GITHUB_STEP_SUMMARY"
+          echo '- see `gui-validate-chain.json` artifact for full details' >> "$GITHUB_STEP_SUMMARY"
