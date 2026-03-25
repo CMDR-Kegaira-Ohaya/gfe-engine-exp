@@ -88,6 +88,11 @@ The current action surface supports:
 - Pages inspection
 - workflow inspection and workflow dispatch
 
+### Token-versus-connector note
+The token permission surface may include broader families than the current connector exposes.
+For example, the live token permission record includes **Webhooks — read / write**, but the current custom GPT action surface does **not** currently expose webhook CRUD endpoints.
+So webhook authority should not be treated as a blocker assumption, but it also should not be treated as a directly callable connector capability unless the action surface is expanded.
+
 ### Current path model note
 The active file surface is the generic `/contents/{path}` model.
 That means nested repository paths are part of the intended working surface.
@@ -103,7 +108,7 @@ The generic path-based contents endpoints and the git-object endpoints are the p
 
 ### Browser app caution
 Repo-control capability available to the GPT/operator is not the same thing as a safe browser-app feature.
-Do not automatically assume that because the GPT  can mutate or delete stored artifacts, the public app should expose the same operation in the same way.
+Do not automatically assume that because the GPT can mutate or delete stored artifacts, the public app should expose the same operation in the same way.
 
 ## How to use this file
 [RID_CAPABILITY_USAGE]
