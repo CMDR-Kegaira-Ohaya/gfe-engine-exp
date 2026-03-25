@@ -8,7 +8,12 @@
     "js:symbols": "node ./tools/js/parse.mjs symbols",
     "js:deps": "node ./tools/js/parse.mjs deps",
     "js:find": "node ./tools/js/parse.mjs find",
-    "js:summary-all": "node ./tools/js/summary-all.mjs"
+    "js:summary-all": "node ./tools/js/summary-all.mjs",
+    "gui:slice": "node ./tools/js/gui-slice.mjs",
+    "gui:entry-audit": "node ./tools/js/gui-entry-audit.mjs",
+    "gui:copy-scan": "node ./tools/js/gui-copy-scan.mjs",
+    "gui:cut-check": "node ./tools/js/gui-cut-check.mjs",
+    "gui:symbol-move": "node ./tools/js/gui-symbol-move.mjs"
   },
   "dependencies": {
     "acorn": "^8.16.0",
