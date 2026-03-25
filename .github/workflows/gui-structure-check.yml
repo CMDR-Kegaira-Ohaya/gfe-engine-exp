@@ -37,16 +37,16 @@ jobs:
           npm run js:check -- ui-v3/atlas-renderer-core.js
 
       - name: Audit Workbench v3 entry path
-        run: npm run gui:entry-audit -- workbench-v3.html > gui-entry-audit.json
+        run: npm run --silent gui:entry-audit -- workbench-v3.html > gui-entry-audit.json
 
       - name: Cut-check Workbench v3 path
-        run: npm run gui:cut-check -- workbench-v3.html > gui-cut-check.json
+        run: npm run --silent gui:cut-check -- workbench-v3.html > gui-cut-check.json
 
       - name: Require clean Workbench v3 cut-check result
         run: jq -e '.ok == true' gui-cut-check.json > /dev/null
 
       - name: Scan Workbench v3 visible-copy clusters
-        run: npm run gui:copy-scan -- workbench-v3.html ui-v3 > gui-copy-scan.json
+        run: npm run --silent gui:copy-scan -- workbench-v3.html ui-v3 > gui-copy-scan.json
 
       - name: Upload Workbench v3 structure reports
         uses: actions/upload-artifact@v4

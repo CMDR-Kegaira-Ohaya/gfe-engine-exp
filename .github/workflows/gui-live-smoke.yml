@@ -31,7 +31,7 @@ jobs:
         run: npm install
 
       - name: Run Workbench v3 local smoke harness
-        run: npm run gui:live-smoke -- workbench-v3.html > gui-live-smoke.json
+        run: npm run --silent gui:live-smoke -- workbench-v3.html > gui-live-smoke.json
 
       - name: Require successful Workbench v3 smoke result
         run: jq -e '.ok == true' gui-live-smoke.json > /dev/null

@@ -71,9 +71,9 @@ jobs:
         shell: bash
         run: |
           if [ "${{ needs.scope.outputs.runtime_changed }}" = "true" ]; then
-            npm run gui:validate-chain -- --base-ref "${{ needs.scope.outputs.base_ref }}" --head-ref HEAD --copy-scan > gui-validate-chain.json
+            npm run --silent gui:validate-chain -- --base-ref "${{ needs.scope.outputs.base_ref }}" --head-ref HEAD --copy-scan > gui-validate-chain.json
           else
-            npm run gui:validate-chain -- --base-ref "${{ needs.scope.outputs.base_ref }}" --head-ref HEAD > gui-validate-chain.json
+            npm run --silent gui:validate-chain -- --base-ref "${{ needs.scope.outputs.base_ref }}" --head-ref HEAD > gui-validate-chain.json
           fi
 
       - name: Upload authoritative Workbench v3 validation report
@@ -113,7 +113,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
-          npm run gui:pages-live-smoke -- --page-path workbench-v3.html --retries 20 --delay-ms 15000 > gui-pages-live-smoke.json
+          npm run --silent gui:pages-live-smoke -- --page-path workbench-v3.html --retries 20 --delay-ms 15000 > gui-pages-live-smoke.json
 
       - name: Upload canonical Workbench v3 Pages smoke report
         uses: actions/upload-artifact@v4
