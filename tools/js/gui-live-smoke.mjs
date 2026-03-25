@@ -141,12 +141,29 @@ function createLocalFetch(baseHtmlFile, events) {
   };
 }
 
-async function waitForUi(window, timeoutMs = 1500) {
+function uiReadyState(window) {
+  const notice = window.document.getElementById('notice')?.textContent?.trim() ?? '';
+  const side = window.document.getElementById('side-panel-body')?.textContent?.trim() ?? '';
+  const currentSlug = window.document.getElementById('current-slug')?.textContent?.trim() ?? '';
+  const atlasText = window.document.getElementById('atlas')?.textContent?.trim() ?? '';
+  const timelineText = window.document.getElementById('timeline')?.textContent?.trim() ?? '';
+
+  return {
+    notice,
+    side,
+    current_case_loaded: !!currentSlug && currentSlug !== 'No case open',
+    atlas_rendered: !!atlasText && atlasText !== 'No atlas data yet.' && atlasText !== 'No relation atlas data yet.',
+    timeline_rendered: !!timelineText && timelineText !== 'No timeline loaded.',
+    loading_notice: /^Loading\b/i.test(notice),
+    loading_side: side.includes('Loading catalog') || side.includes('Loading canonical catalog'),
+  };
+}
+
+async function waitForUi(window, timeoutMs = 5000) {
   const started = Date.now();
   while (Date.now() - started < timeoutMs) {
-    const notice = window.document.getElementById('notice')?.textContent?.trim() ?? '';
-    const side = window.document.getElementById('side-panel-body')?.textContent?.trim() ?? '';
-    if (!notice.includes('Loading canonical catalog') && !side.includes('Loading catalog')) break;
+    const state = uiReadyState(window);
+    if (!state.loading_notice && !state.loading_side && state.current_case_loaded && state.atlas_rendered && state.timeline_rendered) break;
     await sleep(25);
   }
   await sleep(50);
