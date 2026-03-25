@@ -247,8 +247,11 @@ function buildMarkers(field, dockBody, targets) {
   return { interactives, zones: buildZoneLayer(groups), firstMarker };
 }
 
-function applyAtlasMapStage(root = document) {
-  root.querySelectorAll('#atlas > .atlas-view').forEach((view) => {
+export function applyAtlasMapStage(root = document) {
+  const atlasRoot = root.matches?.('#atlas') ? root : root.querySelector('#atlas');
+  if (!atlasRoot) return;
+
+  atlasRoot.querySelectorAll(':scope > .atlas-view').forEach((view) => {
     if (view.dataset.mapStaged === 'true') return;
 
     const topRow = view.querySelector('.atlas-top-row');
@@ -319,11 +322,20 @@ function applyAtlasMapStage(root = document) {
 }
 
 const observer = new MutationObserver(() => {
-  applyAtlasMapStage();
+  if (!observer.atlasRoot?.isConnected) return;
+  applyAtlasMapStage(observer.atlasRoot);
 });
 
-applyAtlasMapStage();
-observer.observe(document.body, {
-  childList: true,
-  subtree: true,
-});
+function observeAtlasRoot(root = document) {
+  const atlasRoot = root.matches?.('#atlas') ? root : root.querySelector('#atlas');
+  if (!atlasRoot || observer.atlasRoot === atlasRoot) return;
+  observer.disconnect();
+  observer.atlasRoot = atlasRoot;
+  applyAtlasMapStage(atlasRoot);
+  observer.observe(atlasRoot, {
+    childList: true,
+    subtree: true,
+  });
+}
+
+observeAtlasRoot(document);
