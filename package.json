@@ -13,10 +13,13 @@
     "gui:entry-audit": "node ./tools/js/gui-entry-audit.mjs",
     "gui:copy-scan": "node ./tools/js/gui-copy-scan.mjs",
     "gui:cut-check": "node ./tools/js/gui-cut-check.mjs",
-    "gui:symbol-move": "node ./tools/js/gui-symbol-move.mjs"
+    "gui:symbol-move": "node ./tools/js/gui-symbol-move.mjs",
+    "gui:rewrite": "node ./tools/js/gui-rewrite.mjs",
+    "gui:live-smoke": "node ./tools/js/gui-live-smoke.mjs"
   },
   "dependencies": {
     "acorn": "^8.16.0",
-    "acorn-walk": "^8.3.5"
+    "acorn-walk": "^8.3.5",
+    "jsdom": "^24.1.3"
   }
 }
