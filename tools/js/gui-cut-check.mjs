@@ -16,6 +16,10 @@ function hasCall(text, symbol) {
   return new RegExp(`\\b${symbol}\\s*\\(`).test(text);
 }
 
+function hasDeclaration(text, symbol) {
+  return new RegExp(`function\\s+${symbol}\\s*\\(`).test(text);
+}
+
 async function main() {
   const [, , htmlArg] = process.argv;
   if (!htmlArg) {
@@ -39,18 +43,54 @@ async function main() {
 
   graph.missingImports.forEach((missing) => issues.push({ severity: 'error', kind: 'missing-import', ...missing }));
 
-  const allNodes = Object.values(graph.nodeMap);
-  allNodes.forEach((node) => {
+  Object.values(graph.nodeMap).forEach((node) => {
     if (!node.text) return;
-    if (node.file !== 'ui-v3/atlas-renderer.js' && hasCall(node.text, 'enhanceAtlasMap')) {
-      issues.push({ severity: 'warn', kind: 'enhancer-call-outside-renderer', file: node.file });
+
+    if (/atlas-map-enhancer\.js/.test(node.text)) {
+      issues.push({
+        severity: 'error',
+        kind: 'deleted-enhancer-import-reference',
+        file: node.file,
+        detail: 'atlas-map-enhancer.js should not be referenced after enhancer removal.',
+      });
+    }
+
+    if (hasCall(node.text, 'enhanceAtlasMap')) {
+      issues.push({
+        severity: 'error',
+        kind: 'deleted-enhancer-call-reference',
+        file: node.file,
+        detail: 'enhanceAtlasMap() should not be called after enhancer removal.',
+      });
     }
   });
 
-  const appNode = graph.nodeMap['ui-v3/app.js'];
   const rendererNode = graph.nodeMap['ui-v3/atlas-renderer.js'];
-  if (appNode?.text && rendererNode?.text && hasCall(appNode.text, 'enhanceAtlasMap') && hasCall(rendererNode.text, 'enhanceAtlasMap')) {
-    issues.push({ severity: 'warn', kind: 'duplicate-enhancer-ownership', files: ['ui-v3/app.js', 'ui-v3/atlas-renderer.js'] });
+  if (!rendererNode?.text) {
+    issues.push({
+      severity: 'error',
+      kind: 'missing-renderer-node',
+      file: 'ui-v3/atlas-renderer.js',
+      detail: 'The canonical Workbench v3 renderer module must be reachable from the live entry path.',
+    });
+  } else {
+    if (!hasDeclaration(rendererNode.text, 'ensureAtlasMapShells')) {
+      issues.push({
+        severity: 'error',
+        kind: 'missing-renderer-shell-scaffolding',
+        file: 'ui-v3/atlas-renderer.js',
+        detail: 'Renderer-owned atlas shell scaffolding is missing.',
+      });
+    }
+
+    if (!hasDeclaration(rendererNode.text, 'wireAtlasMap')) {
+      issues.push({
+        severity: 'error',
+        kind: 'missing-renderer-map-wiring',
+        file: 'ui-v3/atlas-renderer.js',
+        detail: 'Renderer-owned atlas map interaction wiring is missing.',
+      });
+    }
   }
 
   console.log(JSON.stringify({

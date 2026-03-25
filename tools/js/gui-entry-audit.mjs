@@ -22,6 +22,10 @@ function countLiteral(text, pattern) {
   return matches ? matches.length : 0;
 }
 
+function hasLiteral(text, pattern) {
+  return pattern.test(text);
+}
+
 async function main() {
   const [, , htmlArg] = process.argv;
   if (!htmlArg) {
@@ -36,18 +40,39 @@ async function main() {
   const graph = await buildModuleGraph(entryModules);
 
   const warnings = [];
-  const appNode = graph.nodeMap['ui-v3/app.js'];
   const rendererNode = graph.nodeMap['ui-v3/atlas-renderer.js'];
 
-  if (appNode?.text && rendererNode?.text) {
-    const appCalls = countLiteral(appNode.text, /\benhanceAtlasMap\s*\(/g);
-    const rendererCalls = countLiteral(rendererNode.text, /\benhanceAtlasMap\s*\(/g);
-    if (appCalls && rendererCalls) {
+  Object.values(graph.nodeMap).forEach((node) => {
+    if (!node.text) return;
+
+    const staleEnhancerImport = countLiteral(node.text, /atlas-map-enhancer\.js/g);
+    const staleEnhancerCall = countLiteral(node.text, /\benhanceAtlasMap\s*\(/g);
+
+    if (staleEnhancerImport || staleEnhancerCall) {
       warnings.push({
-        kind: 'duplicate-atlas-enhancement-ownership',
-        app_calls: appCalls,
-        renderer_calls: rendererCalls,
-        detail: 'enhanceAtlasMap is still called from both app.js and atlas-renderer.js',
+        kind: 'stale-enhancer-reference',
+        file: node.file,
+        import_hits: staleEnhancerImport,
+        call_hits: staleEnhancerCall,
+        detail: 'atlas-map-enhancer.js and enhanceAtlasMap() should no longer appear in the canonical Workbench v3 runtime path.',
+      });
+    }
+  });
+
+  if (rendererNode?.text) {
+    if (!hasLiteral(rendererNode.text, /function\s+ensureAtlasMapShells\s*\(/)) {
+      warnings.push({
+        kind: 'renderer-shell-scaffolding-missing',
+        file: 'ui-v3/atlas-renderer.js',
+        detail: 'atlas shell scaffolding is expected to live directly in atlas-renderer.js.',
+      });
+    }
+
+    if (!hasLiteral(rendererNode.text, /function\s+wireAtlasMap\s*\(/)) {
+      warnings.push({
+        kind: 'renderer-map-wiring-missing',
+        file: 'ui-v3/atlas-renderer.js',
+        detail: 'atlas map interaction wiring is expected to live directly in atlas-renderer.js.',
       });
     }
   }
