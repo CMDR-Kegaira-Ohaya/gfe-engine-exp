@@ -7,6 +7,12 @@ This file is the canonical bootstrap entrypoint for GPT sessions and operator re
 If a GPT session has repo-control access, start here before touching implementation files.
 Read in this order unless the task explicitly requires a narrower path.
 
+## Self-referential layer
+The repo self-referential layer is centered in `/main/`.
+Use `/main/*` as the bootstrap, operator, structure, tooling, and capability map.
+Do not spread repo authority into side lanes.
+Lane-local notes may exist elsewhere, but they do not replace `/main/`.
+
 ## Authority and traversal order
 
 ### Layer 1 — Canonical engine doctrine
@@ -30,7 +36,7 @@ Read these next when the task concerns how this repository is organized or how t
 5. `/main/REPO_SCHEMA.json`
 6. `/PROCEDURE_INDEX.md`
 7. `/main/GPT_CAPABILITY_SURFACE.md`
-8. `/main/TOKEN_PERMISSION_SURFACE.md
+8. `/main/TOKEN_PERMISSION_SURFACE.md`
 
 ### Layer 3 — Solver implementation
 [RID_TOC_SOLVER_LAYER]
@@ -43,9 +49,9 @@ Read these when the task concerns executable math, validation, normalization, da
 Read these when the task concerns the workbench UI, rendering, repo connection logic, or Pages behavior.
 
 - `/index.html`
-- `/workbench-v2.html`
+- `/workbench-v3.html`
 - `/privacy.html`
-- `/ui-v2/`
+- `/ui-v3/`
 - `/.github/workflows/`
 
 ### Layer 5 — Case payloads
@@ -53,6 +59,7 @@ Read these when the task concerns the workbench UI, rendering, repo connection l
 Read these when the task concerns saved cases, case indexes, smoke tests, or markdown companions.
 
 - `/cases/`
+- `/catalog/`
 
 ## Quick routing by task
 
@@ -75,7 +82,7 @@ Read these when the task concerns saved cases, case indexes, smoke tests, or mar
 ### Repo debugging / UI bugs / Pages issues
 - Start with `/main/SYSTEM_MAP.md`
 - Then `/main/EDIT_RULES.md`
-- Then relevant files in `/index.html`, `workbench-v2.html`, `/ui-v2/*`, `.github/`
+- Then relevant files in `/index.html`, `/workbench-v3.html`, `/ui-v3/*`, `/.github/`
 
 ### Save/load flow or schema issues
 - Start with `/main/REPO_SCHEMA.json`
@@ -91,7 +98,7 @@ Read these when the task concerns saved cases, case indexes, smoke tests, or mar
 - Read this file
 - Read `/main/GPT_OPERATOR_MANUAL.md`
 - Read `/main/SYSTEM_MAP.md`
-- Only then branch into engine, solver, UI, or workflow files
+- Only then branch into engine, solver, UI, workflow, or case files
 
 ## Operational cross-links
 - Instructions and tooling: `/main/INSTRUCTIONS_INDEX.md`
@@ -111,12 +118,13 @@ Read these when the task concerns saved cases, case indexes, smoke tests, or mar
 - The assistant may inspect, analyze, test, and report findings, but repository changes require explicit human approval.
 
 ## Current operational facts
-- `/solver/` now exists and contains executable runtime modules.
-- `/.github/workflows/` now contains at least two useful workflows: `solver-selftest.yml` and `validate-cases.yml`.
-- The public workbench now routes through `/index.html` and `/ui-v2/app.js`.
-- `workbench-v2.html` remains as a compatibility surface for the same v2 workbench.
+- `/solver/` exists and contains executable runtime modules.
+- `/.github/workflows/` contains useful workflows including `solver-selftest.yml` and `validate-cases.yml`.
+- The public workbench now routes through `/index.html` and the v3 surface.
+- `/workbench-v3.html` is the direct v3 workbench surface.
+- `ui-v3/` is the live frontend implementation layer in the current repo state.
 - If a large file write fails through the assistant tool path, prefer manual paste or git-object write paths rather than redefining architecture.
-- JavaScript structural inspection tooling now exists under `/tools/js/` and should be discoverable from boot via `/main/INSTRUCTIONS_INDEX.md`.
+- JavaScript structural inspection tooling exists under `/tools/js/` and should be discoverable from boot via `/main/INSTRUCTIONS_INDEX.md`.
 
 ## Canonical status labels
 - **Canonical**: source of truth for meaning

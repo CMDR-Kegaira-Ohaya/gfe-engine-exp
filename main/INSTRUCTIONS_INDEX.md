@@ -21,6 +21,11 @@ It is not canonical engine doctrine. It supplements `/main/TOC.md` and `/main/GP
 - GPT connector/API action surface: `/main/GPT_CAPABILITY_SURFACE.md`
 - Live token permission surface: `/main/TOKEN_PERMISSION_SURFACE.md`
 
+## Self-referential layer boundary
+The repo-wide self-referential layer is `/main/*`.
+Add repo-wide tooling references here or in the other `/main/*` control docs.
+Do not create parallel repo control layers in side lanes.
+
 ## Operational tools
 [RID_INSTRUCTIONS_OPERATIONAL_TOOLS]
 
@@ -34,10 +39,10 @@ npm install
 
 Commands:
 ```bash
-npm run js:check -- ui-v2/app.js
-npm run js:symbols -- ui-v2/app.js
-npm run js:deps -- ui-v2/app.js
-npm run js:find -- ui-v2/app.js render
+npm run js:check -- ui-v3/app.js
+npm run js:symbols -- ui-v3/app.js
+npm run js:deps -- ui-v3/app.js
+npm run js:find -- ui-v3/app.js render
 npm run js:summary-all
 ```
 
@@ -47,7 +52,7 @@ What it gives:
 - import/export summaries
 - dependency edges
 - identifier lookup
-- batch summaries across `/ui/`, `/ui-v2/`, and `/solver/`
+- batch summaries across `/ui/`, `/ui-v3/`, and `/solver/`
 
 Boundaries:
 - this is for structural inspection, not for doctrine
@@ -81,6 +86,6 @@ Boundaries:
 - when a repo capability is operational, repeatable, and not canonical doctrine
 - when usage should be cross-linked with procedures or tooling
 
-````
+```text
 If a new repo-useful tool is added, list it here and add a cross-link from `/main/TOC.md`.
-````
+```

@@ -8,7 +8,7 @@
 Canonical GFE source stack copied into the repository so sessions can bootstrap from repo state rather than hidden GPT memory.
 
 ### `/main/`
-Operational control layer for GPT re-entry:
+Operational control layer and centralized self-referential layer for GPT re-entry:
 - `TOC.md` = bootstrap entrypoint
 - `GPT_OPERATOR_MANUAL.md` = session operating logic
 - `SYSTEM_MAP.md` = structural map
@@ -18,6 +18,9 @@ Operational control layer for GPT re-entry:
 - `EDIT_RULES.md` = edit boundaries and workflow constraints
 - `REPO_SCHEMA.json` = machine-readable directory and file-role map
 
+This is the only repo-wide self-referential layer.
+Lane-local notes may exist elsewhere, but they do not replace `/main/`.
+
 ### `/solver/`
 Executable implementation layer for validation, normalization, payload handling, prevalence, envelope, compensation, cascade, and future runtime math.
 This layer implements canon but does not revise it.
@@ -25,16 +28,19 @@ No automatic process may modify this layer.
 
 ### Root HTML
 - `index.html` = public Pages workbench entrypoint
-- `workbench-v2.html` = compatibility entry for the same v2 workbench surface
+- `workbench-v3.html` = direct v3 workbench surface
 - `privacy.html` = public privacy page
 
-### `/ui-v2/`
+### `/ui-v3/`
 Active frontend workbench modules for rendering, workspace assembly, repo case loading, timeline/participant focus, derived-state inspection, salience styling, and polish behavior.
-`/ui-v2/app.js` is the active ingest entry point for running validation and solver runtime on loaded cases.
+`/ui-v3/app.js` is the active app entry point for the v3 workbench surface.
 
 ### `/cases/`
 Repository-level case storage for public/shared/demo/smoke-test data.
 Cases are consumed by the workbench and by solver validation scripts and workflows.
+
+### `/catalog/`
+Catalog/index layer for discoverable case artifacts used by the workbench.
 
 ### `/.github/workflows/`
 Workflow and automation files for repository maintenance and Pages behavior.
@@ -45,9 +51,15 @@ Currently includes at least:
 ### `/tools/js/`
 Operational JavaScript inspection tooling for syntax checks, AST parsing, symbol summaries, dependency edges, identifier lookup, and batch summaries.
 
+### `/users/`
+Lane-local user working areas.
+Useful for notes, tools, and project boards.
+Not part of the repo-wide self-referential authority layer.
+
 ## Self-referential capability map
 [RID_SYSTEM_SELFREF_CAPABILITY_MAP]
-- workbench surfaces = `/index.html` + `/ui-v2/*`, with `workbench-v2.html` as a compatibility route to the same v2 workbench
+- bootstrap surfaces = `/main/*`
+- workbench surfaces = `/index.html`, `/workbench-v3.html`, `/ui-v3/*`
 - workflow surfaces = `/.github/workflows/*` for validation, selftest, and repo maintenance
 - inspection/tooling surfaces = `/tools/js/*` for JavaScript structure inspection and `/main/INSTRUCTIONS_INDEX.md` + `/PROCEDURE_INDEX.md` for operational guidance
 - GPT repo-control connector surface = `/main/GPT_CAPABILITY_SURFACE.md` for custom connector capabilities and repo-control caveats
@@ -59,7 +71,7 @@ Operational JavaScript inspection tooling for syntax checks, AST parsing, symbol
 2. Canonical meaning comes from `/engine/*`
 3. Repo operating behavior comes from `/main/*`
 4. Executable logic, when present, lives in `/solver/*`
-5. The public workbench renders and manipulates case data through `index.html`, `workbench-v2.html`, and `/ui-v2/*`
+5. The public workbench renders and manipulates case data through `index.html`, `workbench-v3.html`, and `/ui-v3/*`
 6. Workflows run repo-level checks over solver and case data
 7. Cases live under `/cases/*`
 
@@ -72,8 +84,6 @@ Operational JavaScript inspection tooling for syntax checks, AST parsing, symbol
 
 ## Current intended usage
 - `main` branch = public workbench and canonical implementation
-- `cases/users/shared` = shared branch
-- `cases/users/various` = miscellaneous communal/testing branch
 
 ## What should not be collapsed
 - engine doctrine vs solver implementation
@@ -81,7 +91,7 @@ Operational JavaScript inspection tooling for syntax checks, AST parsing, symbol
 - workflow automation vs canonical model
 - repo operating map vs saved case data
 - bootstrap manuals vs canonical model files
-- public workbench repo vs later personal forks/copies
+- repo-wide self-reference in `/main/` vs lane-local notes under `/users/`
 
 ## Session rebuild path
 If context is lost, the minimum recovery path is:
@@ -89,8 +99,8 @@ If context is lost, the minimum recovery path is:
 
 ## Editing hotspots
 - solver work: `/solver/*`
-- UI bugs: `/ui-v2/*`, `index.html`, `workbench-v2.html`
-- save/load behavior: `/ui-v2/app.js`, `/cases/*`, relevant workflow files
+- UI bugs: `/ui-v3/*`, `index.html`, `workbench-v3.html`
+- save/load behavior: `/ui-v3/app.js`, `/cases/*`, relevant workflow files
 - automation/validation: `/.github/workflows/*`, `/solver/check-cases.js`, `/solver/selftest.js`
 - engine doctrine: `/engine/*` only when explicitly revising canonical content
 - if a large file write fails through the assistant tool path, prefer manual paste or git-object write paths rather than restructuring the repo to match the tool

@@ -19,7 +19,7 @@ Restore working context quickly and reduce drift between sessions by making the 
 [RID_OPERATOR_SESSION_BOOTSTRAP]
 1. Read `/main/TOC.md`.
 2. Read this file.
-3. Read `/main/SYSTEM_MAP.md`
+3. Read `/main/SYSTEM_MAP.md`.
 4. Read `/main/EDIT_RULES.md` if edits are likely.
 5. Read `/main/INSTRUCTIONS_INDEX.md` for repo-useful tooling and operational helpers.
 6. Read `/PROCEDURE_INDEX.md` if troubleshooting or repo-write recovery is relevant.
@@ -30,8 +30,9 @@ Restore working context quickly and reduce drift between sessions by making the 
 - GPT operating behavior inside this repo comes from `/main/*`.
 - Solver code in `/solver/*` implements canon; it does not define doctrine.
 - UI code never defines doctrine.
-- Workflow files under `/.github/workflows/*g` automate checks and maintenance; they do not define doctrine.
+- Workflow files under `/.github/workflows/*` automate checks and maintenance; they do not define doctrine.
 - Case files do not redefine the engine.
+- Repo-wide self-reference is centered in `/main/*` and should not be spread into lane-local notes.
 
 ## Use the action deliberately
 When repo-control is available:
@@ -52,7 +53,7 @@ When repo-control is available:
 - Fix the smallest real blocker first.
 - Do not rewrite large files merely for style.
 - When a module is repeatedly unstable, replace it cleanly rather than stacking brittle patches.
-- Keep shared entrypoints stable: `index.html`, `workbench-v2.html`, `/ui-v2/`, `/cases/`, `/main/`, `/engine/`, `/solver/`, `/.github/workflows/`.
+- Keep shared entrypoints stable: `index.html`, `workbench-v3.html`, `/ui-v3/`, `/cases/`, `/main/`, `/engine/`, `/solver/`, `/.github/workflows/`.
 
 ## Report-first governance
 [RID_OPERATOR_REPORT_FIRST_GOVERNANCE]
@@ -87,17 +88,18 @@ If a new session starts with no prior context:
 
 ## Current repo role split
 - `/engine/` = canonical model stack
-- `/main/` = bootstrap and operator map
+- `/main/` = bootstrap, operator map, and repo-wide self-reference
 - `/solver/` = executable implementation layers
-- `index.html`, `workbench-v2.html`, and `/ui-v2/*` = active workbench implementation
+- `index.html`, `workbench-v3.html`, and `/ui-v3/*` = active workbench implementation
 - `/.github/workflows/` = automated checks and maintenance flows
 - `/cases/` = saved data and smoke tests
 - `/tools/js/` = operational JavaScript inspection tooling
+- `/users/` = local user lanes, not repo-wide authority
 
 ## Current operational facts
 - `/solver/` exists and is active.
 - `solver-selftest.yml` checks solver integrity.
 - `validate-cases.yml` checks saved cases against solver validation.
-- The public workbench now routes through `/index.html` and `/ui-v2/app.js`.
-- `workbench-v2.html` remains as a compatibility surface for the same v2 workbench.
+- The public workbench routes through `/index.html` and the v3 surface.
+- `workbench-v3.html` remains available as the direct v3 workbench surface.
 - Repo-useful tooling and troubleshooting should be discoverable from boot through `/main/INSTRUCTIONS_INDEX.md` and `/PROCEDURE_INDEX.md`.
