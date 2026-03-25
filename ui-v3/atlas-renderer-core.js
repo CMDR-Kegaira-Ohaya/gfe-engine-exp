@@ -204,7 +204,7 @@ function renderEventCards(events, emptyMessage = 'No relation events are encoded
 
 function renderExpressionParticipantCard(participantId, participantData) {
   const axisEntries = Object.entries(participantData.axes || {});
-  return `<section class="expression-card" data-map-kind="expression" data-map-label="${esc(label(participantId))}">
+  return `<section class="expression-card" data-axis="identity" data-map-kind="expression" data-map-label="${esc(label(participantId))}">
     <div class="section-heading-row">
       <div>
         <div class="group-label">Participant state</div>
@@ -346,6 +346,7 @@ function renderStructureOverview(step) {
       ],
       renderAxisCards(participantData.axes || {}),
       {
+        axis: 'identity',
         pillClass: 'compact axis-pill-row axis-pill-row--identity',
         mapKind: 'structure',
         mapLabel: label(participantId),
@@ -370,6 +371,7 @@ function renderStructureParticipant(stepIndex, participantId, participantData) {
       ],
       renderAxisCards(participantData.axes || {}),
       {
+        axis: 'identity',
         mapKind: 'structure',
         mapLabel: label(participantId),
       },
@@ -416,6 +418,7 @@ function renderRelationsOverview(stepIndex, step) {
       ],
       renderEventCards(getStepEvents(stepIndex)),
       {
+        axis: 'relations',
         mapKind: 'relations',
         mapLabel: selectedMomentLabel(),
       },
@@ -439,6 +442,7 @@ function renderRelationsParticipant(stepIndex, participantId) {
       ],
       renderEventCards(events, 'No encounters in this step include the focused participant yet.'),
       {
+        axis: 'relations',
         mapKind: 'relations',
         mapLabel: label(participantId),
       },
@@ -491,11 +495,13 @@ function renderExpressionOverview(stepIndex, step) {
           pluralize(Array.isArray(event.payload_bundle) ? event.payload_bundle.length : 0, 'primitive'),
         ].filter(Boolean), `compact axis-pill-row axis-pill-row--${esc(axisToken(event.axis || 'axis'))}`)}</section>`).join('')}</div>`,
         {
+          axis: 'expression',
           mapKind: 'expression',
           mapLabel: 'Current encounter surfaces',
         },
       ) : ''}`,
       {
+        axis: 'expression',
         mapKind: 'expression',
         mapLabel: selectedMomentLabel(),
       },
@@ -518,6 +524,7 @@ function renderExpressionParticipant(stepIndex, participantId, participantData) 
         pluralize(Array.isArray(event.payload_bundle) ? event.payload_bundle.length : 0, 'primitive'),
       ].filter(Boolean), `compact axis-pill-row axis-pill-row--${esc(axisToken(event.axis || 'axis'))}`)}</section>`).join('')}</div>` : '<div class="inline-empty">No expression-linked encounters include this participant in the selected step yet.</div>',
       {
+        axis: 'expression',
         mapKind: 'expression',
         mapLabel: 'Current linked encounters',
       },

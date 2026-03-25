@@ -108,19 +108,6 @@ function applyCopyRules(root, rules) {
   });
 }
 
-function annotateAtlasMapMetadata(root) {
-  if (!root) return;
-
-  root.querySelectorAll(':scope > .atlas-view').forEach((view) => {
-    view.querySelectorAll(':scope > .atlas-section-stack > .atlas-section, :scope > .atlas-section-stack > .expression-card').forEach((section) => {
-      if (!section.dataset.axis) {
-        const axisNode = section.querySelector('[data-axis]');
-        if (axisNode?.dataset.axis) section.dataset.axis = axisNode.dataset.axis;
-      }
-    });
-  });
-}
-
 function atlasRootFrom(root = document) {
   return root.matches?.('#atlas') ? root : root.querySelector('#atlas');
 }
@@ -378,7 +365,6 @@ export function renderAtlas(ctx) {
     ATLAS_COPY_RULES,
     ctx,
     (root) => {
-      annotateAtlasMapMetadata(root);
       wireAtlasMap(root);
     },
   );
