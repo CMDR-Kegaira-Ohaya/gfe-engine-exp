@@ -83,6 +83,19 @@ function deriveAtlasViewKind(view) {
   return match ? match.replace('atlas-view--', '') : 'overview';
 }
 
+function fieldTitleFromView(view) {
+  return view.dataset.mapHeading || view.querySelector('.atlas-heading')?.textContent?.trim() || 'Atlas field';
+}
+
+function mapNoteFromView(view) {
+  return view.dataset.mapNote || view.querySelector('.atlas-note')?.textContent?.trim() || 'Atlas field view.';
+}
+
+function fieldPillsFromView(view) {
+  const statePills = view.querySelector('.atlas-state-pills');
+  return statePills ? statePills.cloneNode(true).outerHTML : '';
+}
+
 function sectionHeading(section) {
   return section.querySelector('h5')?.textContent?.trim()
     || section.querySelector('.expression-name,.event-card-title,.group-label')?.textContent?.trim()
@@ -144,6 +157,53 @@ function annotateAtlasMapMetadata(root) {
   });
 }
 
+function ensureAtlasMapShells(root) {
+  if (!root) return;
+
+  root.querySelectorAll(':scope > .atlas-view').forEach((view) => {
+    if (view.querySelector(':scope > .atlas-map-shell')) return;
+
+    const mapShell = document.createElement('div');
+    mapShell.className = 'atlas-map-shell';
+
+    const field = document.createElement('section');
+    field.className = 'atlas-map-field';
+    field.dataset.viewKind = view.dataset.mapViewKind || deriveAtlasViewKind(view);
+    field.dataset.focusAnchor = view.dataset.mapFocusAnchor || fieldTitleFromView(view);
+    field.innerHTML = `
+      <div class="atlas-map-field-head">
+        <div class="group-label">Atlas field</div>
+        <h5 class="atlas-map-field-title">${fieldTitleFromView(view)}</h5>
+        <p class="atlas-map-field-note">${mapNoteFromView(view)}</p>
+      </div>
+      <div class="atlas-map-field-meta">${fieldPillsFromView(view)}</div>
+      <div class="atlas-map-placeholder" aria-hidden="true">
+        <div class="atlas-map-ring atlas-map-ring--a"></div>
+        <div class="atlas-map-ring atlas-map-ring--b"></div>
+        <div class="atlas-map-vector atlas-map-vector--a"></div>
+        <div class="atlas-map-vector atlas-map-vector--b"></div>
+      </div>
+    `;
+
+    const dock = document.createElement('section');
+    dock.className = 'atlas-detail-dock';
+    dock.innerHTML = `
+      <div class="atlas-detail-dock-head">
+        <div class="atlas-detail-dock-copy">
+          <div class="group-label">Atlas detail</div>
+          <h5 class="atlas-detail-dock-title">Current detail</h5>
+          <p class="atlas-detail-dock-note">Select a marker in the field to inspect the matching atlas detail.</p>
+        </div>
+      </div>
+      <div class="atlas-detail-dock-body"></div>
+    `;
+
+    mapShell.appendChild(field);
+    mapShell.appendChild(dock);
+    view.appendChild(mapShell);
+  });
+}
+
 function renderWithPolish(renderFn, root, rules, ctx, afterRender) {
   const result = renderFn(ctx);
   applyCopyRules(root, rules);
@@ -164,6 +224,7 @@ export function renderAtlas(ctx) {
     (root) => {
       annotateAtlasViewMetadata(root);
       annotateAtlasMapMetadata(root);
+      ensureAtlasMapShells(root);
       enhanceAtlasMap(root);
     },
   );

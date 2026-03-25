@@ -29,30 +29,19 @@ const POSITION_GROUPS = {
   ],
 };
 
-function fieldTitleFromView(view) {
-  return view.dataset.mapHeading || view.querySelector('.atlas-heading')?.textContent?.trim() || 'Atlas field';
-}
-
-function mapNoteFromView(view) {
-  return view.dataset.mapNote || view.querySelector('.atlas-note')?.textContent?.trim() || 'Atlas field view.';
-}
-
-function fieldPillsFromView(view) {
-  const statePills = view.querySelector('.atlas-state-pills');
-  return statePills ? statePills.cloneNode(true).outerHTML : '';
-}
-
 function atlasRootFrom(root = document) {
   return root.matches?.('#atlas') ? root : root.querySelector('#atlas');
 }
 
 function detailNodesFromView(view) {
+  const mapShell = view.querySelector(':scope > .atlas-map-shell');
   const preservedNodes = [
     view.querySelector('.atlas-top-row'),
     view.querySelector('.atlas-state-strip'),
     view.querySelector('.atlas-provenance-strip'),
     view.querySelector('.atlas-lens-shell'),
     view.querySelector('.atlas-note'),
+    mapShell,
   ];
 
   return Array.from(view.children).filter((node) => !preservedNodes.includes(node));
@@ -270,46 +259,19 @@ export function enhanceAtlasMap(root = document) {
   if (!atlasRoot) return;
 
   atlasRoot.querySelectorAll(':scope > .atlas-view').forEach((view) => {
-    if (view.dataset.mapEnhanced === 'true') return;
+    const mapShell = view.querySelector(':scope > .atlas-map-shell');
+    const field = mapShell?.querySelector(':scope > .atlas-map-field');
+    const dock = mapShell?.querySelector(':scope > .atlas-detail-dock');
+    const dockBody = dock?.querySelector(':scope > .atlas-detail-dock-body');
+    if (!mapShell || !field || !dockBody) return;
+
+    field.dataset.viewKind = viewKindFromAtlasView(view);
+    field.dataset.focusAnchor = view.dataset.mapFocusAnchor || field.querySelector('.atlas-map-field-title')?.textContent?.trim() || '';
+
+    field.querySelectorAll('.atlas-map-zones, .atlas-map-interactives').forEach((node) => node.remove());
+    dockBody.replaceChildren();
 
     const detailNodes = detailNodesFromView(view);
-
-    const mapShell = document.createElement('div');
-    mapShell.className = 'atlas-map-shell';
-
-    const field = document.createElement('section');
-    field.className = 'atlas-map-field';
-    field.dataset.viewKind = viewKindFromAtlasView(view);
-    field.dataset.focusAnchor = view.dataset.mapFocusAnchor || fieldTitleFromView(view);
-    field.innerHTML = `
-      <div class="atlas-map-field-head">
-        <div class="group-label">Atlas field</div>
-        <h5 class="atlas-map-field-title">${fieldTitleFromView(view)}</h5>
-        <p class="atlas-map-field-note">${mapNoteFromView(view)}</p>
-      </div>
-      <div class="atlas-map-field-meta">${fieldPillsFromView(view)}</div>
-      <div class="atlas-map-placeholder" aria-hidden="true">
-        <div class="atlas-map-ring atlas-map-ring--a"></div>
-        <div class="atlas-map-ring atlas-map-ring--b"></div>
-        <div class="atlas-map-vector atlas-map-vector--a"></div>
-        <div class="atlas-map-vector atlas-map-vector--b"></div>
-      </div>
-    `;
-
-    const dock = document.createElement('section');
-    dock.className = 'atlas-detail-dock';
-    dock.innerHTML = `
-      <div class="atlas-detail-dock-head">
-        <div class="atlas-detail-dock-copy">
-          <div class="group-label">Atlas detail</div>
-          <h5 class="atlas-detail-dock-title">Current detail</h5>
-          <p class="atlas-detail-dock-note">Select a marker in the field to inspect the matching atlas detail.</p>
-        </div>
-      </div>
-      <div class="atlas-detail-dock-body"></div>
-    `;
-
-    const dockBody = dock.querySelector('.atlas-detail-dock-body');
     detailNodes.forEach((node) => dockBody.appendChild(node));
 
     const targets = Array.from(dockBody.querySelectorAll(':scope > .atlas-section, :scope > .expression-card'));
@@ -320,9 +282,6 @@ export function enhanceAtlasMap(root = document) {
       if (firstMarker) activateMarker(field, dockBody, firstMarker.marker, firstMarker.target);
     }
 
-    view.appendChild(mapShell);
-    mapShell.appendChild(field);
-    mapShell.appendChild(dock);
     view.dataset.mapEnhanced = 'true';
   });
 }
