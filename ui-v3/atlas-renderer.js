@@ -108,17 +108,12 @@ function applyCopyRules(root, rules) {
   });
 }
 
-function deriveAtlasViewKind(view) {
-  const match = Array.from(view?.classList || []).find((cls) => cls.startsWith('atlas-view--'));
-  return match ? match.replace('atlas-view--', '') : 'overview';
-}
-
 function fieldTitleFromView(view) {
-  return view.dataset.mapHeading || view.querySelector('.atlas-heading')?.textContent?.trim() || 'Atlas field';
+  return view.dataset.mapHeading || 'Atlas field';
 }
 
 function mapNoteFromView(view) {
-  return view.dataset.mapNote || view.querySelector('.atlas-note')?.textContent?.trim() || 'Atlas field view.';
+  return view.dataset.mapNote || 'Atlas field view.';
 }
 
 function fieldPillsFromView(view) {
@@ -150,7 +145,7 @@ function ensureAtlasMapShells(root) {
 
     const field = document.createElement('section');
     field.className = 'atlas-map-field';
-    field.dataset.viewKind = view.dataset.mapViewKind || deriveAtlasViewKind(view);
+    field.dataset.viewKind = view.dataset.mapViewKind || 'overview';
     field.dataset.focusAnchor = view.dataset.mapFocusAnchor || fieldTitleFromView(view);
     field.innerHTML = `
       <div class="atlas-map-field-head">
@@ -406,7 +401,7 @@ function wireAtlasMap(root = document) {
     const dockBody = dock?.querySelector(':scope > .atlas-detail-dock-body');
     if (!mapShell || !field || !dockBody) return;
 
-    field.dataset.viewKind = view.dataset.mapViewKind || deriveAtlasViewKind(view);
+    field.dataset.viewKind = view.dataset.mapViewKind || 'overview';
     field.dataset.focusAnchor = view.dataset.mapFocusAnchor || field.querySelector('.atlas-map-field-title')?.textContent?.trim() || '';
 
     field.querySelectorAll('.atlas-map-zones, .atlas-map-interactives').forEach((node) => node.remove());
