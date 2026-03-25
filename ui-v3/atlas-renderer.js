@@ -61,16 +61,70 @@ const ATLAS_COPY_RULES = [
 
 function applyCopyRules(root, rules) {
   if (!root) return;
+
   rules.forEach((rule) => {
     root.querySelectorAll(rule.selector).forEach((node) => {
       const current = node.textContent?.trim();
       if (!current) return;
+
       if (rule.transform) {
         const next = rule.transform(current);
         if (next && next !== current) node.textContent = next;
         return;
       }
+
       if (current === rule.from) node.textContent = rule.to;
+    });
+  });
+}
+
+function atlasViewKind(view) {
+  const match = Array.from(view?.classList || []).find((cls) => cls.startsWith('atlas-view--'));
+  return match ? match.replace('atlas-view--', '') : 'overview';
+}
+
+function sectionHeading(section) {
+  return section.querySelector('h5')?.textContent?.trim()
+    || section.querySelector('.expression-name,.event-card-title,.group-label')?.textContent?.trim()
+    || 'Detail';
+}
+
+function sectionKicker(section) {
+  return section.querySelector('.group-label')?.textContent?.trim().toLowerCase() || '';
+}
+
+function sectionHeadingText(section) {
+  return section.querySelector('h5')?.textContent?.trim().toLowerCase() || '';
+}
+
+function inferMapKind(section, viewKind) {
+  if (section.classList.contains('expression-card')) return 'expression';
+
+  const kicker = sectionKicker(section);
+  const heading = sectionHeadingText(section);
+  const text = `${kicker} ${heading}`.trim();
+
+  if (text.includes('expression') || text.includes('payload') || text.includes('primitive')) return 'expression';
+  if (text.includes('relation') || text.includes('route') || text.includes('encounter')) return 'relations';
+  if (text.includes('state') || text.includes('participant') || text.includes('structure')) return 'structure';
+
+  if (viewKind === 'encounter') return 'relations';
+  if (viewKind === 'participant') return 'structure';
+  return 'default';
+}
+
+function annotateAtlasMapMetadata(root) {
+  if (!root) return;
+
+  root.querySelectorAll(':scope > .atlas-view').forEach((view) => {
+    const viewKind = atlasViewKind(view);
+    view.querySelectorAll(':scope > .atlas-section-stack > .atlas-section, :scope > .atlas-section-stack > .expression-card').forEach((section) => {
+      if (!section.dataset.mapLabel) section.dataset.mapLabel = sectionHeading(section);
+      if (!section.dataset.mapKind) section.dataset.mapKind = inferMapKind(section, viewKind);
+      if (!section.dataset.axis) {
+        const axisNode = section.querySelector('[data-axis]');
+        if (axisNode?.dataset.axis) section.dataset.axis = axisNode.dataset.axis;
+      }
     });
   });
 }
@@ -92,6 +146,9 @@ export function renderAtlas(ctx) {
     ctx?.els?.atlas,
     ATLAS_COPY_RULES,
     ctx,
-    (root) => enhanceAtlasMap(root),
+    (root) => {
+      annotateAtlasMapMetadata(root);
+      enhanceAtlasMap(root);
+    },
   );
 }

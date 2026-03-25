@@ -65,16 +65,19 @@ function axisFromSection(section) {
 }
 
 function markerTextFromSection(section) {
-  const heading = section.querySelector('h5')?.textContent?.trim();
-  if (heading) return heading;
-  const label = section.querySelector('.expression-name,.event-card-title,.group-label')?.textContent?.trim();
-  return label || 'Detail';
+  return section.dataset.mapLabel
+    || section.querySelector('h5')?.textContent?.trim()
+    || section.querySelector('.expression-name, .event-card-title, .group-label')?.textContent?.trim()
+    || 'Detail';
 }
 
 function sectionKind(section) {
+  if (section.dataset.mapKind) return section.dataset.mapKind;
+
   const kicker = section.querySelector('.group-label')?.textContent?.trim().toLowerCase() || '';
   const heading = section.querySelector('h5')?.textContent?.trim().toLowerCase() || '';
   const text = `${kicker} ${heading}`;
+
   if (text.includes('expression') || section.classList.contains('expression-card')) return 'expression';
   if (text.includes('relation') || text.includes('route') || text.includes('encounter')) return 'relations';
   if (text.includes('state') || text.includes('participant')) return 'structure';
