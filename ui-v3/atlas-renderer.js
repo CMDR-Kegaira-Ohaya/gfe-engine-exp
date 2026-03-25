@@ -2,6 +2,7 @@ import {
   renderAtlas as renderAtlasCore,
   renderTimeline as renderTimelineCore,
 } from './atlas-renderer-core.js';
+import { enhanceAtlasMap } from './atlas-map-enhancer.js';
 
 const TIMELINE_COPY_RULES = [
   {
@@ -74,9 +75,10 @@ function applyCopyRules(root, rules) {
   });
 }
 
-function renderWithPolish(renderFn, root, rules, ctx) {
+function renderWithPolish(renderFn, root, rules, ctx, afterRender) {
   const result = renderFn(ctx);
   applyCopyRules(root, rules);
+  if (afterRender) afterRender(root, ctx, result);
   return result;
 }
 
@@ -85,5 +87,11 @@ export function renderTimeline(ctx) {
 }
 
 export function renderAtlas(ctx) {
-  return renderWithPolish(renderAtlasCore, ctx?.els?.atlas, ATLAS_COPY_RULES, ctx);
+  return renderWithPolish(
+    renderAtlasCore,
+    ctx?.els?.atlas,
+    ATLAS_COPY_RULES,
+    ctx,
+    (root) => enhanceAtlasMap(root),
+  );
 }
