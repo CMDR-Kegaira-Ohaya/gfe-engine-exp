@@ -41,6 +41,7 @@ async function main() {
 
   const warnings = [];
   const rendererNode = graph.nodeMap['ui-v3/atlas-renderer.js'];
+  const coreNode = graph.nodeMap['ui-v3/atlas-renderer-core.js'];
 
   Object.values(graph.nodeMap).forEach((node) => {
     if (!node.text) return;
@@ -59,15 +60,17 @@ async function main() {
     }
   });
 
-  if (rendererNode?.text) {
-    if (!hasLiteral(rendererNode.text, /function\s+ensureAtlasMapShells\s*\(/)) {
+  if (coreNode?.text) {
+    if (!hasLiteral(coreNode.text, /function\s+renderAtlasMapShell\s*\(/)) {
       warnings.push({
-        kind: 'renderer-shell-scaffolding-missing',
-        file: 'ui-v3/atlas-renderer.js',
-        detail: 'atlas shell scaffolding is expected to live directly in atlas-renderer.js.',
+        kind: 'core-shell-scaffolding-missing',
+        file: 'ui-v3/atlas-renderer-core.js',
+        detail: 'atlas map shell scaffolding is expected to live directly in atlas-renderer-core.js.',
       });
     }
+  }
 
+  if (rendererNode?.text) {
     if (!hasLiteral(rendererNode.text, /function\s+wireAtlasMap\s*\(/)) {
       warnings.push({
         kind: 'renderer-map-wiring-missing',

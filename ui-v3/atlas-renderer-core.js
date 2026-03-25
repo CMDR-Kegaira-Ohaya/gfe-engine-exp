@@ -228,25 +228,31 @@ function renderAtlasLensSwitch() {
   </section>`;
 }
 
-function renderAtlasStateStrip(viewKind) {
-  const modeText = viewKind === 'participant'
+function atlasModeText(viewKind) {
+  return viewKind === 'participant'
     ? 'Participant focus'
     : viewKind === 'encounter'
       ? 'Encounter focus'
       : 'Step overview';
+}
 
-  const pills = [
+function atlasStatePills(viewKind) {
+  return pillRow([
     `Moment ${selectedMomentLabel()}`,
     `Lens ${lensMeta().short}`,
-    modeText,
-  ];
+    atlasModeText(viewKind),
+  ], 'compact atlas-state-pills');
+}
+
+function renderAtlasStateStrip(viewKind) {
+  const modeText = atlasModeText(viewKind);
 
   return `<section class="atlas-state-strip atlas-state-strip--${viewKind}">
     <div class="atlas-state-heading">
       <span class="atlas-mode-tag atlas-mode-tag--${viewKind}">${esc(modeText)}</span>
       <div class="atlas-state-context">${esc(selectedMomentLabel())}</div>
     </div>
-    ${pillRow(pills, 'compact atlas-state-pills')}
+    ${atlasStatePills(viewKind)}
   </section>`;
 }
 
@@ -272,6 +278,35 @@ function renderAtlasProvenanceStrip() {
   </section>`;
 }
 
+function renderAtlasMapShell(viewKind, heading, note) {
+  return `<div class="atlas-map-shell">
+    <section class="atlas-map-field" data-view-kind="${esc(viewKind)}" data-focus-anchor="${esc(heading)}">
+      <div class="atlas-map-field-head">
+        <div class="group-label">Atlas field</div>
+        <h5 class="atlas-map-field-title">${esc(heading)}</h5>
+        <p class="atlas-map-field-note">${esc(note)}</p>
+      </div>
+      <div class="atlas-map-field-meta">${atlasStatePills(viewKind)}</div>
+      <div class="atlas-map-placeholder" aria-hidden="true">
+        <div class="atlas-map-ring atlas-map-ring--a"></div>
+        <div class="atlas-map-ring atlas-map-ring--b"></div>
+        <div class="atlas-map-vector atlas-map-vector--a"></div>
+        <div class="atlas-map-vector atlas-map-vector--b"></div>
+      </div>
+    </section>
+    <section class="atlas-detail-dock">
+      <div class="atlas-detail-dock-head">
+        <div class="atlas-detail-dock-copy">
+          <div class="group-label">Atlas detail</div>
+          <h5 class="atlas-detail-dock-title">Current detail</h5>
+          <p class="atlas-detail-dock-note">Select a marker in the field to inspect the matching atlas detail.</p>
+        </div>
+      </div>
+      <div class="atlas-detail-dock-body"></div>
+    </section>
+  </div>`;
+}
+
 function atlasShell(viewKind, kicker, heading, note, body, showClearFocus = false) {
   return `<div
     class="atlas-view atlas-view--${viewKind}"
@@ -291,6 +326,7 @@ function atlasShell(viewKind, kicker, heading, note, body, showClearFocus = fals
     ${renderAtlasProvenanceStrip()}
     ${renderAtlasLensSwitch()}
     <p class="atlas-note">${esc(note)}</p>
+    ${renderAtlasMapShell(viewKind, heading, note)}
     ${body}
   </div>`;
 }

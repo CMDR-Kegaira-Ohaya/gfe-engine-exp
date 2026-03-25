@@ -66,6 +66,8 @@ async function main() {
   });
 
   const rendererNode = graph.nodeMap['ui-v3/atlas-renderer.js'];
+  const coreNode = graph.nodeMap['ui-v3/atlas-renderer-core.js'];
+
   if (!rendererNode?.text) {
     issues.push({
       severity: 'error',
@@ -73,24 +75,29 @@ async function main() {
       file: 'ui-v3/atlas-renderer.js',
       detail: 'The canonical Workbench v3 renderer module must be reachable from the live entry path.',
     });
-  } else {
-    if (!hasDeclaration(rendererNode.text, 'ensureAtlasMapShells')) {
-      issues.push({
-        severity: 'error',
-        kind: 'missing-renderer-shell-scaffolding',
-        file: 'ui-v3/atlas-renderer.js',
-        detail: 'Renderer-owned atlas shell scaffolding is missing.',
-      });
-    }
+  } else if (!hasDeclaration(rendererNode.text, 'wireAtlasMap')) {
+    issues.push({
+      severity: 'error',
+      kind: 'missing-renderer-map-wiring',
+      file: 'ui-v3/atlas-renderer.js',
+      detail: 'Renderer-owned atlas map interaction wiring is missing.',
+    });
+  }
 
-    if (!hasDeclaration(rendererNode.text, 'wireAtlasMap')) {
-      issues.push({
-        severity: 'error',
-        kind: 'missing-renderer-map-wiring',
-        file: 'ui-v3/atlas-renderer.js',
-        detail: 'Renderer-owned atlas map interaction wiring is missing.',
-      });
-    }
+  if (!coreNode?.text) {
+    issues.push({
+      severity: 'error',
+      kind: 'missing-core-node',
+      file: 'ui-v3/atlas-renderer-core.js',
+      detail: 'The canonical Workbench v3 atlas core module must be reachable from the live entry path.',
+    });
+  } else if (!hasDeclaration(coreNode.text, 'renderAtlasMapShell')) {
+    issues.push({
+      severity: 'error',
+      kind: 'missing-core-shell-scaffolding',
+      file: 'ui-v3/atlas-renderer-core.js',
+      detail: 'Core-owned atlas map shell scaffolding is missing.',
+    });
   }
 
   console.log(JSON.stringify({
