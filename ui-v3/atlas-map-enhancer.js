@@ -30,13 +30,11 @@ const POSITION_GROUPS = {
 };
 
 function fieldTitleFromView(view) {
-  const heading = view.querySelector('.atlas-heading')?.textContent?.trim();
-  return heading || 'Atlas field';
+  return view.dataset.mapHeading || view.querySelector('.atlas-heading')?.textContent?.trim() || 'Atlas field';
 }
 
 function mapNoteFromView(view) {
-  const note = view.querySelector('.atlas-note')?.textContent?.trim();
-  return note || 'Atlas field view.';
+  return view.dataset.mapNote || view.querySelector('.atlas-note')?.textContent?.trim() || 'Atlas field view.';
 }
 
 function fieldPillsFromView(view) {
@@ -85,8 +83,9 @@ function sectionKind(section) {
 }
 
 function viewKindFromAtlasView(view) {
-  const match = Array.from(view.classList).find((cls) => cls.startsWith('atlas-view--'));
-  return match ? match.replace('atlas-view--', '') : 'overview';
+  return view.dataset.mapViewKind
+    || Array.from(view.classList).find((cls) => cls.startsWith('atlas-view--'))?.replace('atlas-view--', '')
+    || 'overview';
 }
 
 function normalizeText(value) {
@@ -281,7 +280,7 @@ export function enhanceAtlasMap(root = document) {
     const field = document.createElement('section');
     field.className = 'atlas-map-field';
     field.dataset.viewKind = viewKindFromAtlasView(view);
-    field.dataset.focusAnchor = fieldTitleFromView(view);
+    field.dataset.focusAnchor = view.dataset.mapFocusAnchor || fieldTitleFromView(view);
     field.innerHTML = `
       <div class="atlas-map-field-head">
         <div class="group-label">Atlas field</div>

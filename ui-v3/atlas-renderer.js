@@ -78,7 +78,7 @@ function applyCopyRules(root, rules) {
   });
 }
 
-function atlasViewKind(view) {
+function deriveAtlasViewKind(view) {
   const match = Array.from(view?.classList || []).find((cls) => cls.startsWith('atlas-view--'));
   return match ? match.replace('atlas-view--', '') : 'overview';
 }
@@ -113,11 +113,26 @@ function inferMapKind(section, viewKind) {
   return 'default';
 }
 
+function annotateAtlasViewMetadata(root) {
+  if (!root) return;
+
+  root.querySelectorAll(':scope > .atlas-view').forEach((view) => {
+    if (!view.dataset.mapViewKind) view.dataset.mapViewKind = deriveAtlasViewKind(view);
+
+    const heading = view.querySelector('.atlas-heading')?.textContent?.trim();
+    if (heading && !view.dataset.mapHeading) view.dataset.mapHeading = heading;
+    if (heading && !view.dataset.mapFocusAnchor) view.dataset.mapFocusAnchor = heading;
+
+    const note = view.querySelector('.atlas-note')?.textContent?.trim();
+    if (note && !view.dataset.mapNote) view.dataset.mapNote = note;
+  });
+}
+
 function annotateAtlasMapMetadata(root) {
   if (!root) return;
 
   root.querySelectorAll(':scope > .atlas-view').forEach((view) => {
-    const viewKind = atlasViewKind(view);
+    const viewKind = view.dataset.mapViewKind || deriveAtlasViewKind(view);
     view.querySelectorAll(':scope > .atlas-section-stack > .atlas-section, :scope > .atlas-section-stack > .expression-card').forEach((section) => {
       if (!section.dataset.mapLabel) section.dataset.mapLabel = sectionHeading(section);
       if (!section.dataset.mapKind) section.dataset.mapKind = inferMapKind(section, viewKind);
@@ -147,6 +162,7 @@ export function renderAtlas(ctx) {
     ATLAS_COPY_RULES,
     ctx,
     (root) => {
+      annotateAtlasViewMetadata(root);
       annotateAtlasMapMetadata(root);
       enhanceAtlasMap(root);
     },
