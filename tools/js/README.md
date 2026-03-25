@@ -79,7 +79,9 @@ npm run gui:validate-chain -- --base-ref HEAD~1 --head-ref HEAD --copy-scan
 - The canonical live GUI entry is `workbench-v3.html`.
 - Root `index.html` now redirects to `./workbench-v3.html`.
 - `ui-v3/**`, `tools/js/gui-*`, and the `gui-*` workflows are the canonical live GUI support surface.
-- The atlas map enhancer file has been removed; atlas shell creation and interaction wiring now live in `ui-v3/atlas-renderer.js`.
+- The atlas map enhancer file has been removed.
+- `ui-v3/atlas-renderer-core.js` now owns atlas structure, section/view metadata, and atlas map shell scaffolding.
+- `ui-v3/atlas-renderer.js` is now the thinner interaction layer for detail remap, marker/zone generation, and atlas map wiring.
 - These tools assume ECMAScript modules and parse with `sourceType: "module"`.
 - They are for structural inspection and migration aid, not canonical doctrine.
 - They do not yet cover JSX or TypeScript.

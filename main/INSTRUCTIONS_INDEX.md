@@ -78,6 +78,8 @@ Operational notes:
 - `tools/js/gui-live-smoke.mjs` is the canonical local smoke harness for Workbench v3.
 - The Workbench v3 smoke harness is hardened for Node 24-era globals with descriptor-aware global binding and restoration.
 - Node 24 is the canonical runtime assumption for the `gui-*` workflow lane.
+- `ui-v3/atlas-renderer-core.js` is now the stable owner of atlas structure, section/view metadata, and atlas map shell scaffolding.
+- `ui-v3/atlas-renderer.js` is now the thinner interaction layer for detail remap, marker/zone generation, and atlas map wiring.
 - Use `gui:pages-live-smoke` and `gui:pages-artifact-verify` for deployed-output evidence beyond the local harness.
 
 Boundaries:
