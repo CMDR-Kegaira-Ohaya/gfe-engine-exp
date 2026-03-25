@@ -1,5 +1,5 @@
-/* Atlas map-stage scaffold
-   Introduces a stable field + fixed detail dock inside the atlas without inventing map objects yet.
+/* Atlas map enhancer scaffold
+   Introduces a stable field + fixed detail dock inside the atlas without inventing native map objects yet.
 */
 
 .atlas-map-shell {
