@@ -66,6 +66,9 @@ Use this when the task concerns the canonical live GUI surface, local GUI smoke 
 Canonical live surface:
 - `/workbench-v3.html`
 - `/ui-v3/**`
+- `/solver/**`
+- `/catalog/**`
+- `/cases/**`
 - `/tools/js/gui-*`
 - `/.github/workflows/gui-*`
 
@@ -80,6 +83,8 @@ Operational notes:
 - Node 24 is the canonical runtime assumption for the `gui-*` workflow lane.
 - `ui-v3/atlas-renderer-core.js` is now the stable owner of atlas structure, section/view metadata, and atlas map shell scaffolding.
 - `ui-v3/atlas-renderer.js` is now the thinner interaction layer for detail remap, marker/zone generation, and atlas map wiring.
+- `gui-deploy-verify.yml` is now the authoritative validation-and-deploy lane for Workbench v3 when the repository Pages source is configured for GitHub Actions.
+- The staged GitHub Pages artifact is intentionally limited to `index.html`, `workbench-v3.html`, `privacy.html`, `ui-v3/**`, `solver/**`, `catalog/**`, and `cases/**`.
 - Use `gui:pages-live-smoke` and `gui:pages-artifact-verify` for deployed-output evidence beyond the local harness.
 
 Boundaries:

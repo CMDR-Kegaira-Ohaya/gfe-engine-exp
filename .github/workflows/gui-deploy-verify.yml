@@ -33,13 +33,13 @@ jobs:
 
           git diff --name-only "$BASE_REF" HEAD > changed-files.txt || true
 
-          if grep -Eq '^(workbench-v3\.html|ui-v3/|tools/js/gui-|\.github/workflows/gui-|package\.json)' changed-files.txt; then
+          if grep -Eq '^(index\.html|workbench-v3\.html|privacy\.html|ui-v3/|solver/|catalog/|cases/|tools/js/gui-|\.github/workflows/gui-|\.github/redeploy/|package\.json)' changed-files.txt; then
             echo "gui_changed=true" >> "$GITHUB_OUTPUT"
           else
             echo "gui_changed=false" >> "$GITHUB_OUTPUT"
           fi
 
-          if grep -Eq '^(workbench-v3\.html|ui-v3/|package\.json)' changed-files.txt; then
+          if grep -Eq '^(index\.html|workbench-v3\.html|privacy\.html|ui-v3/|solver/|catalog/|cases/|\.github/redeploy/|package\.json)' changed-files.txt; then
             echo "runtime_changed=true" >> "$GITHUB_OUTPUT"
           else
             echo "runtime_changed=false" >> "$GITHUB_OUTPUT"
@@ -91,11 +91,59 @@ jobs:
           echo '' >> "$GITHUB_STEP_SUMMARY"
           echo '- authoritative command: `npm run gui:validate-chain -- --base-ref <base> --head-ref HEAD [--copy-scan]`' >> "$GITHUB_STEP_SUMMARY"
           echo '- canonical entry: `workbench-v3.html`' >> "$GITHUB_STEP_SUMMARY"
-          echo '- canonical runtime: `ui-v3/**`' >> "$GITHUB_STEP_SUMMARY"
+          echo '- canonical runtime: `ui-v3/**`, `solver/**`, `catalog/**`, `cases/**`' >> "$GITHUB_STEP_SUMMARY"
           echo '- report uploaded as `gui-v3-validate-chain-report`' >> "$GITHUB_STEP_SUMMARY"
 
-  deployed-pages-smoke:
+  deploy-pages:
     needs: [scope, validate-and-verify]
+    if: ${{ needs.scope.outputs.runtime_changed == 'true' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: github-pages
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Stage canonical Workbench v3 Pages artifact
+        shell: bash
+        run: |
+          rm -rf _site
+          mkdir -p _site
+          for path in index.html workbench-v3.html privacy.html ui-v3 solver catalog cases; do
+            if [ -e "$path" ]; then
+              cp -R "$path" _site/
+            fi
+          done
+          touch _site/.nojekyll
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Summarize Workbench v3 Pages deploy
+        run: |
+          echo '## Workbench v3 Pages deploy' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '- deploy source: GitHub Actions artifact from canonical Workbench v3 runtime' >> "$GITHUB_STEP_SUMMARY"
+          echo '- staged public paths: `index.html`, `workbench-v3.html`, `privacy.html`, `ui-v3/**`, `solver/**`, `catalog/**`, `cases/**`' >> "$GITHUB_STEP_SUMMARY"
+          echo '- deployment URL: `${{ steps.deployment.outputs.page_url }}`' >> "$GITHUB_STEP_SUMMARY"
+
+  deployed-pages-smoke:
+    needs: [scope, validate-and-verify, deploy-pages]
     if: ${{ needs.scope.outputs.runtime_changed == 'true' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     steps:
@@ -129,7 +177,7 @@ jobs:
           echo '## Workbench v3 Pages smoke' >> "$GITHUB_STEP_SUMMARY"
           echo '' >> "$GITHUB_STEP_SUMMARY"
           echo '- canonical deployed page polled: `workbench-v3.html`' >> "$GITHUB_STEP_SUMMARY"
-          echo '- root redirect model is accepted only insofar as it lands on Workbench v3' >> "$GITHUB_STEP_SUMMARY"
+          echo '- deployment URL: `${{ needs.deploy-pages.outputs.page_url }}`' >> "$GITHUB_STEP_SUMMARY"
           echo '- report uploaded as `gui-v3-pages-live-smoke-report`' >> "$GITHUB_STEP_SUMMARY"
 
   no-gui-changes:

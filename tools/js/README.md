@@ -71,14 +71,15 @@ npm run gui:validate-chain -- --base-ref HEAD~1 --head-ref HEAD --copy-scan
 
 - `gui-structure-check.yml` runs entry audit, cut-check, and copy scan for the canonical Workbench v3 surface.
 - `gui-live-smoke.yml` runs the local Workbench v3 smoke harness.
-- `gui-deploy-verify.yml` is the authoritative push-time validator for the canonical Workbench v3 surface.
+- `gui-deploy-verify.yml` is the authoritative push-time validator and GitHub Actions Pages deploy lane for the canonical Workbench v3 surface.
 - `gui-force-redeploy.yml` intentionally invalidates the Workbench v3 deploy path.
 
 ## Notes
 
 - The canonical live GUI entry is `workbench-v3.html`.
 - Root `index.html` now redirects to `./workbench-v3.html`.
-- `ui-v3/**`, `tools/js/gui-*`, and the `gui-*` workflows are the canonical live GUI support surface.
+- `ui-v3/**`, `solver/**`, `catalog/**`, `cases/**`, `tools/js/gui-*`, and the `gui-*` workflows are the canonical live GUI support surface.
+- The Pages deploy artifact is intentionally trimmed to `index.html`, `workbench-v3.html`, `privacy.html`, `ui-v3/**`, `solver/**`, `catalog/**`, and `cases/**`.
 - The atlas map enhancer file has been removed.
 - `ui-v3/atlas-renderer-core.js` now owns atlas structure, section/view metadata, and atlas map shell scaffolding.
 - `ui-v3/atlas-renderer.js` is now the thinner interaction layer for detail remap, marker/zone generation, and atlas map wiring.

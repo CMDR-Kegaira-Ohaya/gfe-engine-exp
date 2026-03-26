@@ -3,18 +3,31 @@ name: gui-v3-live-smoke
 on:
   push:
     paths:
+      - 'index.html'
       - 'workbench-v3.html'
+      - 'privacy.html'
       - 'ui-v3/**'
+      - 'solver/**'
+      - 'catalog/**'
+      - 'cases/**'
       - 'tools/js/gui-*'
       - 'package.json'
       - '.github/workflows/gui-live-smoke.yml'
+      - '.github/workflows/gui-deploy-verify.yml'
+      - '.github/redeploy/**'
   pull_request:
     paths:
+      - 'index.html'
       - 'workbench-v3.html'
+      - 'privacy.html'
       - 'ui-v3/**'
+      - 'solver/**'
+      - 'catalog/**'
+      - 'cases/**'
       - 'tools/js/gui-*'
       - 'package.json'
       - '.github/workflows/gui-live-smoke.yml'
+      - '.github/workflows/gui-deploy-verify.yml'
   workflow_dispatch:
 
 jobs:
@@ -47,6 +60,6 @@ jobs:
           echo '## Workbench v3 local smoke' >> "$GITHUB_STEP_SUMMARY"
           echo '' >> "$GITHUB_STEP_SUMMARY"
           echo '- canonical entry loaded: `workbench-v3.html`' >> "$GITHUB_STEP_SUMMARY"
-          echo '- canonical runtime exercised: `ui-v3/**`' >> "$GITHUB_STEP_SUMMARY"
+          echo '- canonical runtime exercised: `ui-v3/**`, `solver/**`, `catalog/**`, `cases/**`' >> "$GITHUB_STEP_SUMMARY"
           echo '- no local Workbench v3 smoke failure was accepted' >> "$GITHUB_STEP_SUMMARY"
           echo '- report uploaded as `gui-v3-live-smoke-report`' >> "$GITHUB_STEP_SUMMARY"
