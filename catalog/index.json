@@ -1,6 +1,6 @@
 {
   "branch": "main",
-  "generated_at": "2026-03-26T23:13:59.091Z",
+  "generated_at": "2026-03-26T23:14:59.882Z",
   "count": 3,
   "cases": [
     {
@@ -14,7 +14,7 @@
       "reading_count": 0,
       "participants": 3,
       "timesteps": 3,
-      "modified": "2026-03-27T01:13:50+02:00",
+      "modified": "2026-03-27T01:14:50+02:00",
       "synopsis": "A city library is deciding whether to turn its quiet reading room into a mixed-use collaboration space.",
       "paths": {
         "case": "/cases/gui_smoke_modern_case/source/case.md",
