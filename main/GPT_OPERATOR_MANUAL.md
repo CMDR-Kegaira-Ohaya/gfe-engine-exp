@@ -20,10 +20,11 @@ Restore working context quickly and reduce drift between sessions by making the 
 1. Read `/main/TOC.md`.
 2. Read this file.
 3. Read `/main/SYSTEM_MAP.md`.
-4. Read `/main/EDIT_RULES.md` if edits are likely.
-5. Read `/main/INSTRUCTIONS_INDEX.md` for repo-useful tooling and operational helpers.
-6. Read `/PROCEDURE_INDEX.md` if troubleshooting or repo-write recovery is relevant.
-7. Only then open task-relevant engine, solver, UI, workflow, or case files.
+4. Read `/main/WORKBENCH_V3_OPERATOR_MAP.md` when the task concerns the GUI, Pages, or public workbench behavior.
+5. Read `/main/EDIT_RULES.md` if edits are likely.
+6. Read `/main/INSTRUCTIONS_INDEX.md` for repo-useful tooling and operational helpers.
+7. Read `/PROCEDURE_INDEX.md` if troubleshooting or repo-write recovery is relevant.
+8. Only then open task-relevant engine, solver, UI, workflow, or case files.
 
 ## Priority rules
 - Engine meaning comes from `/engine/*`.
@@ -53,7 +54,15 @@ When repo-control is available:
 - Fix the smallest real blocker first.
 - Do not rewrite large files merely for style.
 - When a module is repeatedly unstable, replace it cleanly rather than stacking brittle patches.
-- Keep shared entrypoints stable: `index.html`, `workbench-v3.html`, `/ui-v3/`, `/cases/`, `/main/`, `/engine/`, `/solver/`, `/.github/workflows/`.
+- Keep shared entrypoints stable:
+  - `index.html`
+  - `workbench-v3.html`
+  - `/ui-v3/`
+  - `/cases/`
+  - `/main/`
+  - `/engine/`
+  - `/solver/`
+  - `/.github/workflows/`
 
 ## Report-first governance
 [RID_OPERATOR_REPORT_FIRST_GOVERNANCE]
@@ -68,6 +77,7 @@ If a new session starts with no prior context:
 - do not ask for the project history first
 - rebuild context from `/main/TOC.md`
 - summarize the repo state briefly before acting if the task is ambiguous
+- for GUI work, read `/main/WORKBENCH_V3_OPERATOR_MAP.md` before making UI or workflow claims
 
 ## Safe escalation order
 1. Inspect
@@ -88,18 +98,36 @@ If a new session starts with no prior context:
 
 ## Current repo role split
 - `/engine/` = canonical model stack
-- `/main/` = bootstrap, operator map, and repo-wide self-reference
+- `/main/` = bootstrap, operator map, GUI map, capability map, and repo-wide self-reference
 - `/solver/` = executable implementation layers
 - `index.html`, `workbench-v3.html`, and `/ui-v3/*` = active workbench implementation
 - `/.github/workflows/` = automated checks and maintenance flows
 - `/cases/` = saved data and smoke tests
-- `/tools/js/` = operational JavaScript inspection tooling
+- `/catalog/` = discoverable case index for the workbench
+- `/tools/js/` = operational JavaScript and GUI inspection tooling
 - `/users/` = local user lanes, not repo-wide authority
 
 ## Current operational facts
 - `/solver/` exists and is active.
 - `solver-selftest.yml` checks solver integrity.
 - `validate-cases.yml` checks saved cases against solver validation.
-- The public workbench routes through `/index.html` and the v3 surface.
-- `workbench-v3.html` remains available as the direct v3 workbench surface.
-- Repo-useful tooling and troubleshooting should be discoverable from boot through `/main/INSTRUCTIONS_INDEX.md` and `/PROCEDURE_INDEX.md`.
+- `workbench-v3.html` is the canonical live GUI surface.
+- Root `index.html` redirects to the v3 surface.
+- Workbench v3 supports:
+  - canonical repo case loading
+  - local package import
+  - case / encoding / reading tabs
+  - timeline focus
+  - atlas inspection
+  - GPT-side reading handoff
+- Reading generation remains GPT-side.
+- Save/delete/promotion are not browser-native authoring flows.
+- The canonical GUI validation/deploy lane is centered on:
+  - `gui-structure-check.yml`
+  - `gui-live-smoke.yml`
+  - `gui-deploy-verify.yml`
+  - `gui-force-redeploy.yml`
+- The deploy lane now assumes:
+  - one-time manual Pages bootstrap in repo settings
+  - fail-fast workflow behavior until Pages is switched to GitHub Actions
+- Repo-useful tooling and troubleshooting should be discoverable from boot through `/main/INSTRUCTIONS_INDEX.md`, `/main/WORKBENCH_V3_OPERATOR_MAP.md`, and `/PROCEDURE_INDEX.md`.

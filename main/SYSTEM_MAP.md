@@ -12,8 +12,9 @@ Operational control layer and centralized self-referential layer for GPT re-entr
 - `TOC.md` = bootstrap entrypoint
 - `GPT_OPERATOR_MANUAL.md` = session operating logic
 - `SYSTEM_MAP.md` = structural map
+- `WORKBENCH_V3_OPERATOR_MAP.md` = canonical live GUI/operator map
 - `INSTRUCTIONS_INDEX.md` = operational tooling and helper workflows
-- `GPT_CAPABILITY_SURFACE.md` = GPT action surface for custom connector capabilities and repo-control caveats
+- `GPT_CAPABILITY_SURFACE.md` = custom connector action surface and caveats
 - `TOKEN_PERMISSION_SURFACE.md` = live token permission surface
 - `EDIT_RULES.md` = edit boundaries and workflow constraints
 - `REPO_SCHEMA.json` = machine-readable directory and file-role map
@@ -22,34 +23,46 @@ This is the only repo-wide self-referential layer.
 Lane-local notes may exist elsewhere, but they do not replace `/main/`.
 
 ### `/solver/`
-Executable implementation layer for validation, normalization, payload handling, prevalence, envelope, compensation, cascade, and future runtime math.
+Executable implementation layer for validation, normalization, payload handling, prevalence, envelope, compensation, cascade, dashboard shaping, and future runtime math.
 This layer implements canon but does not revise it.
 No automatic process may modify this layer.
 
 ### Root HTML
-- `index.html` = public Pages workbench entrypoint
+- `index.html` = public Pages entrypoint that redirects to `./workbench-v3.html`
 - `workbench-v3.html` = direct v3 workbench surface
 - `privacy.html` = public privacy page
 
 ### `/ui-v3/`
-Active frontend workbench modules for rendering, workspace assembly, repo case loading, timeline/participant focus, derived-state inspection, salience styling, and polish behavior.
-`/ui-v3/app.js` is the active app entry point for the v3 workbench surface.
+Active frontend workbench modules for rendering, workspace assembly, repo case loading, local package import, reading handoff, timeline focus, participant/encounter focus, derived-state inspection, atlas behavior, and UI polish.
+`/ui-v3/app.js` is the active app entrypoint for the v3 workbench surface.
+
+Important split inside `/ui-v3/`:
+- `atlas-renderer-core.js` = atlas structure / metadata / shell owner
+- `atlas-renderer.js` = thinner atlas interaction wiring layer
 
 ### `/cases/`
 Repository-level case storage for public/shared/demo/smoke-test data.
 Cases are consumed by the workbench and by solver validation scripts and workflows.
 
 ### `/catalog/`
-Catalog/index layer for discoverable case artifacts used by the workbench.
+Catalog/index layer for discoverable case artifacts used by the workbench open-case surface.
 
 ### `/.github/workflows/`
-Workflow and automation files for repository maintenance and Pages behavior.
-Currently includes at least:
-- `solver-selftest.yml` = solver integrity smoke test
-- `validate-cases.yml` = case validation against solver constraints
+Workflow and automation files for repository maintenance, solver checks, case validation, GUI validation, Pages behavior, and operational deploy loops.
+
+Important current workflows include:
+- `solver-selftest.yml`
+- `validate-cases.yml`
+- `gui-structure-check.yml`
+- `gui-live-smoke.yml`
+- `gui-deploy-verify.yml`
+- `gui-force-redeploy.yml`
 
 ### `/tools/js/`
-Operational JavaScript inspection tooling for syntax checks, AST parsing, symbol summaries, dependency edges, identifier lookup, and batch summaries.
+Operational JavaScript inspection tooling and GUI tooling for syntax checks, AST parsing, symbol summaries, dependency edges, identifier lookup, GUI entry audits, cut checks, local smoke, Pages smoke, artifact verification, repo diffs, rewrites, slice views, and validation chains.
+
+### `/tools/cases/`
+Operational case migration, catalog-build, and validation tooling.
 
 ### `/users/`
 Lane-local user working areas.
@@ -60,10 +73,10 @@ Not part of the repo-wide self-referential authority layer.
 [RID_SYSTEM_SELFREF_CAPABILITY_MAP]
 - bootstrap surfaces = `/main/*`
 - workbench surfaces = `/index.html`, `/workbench-v3.html`, `/ui-v3/*`
-- workflow surfaces = `/.github/workflows/*` for validation, selftest, and repo maintenance
-- inspection/tooling surfaces = `/tools/js/*` for JavaScript structure inspection and `/main/INSTRUCTIONS_INDEX.md` + `/PROCEDURE_INDEX.md` for operational guidance
-- GPT repo-control connector surface = `/main/GPT_CAPABILITY_SURFACE.md` for custom connector capabilities and repo-control caveats
-- live token permission surface = `/main/TOKEN_PERMISSION_SURFACE.md` for current token authority width
+- workflow surfaces = `/.github/workflows/*` for validation, deploy checks, solver checks, and repo maintenance
+- inspection/tooling surfaces = `/tools/js/*` and `/tools/cases/*`
+- GPT repo-control connector surface = `/main/GPT_CAPABILITY_SURFACE.md`
+- live token permission surface = `/main/TOKEN_PERMISSION_SURFACE.md`
 
 ## Conceptual flow
 [RID_SYSTEM_CONCEPTUAL_FLOW]
@@ -71,9 +84,10 @@ Not part of the repo-wide self-referential authority layer.
 2. Canonical meaning comes from `/engine/*`
 3. Repo operating behavior comes from `/main/*`
 4. Executable logic, when present, lives in `/solver/*`
-5. The public workbench renders and manipulates case data through `index.html`, `workbench-v3.html`, and `/ui-v3/*`
-6. Workflows run repo-level checks over solver and case data
+5. The public workbench renders and manipulates case state through `index.html`, `workbench-v3.html`, and `/ui-v3/*`
+6. Catalog data under `/catalog/*` tells the workbench what canonical repo cases are available
 7. Cases live under `/cases/*`
+8. Workflows run repo-level checks over solver, cases, GUI, and Pages behavior
 
 ## Governance rules
 [RID_SYSTEM_GOVERNANCE_RULES]
@@ -83,7 +97,7 @@ Not part of the repo-wide self-referential authority layer.
 - The assistant may inspect, analyze, and report findings, but repository changes require explicit human approval.
 
 ## Current intended usage
-- `main` branch = public workbench and canonical implementation
+- `main` branch = public workbench and canonical implementation branch
 
 ## What should not be collapsed
 - engine doctrine vs solver implementation
@@ -95,12 +109,13 @@ Not part of the repo-wide self-referential authority layer.
 
 ## Session rebuild path
 If context is lost, the minimum recovery path is:
-`/main/TOC.md` → `/main/GPT_OPERATOR_MANUAL.md` → `/main/SYSTEM_MAP.md`
+`/main/TOC.md` → `/main/GPT_OPERATOR_MANUAL.md` → `/main/SYSTEM_MAP.md` → `/main/WORKBENCH_V3_OPERATOR_MAP.md`
 
 ## Editing hotspots
 - solver work: `/solver/*`
 - UI bugs: `/ui-v3/*`, `index.html`, `workbench-v3.html`
-- save/load behavior: `/ui-v3/app.js`, `/cases/*`, relevant workflow files
-- automation/validation: `/.github/workflows/*`, `/solver/check-cases.js`, `/solver/selftest.js`
+- package/load/import behavior: `/ui-v3/app.js`, `/catalog/*`, `/cases/*`
+- atlas/timeline behavior: `/ui-v3/app.js`, `/ui-v3/atlas-renderer-core.js`, `/ui-v3/atlas-renderer.js`
+- automation/validation: `/.github/workflows/*`, `tools/js/gui-*`, `tools/cases/*`
 - engine doctrine: `/engine/*` only when explicitly revising canonical content
 - if a large file write fails through the assistant tool path, prefer manual paste or git-object write paths rather than restructuring the repo to match the tool

@@ -8,6 +8,7 @@ It is not canonical engine doctrine. It supplements `/main/TOC.md` and `/main/GP
 [RID_INSTRUCTIONS_USE_FROM_BOOT]
 - Start at `/main/TOC.md`
 - Then read `/main/GPT_OPERATOR_MANUAL.md`
+- Then read `/main/WORKBENCH_V3_OPERATOR_MAP.md` when the task concerns the GUI, Pages, or workbench behavior
 - Then use this file for tooling, procedures, and operational helpers
 - Use `/PROCEDURE_INDEX.md` for troubleshooting and repo-write recovery
 
@@ -15,6 +16,7 @@ It is not canonical engine doctrine. It supplements `/main/TOC.md` and `/main/GP
 [RID_INSTRUCTIONS_CROSS_LINKS]
 - Bootstrap: `/main/TOC.md`
 - Operator manual: `/main/GPT_OPERATOR_MANUAL.md`
+- Workbench v3 GUI map: `/main/WORKBENCH_V3_OPERATOR_MAP.md`
 - Edit governance: `/main/EDIT_RULES.md`
 - Troubleshooting and repo recovery: `/PROCEDURE_INDEX.md`
 - JavaScript tools usage: `/tools/js/README.md`
@@ -61,7 +63,7 @@ Boundaries:
 
 ### Workbench v3 GUI validation tooling
 [RID_INSTRUCTIONS_GUI_V3_VALIDATION]
-Use this when the task concerns the canonical live GUI surface, local GUI smoke validation, deployed Pages smoke validation, or workflow-backed GUI verification.
+Use this when the task concerns the canonical live GUI surface, local GUI smoke validation, deployed Pages smoke validation, workflow-backed GUI verification, or the Workbench v3 operator lane.
 
 Canonical live surface:
 - `/workbench-v3.html`
@@ -81,17 +83,19 @@ Operational notes:
 - `tools/js/gui-live-smoke.mjs` is the canonical local smoke harness for Workbench v3.
 - The Workbench v3 smoke harness is hardened for Node 24-era globals with descriptor-aware global binding and restoration.
 - Node 24 is the canonical runtime assumption for the `gui-*` workflow lane.
-- `ui-v3/atlas-renderer-core.js` is now the stable owner of atlas structure, section/view metadata, and atlas map shell scaffolding.
-- `ui-v3/atlas-renderer.js` is now the thinner interaction layer for detail remap, marker/zone generation, and atlas map wiring.
-- `gui-deploy-verify.yml` is now the authoritative validation-and-deploy lane for Workbench v3 when the repository Pages source is configured for GitHub Actions.
+- `ui-v3/atlas-renderer-core.js` is the stable owner of atlas structure, section/view metadata, and atlas map shell scaffolding.
+- `ui-v3/atlas-renderer.js` is the thinner interaction layer for detail remap, marker/zone generation, and atlas map wiring.
+- `gui-deploy-verify.yml` is the authoritative validation-and-deploy lane for Workbench v3 after the repository Pages source has already been switched to GitHub Actions.
 - The staged GitHub Pages artifact is intentionally limited to `index.html`, `workbench-v3.html`, `privacy.html`, `ui-v3/**`, `solver/**`, `catalog/**`, and `cases/**`.
-- Use `gui:pages-live-smoke` and `gui:pages-artifact-verify` for deployed-output evidence beyond the local harness.
 - `gui-deploy-verify.yml` now performs a fail-fast Pages bootstrap check before attempting the Actions deploy path.
-- If the repository is still on legacy Pages, the canonical message is: `Settings → Pages → Source → GitHub Actions`.
+- The canonical bootstrap message is:
+  - `Settings → Pages → Source → GitHub Actions`
+- Use `/main/WORKBENCH_V3_OPERATOR_MAP.md` when you need the user-visible behavior map, not just the tooling map.
 
 Boundaries:
 - the local smoke harness is operational evidence, not final proof of deployed browser state
 - deployed Pages smoke is still the required check for the live Pages surface
+- switching Pages from legacy to GitHub Actions is treated as a one-time manual bootstrap step, not a dependable production API step
 - this tooling does not outrank engine doctrine or solver doctrine
 
 ### GPT repo-control connector and token surfaces
@@ -102,26 +106,26 @@ Read `/main/GPT_CAPABILITY_SURFACE.md` for:
 - connector / API action surface
 - guidance on when to prefer general path-based repo operations over narrower legacy helpers
 - the current live 30-operation connector pack
-- Pages settings/build control now exposed through the connector
-- workflow rerun/cancel control and workflow-run artifact inspection now exposed through the connector
+- Pages settings/build control exposed through the connector
+- workflow rerun/cancel control and workflow-run artifact inspection exposed through the connector
+- the current caution that Pages-source switching should still be treated as manual bootstrap by default
 
 Read `/main/TOKEN_PERMISSION_SURFACE.md` for:
 - live token permission surface
 - practical authority width of the current token
 
 Practical operator implications of the current live connector pack:
-- the GPT can now inspect and classify GitHub Pages state through the connector
-- the GPT can now request/check Pages builds
-- switching Pages from legacy to GitHub Actions publishing is treated as a one-time manual bootstrap step unless an explicitly approved admin path is being tested
-- the GPT can now inspect workflow-run artifacts directly
-- the GPT can now rerun failed runs or cancel stuck runs from the connector layer
+- the GPT can inspect and classify current Pages state through the connector
+- the GPT can request/check Pages builds
+- the GPT can inspect workflow-run artifacts directly
+- the GPT can rerun failed runs or cancel stuck runs from the connector layer
 - the GPT still should prefer generic path-based repo operations over narrower legacy case helpers
 
 Use these before assuming:
 - the GPT is limited to flat `/cases/*.json` helpers
 - the GPT is read-only
 - workflow dispatch or arbitrary-path writes are unavailable
-- Pages source switching still requires a manual-only connector model
+- Pages source switching should be treated as automatic steady-state production behavior
 
 Boundaries:
 - exposed connector/action surface does not guarantee success
@@ -133,6 +137,6 @@ Boundaries:
 - when a repo capability is operational, repeatable, and not canonical doctrine
 - when usage should be cross-linked with procedures or tooling
 
- ```text
+```text
 If a new repo-useful tool is added, list it here and add a cross-link from `/main/TOC.md`.
 ```
