@@ -35,18 +35,19 @@ Read `/main/EDIT_RULES.md` and related repo-operating docs for layer 3.
 
 As currently configured, the token has at least:
 
+- **Metadata** — read-only
 - **Actions** — read / write
+- **Actions variables** — read / write
+- **Code** — read / write
 - **Commit statuses** — read / write
-- **Contents** — read / write
-- **Custom properties** — read / write
+- **Custom properties for repositories** — read / write
 - **Deployments** — read / write
 - **Issues** — read / write
 - **Merge queues** — read / write
-- **Metadata** — read-only
 - **Pages** — read / write
 - **Pull requests** — read / write
-- **Variables** — read / write
-- **Webhooks** — read / write
+- **Repository hooks** — read / write
+- **Security events** — read / write
 - **Workflows** — read / write
 
 ## Practical implications
@@ -57,15 +58,25 @@ The GPT/operator should not assume a narrow read-only or file-only token by defa
 This does **not** weaken governance.
 Repo rules, edit rules, branch protection, workflow settings, and explicit human approval requirements still matter.
 
-Webhook read/write authority matters especially for live-connected GUI work.
-It removes "token lacks webhook authority" as a valid blocker assumption.
-But it still does not prove that webhook-based GUI integration is already implemented; that remains an architecture and implementation question.
+This token surface now materially supports assumptions about:
+- Pages write-level control
+- workflow run/cancel/rerun control
+- actions-variable management
+- repository-hook authority
+- security-event write-level authority
+- code-centric repo mutation beyond narrow file-only assumptions
+
+But this does **not** mean that the current connector exposes all of those families.
+The repository-hook and security-event token surfaces, for example, may exceed the current live 30-operation connector pack.
+
+So “the token lacks this authority” is now a weaker default assumption across Pages, workflows, repository hooks, and security events.
+But “the connector exposes a direct call path” still must be checked separately.
 
 ## How to use this file
 
 Read this file:
 - after `/main/TOC.md` when token authority width matters to the task
-- before assuming the live token lacks workflow, branch, Pages, webhook, or repo-write capability
+- before assuming the live token lacks workflow, branch, Pages, repository-hook, security-event, or repo-write capability
 - before designing around outdated narrow-token assumptions
 
 Cross-check with:
