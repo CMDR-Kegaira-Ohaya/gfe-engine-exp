@@ -22,7 +22,7 @@
       <div class="actions">
         <button id="actions-toggle" class="ghost" aria-expanded="false" aria-controls="actions-panel">Actions</button>
         <button id="clear-btn" class="ghost">Clear</button>
-        <button id="delete-btn" class="ghost">Delete</button>
+        <button id="delete-btn" class="ghost">Delete (GPT-side)</button>
       </div>
     </header>
 
@@ -68,13 +68,14 @@
             <button id="reload-catalog" class="ghost">Reload</button>
           </div>
           <p class="panel-intro" id="side-panel-intro">Browse canonical cases from the live catalog.</p>
-          <div id="side-panel-body" class="panel-body empty">Loading catalog… </div>
+          <div id="side-panel-body" class="panel-body empty">Loading catalog…</div>
         </section>
       </aside>
 
       <section class="center-panel">
         <div class="case-header">
-          <div class="eyebrow" id="current-slug">No case open</div>
+          <div>
+            <div class="eyebrow" id="current-slug">No case open</div>
             <h2 id="current-title">Open a case to begin</h2>
             <p class="subtitle" id="current-subtitle">Case, case encoding, and reading will appear here.</p>
           </div>
@@ -107,5 +108,6 @@
   </div>
 
   <script type="module" src="./ui-v3/app.js"></script>
+  <script src="./ui-v3/wording-polish.js"></script>
 </body>
 </html>
