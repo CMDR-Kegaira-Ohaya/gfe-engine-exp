@@ -214,3 +214,164 @@ A user should be able to:
 - understand that reading generation is GPT-side, with a clear handoff path
 - see the same intended wording locally and on live Pages
 - rely on the Actions deploy lane without manual “did it deploy?” checking
+
+
+---
+
+## Human-first frontend plan (planning note)
+
+### What the board already had
+The board already captured:
+- Workbench v3 as the canonical live GUI
+- stable Pages / deploy posture
+- reading handoff as GPT-side
+- the current lane as user-visible polish
+- a warning not to reopen architecture churn
+
+### What was missing
+The board did not yet state the broader product problem clearly enough:
+
+- the frontend is still easier for the system to parse than for a non-technical human to use
+- the GUI is inspector-first instead of guidance-first
+- meaning is scattered across the notice bar, side panel, badges, tabs, atlas, and timeline
+- a new user is not told clearly:
+  - what to do first
+  - what matters now
+  - what can wait until later
+
+This should now be treated as the main Workbench v3 product problem inside the current lane.
+
+### Working diagnosis
+The backend / canonical model is good enough to continue from.
+The main problem is presentation and workflow comprehension, not core architecture.
+
+Treat the next phase as:
+**human-first frontend polish on top of the stable Workbench v3 implementation**
+
+### Human-first target experience
+A non-technical user should experience the GUI in this order:
+
+1. **Start here**
+   - open a canonical case
+   - or import a local package
+
+2. **Review what loaded**
+   - see the case title
+   - see a plain-language explanation of what is available
+   - see one obvious next action
+
+3. **Continue only as needed**
+   - read the case
+   - open the reading handoff
+   - inspect encoding / timeline / atlas only when needed
+
+Technical inspection surfaces should remain available, but should no longer compete with the first-use path.
+
+### Plan by phase
+#### Phase 1 — first-use workflow clarity
+Goal:
+make the first screen answer “what do I do first?”
+
+Scope:
+- visible start-here path in the main surface
+- open/import as the first strong decision
+- one obvious next action after load
+- do not rely on the Actions popover as the primary workflow entrance
+
+Primary files:
+- `/workbench-v3.html`
+- `/ui-v3/app.js`
+- `/ui-v3/styles.css`
+- `/ui-v3/open-panel.css`
+
+#### Phase 2 — information hierarchy cleanup
+Goal:
+reduce the feeling that information is “all over the place”
+
+Scope:
+- reduce simultaneous emphasis across notice bar, badges, side panel, tabs, timeline, and atlas
+- ensure there is one primary focal region at each state
+- demote secondary technical status until it is needed
+
+Primary files:
+- `/workbench-v3.html`
+- `/ui-v3/styles.css`
+- `/ui-v3/open-panel.css`
+- `/ui-v3/reading-surfaces.css`
+
+#### Phase 3 — plain-language meaning pass
+Goal:
+translate machine-shaped concepts into human-usable guidance
+
+Scope:
+- keep canonical terms, but explain them in place
+- prefer plain-language helper copy before technical detail
+- keep reading handoff explicitly GPT-side
+- label purpose, not just data type
+
+Primary files:
+- `/ui-v3/app.js`
+- `/workbench-v3.html`
+
+#### Phase 4 — progressive disclosure for inspection
+Goal:
+keep technical depth available without making it the default burden
+
+Scope:
+- summary before raw encoding
+- atlas / timeline as optional inspection tools after comprehension
+- validation as supportive evidence, not the main headline unless something is wrong
+
+Primary files:
+- `/ui-v3/app.js`
+- `/ui-v3/reading-surfaces.css`
+- `/ui-v3/styles.css`
+- atlas/timeline files only if needed for visual de-emphasis
+
+#### Phase 5 — consistency and verification
+Goal:
+keep the human-first path stable locally and on deployed Pages
+
+Scope:
+- wording consistency local/live
+- validate first-use flow on deployed Pages
+- preserve deploy confidence while polishing UX
+
+Primary files / tools:
+- `tools/js/gui-live-smoke.mjs`
+- `tools/js/gui-pages-live-smoke.mjs`
+- `tools/js/gui-validate-chain.mjs`
+- `.github/workflows/gui-deploy-verify.yml`
+
+### Immediate working order from this plan
+1. first-use workflow clarity
+2. visual hierarchy cleanup
+3. plain-language summaries
+4. progressive disclosure for technical inspection
+5. validation and live check
+
+### Exact files to inspect first next session
+1. `/workbench-v3.html`
+2. `/ui-v3/app.js`
+3. `/ui-v3/styles.css`
+4. `/ui-v3/open-panel.css`
+5. `/ui-v3/reading-surfaces.css`
+
+Inspect only after that if needed:
+- `/ui-v3/atlas-renderer-core.js`
+- `/ui-v3/atlas-renderer.js`
+
+### Non-goals
+- no backend architecture reopening
+- no solver doctrine changes
+- no engine canon changes
+- no second live GUI lane
+- no browser-native save/delete/promote flow
+- no speculative rewrite of atlas/timeline ownership
+
+### Updated success condition for the next phase
+A non-technical user should be able to:
+- understand the first action within a few seconds
+- distinguish opening/importing from reading/inspection
+- feel that atlas/timeline are available tools, not mandatory obstacles
+- describe the interface as a guided workflow rather than a machine inspection board
