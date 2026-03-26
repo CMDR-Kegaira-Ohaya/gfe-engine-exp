@@ -1,8 +1,8 @@
-
 (() => {
-  const appShell = document.querySelector('.app-shell');
   const centerPanel = document.querySelector('.center-panel');
-  if (!appShell || !centerPanel) return;
+  if (!centerPanel) return;
+
+  let lastHasCase = false;
 
   function ensureGuide() {
     let guide = document.getElementById('plain-language-guide');
@@ -16,38 +16,43 @@
     guide.className = 'plain-language-guide';
     guide.innerHTML = `
       <div class="plain-language-guide-head">
-        <div class="plain-language-kicker">What you're looking at</div>
+        <div class="plain-language-kicker">What you are looking at</div>
         <h3 class="plain-language-title" id="plain-language-title">Open a case to begin</h3>
-        <p class="plain-language-copy" id="plain-language-copy">This area will explain the current tab in plain language and tell you what to do next.</p>
+        <p class="plain-language-copy" id="plain-language-copy">This area explains the current tab in one short sentence so you do not have to scan the whole page.</p>
       </div>
-      <div class="plain-language-tab-row">
-        <article class="plain-language-tab" data-explain-tab="case">
-          <h3 class="plain-language-tab-title">Case</h3>
-          <p class="plain-language-tab-copy">The original case material. Start here before you use the technical views.</p>
-        </article>
-        <article class="plain-language-tab" data-explain-tab="encoding">
-          <h3 class="plain-language-tab-title">Case encoding</h3>
-          <p class="plain-language-tab-copy">The structured map of the case. Use this when you want to inspect how the case was broken down.</p>
-        </article>
-        <article class="plain-language-tab" data-explain-tab="reading">
-          <h3 class="plain-language-tab-title">Case reading</h3>
-          <p class="plain-language-tab-copy">The drafted interpretation of the case. This is the human-facing reading surface.</p>
-        </article>
-      </div>
-      <div class="plain-language-badge-row">
-        <div class="plain-language-badge" data-explain-badge="source">
-          <div class="plain-language-badge-label">Source</div>
-          <div class="plain-language-badge-value" id="plain-language-source">Where this case came from.</div>
+      <details class="plain-language-details" id="plain-language-details">
+        <summary class="plain-language-summary">Explain tabs and status</summary>
+        <div class="plain-language-details-body">
+          <div class="plain-language-tab-row">
+            <article class="plain-language-tab" data-explain-tab="case">
+              <h3 class="plain-language-tab-title">Case</h3>
+              <p class="plain-language-tab-copy">The original case material. Start here before you use the technical views.</p>
+            </article>
+            <article class="plain-language-tab" data-explain-tab="encoding">
+              <h3 class="plain-language-tab-title">Case encoding</h3>
+              <p class="plain-language-tab-copy">The structured map of the case. Use this when you want to inspect how the case was broken down.</p>
+            </article>
+            <article class="plain-language-tab" data-explain-tab="reading">
+              <h3 class="plain-language-tab-title">Case reading</h3>
+              <p class="plain-language-tab-copy">The drafted interpretation of the case. This is the human-facing reading surface.</p>
+            </article>
+          </div>
+          <div class="plain-language-badge-row">
+            <div class="plain-language-badge">
+              <div class="plain-language-badge-label">Source</div>
+              <div class="plain-language-badge-value" id="plain-language-source">Where this case came from.</div>
+            </div>
+            <div class="plain-language-badge">
+              <div class="plain-language-badge-label">Status</div>
+              <div class="plain-language-badge-value" id="plain-language-status">What is available right now.</div>
+            </div>
+            <div class="plain-language-badge">
+              <div class="plain-language-badge-label">Validation</div>
+              <div class="plain-language-badge-value" id="plain-language-validation">Whether the loaded package looks okay.</div>
+            </div>
+          </div>
         </div>
-        <div class="plain-language-badge" data-explain-badge="status">
-          <div class="plain-language-badge-label">Status</div>
-          <div class="plain-language-badge-value" id="plain-language-status">What is available right now.</div>
-        </div>
-        <div class="plain-language-badge" data-explain-badge="validation">
-          <div class="plain-language-badge-label">Validation</div>
-          <div class="plain-language-badge-value" id="plain-language-validation">Whether the loaded package looks okay.</div>
-        </div>
-      </div>
+      </details>
     `;
 
     const tabs = centerPanel.querySelector('.tabs');
@@ -76,31 +81,31 @@
     if (!state.hasCase) {
       return {
         title: 'Open a case to begin',
-        copy: 'The center panel is the human-readable starting point. After a case loads, read the Case tab first before you use the more technical surfaces.',
+        copy: 'This area explains the current tab in one short sentence so you do not have to scan the whole page.',
       };
     }
 
     if (state.activeTab === 'encoding') {
       return {
-        title: `Encoding view for “${state.title}”`,
-        copy: 'This tab shows the structured breakdown of the case. It is most useful when you want to inspect the case at a more technical level.',
+        title: `Viewing case encoding for “${state.title}”`,
+        copy: 'This is the technical breakdown of the case. Return to the Case tab whenever you want the source-first view again.',
       };
     }
 
     if (state.activeTab === 'reading') {
       return {
         title: state.hasReading
-          ? `Reading view for “${state.title}”`
-          : `Reading slot for “${state.title}”`,
+          ? `Viewing case reading for “${state.title}”`
+          : `Viewing the reading slot for “${state.title}”`,
         copy: state.hasReading
-          ? 'This tab shows the drafted reading for this case. Return to the Case tab any time you want the original source material again.'
-          : 'This tab will show a drafted reading after you use Reading handoff with GPT. The Case tab is still the best first stop for reviewing the source.',
+          ? 'This tab shows the drafted interpretation. Go back to Case whenever you want the original source material.'
+          : 'This tab will show a drafted reading after you use reading handoff with GPT.',
       };
     }
 
     return {
-      title: `Case view for “${state.title}”`,
-      copy: 'This tab shows the case itself. Start here to read the source material before moving to encoding, reading, timeline, or atlas.',
+      title: `Viewing case for “${state.title}”`,
+      copy: 'This is the original source material. Start here before moving to encoding, reading, timeline, or atlas.',
     };
   }
 
@@ -136,6 +141,15 @@
 
     const state = deriveState();
     const headline = buildHeadline(state);
+    const details = guide.querySelector('#plain-language-details');
+
+    guide.classList.toggle('compact', state.hasCase);
+    if (!state.hasCase) {
+      details.open = false;
+    } else if (!lastHasCase) {
+      details.open = false;
+    }
+    lastHasCase = state.hasCase;
 
     const title = guide.querySelector('#plain-language-title');
     const copy = guide.querySelector('#plain-language-copy');
@@ -175,7 +189,7 @@
     childList: true,
     characterData: true,
     attributes: true,
-    attributeFilter: ['class', 'data-tab'],
+    attributeFilter: ['class', 'data-tab', 'open'],
   });
 
   if (document.readyState === 'loading') {
