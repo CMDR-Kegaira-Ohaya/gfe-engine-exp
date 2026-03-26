@@ -689,7 +689,7 @@ function renderReadingPlaceholder() {
     <p>Reading generation stays GPT-side, but the handoff is now clearer here.</p>
     <p>Open or import a case, inspect the encoding, then use GPT to generate markdown for the Reading tab.</p>
     <div class="placeholder-actions">
-      <button class="ghost" data-reading-action="cue">Use GPT to generate reading</button>
+      <button class="ghost" data-reading-action="cue">Copy GPT handoff</button>
     </div>
     <p class="placeholder-note">Suggested GPT handoff:</p>
     <pre class="pre-json">${esc(readingCueText())}</pre>
@@ -791,9 +791,33 @@ function renderContextBanner() {
   </section>`;
 }
 
+function renderQuickStartCard() {
+  return `<section class="placeholder-card">
+    <h3>Open a case to begin</h3>
+    <p>Start from the canonical repo catalog or import a local package directly into the live workbench.</p>
+    <div class="placeholder-actions">
+      <button class="ghost" data-ui-action="mode-open">Browse repo cases</button>
+      <button class="ghost" data-ui-action="import-package">Import local package</button>
+    </div>
+    <p class="placeholder-note">Import supports one encoding JSON plus optional case and reading markdown or text files.</p>
+  </section>`;
+}
+
+function renderReadingEmptyState() {
+  return `<section class="placeholder-card">
+    <h3>No case reading saved yet</h3>
+    <p>The current case and case encoding are available, but no reading is attached yet.</p>
+    <div class="placeholder-actions">
+      <button class="ghost" data-ui-action="mode-reading">Open Generate reading</button>
+      <button class="ghost" data-ui-action="copy-reading-cue">Copy GPT handoff</button>
+    </div>
+    <p class="placeholder-note">Use the generated markdown in the Workbench v3 Reading tab. Save, delete, and promotion remain GPT-side.</p>
+  </section>`;
+}
+
 function renderTabContent() {
   if (!state.activeSlug) {
-    els.tabContent.innerHTML = '<div class="empty">Open a case to show the v3 reader.</div>';
+    els.tabContent.innerHTML = renderQuickStartCard();
     return;
   }
 
@@ -811,7 +835,7 @@ function renderTabContent() {
 
   els.tabContent.innerHTML = state.readingMarkdown.trim()
     ? `${banner}<div class="reading-surface">${renderMarkdown(state.readingMarkdown)}</div>`
-    : `${banner}<section class="placeholder-card"><h3>No case reading saved yet</h3><p>The current case and case encoding are available, but no reading is attached yet.</p><p class="placeholder-note">Open “Generate reading” in the actions panel for a suggested GPT handoff.</p></section>`;
+    : `${banner}${renderReadingEmptyState()}`;
 }
 
 function atlasRendererContext() {
@@ -876,6 +900,14 @@ function renderAll() {
   renderTimeline();
 }
 
+function openPackageImportPicker() {
+  setMode('package');
+  requestAnimationFrame(() => {
+    const input = els.sidePanelBody.querySelector('[data-package-file-input]');
+    if (input) input.click();
+  });
+}
+
 function handlePackageAction(action) {
   if (action === 'repo') {
     setMode('open');
@@ -884,25 +916,29 @@ function handlePackageAction(action) {
   }
 
   if (action === 'import') {
-    const input = els.sidePanelBody.querySelector('[data-package-file-input]');
-    if (input) input.click();
+    openPackageImportPicker();
   }
 }
 
-async function handleReadingAction() {
+async function copyReadingCueToClipboard() {
   const cue = readingCueText();
 
   try {
     if (navigator?.clipboard?.writeText) {
       await navigator.clipboard.writeText(cue);
       setNotice('Suggested reading handoff copied. Use GPT to generate reading and save it when ready.');
-      return;
+      return true;
     }
   } catch (error) {
-    // Fall through to the non-clipboard notice.
+    return false;
   }
 
-  setNotice('Use GPT to generate reading. The suggested handoff is shown in the side panel.');
+  return false;
+}
+
+async function handleReadingAction() {
+  const copied = await copyReadingCueToClipboard();
+  if (!copied) setNotice('Use GPT to generate reading. The suggested handoff is shown in the side panel.');
 }
 
 function handleClear() {
@@ -967,6 +1003,36 @@ function bindEvents() {
       setNotice(`Could not import local package: ${error.message}`);
     } finally {
       input.value = '';
+    }
+  });
+
+  els.tabContent.addEventListener('click', async (event) => {
+    const actionButton = event.target.closest('[data-ui-action]');
+    if (!actionButton) return;
+
+    const action = actionButton.dataset.uiAction;
+
+    if (action === 'mode-open') {
+      setMode('open');
+      return;
+    }
+
+    if (action === 'mode-reading') {
+      setMode('reading');
+      return;
+    }
+
+    if (action === 'import-package') {
+      openPackageImportPicker();
+      return;
+    }
+
+    if (action === 'copy-reading-cue') {
+      const copied = await copyReadingCueToClipboard();
+      if (!copied) {
+        setMode('reading');
+        setNotice('Clipboard access is unavailable here. The suggested GPT handoff is shown in Generate reading.');
+      }
     }
   });
 
