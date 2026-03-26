@@ -9,9 +9,9 @@
       "slug": "gui_smoke_modern_case",
       "has_case": true,
       "has_encoding": true,
-      "has_reading": false,
+      "has_reading": true,
       "revision_count": 1,
-      "reading_count": 0,
+      "reading_count": 1,
       "participants": 3,
       "timesteps": 3,
       "modified": "2026-03-27T01:14:50+02:00",
@@ -20,7 +20,7 @@
         "case": "/cases/gui_smoke_modern_case/source/case.md",
         "manifest": "/cases/gui_smoke_modern_case/manifest.json",
         "encoding": "/cases/gui_smoke_modern_case/revisions/rev_smoke_v1/encoding.json",
-        "reading": ""
+        "reading": "/cases/gui_smoke_modern_case/readings/current_model_reading.md"
       }
     },
     {
