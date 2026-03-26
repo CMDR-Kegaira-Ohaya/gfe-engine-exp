@@ -8,7 +8,7 @@
     linear-gradient(180deg, rgba(12, 29, 19, 0.98), rgba(8, 17, 11, 0.96)),
     var(--surface);
   box-shadow: var(--shadow), var(--glow);
-  padding: 16px 18px;
+  padding: 18px 20px;
   position: relative;
   overflow: hidden;
 }
@@ -41,7 +41,7 @@
 .workflow-kicker,
 .workflow-step-kicker,
 .workflow-chip {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.16em;
@@ -54,16 +54,17 @@
 
 .workflow-title {
   margin: 0;
-  font-size: 22px;
-  line-height: 1.08;
+  font-size: 24px;
+  line-height: 1.12;
   color: var(--text);
 }
 
 .workflow-copy {
   margin: 0;
   max-width: 70ch;
+  font-size: 15px;
   color: rgba(216, 255, 231, 0.84);
-  line-height: 1.58;
+  line-height: 1.62;
 }
 
 .workflow-actions {
@@ -79,10 +80,12 @@
   border-color: rgba(103, 247, 161, 0.44);
   color: var(--accent);
   box-shadow: var(--glow);
+  font-size: 14px;
 }
 
 .workflow-actions .workflow-secondary {
   background: rgba(8, 17, 11, 0.42);
+  font-size: 14px;
 }
 
 .workflow-steps {
@@ -96,7 +99,7 @@
 .workflow-step {
   display: grid;
   gap: 8px;
-  padding: 12px 13px;
+  padding: 14px 14px;
   border-radius: 12px;
   border: 1px solid rgba(112, 255, 174, 0.12);
   background: rgba(9, 18, 12, 0.76);
@@ -127,15 +130,15 @@
 
 .workflow-step-title {
   margin: 0;
-  font-size: 15px;
-  line-height: 1.18;
+  font-size: 17px;
+  line-height: 1.25;
   color: var(--text);
 }
 
 .workflow-step-copy {
   margin: 0;
-  font-size: 12px;
-  line-height: 1.52;
+  font-size: 14px;
+  line-height: 1.6 ;
   color: rgba(216, 255, 231, 0.78);
 }
 
@@ -243,7 +246,7 @@
   }
 
   .workflow-title {
-    font-size: 20px;
+    font-size: 22px;
   }
 
   .workflow-actions {
