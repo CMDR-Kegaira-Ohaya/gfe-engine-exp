@@ -1,0 +1,125 @@
+.plain-language-guide {
+  margin: 0 20px 14px;
+  padding: 14px 16px;
+  border: 1px solid rgba(112, 255, 174, 0.14);
+  border-radius: 14px;
+  background: rgba(10, 22, 14, 0.78);
+  box-shadow: inset 0 1px 0 rgba(216, 255, 231, 0.02);
+  display: grid;
+  gap: 12px;
+}
+
+.plain-language-guide-head {
+  display: grid;
+  gap: 6px;
+}
+
+.plain-language-kicker {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: rgba(141, 179, 157, 0.86);
+}
+
+.plain-language-title {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.16;
+  color: var(--text);
+}
+
+.plain-language-copy {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.62;
+  color: rgba(216, 255, 231, 0.84);
+  max-width: 74ch;
+}
+
+.plain-language-tab-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.plain-language-tab {
+  display: grid;
+  gap: 6px;
+  padding: 10px 11px;
+  border: 1px solid rgba(112, 255, 174, 0.12);
+  border-radius: 12px;
+  background: rgba(8, 17, 11, 0.58);
+  transition: border-color 140ms ease, background 140ms ease, box-shadow 140ms ease, opacity 140ms ease;
+}
+
+.plain-language-tab.active {
+  border-color: rgba(103, 247, 161, 0.38);
+  background: rgba(12, 29, 19, 0.9);
+  box-shadow: 0 0 0 1px rgba(103, 247, 161, 0.08), 0 0 16px rgba(60, 255, 143, 0.05);
+}
+
+.plain-language-tab.muted {
+  opacity: 0.76;
+}
+
+.plain-language-tab-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.26;
+  color: var(--text);
+}
+
+.plain-language-tab-copy {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.54;
+  color: rgba(216, 255, 231, 0.78);
+}
+
+.plain-language-badge-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.plain-language-badge {
+  display: grid;
+  gap: 4px;
+  padding: 9px 10px;
+  border: 1px solid rgba(112, 255, 174, 0.12);
+  border-radius: 10px;
+  background: rgba(8, 17, 11, 0.54);
+}
+
+.plain-language-bade label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16um;
+  color: rgba(141, 179, 157, 0.84);
+}
+
+.plain-language-bade value {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.36;
+  color: rgba(216, 255, 231, 0.9);
+}
+
+.app-shell.workflow-no-case .plain-language-guide {
+  opacity: 0.92;
+}
+
+.app-shell.workflow-on-case-tab .plain-language-guide {
+  border-color: rgba(103, 247, 161, 0.18);
+  background: rgba(11, 23, 15, 0.84);
+}
+
+@media (max-width: 960px) {
+  .plain-language-tab-row,
+  .plain-language-badge-row {
+    grid-template-columns: 1fr;
+  }
+}
