@@ -1,199 +1,216 @@
 # GUI Blueprint and Implementation (Working Board)
 
-**Purpose:** temporary working board for the v3/frontend transition while the reader is being rebuilt toward the final atlas-first structure.
+**Purpose:** live working board for the canonical Workbench v3 GUI lane.
+Use this file to keep current repo truth, current work order, and current operator direction visible in one place.
 
 Use this file to:
-- keep live repo truth in one place
-- record what is now locked
-- keep the current work order explicit
-- avoid planning from stale chat state or obsolete implementation phases
+- record what is actually live now
+- keep the current direction explicit
+- prevent drift back to stale migration assumptions
+- keep next work readable for future sessions
 
 Do not use this file as:
 - engine canon
-- backend doctrine
-- permanent repo memory
+- solver doctrine
+- permanent repo memory outside the current GUI lane
 
 ---
 
-## Repo reality snapshot
+## Current progress checkpoint
 
 Current repo truth:
-- canonical case browsing comes from `/catalog/index.json`
-- canonical case artifacts live under `/cases/<slug>/...`
-- active v3 entry files are:
-  - `/workbench-v3.html`
-  - `/ui-v3/app.js`
-  - `/ui-v3/styles.css`
-  - `/ui-v3/palette.css`
-  - `/ui-v3/layout-atlas-map.css`
-  - `/ui-v3/atlas-map-stage.css`
-  - `/ui-v3/atlas-map-stage.js`
-  - `/ui-v3/family-pass.js`
+- canonical live GUI entry is `/workbench-v3.html`
+- root `/index.html` redirects to `./workbench-v3.html`
+- canonical live GUI support surface is:
+  - `/ui-v3/**`
+  - `/solver/**`
+  - `/catalog/**`
+  - `/cases/**`
+  - `/tools/js/gui-*`
+  - `/.github/workflows/gui-*`
+- Workbench v3 now supports:
+  - canonical repo case loading from `/catalog/index.json`
+  - local package import in the browser
+  - case / case encoding / case reading tabs
+  - persistent-left atlas
+  - bottom timeline focus
+  - GPT-side reading handoff flow
+- reading generation remains GPT-side
+- save / delete / promotion are not browser-native authoring flows
+- atlas ownership is now split clearly:
+  - `ui-v3/atlas-renderer-core.js` = structure / metadata / atlas shell owner
+  - `ui-v3/atlas-renderer.js` = interaction / remap / marker / zone wiring layer
+- the self-referential repo layer now includes:
+  - `/main/TOC.md`
+  - `/main/GPT_OPERATOR_MANUAL.md`
+  - `/main/SYSTEM_MAP.md`
+  - `/main/WORKBENCH_V3_OPERATOR_MAP.md`
+  - `/main/INSTRUCTIONS_INDEX.md`
+- GitHub Pages is now configured for **GitHub Actions** publishing
+- the canonical deploy lane is now working in steady state through `gui-deploy-verify.yml`
+- the Actions-based Pages deploy and deployed smoke completed green for commit `f7093fc21832d0419891f554ea56b529704bd81f`
+
+This means the GUI lane is no longer blocked on Pages bootstrap.
+The repo is now in the intended steady-state deploy model.
 
 ---
 
 ## Product posture
 
-v3 remains **reader-first**.
+Workbench v3 is **reader-first and inspector-first**.
 
 The GUI owns:
 - browse
 - open
-- read
 - inspect
 - navigate timeline
 - navigate atlas
-- show artifact status and provenance
+- show artifact/source/validation state
+- import local case packages for local use
+- provide the reading handoff surface
 
 GPT-side owns:
-- generate
+- generate reading
 - save
 - delete
 - promote
-- package
 - repo mutation
-- workflow dispatch
+- workflow dispatch / deeper operator actions
+
+The browser UI should remain cleanly separated from repo-mutation authority.
 
 ---
 
 ## Locked direction
 
-These are now treated as locked for frontend direction:
-- atlas is the **primary instrument**, permanently
-- screen split is stable; atlas is not a temporary mode
-- atlas is moving toward **native renderer structure**, not long-term staged patches
-- family treatment is moving toward **native**, not long-term post-pass logic
-- detail dock keeps a **stable reading grammar**
-- family native scope should affect:
-  - payload
-  - field markers
-  - detail dock
-  - but **per actor**, not as one undifferentiated atlas-wide flood
-- motion is for **payload effects**, not decoration
-- payload motion includes:
-  - direction
-  - impact / arrival
-  - persistence / retention traces
-- no 3D/fractal/art-project detour for this workstream
-- Θ must be derived from canon, not improvised visually
+These are now treated as locked enough to work from:
+- Workbench v3 is the only supported live GUI surface
+- root `index.html` is a redirect convenience, not a second live workbench
+- v2 is not treated as an active GUI target
+- package/load/import behavior is part of the real GUI surface now, not placeholder territory
+- reading handoff is part of the real GUI surface now, not hidden operator knowledge
+- atlas remains the persistent left-side instrument
+- timeline remains the bottom focus/navigation instrument
+- the current deploy model is:
+  - one-time manual Pages bootstrap already completed
+  - steady-state Actions deploy through `gui-deploy-verify.yml`
+  - deployed smoke after deploy is required
+- future sessions should rebuild GUI context from `/main/*`, not from stale chat memory
 
 ---
 
-## Live implementation state (actual)
+## Live implementation reality
 
-What is live now:
-- stable desktop split gives atlas and reader equal screen importance
-- atlas has a staged **field + fixed detail dock** structure
-- field markers are clickable and derived from current atlas detail sections
-- region cues exist in the atlas field
-- marker/detail sync is now **bidirectional**
-- overview / participant / encounter produce different field states
-- marker emphasis now responds to focus mode and current focus text
-- family treatment is still staged through `ui-v3/family-pass.js`
+### Entrypoints
+- `/workbench-v3.html`
+- `/ui-v3/app.js`
 
-This means v3 is no longer in shell setup.
-It is in a **pre-native atlas transition phase**.
+### Main runtime ownership
+- `/workbench-v3.html`
+  - shell layout
+  - main regions
+  - top actions
+  - tabs
+  - mount points
+- `/ui-v3/app.js`
+  - app controller
+  - catalog loading
+  - case loading
+  - local package import
+  - reading handoff actions
+  - tab state
+  - timeline / atlas focus state
+- `/ui-v3/atlas-renderer-core.js`
+  - atlas structure / metadata / shell scaffolding
+- `/ui-v3/atlas-renderer.js`
+  - atlas interaction layer
+- `/catalog/index.json`
+  - canonical catalog for open-case browsing
+- `/cases/**`
+  - canonical stored case artifacts
 
----
+### Important support CSS
+- `/ui-v3/styles.css`
+- `/ui-v3/reading-surfaces.css`
+- `/ui-v3/open-panel.css`
+- `/ui-v3/palette.css`
+- `/ui-v3/layout-atlas-map.css`
+- `/ui-v3/atlas-map-enhancer.css`
 
-## Design notes now locked enough to work from
+### Important workflows
+- `gui-structure-check.yml`
+- `gui-live-smoke.yml`
+- `gui-deploy-verify.yml`
+- `gui-force-redeploy.yml`
 
-### Screen model
-- left side = atlas / semantic map
-- right side = case reading / encoding / companion detail surfaces
-- this divide is stable, not mode-switched
+### Important GUI tools
+- `gui-entry-audit.mjs`
+- `gui-cut-check.mjs`
+- `gui-live-smoke.mjs`
+- `gui-pages-live-smoke.mjs`
+- `gui-pages-artifact-verify.mjs`
+- `gui-repo-diff.mjs`
+- `gui-validate-chain.mjs`
 
-### Atlas model
-- atlas should behave like a **semantic map**, not a card stack
-- map logic is preferred over scenic illustration
-- calm field first; semantic richness second
-- fixed detail dock is preferred over popup-heavy interaction
-- the atlas should eventually be spatial **without becoming decorative fantasy**
-
-### Detail dock grammar
-Stable reading rhythm should remain even when the selected content changes.
-Working grammar:
-1. context
-2. summary
-3. structure
-4. relations
-5. expression
-6. payload
-
-### Motion doctrine
-- motion is instructional
-- motion belongs to payload behavior and interaction understanding
-- motion should explain transfer, arrival, buildup, retention, and consequence
-- motion should not be atmospheric filler
-
-### Θ / Ruin posture
-- Ruin and Θ are not free decorative symbols
-- Θ needs canon-faithful operational translation before native UI integration
-- Ruin and Θ should not spread wider until their data path / UI rule is explicit
-
----
-
-## Architecture status
-
-Strong:
-- atlas-first screen direction
-- stable split
-- focus model
-- detail dock idea
-- semantic-map direction
-- payload-motion doctrine
-
-Transitional:
-- `atlas-map-stage.js` and `atlas-map-stage.css` are still staged scaffolds
-- `family-pass.js` is still staged
-- `ui-v3/app.js` still carries the old integrated render center of gravity
-
-Not yet final:
-- native atlas renderer structure
-- native family rendering
-- canon-faithful Θ integration
-- payload motion layer
+Canonical operator command:
+```bash
+npm run gui:validate-chain -- --base-ref HEAD~1 --head-ref HEAD --copy-scan
+```
 
 ---
 
 ## Immediate work order (current)
 
-1. **Refresh working-board truth**
-   - keep this file and the visual codex lean, current, and non-redundant
+1. **Keep live deploy confidence high**
+   - preserve the now-working Actions Pages lane
+   - keep local smoke + deployed smoke green
+   - treat `gui-deploy-verify.yml` as authoritative
 
-2. **Stop expanding staged refinements as if they were final architecture**
-   - staged layers may still exist briefly, but no longer define direction
+2. **Continue user-visible Workbench v3 polish**
+   - package/load/import surface
+   - reading workflow affordances
+   - clearer GPT-side handoff in the UI
+   - wording consistency across empty states and quick actions
 
-3. **Begin native atlas renderer rebuild now**
-   - migrate atlas field / zones / markers / detail dock into native render structure
-   - reduce dependence on post-render wrapping logic
+3. **Continue timeline / atlas UX polish**
+   - user-visible clarity only
+   - preserve the current architecture split
+   - avoid reopening architecture migration unless a real blocker appears
 
-4. **Move family from staged to native**
-   - preserve per-actor behavior
-   - thread family through payload + field marker + detail dock surfaces
+4. **Use the self-referential layer as the re-entry guide**
+   - future sessions should read `/main/TOC.md`
+   - then `/main/GPT_OPERATOR_MANUAL.md`
+   - then `/main/SYSTEM_MAP.md`
+   - then `/main/WORKBENCH_V3_OPERATOR_MAP.md`
+   - then `/main/INSTRUCTIONS_INDEX.md`
 
-5. **Translate canon into explicit UI rule for Θ**
-   - do not improvise beyond canon
-
-6. **Add payload motion only after native atlas structure is in place**
-   - motion must clarify payload behavior, not compensate for architectural transition
+5. **Only then consider deeper atlas refinement**
+   - no spiraling architecture work
+   - no speculative rewrites without a real product need
 
 ---
 
 ## Current biggest risks
 
-- leaving transitional wrappers in place too long and mistaking them for architecture
-- letting visual additions outpace canon-faithful semantic rules
-- letting working docs become repetitive and stale
-- integrating Θ visually before its operational UI rule is explicit
+- drifting back into “multiple live surfaces” confusion
+- mixing GPT-side repo mutation responsibilities into browser UX
+- reopening architecture work when the current lane is user-visible polish
+- letting wording drift between:
+  - center empty states
+  - side panel actions
+  - reading handoff surfaces
+  - deployed live copy
+- forgetting that the deploy model is now stable and should be used, not re-debated
 
 ---
 
 ## Success condition for the current phase
 
 A user should be able to:
-- read the atlas as the primary instrument
-- move between overview / participant / encounter without relearning the interface
-- understand that field, region, marker, and detail are one connected system
-- read payload and family distinctions without needing the old staged logic to explain them
-- later receive motion as clarification, not as compensation
+- open a canonical repo case from the live catalog
+- import a local case package without confusion
+- understand where case / encoding / reading live in the interface
+- use the timeline and atlas as the persistent navigation instruments
+- understand that reading generation is GPT-side, with a clear handoff path
+- see the same intended wording locally and on live Pages
+- rely on the Actions deploy lane without manual “did it deploy?” checking
