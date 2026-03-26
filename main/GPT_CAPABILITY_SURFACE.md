@@ -82,8 +82,8 @@ The current active operation set is:
 - `listWorkflowRunJobs` — `GET /actions/runs/{run_id}/jobs`
 - `rerunWorkflowRun` — `POST /actions/runs/{run_id}/rerun`
 - `rerunFailedJobs` — `POST /actions/runs/{run_id}/rerun-failed-jobs`
-- `cancelWorkflowRun` — `POST /actions/runs/{run_id}/cancel`
-- `forceCancelWorkflowRun` — `POST /actions/runs/{run_id}/force-cancel`
+- `cancelWorkflowRun` — `POST /actions/runs/{run_id}/cancel
+- `forceCancelWorkflowRun` — `POST /actions/runs/{run_id}/force-cancel
 
 ## Practical implications
 [RID_CAPABILITY_PRACTICAL_IMPLICATIONS]
@@ -102,11 +102,16 @@ The current action surface supports:
 ### Pages-control implications
 The connector can now:
 - inspect the current GitHub Pages site
-- switch Pages source behavior through `updatePagesSite`
+- attempt to switch Pages source behavior through `updatePagesSite`
 - request a Pages build
 - inspect the latest Pages build state
 
-This closes the earlier gap where the GPT could validate Pages and deploy workflows but could not directly switch the repository Pages source between legacy and GitHub Actions publishing.
+Do **not** treat `updatePagesSite(build_type="workflow")` as a dependable bootstrap path.
+The stable operating model is:
+- one-time manual bootstrap in repo UI: `Settings → Pages → Source → GitHub Actions`
+- steady-state automation through the canonical workflow deploy lane after that switch
+
+The API path remains useful for explicit admin testing and classification work, but a persistent `403` there should be treated as an auth/policy problem, not as a reason to redesign steady-state deployment around repeated mode-switch attempts.
 
 ### Workflow-control implications
 The connector can now:
@@ -128,7 +133,7 @@ So broader authority should not be treated as a blocker assumption, but it also 
 The active file surface is the generic `/contents/{path}` model.
 That means nested repository paths are part of the intended working surface.
 
-`listCases` remains a convenience helper for top-level `/cases` inspection, not the full file-capability model.
+ `listCases` remains a convenience helper for top-level `/cases` inspection, not the full file-capability model.
 
 ### Ref-path note
 Use `getBranchRef` for simple `heads/{branch}` lookups.
