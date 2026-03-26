@@ -18,9 +18,7 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
 }
 
-* {
-  box-sizing: border-box;
-}
+* {\n  box-sizing: border-box;\n}
 
 html,
 body {
@@ -36,6 +34,8 @@ body {
     var(--bg);
   background-size: auto, 24px 24px, 24px 24px, auto;
   color: var(--text);
+  font-size: 15px;
+  line-height: 1.55;
 }
 
 button,
@@ -109,6 +109,8 @@ button.ghost {
   margin: 0;
   color: var(--muted);
   max-width: 780px;
+  font-size: 15px;
+  line-height: 1.56;
 }
 
 .eyebrow,
@@ -116,7 +118,7 @@ button.ghost {
 .group-label,
 .step-detail-label,
 .event-card-kicker {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -152,6 +154,8 @@ button.ghost {
   background: rgba(8, 17, 11, 0.78);
   color: var(--accent);
   box-shadow: var(--glow);
+  font-size: 14px;
+  line-height: 1.55;
 }
 
 .actions-popover-shell {
@@ -186,6 +190,7 @@ button.ghost {
   width: 100%;
   text-align: left;
   background: var(--surface-soft);
+  font-size: 14px;
 }
 
 .action-btn.active {
@@ -198,7 +203,8 @@ button.ghost {
 .group-note {
   margin: 0;
   color: var(--muted);
-  line-height: 1.5;
+  line-height: 1.56;
+  font-size: 14px;
 }
 
 .grid {
@@ -362,6 +368,8 @@ button.ghost {
 .subtitle {
   margin: 0 20px 16px;
   color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 .atlas-intro {
@@ -402,6 +410,8 @@ button.ghost {
 .catalog-title {
   font-weight: 700;
   margin-bottom: 6px;
+  font-size: 16px;
+  line-height: 1.35;
 }
 
 .catalog-meta,
@@ -420,7 +430,7 @@ button.ghost {
 .encounter-detail-list,
 .atlas-provenance-label,
 .timeline-summary-copy {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--muted);
 }
 
@@ -435,7 +445,7 @@ button.ghost {
   border-radius: 999px;
   background: rgba(103, 247, 161, 0.08);
   color: var(--accent);
-  font-size: 12px;
+  font-size: 13px;
   border: 1px solid rgba(103, 247, 161, 0.14);
 }
 
@@ -473,7 +483,7 @@ button.ghost {
 
 .context-copy {
   margin-top: 6px;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 .reading-surface {
@@ -515,12 +525,15 @@ button.ghost {
 .encounter-detail-list dt {
   font-weight: 700;
   color: var(--muted);
+  font-size: 12px;
 }
 
 .summary-list dd,
 .axis-values dd,
 .encounter-detail-list dd {
   margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .pre-json {
@@ -530,6 +543,8 @@ button.ghost {
   background: rgba(10, 22, 14, 0.96);
   border: 1px solid var(--border);
   overflow: auto;
+  font-size: 13px;
+  line-height: 1.6;
 }
 
 .placeholder-card {
@@ -542,11 +557,14 @@ button.ghost {
 
 .placeholder-card h3 {
   margin: 0 0 10px;
+  font-size: 18px;
+  line-height: 1.25;
 }
 
 .placeholder-card p {
   margin: 0 0 10px;
-  line-height: 1.55;
+  line-height: 1.58;
+  font-size: 14px;
 }
 
 .hidden {
@@ -591,6 +609,7 @@ button.ghost {
 
 .focus-strip-title {
   font-weight: 700;
+  font-size: 15px;
 }
 
 .focus-strip-meta {
@@ -687,12 +706,6 @@ button.ghost {
   box-shadow: 0 0 0 5px rgba(60, 255, 143, 0.18), 0 0 28px rgba(60, 255, 143, 0.3);
 }
 
-.timeline:has(.encounter-btn.active) .timeline-step-card.active .timeline-summary-kicker {
-  background: rgba(103, 247, 161, 0.14);
-  border-color: rgba(103, 247, 161, 0.52);
-  box-shadow: 0 0 0 1px rgba(103, 247, 161, 0.16), 0 0 12px rgba(60, 255, 143, 0.08);
-}
-
 .timeline-step-select {
   width: 100%;
   border: 0;
@@ -734,7 +747,7 @@ button.ghost {
   border: 1px solid var(--border);
   background: rgba(103, 247, 161, 0.06);
   color: var(--accent);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -750,7 +763,7 @@ button.ghost {
 .timeline-summary-copy {
   flex: 1 1 220px;
   min-width: 0;
-  line-height: 1.4;
+  line-height: 1.55;
 }
 
 .timeline-step-card.active .timeline-summary-copy {
@@ -767,8 +780,9 @@ button.ghost {
 .step-detail-summary {
   margin: 0;
   color: var(--muted);
-  line-height: 1.55;
+  line-height: 1.6;
   padding-top: 14px;
+  font-size: 14px;
 }
 
 .step-detail-block {
@@ -779,6 +793,7 @@ button.ghost {
 .step-chip {
   padding: 8px 12px;
   background: rgba(8, 17, 11, 0.8);
+  font-size: 13px;
 }
 
 .step-chip.active,
@@ -815,13 +830,10 @@ button.ghost {
   background: rgba(8, 17, 11, 0.8);
   padding: 11px 13px;
   border-radius: 12px;
+  font-size: 14px;
 }
 
 .lens-btn-row {
-  width: 100%;
-}
-
-.lens-btn {
   width: auto;
   padding: 8px 10px;
   border-radius: 999px;
@@ -837,12 +849,12 @@ button.ghost {
 .lens-note,
 .atlas-note {
   margin: 0;
-  line-height: 1.45;
+  line-height: 1.55;
 }
 
 .atlas-heading {
   margin: 4px 0 0;
-  font-size: 18px;
+  font-size: 20px;
 }
 
 .atlas-state-strip {
@@ -876,7 +888,7 @@ button.ghost {
   border: 1px solid var(--border-strong);
   background: rgba(103, 247, 161, 0.08);
   color: var(--accent);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -923,7 +935,8 @@ button.ghost {
 
 .atlas-provenance-value {
   color: var(--text);
-  line-height: 1.3;
+  line-height: 1.4;
+  font-size: 13px;
 }
 
 .atlas-provenance-item--ok .atlas-provenance-value {
@@ -947,7 +960,7 @@ button.ghost {
 .atlas-section h5,
 .axis-card h4 {
   margin: 2px 0 0;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .atlas-pill-row {
@@ -966,7 +979,7 @@ button.ghost {
   border: 1px solid var(--border);
   background: rgba(103, 247, 161, 0.08);
   color: var(--accent);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1;
 }
 
@@ -1017,13 +1030,14 @@ button.ghost {
   border: 1px solid rgba(112, 255, 174, 0.12);
   border-radius: 9px;
   background: rgba(11, 21, 14, 0.82);
+  font-size: 13px;
 }
 
 .empty {
   color: var(--muted);
 }
 
-@media (max-width: 1180px) {
+ @media (max-width: 1180px) {
   .grid {
     grid-template-columns: 1fr;
   }
@@ -1075,23 +1089,23 @@ button.ghost {
 }
 
 .atlas-view .context-kicker {
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.18em;
   color: rgba(141, 179, 157, 0.8);
 }
 
 .atlas-heading {
   margin: 0;
-  font-size: 20px;
-  line-height: 1.08;
+  font-size: 22px;
+  line-height: 1.1;
   letter-spacing: 0.01em;
   color: var(--text);
 }
 
 .atlas-note {
   max-width: 44ch;
-  font-size: 12px;
-  line-height: 1.55;
+  font-size: 14px;
+  line-height: 1.6;
   color: rgba(141, 179, 157, 0.88);
 }
 
@@ -1106,7 +1120,7 @@ button.ghost {
 }
 
 .atlas-state-context {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.04em;
   color: rgba(216, 255, 231, 0.88);
@@ -1114,13 +1128,13 @@ button.ghost {
 
 .atlas-mode-tag {
   padding: 4px 7px;
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.16em;
 }
 
 .atlas-state-pills .atlas-pill {
   padding: 4px 7px;
-  font-size: 11px;
+  font-size: 12px;
   color: rgba(216, 255, 231, 0.82);
   border-color: rgba(112, 255, 174, 0.14);
   background: rgba(103, 247, 161, 0.06);
@@ -1133,7 +1147,7 @@ button.ghost {
 
 .atlas-provenance-head .group-label,
 .atlas-lens-shell .group-label {
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.16em;
   color: rgba(141, 179, 157, 0.82);
 }
@@ -1148,16 +1162,16 @@ button.ghost {
 }
 
 .atlas-provenance-label {
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: rgba(141, 179, 157, 0.8);
 }
 
 .atlas-provenance-value {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
-  line-height: 1.25;
+  line-height: 1.35;
 }
 
 .atlas-lens-shell {
@@ -1176,17 +1190,16 @@ button.ghost {
 
 .lens-btn {
   padding: 6px 9px;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .lens-note {
   max-width: 46ch;
-  font-size: 12px;
-  line-height: 1.5;
+  font-size: 14px;
+  line-height: 1.55;
   color: rgba(141, 179, 157, 0.86);
 }
 
-/* center reader terminal grammar refinement */
 .center-panel .case-header {
   align-items: flex-start;
   gap: 18px;
@@ -1200,7 +1213,7 @@ button.ghost {
 }
 
 .center-panel .case-header h2 {
-  font-size: 24px;
+  font-size: 26px;
   line-height: 1.08;
   letter-spacing: 0.01em;
   color: var(--text);
@@ -1209,8 +1222,8 @@ button.ghost {
 .center-panel .subtitle {
   margin-top: 0;
   margin-bottom: 14px;
-  font-size: 12px;
-  line-height: 1.55;
+  font-size: 14px;
+  line-height: 1.6;
   color: rgba(141, 179, 157, 0.88);
   max-width: 56ch;
 }
@@ -1222,7 +1235,7 @@ button.ghost {
 
 .center-panel .badge {
   padding: 4px 8px;
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: rgba(216, 255, 231, 0.84);
@@ -1238,9 +1251,9 @@ button.ghost {
 }
 
 .center-panel .tab-btn {
-  padding: 7px 10px;
+  padding: 8ppx 12px;
   border-radius: 999px;
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: rgba(141, 179, 157, 0.86);
@@ -1272,14 +1285,14 @@ button.ghost {
 }
 
 .center-panel .context-kicker {
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.16em;
   color: rgba(141, 179, 157, 0.82);
 }
 
 .center-panel .context-copy {
   margin-top: 5px;
-  font-size: 12px;
-  line-height: 1.55;
+  font-size: 14px;
+  line-height: 1.60;
   color: rgba(216, 255, 231, 0.8);
 }
