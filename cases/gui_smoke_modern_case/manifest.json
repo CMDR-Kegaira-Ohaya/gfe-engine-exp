@@ -1,0 +1,6 @@
+{
+  "case_id": "gui_smoke_modern_case",
+  "title": "GUI smoke modern case",
+  "slug": "gui_smoke_modern_case",
+  "current_case_source": "./source/case.md"
+}
