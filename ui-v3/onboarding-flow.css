@@ -100,7 +100,7 @@
   border-radius: 12px;
   border: 1px solid rgba(112, 255, 174, 0.12);
   background: rgba(9, 18, 12, 0.76);
-  transition: border-color 140ms ease, background 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+  transition: border-color 140ms ease, background 140ms ease, box-shadow 140ms ease, transform 140ms ease, opacity 140ms ease;
 }
 
 .workflow-step.current {
@@ -173,6 +173,52 @@
 
 .app-shell.workflow-no-case .center-panel .tabs {
   opacity: 0.78;
+}
+
+.app-shell.workflow-has-case .notice-bar {
+  opacity: 0.72;
+  color: rgba(141, 179, 157, 0.88);
+  border-color: rgba(112, 255, 174, 0.12);
+  box-shadow: none;
+}
+
+.app-shell.workflow-has-case .center-panel {
+  border-color: rgba(103, 247, 161, 0.24);
+  box-shadow: var(--shadow), 0 0 0 1px rgba(103, 247, 161, 0.06);
+}
+
+.app-shell.workflow-on-case-tab .center-panel {
+  border-color: rgba(103, 247, 161, 0.3);
+  box-shadow: var(--shadow), 0 0 0 1px rgba(103, 247, 161, 0.09), 0 0 20px rgba(60, 255, 143, 0.05);
+}
+
+.app-shell.workflow-on-case-tab .left-panel,
+.app-shell.workflow-on-case-tab .timeline-panel {
+  opacity: 0.84;
+}
+
+.app-shell.workflow-on-case-tab .badge-row {
+  opacity: 0.68;
+}
+
+.app-shell.workflow-away-from-case .left-panel,
+.app-shell.workflow-away-from-case .timeline-panel {
+  opacity: 0.9;
+}
+
+.app-shell.workflow-away-from-case .center-panel .badge-row {
+  opacity: 0.8;
+}
+
+.app-shell.workflow-reading-missing .workflow-step[data-workflow-step="continue"] {
+  border-color: rgba(103, 247, 161, 0.34);
+  background: rgba(12, 29, 19, 0.9);
+  box-shadow: 0 0 0 1px rgba(103, 247, 161, 0.08), 0 0 16px rgba(60, 255, 143, 0.05);
+}
+
+.app-shell.workflow-has-reading .workflow-step[data-workflow-step="continue"] {
+  border-color: rgba(103, 247, 161, 0.2);
+  background: rgba(11, 25, 16, 0.82);
 }
 
 @media (max-width: 1180px) {
