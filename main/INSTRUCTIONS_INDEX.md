@@ -86,6 +86,8 @@ Operational notes:
 - `gui-deploy-verify.yml` is now the authoritative validation-and-deploy lane for Workbench v3 when the repository Pages source is configured for GitHub Actions.
 - The staged GitHub Pages artifact is intentionally limited to `index.html`, `workbench-v3.html`, `privacy.html`, `ui-v3/**`, `solver/**`, `catalog/**`, and `cases/**`.
 - Use `gui:pages-live-smoke` and `gui:pages-artifact-verify` for deployed-output evidence beyond the local harness.
+- `gui-deploy-verify.yml` now performs a fail-fast Pages bootstrap check before attempting the Actions deploy path.
+- If the repository is still on legacy Pages, the canonical message is: `Settings → Pages → Source → GitHub Actions`.
 
 Boundaries:
 - the local smoke harness is operational evidence, not final proof of deployed browser state
@@ -108,8 +110,9 @@ Read `/main/TOKEN_PERMISSION_SURFACE.md` for:
 - practical authority width of the current token
 
 Practical operator implications of the current live connector pack:
-- the GPT can now attempt to switch GitHub Pages source behavior through `updatePagesSite`
+- the GPT can now inspect and classify GitHub Pages state through the connector
 - the GPT can now request/check Pages builds
+- switching Pages from legacy to GitHub Actions publishing is treated as a one-time manual bootstrap step unless an explicitly approved admin path is being tested
 - the GPT can now inspect workflow-run artifacts directly
 - the GPT can now rerun failed runs or cancel stuck runs from the connector layer
 - the GPT still should prefer generic path-based repo operations over narrower legacy case helpers
@@ -130,6 +133,6 @@ Boundaries:
 - when a repo capability is operational, repeatable, and not canonical doctrine
 - when usage should be cross-linked with procedures or tooling
 
-```text
+ ```text
 If a new repo-useful tool is added, list it here and add a cross-link from `/main/TOC.md`.
 ```
