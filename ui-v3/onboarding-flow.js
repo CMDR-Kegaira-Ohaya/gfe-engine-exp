@@ -38,7 +38,7 @@
             <span class="workflow-chip" data-workflow-chip="review">Next</span>
           </div>
           <h3 class="workflow-step-title">Review what loaded</h3>
-          <p class="workflow-step-copy">Read the case first. The title, source, and case tab tell you what is currently loaded.</p>
+          <p class="workflow-step-copy">Read the case first. The title, source, and Case tab tell you what is currently loaded.</p>
         </article>
         <article class="workflow-step" data-workflow-step="continue">
           <div class="workflow-step-head">
@@ -166,10 +166,11 @@
     const workflowCopy = banner.querySelector('#workflow-copy');
 
     applyHierarchyClasses(state);
+    banner.classList.toggle('compact', hasCase);
 
     if (!hasCase) {
       workflowTitle.textContent = 'Start with one clear choice';
-      workflowCopy.textContent = 'Browse a canonical case or import a local package. After one case loads, the case tab becomes the main place to read first.';
+      workflowCopy.textContent = 'Browse a canonical case or import a local package. After one case loads, the Case tab becomes the main place to read first.';
       primary.textContent = 'Browse canonical cases';
       primary.dataset.workflowAction = 'open';
       setStepState('open', 'current');
@@ -178,33 +179,32 @@
       return;
     }
 
+    setStepState('open', 'done');
+
     if (activeTab !== 'case') {
-      workflowTitle.textContent = `“${title}” is loaded`);
-      workflowCopy.textContent = 'The case is already open. Return to the case tab first whenever you want the simplest human-readable starting point.';
+      workflowTitle.textContent = `Case loaded: ${title}`;
+      workflowCopy.textContent = 'Return to the Case tab whenever you want the clearest source-first view.';
       primary.textContent = 'Read the case';
       primary.dataset.workflowAction = 'case';
-      setStepState('open', 'done');
       setStepState('review', 'current');
       setStepState('continue', hasReading ? 'done' : 'later');
       return;
     }
 
-    workflowTitle.textContent = `Review “${title}” first`;
+    workflowTitle.textContent = `Now reading: ${title}`;
+    setStepState('review', 'done');
+
     if (readingMissing) {
-      workflowCopy.textContent = 'The case is loaded. Read it here first, then open reading handoff when you want GPT to draft a reading from the loaded case context.';
+      workflowCopy.textContent = 'Stay in the Case tab for source review. Open reading handoff only when you want GPT to draft a reading.';
       primary.textContent = 'Open reading handoff';
       primary.dataset.workflowAction = 'reading-handoff';
-      setStepState('open', 'done');
-      setStepState('review', 'done');
       setStepState('continue', 'current');
       return;
     }
 
-    workflowCopy.textContent = 'The case and a reading are available. Stay on the case for source review, or jump to the saved reading when you want the drafted interpretation.';
+    workflowCopy.textContent = 'The case and a reading are available. Stay here for the source, or open case reading when you want the drafted interpretation.';
     primary.textContent = 'Open case reading';
     primary.dataset.workflowAction = 'reading-tab';
-    setStepState('open', 'done');
-    setStepState('review', 'done');
     setStepState('continue', 'current');
   }
 
