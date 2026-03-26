@@ -39,6 +39,8 @@ Read `/main/EDIT_RULES.md` and related repo-operating docs for Layer 3.
 The current active custom GPT API action for this repo targets:
 - `https://api.github.com/repos/CMDR-Kegaira-Ohaya/gfe-engine-exp`
 
+The current live connector pack is a **30-operation action surface**.
+
 The current active operation set is:
 
 ### Contents and path operations
@@ -67,12 +69,21 @@ The current active operation set is:
 
 ### Pages operations
 - `getPagesSite` — `GET /pages`
+- `updatePagesSite` — `PUT /pages`
+- `requestPagesBuild` — `POST /pages/builds`
+- `getLatestPagesBuild` — `GET /pages/builds/latest`
 
 ### Workflow and run operations
 - `listWorkflows` — `GET /actions/workflows`
 - `listWorkflowRuns` — `GET /actions/workflows/{workflow_id}/runs`
 - `getWorkflowRun` — `GET /actions/runs/{run_id}`
 - `dispatchWorkflow` — `POST /actions/workflows/{workflow_id}/dispatches`
+- `listWorkflowRunArtifacts` — `GET /actions/runs/{run_id}/artifacts`
+- `listWorkflowRunJobs` — `GET /actions/runs/{run_id}/jobs`
+- `rerunWorkflowRun` — `POST /actions/runs/{run_id}/rerun`
+- `rerunFailedJobs` — `POST /actions/runs/{run_id}/rerun-failed-jobs`
+- `cancelWorkflowRun` — `POST /actions/runs/{run_id}/cancel`
+- `forceCancelWorkflowRun` — `POST /actions/runs/{run_id}/force-cancel`
 
 ## Practical implications
 [RID_CAPABILITY_PRACTICAL_IMPLICATIONS]
@@ -85,17 +96,38 @@ The current action surface supports:
 - branch listing, branch creation, and ref inspection/update
 - lower-level git-object fallback work through blob / tree / commit operations
 - merge-style promotion flows
-- Pages inspection
-- workflow inspection and workflow dispatch
+- Pages inspection and Pages settings update
+- workflow inspection, workflow dispatch, workflow rerun/cancel control, job inspection, and run-artifact inspection
+
+### Pages-control implications
+The connector can now:
+- inspect the current GitHub Pages site
+- switch Pages source behavior through `updatePagesSite`
+- request a Pages build
+- inspect the latest Pages build state
+
+This closes the earlier gap where the GPT could validate Pages and deploy workflows but could not directly switch the repository Pages source between legacy and GitHub Actions publishing.
+
+### Workflow-control implications
+The connector can now:
+- list workflow-run artifacts for verification work
+- list jobs for a workflow run
+- rerun a whole workflow run
+- rerun only failed jobs from a run
+- cancel or force-cancel stuck runs
+
+This materially improves deploy recovery and validation-loop control for the canonical Workbench v3 GUI lane.
 
 ### Token-versus-connector note
 The token permission surface may include broader families than the current connector exposes.
-For example, the live token permission record includes **Webhooks — read / write**, but the current custom GPT action surface does **not** currently expose webhook CRUD endpoints.
-So webhook authority should not be treated as a blocker assumption, but it also should not be treated as a directly callable connector capability unless the action surface is expanded.
+For example, the live token permission record includes **Repository hooks — read / write** and **Security events — read / write**, but the current custom GPT action surface still does **not** expose repository-hook or security-event CRUD endpoints.
+
+So broader authority should not be treated as a blocker assumption, but it also should not be treated as a directly callable connector capability unless the action surface is expanded.
 
 ### Current path model note
 The active file surface is the generic `/contents/{path}` model.
 That means nested repository paths are part of the intended working surface.
+
 `listCases` remains a convenience helper for top-level `/cases` inspection, not the full file-capability model.
 
 ### Ref-path note
@@ -105,6 +137,11 @@ Use `getRef` and `updateRef` when the ref path itself matters more generally.
 ### Legacy-surface note
 This active GFE action surface does **not** rely on older flat case-helper write/read/delete operations.
 The generic path-based contents endpoints and the git-object endpoints are the primary control surface.
+
+In the current 30-operation pack, the older case-specific helper trio is intentionally not part of the live connector pack:
+- `getCase`
+- `saveCase`
+- `deleteCase`
 
 ### Browser app caution
 Repo-control capability available to the GPT/operator is not the same thing as a safe browser-app feature.
