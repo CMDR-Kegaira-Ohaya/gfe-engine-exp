@@ -1,0 +1,337 @@
+{
+  "case_id": "gui_smoke_modern_case",
+  "system_name": "GUI smoke modern case",
+  "locus_of_analysis": "personal",
+  "description": "A small but fully renderable smoke fixture for Workbench v3 with case, encoding, reading, timeline, and atlas support.",
+  "participants": [
+    "library_leadership",
+    "quiet_room_regulars",
+    "community_program_team"
+  ],
+  "timeline": [
+    {
+      "timestep_label": "Quiet room serves a stable reading community",
+      "participants": {
+        "quiet_room_regulars": {
+          "axes": {
+            "body": {
+              "A": 35,
+              "R": 70,
+              "I": 30
+            },
+            "mind": {
+              "A": 80,
+              "R": 60,
+              "I": 75
+            },
+            "social": {
+              "A": 45,
+              "R": 55,
+              "I": 40
+            },
+            "ethics": {
+              "A": 65,
+              "R": 55,
+              "I": 65
+            },
+            "time": {
+              "A": 60,
+              "R": 70,
+              "I": 55
+            }
+          }
+        },
+        "library_leadership": {
+          "axes": {
+            "body": {
+              "A": 20,
+              "R": 45,
+              "I": 20
+            },
+            "mind": {
+              "A": 55,
+              "R": 60,
+              "I": 45
+            },
+            "social": {
+              "A": 60,
+              "R": 70,
+              "I": 50
+            },
+            "ethics": {
+              "A": 55,
+              "R": 50,
+              "I": 55
+            },
+            "time": {
+              "A": 50,
+              "R": 65,
+              "I": 45
+            }
+          }
+        }
+      }
+    },
+    {
+      "timestep_label": "Collaboration proposal shifts the decision frame",
+      "participants": {
+        "library_leadership": {
+          "axes": {
+            "body": {
+              "A": 20,
+              "R": 45,
+              "I": 20
+            },
+            "mind": {
+              "A": 65,
+              "R": 65,
+              "I": 55
+            },
+            "social": {
+              "A": 80,
+              "R": 75,
+              "I": 70
+            },
+            "ethics": {
+              "A": 50,
+              "R": 45,
+              "I": 60
+            },
+            "time": {
+              "A": 75,
+              "R": 70,
+              "I": 70
+            }
+          }
+        },
+        "community_program_team": {
+          "axes": {
+            "body": {
+              "A": 25,
+              "R": 50,
+              "I": 25
+            },
+            "mind": {
+              "A": 60,
+              "R": 65,
+              "I": 55
+            },
+            "social": {
+              "A": 85,
+              "R": 75,
+              "I": 80
+            },
+            "ethics": {
+              "A": 55,
+              "R": 45,
+              "I": 60
+            },
+            "time": {
+              "A": 70,
+              "R": 65,
+              "I": 65
+            }
+          }
+        },
+        "quiet_room_regulars": {
+          "axes": {
+            "body": {
+              "A": 40,
+              "R": 65,
+              "I": 35
+            },
+            "mind": {
+              "A": 85,
+              "R": 40,
+              "I": 85
+            },
+            "social": {
+              "A": 50,
+              "R": 40,
+              "I": 55
+            },
+            "ethics": {
+              "A": 75,
+              "R": 40,
+              "I": 80
+            },
+            "time": {
+              "A": 70,
+              "R": 45,
+              "I": 75
+            }
+          }
+        }
+      }
+    },
+    {
+      "timestep_label": "Decision turns on public value versus dependable use",
+      "participants": {
+        "library_leadership": {
+          "axes": {
+            "body": {
+              "A": 20,
+              "R": 45,
+              "I": 20
+            },
+            "mind": {
+              "A": 70,
+              "R": 60,
+              "I": 65
+            },
+            "social": {
+              "A": 75,
+              "R": 70,
+              "I": 75
+            },
+            "ethics": {
+              "A": 65,
+              "R": 50,
+              "I": 75
+            },
+            "time": {
+              "A": 65,
+              "R": 60,
+              "I": 60
+            }
+          }
+        },
+        "quiet_room_regulars": {
+          "axes": {
+            "body": {
+              "A": 45,
+              "R": 55,
+              "I": 40
+            },
+            "mind": {
+              "A": 85,
+              "R": 35,
+              "I": 85
+            },
+            "social": {
+              "A": 55,
+              "R": 35,
+              "I": 60
+            },
+            "ethics": {
+              "A": 80,
+              "R": 40,
+              "I": 85
+            },
+            "time": {
+              "A": 75,
+              "R": 40,
+              "I": 80
+            }
+          }
+        },
+        "community_program_team": {
+          "axes": {
+            "body": {
+              "A": 25,
+              "R": 50,
+              "I": 25
+            },
+            "mind": {
+              "A": 65,
+              "R": 60,
+              "I": 60
+            },
+            "social": {
+              "A": 80,
+              "R": 70,
+              "I": 80
+            },
+            "ethics": {
+              "A": 60,
+              "R": 45,
+              "I": 65
+            },
+            "time": {
+              "A": 75,
+              "R": 60,
+              "I": 70
+            }
+          }
+        }
+      }
+    }
+  ],
+  "payload_events": [
+    {
+      "timestep_idx": 1,
+      "alpha_source": "community_program_team.Org",
+      "alpha_receiving": "library_leadership.Org",
+      "alpha_medium": "community_program_team.Org",
+      "axis": "Org",
+      "face": "outer",
+      "interference": "proposal_pressure",
+      "payload_bundle": [
+        {
+          "sigma": "L",
+          "mode": "route",
+          "register": "emitted",
+          "axis": "Org",
+          "magnitude": 0.7
+        },
+        {
+          "sigma": "Dst",
+          "mode": "load",
+          "register": "retained",
+          "axis": "Org",
+          "magnitude": 0.5
+        }
+      ]
+    },
+    {
+      "timestep_idx": 1,
+      "alpha_source": "quiet_room_regulars.Emb",
+      "alpha_receiving": "library_leadership.Cfg",
+      "alpha_medium": "quiet_room_regulars.Emb",
+      "axis": "Emb",
+      "face": "inner",
+      "interference": "loss_signal",
+      "payload_bundle": [
+        {
+          "sigma": "L",
+          "mode": "route",
+          "register": "emitted",
+          "axis": "Emb",
+          "magnitude": 0.6
+        },
+        {
+          "sigma": "M",
+          "mode": "suppress",
+          "register": "retained",
+          "axis": "Emb",
+          "magnitude": 0.4
+        }
+      ]
+    },
+    {
+      "timestep_idx": 2,
+      "alpha_source": "library_leadership.Cfg",
+      "alpha_receiving": "quiet_room_regulars.Emb",
+      "alpha_medium": "library_leadership.Cfg",
+      "axis": "Cfg",
+      "face": "outer",
+      "interference": "balancing_claim",
+      "payload_bundle": [
+        {
+          "sigma": "L",
+          "mode": "threshold-transfer",
+          "register": "emitted",
+          "axis": "Cfg",
+          "magnitude": 0.5
+        },
+        {
+          "sigma": "Dst",
+          "mode": "load",
+          "register": "retained",
+          "axis": "Cfg",
+          "magnitude": 0.4
+        }
+      ]
+    }
+  ]
+}
