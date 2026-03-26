@@ -72,6 +72,8 @@ npm run gui:validate-chain -- --base-ref HEAD~1 --head-ref HEAD --copy-scan
 - `gui-structure-check.yml` runs entry audit, cut-check, and copy scan for the canonical Workbench v3 surface.
 - `gui-live-smoke.yml` runs the local Workbench v3 smoke harness.
 - `gui-deploy-verify.yml` is the authoritative push-time validator and GitHub Actions Pages deploy lane for the canonical Workbench v3 surface.
+- Treat switching Pages source to GitHub Actions as a one-time manual bootstrap in repo settings, not as a dependable production automation step.
+- The deploy lane now fails fast with a clear bootstrap message if the repository is still on legacy Pages publishing.
 - `gui-force-redeploy.yml` intentionally invalidates the Workbench v3 deploy path.
 
 ## Notes
@@ -82,7 +84,7 @@ npm run gui:validate-chain -- --base-ref HEAD~1 --head-ref HEAD --copy-scan
 - The Pages deploy artifact is intentionally trimmed to `index.html`, `workbench-v3.html`, `privacy.html`, `ui-v3/**`, `solver/**`, `catalog/**`, and `cases/**`.
 - The atlas map enhancer file has been removed.
 - `ui-v3/atlas-renderer-core.js` now owns atlas structure, section/view metadata, and atlas map shell scaffolding.
-- `ui-v3/atlas-renderer.js` is now the thinner interaction layer for detail remap, marker/zone generation, and atlas map wiring.
+- `ui-v3/atlas-renderer.js` is now the thiner interaction layer for detail remap, marker/zone generation, and atlas map wiring.
 - These tools assume ECMAScript modules and parse with `sourceType: "module"`.
 - They are for structural inspection and migration aid, not canonical doctrine.
 - They do not yet cover JSX or TypeScript.
