@@ -125,9 +125,9 @@
     const slug = document.getElementById('current-slug')?.textContent?.trim() || '';
     const title = document.getElementById('current-title')?.textContent?.trim() || 'the current case';
     const status = document.getElementById('status-badge')?.textContent?.trim() || '';
-    const activeTab = document.querySelector('.tab-btn.active').dataset?.tab || 'case';
+    const activeTab = document.querySelector('.tab-btn.active')?.dataset?.tab || 'case';
 
-    const hasCase = slug && slug !== 'No case open';
+    const hasCase = Boolean(slug && slug !== 'No case open');
     const hasReading = /reading (available|imported)/i.test(status);
     const readingMissing = hasCase && !hasReading;
 
@@ -147,15 +147,25 @@
       'Next';
   }
 
+  function applyHierarchyClasses({ hasCase, hasReading, readingMissing, activeTab }) {
+    appShell.classList.toggle('workflow-no-case', !hasCase);
+    appShell.classList.toggle('workflow-has-case', hasCase);
+    appShell.classList.toggle('workflow-on-case-tab', hasCase && activeTab === 'case');
+    appShell.classList.toggle('workflow-away-from-case', hasCase && activeTab !== 'case');
+    appShell.classList.toggle('workflow-has-reading', hasReading);
+    appShell.classList.toggle('workflow-reading-missing', readingMissing);
+  }
+
   function updateBanner() {
     const banner = ensureBanner();
-    const { hasCase, hasReading, readingMissing, activeTab, title } = deriveState();
+    const state = deriveState();
+    const { hasCase, hasReading, readingMissing, activeTab, title } = state;
 
     const primary = banner.querySelector('[data-workflow-primary]');
     const workflowTitle = banner.querySelector('#workflow-title');
     const workflowCopy = banner.querySelector('#workflow-copy');
 
-    appShell.classList.toggle('workflow-no-case', !hasCase);
+    applyHierarchyClasses(state);
 
     if (!hasCase) {
       workflowTitle.textContent = 'Start with one clear choice';
@@ -169,7 +179,7 @@
     }
 
     if (activeTab !== 'case') {
-      workflowTitle.textContent = a“${title}” is loaded`,
+      workflowTitle.textContent = `“${title}” is loaded`);
       workflowCopy.textContent = 'The case is already open. Return to the case tab first whenever you want the simplest human-readable starting point.';
       primary.textContent = 'Read the case';
       primary.dataset.workflowAction = 'case';
