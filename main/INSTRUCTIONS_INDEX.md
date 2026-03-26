@@ -99,15 +99,26 @@ Use this when the task concerns what the GPT can actually do to the repository t
 Read `/main/GPT_CAPABILITY_SURFACE.md` for:
 - connector / API action surface
 - guidance on when to prefer general path-based repo operations over narrower legacy helpers
+- the current live 30-operation connector pack
+- Pages settings/build control now exposed through the connector
+- workflow rerun/cancel control and workflow-run artifact inspection now exposed through the connector
 
 Read `/main/TOKEN_PERMISSION_SURFACE.md` for:
 - live token permission surface
 - practical authority width of the current token
 
+Practical operator implications of the current live connector pack:
+- the GPT can now attempt to switch GitHub Pages source behavior through `updatePagesSite`
+- the GPT can now request/check Pages builds
+- the GPT can now inspect workflow-run artifacts directly
+- the GPT can now rerun failed runs or cancel stuck runs from the connector layer
+- the GPT still should prefer generic path-based repo operations over narrower legacy case helpers
+
 Use these before assuming:
 - the GPT is limited to flat `/cases/*.json` helpers
 - the GPT is read-only
 - workflow dispatch or arbitrary-path writes are unavailable
+- Pages source switching still requires a manual-only connector model
 
 Boundaries:
 - exposed connector/action surface does not guarantee success
