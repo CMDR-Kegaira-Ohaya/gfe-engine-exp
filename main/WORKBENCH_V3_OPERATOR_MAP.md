@@ -17,6 +17,19 @@ Use it to restore working context quickly in new sessions when the task concerns
   - `/.github/workflows/gui-*`
 - `ui-v2/**` and the old root workbench are no longer treated as the live GUI surface
 
+## Current session-start posture
+[RID_WORKBENCH_V3_SESSION_START_POSTURE]
+- The repo is past infrastructure rescue and past Pages bootstrap blockage.
+- GitHub Pages is already on GitHub Actions.
+- The canonical deploy lane is now steady-state and should be used, not re-debated.
+- The current lane is user-visible Workbench v3 polish.
+- Do not reopen major architecture unless a real blocker is found.
+- Assume the user may not be technical enough to guide repo architecture; guide from repo files and current implementation reality.
+- For GUI/public-workbench sessions, begin with:
+  - where we are now
+  - the next best small step
+  - the exact files to inspect first
+
 ## What the GUI is for
 [RID_WORKBENCH_V3_PURPOSE]
 Workbench v3 is a case-first reader and inspector for:
@@ -181,7 +194,10 @@ Stable model:
   - `Settings → Pages → Source → GitHub Actions`
 - steady-state deploys = workflow lane after that switch
 
-`gui-deploy-verify.yml` now performs a fail-fast Pages bootstrap check:
+That bootstrap is already complete for this repo.
+The practical model now is steady-state Actions deploy plus deployed smoke.
+
+`gui-deploy-verify.yml` performs a fail-fast Pages bootstrap check:
 - if Pages `build_type == workflow`, the deploy lane may continue
 - if the repo is still on legacy Pages publishing, the workflow stops with the canonical bootstrap message instead of repeatedly retrying the mode-switch API
 
@@ -228,7 +244,8 @@ Inspect:
 - save/delete/promotion are not browser-native authoring flows
 - atlas structure ownership lives in `atlas-renderer-core.js`
 - atlas interaction wiring lives in `atlas-renderer.js`
-- the deploy lane is designed around manual Pages bootstrap + fail-fast workflow behavior
+- the deploy lane is now steady-state GitHub Actions Pages deploy plus deployed smoke
+- the repo is past infrastructure rescue; current work should default to user-visible polish unless a blocker proves otherwise
 - user guidance should come from repo files, not assumed chat memory
 
 ## Re-entry shortcut

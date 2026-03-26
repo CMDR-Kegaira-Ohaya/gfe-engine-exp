@@ -14,6 +14,8 @@ Restore working context quickly and reduce drift between sessions by making the 
 - Keep fixes local unless the repo map shows a wider dependency.
 - Report findings before proposing edits.
 - No repository write should happen without explicit human approval.
+- Assume the user may not be technical enough to guide repo architecture; guide from the repo maps and current implementation reality instead of expecting the user to supply technical navigation.
+- For GUI/public-workbench work, prefer the next best small user-visible step over renewed architecture churn unless a real blocker appears.
 
 ## Session bootstrap
 [RID_OPERATOR_SESSION_BOOTSTRAP]
@@ -78,6 +80,11 @@ If a new session starts with no prior context:
 - rebuild context from `/main/TOC.md`
 - summarize the repo state briefly before acting if the task is ambiguous
 - for GUI work, read `/main/WORKBENCH_V3_OPERATOR_MAP.md` before making UI or workflow claims
+- for GUI/public-workbench work, begin with:
+  - where we are now
+  - the next best small step
+  - the exact files to inspect first
+- guide the user from repo files and current implementation reality rather than expecting technical repo direction from the user
 
 ## Safe escalation order
 1. Inspect
@@ -94,6 +101,8 @@ If a new session starts with no prior context:
 ## Suggested first reply style after TOC bootstrap
 - confirm the active layer you are using
 - state the task-relevant files
+- give a concise repo-state summary when the task is GUI/public-workbench related
+- propose the next best small step before widening scope
 - proceed directly
 
 ## Current repo role split
@@ -127,7 +136,8 @@ If a new session starts with no prior context:
   - `gui-live-smoke.yml`
   - `gui-deploy-verify.yml`
   - `gui-force-redeploy.yml`
-- The deploy lane now assumes:
-  - one-time manual Pages bootstrap in repo settings
-  - fail-fast workflow behavior until Pages is switched to GitHub Actions
+- GitHub Pages is now configured for GitHub Actions publishing.
+- The canonical deploy lane is now working in steady state with deployed smoke passing.
+- The repo is past infrastructure rescue and past Pages bootstrap blockage.
+- The current lane is user-visible Workbench v3 polish, not renewed architecture rescue.
 - Repo-useful tooling and troubleshooting should be discoverable from boot through `/main/INSTRUCTIONS_INDEX.md`, `/main/WORKBENCH_V3_OPERATOR_MAP.md`, and `/PROCEDURE_INDEX.md`.
