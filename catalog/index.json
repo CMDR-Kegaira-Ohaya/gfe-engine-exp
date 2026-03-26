@@ -1,23 +1,23 @@
 {
   "branch": "main",
-  "generated_at": "2026-03-26T23:11:30.522Z",
+  "generated_at": "2026-03-26T23:12:14.342Z",
   "count": 3,
   "cases": [
     {
       "case_id": "gui_smoke_modern_case",
       "title": "GUI smoke modern case",
       "slug": "gui_smoke_modern_case",
-      "has_case": false,
+      "has_case": true,
       "has_encoding": false,
       "has_reading": false,
       "revision_count": 0,
       "reading_count": 0,
       "participants": 0,
       "timesteps": 0,
-      "modified": "2026-03-27T01:11:20+02:00",
-      "synopsis": "",
+      "modified": "2026-03-27T01:12:07+02:00",
+      "synopsis": "A city library is deciding whether to turn its quiet reading room into a mixed-use collaboration space.",
       "paths": {
-        "case": "",
+        "case": "/cases/gui_smoke_modern_case/source/case.md",
         "manifest": "/cases/gui_smoke_modern_case/manifest.json",
         "encoding": "",
         "reading": ""
