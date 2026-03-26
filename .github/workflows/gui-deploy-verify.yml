@@ -94,8 +94,45 @@ jobs:
           echo '- canonical runtime: `ui-v3/**`, `solver/**`, `catalog/**`, `cases/**`' >> "$GITHUB_STEP_SUMMARY"
           echo '- report uploaded as `gui-v3-validate-chain-report`' >> "$GITHUB_STEP_SUMMARY"
 
-  deploy-pages:
+  pages-bootstrap-check:
     needs: [scope, validate-and-verify]
+    if: ${{ needs.scope.outputs.runtime_changed == 'true' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read
+    steps:
+      - name: Check GitHub Pages publishing mode
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        shell: bash
+        run: |
+          response="$(curl -sS -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/$GITHUB_REPOSITORY/pages")"
+          build_type="$(printf '%s' "$response" | jq -r '.build_type // "unknown"')"
+          html_url="$(printf '%s' "$response" | jq -r '.html_url // ""')"
+
+          echo '## Workbench v3 Pages bootstrap check' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo "- current Pages build_type: `$build_type`" >> "$GITHUB_STEP_SUMMARY"
+ 
+          if [ "$build_type" = "workflow" ]; then
+            echo '- bootstrap state: ready for GitHub Actions Pages deploys' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          echo '- bootstrap state: manual one-time action still required' >> "$GITHUB_STEP_SUMMARY"
+          echo '- required UI step: `Settings → Pages → Source → GitHub Actions`' >> "$GITHUB_STEP_SUMMARY"
+          if [ -n "$html_url" ] && [ "$html_url" != "null" ]; then
+            echo "- current live Pages URL: `$html_url`" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo '- deploy lane intentionally stops here instead of retrying the mode-switch API.' >> "$GITHUB_STEP_SUMMARY"
+
+          echo "Manual one-time bootstrap required: Settings -> Pages -> Source -> GitHub Actions" >&2
+          exit 1
+
+  deploy-pages:
+    needs: [scope, validate-and-verify, pages-bootstrap-check]
     if: ${{ needs.scope.outputs.runtime_changed == 'true' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     permissions:
