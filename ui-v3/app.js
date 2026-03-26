@@ -38,7 +38,9 @@ const state = {
   validation: null,
   solved: null,
   groupedEvents: new Map(),
-  notice: 'Canonical catalog is live. Package loading/import is reserved here.',
+  importedPackage: null,
+  importedFiles: [],
+  notice: 'Canonical catalog is live. Local package import is available here.',
 };
 
 const $ = (id) => document.getElementById(id);
@@ -108,10 +110,15 @@ function setLens(id) {
 }
 
 function getEntry() {
+  if (state.importedPackage && state.importedPackage.slug === state.activeSlug) return state.importedPackage;
   return state.catalog.find((entry) => entry.slug === state.activeSlug) || null;
 }
 
 function getSourceMeta(entry = getEntry()) {
+  if (entry?.source_kind === 'imported') {
+    return { label: 'Source', text: 'Local package import', tone: 'ok' };
+  }
+
   return entry
     ? { label: 'Source', text: 'Canonical repo case', tone: 'ok' }
     : { label: 'Source', text: 'Source zone unknown', tone: 'neutral' };
@@ -119,6 +126,13 @@ function getSourceMeta(entry = getEntry()) {
 
 function getReadingMeta(entry = getEntry()) {
   if (!entry) return { label: 'Reading', text: 'No case', tone: 'neutral' };
+
+  if (entry.source_kind === 'imported') {
+    return state.readingMarkdown.trim()
+      ? { label: 'Reading', text: 'Reading imported', tone: 'ok' }
+      : { label: 'Reading', text: 'Reading missing', tone: 'warn' };
+  }
+
   return entry.has_reading
     ? { label: 'Reading', text: 'Reading available', tone: 'ok' }
     : { label: 'Reading', text: 'Reading missing', tone: 'warn' };
@@ -332,11 +346,33 @@ function resetLoadedState() {
   state.validation = null;
   state.solved = null;
   state.groupedEvents = new Map();
+  state.importedPackage = null;
+  state.importedFiles = [];
 }
 
 function setActiveStep(stepIndex) {
   state.activeStep = Number.isInteger(stepIndex) ? stepIndex : 0;
   clearFocus();
+}
+
+function loadPayloadIntoState(entry, {
+  caseMarkdown = '',
+  encoding = null,
+  readingMarkdown = '',
+  resetTab = true,
+} = {}) {
+  state.activeSlug = entry?.slug ?? null;
+  state.activeStep = 0;
+  if (resetTab) state.activeTab = 'case';
+  clearFocus();
+  state.importedPackage = entry?.source_kind === 'imported' ? entry : null;
+  if (entry?.source_kind !== 'imported') state.importedFiles = [];
+  state.caseMarkdown = caseMarkdown;
+  state.encoding = encoding;
+  state.readingMarkdown = readingMarkdown;
+  state.validation = encoding ? validateCase(encoding) : null;
+  state.solved = encoding ? solveCase(encoding) : null;
+  state.groupedEvents = groupEventsByStep((encoding && encoding.payload_events) || []);
 }
 
 async function fetchJson(path) {
@@ -425,7 +461,7 @@ async function loadCase(slug, { resetTab = true } = {}) {
   clearFocus();
   if (resetTab) state.activeTab = 'case';
 
-  const entry = getEntry();
+  const entry = state.catalog.find((item) => item.slug === slug) || null;
   if (!entry) {
     renderAll();
     return;
@@ -441,12 +477,12 @@ async function loadCase(slug, { resetTab = true } = {}) {
       entry.paths.reading ? fetchText(`.${entry.paths.reading}`) : Promise.resolve(''),
     ]);
 
-    state.caseMarkdown = caseMarkdown;
-    state.encoding = encoding;
-    state.readingMarkdown = readingMarkdown;
-    state.validation = encoding ? validateCase(encoding) : null;
-    state.solved = encoding ? solveCase(encoding) : null;
-    state.groupedEvents = groupEventsByStep((encoding && encoding.payload_events) || []);
+    loadPayloadIntoState(entry, {
+      caseMarkdown,
+      encoding,
+      readingMarkdown,
+      resetTab,
+    });
 
     renderAll();
     setNotice(`“${entry.title}” loaded.`);
@@ -457,6 +493,8 @@ async function loadCase(slug, { resetTab = true } = {}) {
     state.validation = null;
     state.solved = null;
     state.groupedEvents = new Map();
+    state.importedPackage = null;
+    state.importedFiles = [];
 
     renderAll();
     setNotice(`Could not load “${entry.title}”: ${error.message}`);
@@ -468,13 +506,13 @@ function setMode(mode) {
   state.actionsOpen = false;
 
   if (mode === 'reading') {
-    setNotice('Use GPT to generate reading.');
+    setNotice('Use GPT to generate reading. The panel now shows a suggested handoff cue.');
     renderAll();
     return;
   }
 
   if (mode === 'package') {
-    setNotice('Case package support is not fully wired yet.');
+    setNotice('Load a local package or jump back to canonical repo cases from here.');
     renderAll();
     return;
   }
@@ -496,29 +534,165 @@ function renderCatalogList() {
   }).join('');
 }
 
-function renderPackagePlaceholder() {
+function importedFileRoleLabel(role) {
+  if (role === 'encoding') return 'Encoding JSON';
+  if (role === 'case') return 'Case markdown';
+  if (role === 'reading') return 'Reading markdown';
+  return 'Support file';
+}
+
+function guessTextFileRole(fileName, textFileIndex = 0) {
+  const name = String(fileName || '').toLowerCase();
+  if (name.includes('read')) return 'reading';
+  if (name.includes('case') || name.includes('brief') || name.includes('source')) return 'case';
+  return textFileIndex === 0 ? 'case' : 'reading';
+}
+
+function packageTitleFromImport(files, encoding) {
+  if (encoding?.case_id) return label(encoding.case_id);
+  const firstFile = files[0]?.name || 'Imported package';
+  return label(firstFile.replace(/\.[^.]+$/, ''));
+}
+
+async function importPackageFiles(fileList) {
+  const files = Array.from(fileList || []).filter(Boolean);
+  if (!files.length) return;
+
+  setNotice('Importing local package…');
+
+  let encoding = null;
+  let caseMarkdown = '';
+  let readingMarkdown = '';
+  let textFileIndex = 0;
+  const importedFiles = [];
+
+  for (const file of files) {
+    const lowerName = file.name.toLowerCase();
+
+    if (lowerName.endsWith('.json') && !encoding) {
+      const raw = await file.text();
+      encoding = JSON.parse(raw);
+      importedFiles.push({ name: file.name, role: 'encoding' });
+      continue;
+    }
+
+    if (lowerName.endsWith('.md') || lowerName.endsWith('.markdown') || lowerName.endsWith('.txt')) {
+      const text = await file.text();
+      const guessedRole = guessTextFileRole(file.name, textFileIndex);
+      textFileIndex += 1;
+
+      if (guessedRole === 'reading' && !readingMarkdown) {
+        readingMarkdown = text;
+        importedFiles.push({ name: file.name, role: 'reading' });
+        continue;
+      }
+
+      if (!caseMarkdown) {
+        caseMarkdown = text;
+        importedFiles.push({ name: file.name, role: 'case' });
+        continue;
+      }
+
+      if (!readingMarkdown) {
+        readingMarkdown = text;
+        importedFiles.push({ name: file.name, role: 'reading' });
+        continue;
+      }
+
+      importedFiles.push({ name: file.name, role: 'support' });
+      continue;
+    }
+
+    importedFiles.push({ name: file.name, role: 'support' });
+  }
+
+  if (!encoding && !caseMarkdown.trim() && !readingMarkdown.trim()) {
+    throw new Error('No supported package files were found. Import one encoding JSON and optional markdown or text files.');
+  }
+
+  const title = packageTitleFromImport(files, encoding);
+  const slug = `local-${Date.now()}`;
+  const entry = {
+    slug,
+    title,
+    synopsis: `${files.length} imported file${files.length === 1 ? '' : 's'}`,
+    timesteps: Array.isArray(encoding?.timeline) ? encoding.timeline.length : 0,
+    participants: Array.isArray(encoding?.participants) ? encoding.participants.length : 0,
+    has_reading: Boolean(readingMarkdown.trim()),
+    source_kind: 'imported',
+    paths: {},
+  };
+
+  loadPayloadIntoState(entry, {
+    caseMarkdown,
+    encoding,
+    readingMarkdown,
+    resetTab: true,
+  });
+  state.importedFiles = importedFiles;
+
+  renderAll();
+  setNotice(`Imported local package “${title}” from ${pluralize(files.length, 'file')}. Save, delete, and promotion still stay GPT-side.`);
+}
+
+function renderImportedPackageSummary() {
+  if (!state.importedPackage) {
+    return `<p class="placeholder-note">Import a local package to load it directly into the main Workbench v3 surface without repo writes.</p>`;
+  }
+
+  const entry = state.importedPackage;
+  const fileItems = state.importedFiles.length
+    ? `<ul>${state.importedFiles.map((file) => `<li>${esc(importedFileRoleLabel(file.role))}: ${esc(file.name)}</li>`).join('')}</ul>`
+    : '<p class="placeholder-note">No imported file manifest captured.</p>';
+
   return `<section class="placeholder-card">
-    <h3>Case package support</h3>
-    <p>Case package support is not fully wired yet.</p>
-    <p>This surface is reserved for package loading and import.</p>
+    <h3>Imported package</h3>
+    <p><b>${esc(entry.title)}</b> is active in the main workbench surface now.</p>
+    <p class="placeholder-note">Source: local package import · Timesteps: ${entry.timesteps} · Participants: ${entry.participants}</p>
+    ${fileItems}
+  </section>`;
+}
+
+function renderPackagePanel() {
+  return `<section class="placeholder-card">
+    <h3>Open case package</h3>
+    <p>Load a local package into the live workbench without repo writes, or jump back to canonical repo cases.</p>
     <div class="placeholder-actions">
-      <button class="ghost" data-package-action="repo">Load from repo</button>
+      <button class="ghost" data-package-action="repo">Browse repo cases</button>
       <button class="ghost" data-package-action="import">Import files</button>
     </div>
-    <p class="placeholder-note">Load/import entry is reserved here. Full package workflow is not wired yet.</p>
-    <p class="placeholder-note">Save, delete, promote, and package authoring stay GPT-side for now.</p>
-    <p class="placeholder-note">Use GPT for package save, delete, and promotion operations.</p>
+    <input class="hidden" type="file" multiple accept=".json,.md,.markdown,.txt" data-package-file-input>
+    <p class="placeholder-note">Supported local files: one encoding JSON plus optional case and reading markdown or text files.</p>
+    <p class="placeholder-note">Imported packages load into the main timeline/atlas surface immediately. Save, delete, and promotion remain GPT-side.</p>
+    ${renderImportedPackageSummary()}
   </section>`;
+}
+
+function readingCueText() {
+  const entry = getEntry();
+  if (!entry) {
+    return 'Open or import a case first, then ask GPT to generate a reading from the loaded encoding and current timeline context.';
+  }
+
+  return [
+    `Generate a case reading for “${entry.title}”.`,
+    'Use the loaded case encoding and current timeline/atlas context.',
+    'Return markdown suitable for the Workbench v3 Reading tab.',
+    'Do not change ontology, payload structure, or validation semantics.',
+    'Keep the reading operator-facing and aligned with the encoded case evidence.',
+  ].join('\n');
 }
 
 function renderReadingPlaceholder() {
   return `<section class="placeholder-card">
     <h3>Generate reading</h3>
-    <p>Case reading generation stays GPT-side for now.</p>
-    <p>Open a case, inspect the encoding, then use GPT to generate and save a case reading when needed.</p>
+    <p>Reading generation stays GPT-side, but the handoff is now clearer here.</p>
+    <p>Open or import a case, inspect the encoding, then use GPT to generate markdown for the Reading tab.</p>
     <div class="placeholder-actions">
       <button class="ghost" data-reading-action="cue">Use GPT to generate reading</button>
     </div>
+    <p class="placeholder-note">Suggested GPT handoff:</p>
+    <pre class="pre-json">${esc(readingCueText())}</pre>
   </section>`;
 }
 
@@ -534,10 +708,10 @@ function renderSidePanel() {
 
   if (state.currentMode === 'package') {
     els.sidePanelTitle.textContent = 'Open case package';
-    els.sidePanelIntro.textContent = 'Load/import entry is reserved here. Full package workflow is not wired yet.';
+    els.sidePanelIntro.textContent = 'Load a local package here or jump back to the canonical repo catalog.';
     els.reloadCatalog.classList.add('hidden');
     els.sidePanelBody.className = 'panel-body';
-    els.sidePanelBody.innerHTML = renderPackagePlaceholder();
+    els.sidePanelBody.innerHTML = renderPackagePanel();
     return;
   }
 
@@ -637,7 +811,7 @@ function renderTabContent() {
 
   els.tabContent.innerHTML = state.readingMarkdown.trim()
     ? `${banner}<div class="reading-surface">${renderMarkdown(state.readingMarkdown)}</div>`
-    : `${banner}<section class="placeholder-card"><h3>No case reading saved yet</h3><p>The canonical case and case encoding are available, but no saved case reading is attached yet.</p><p class="placeholder-note">Use GPT to generate reading.</p></section>`;
+    : `${banner}<section class="placeholder-card"><h3>No case reading saved yet</h3><p>The current case and case encoding are available, but no reading is attached yet.</p><p class="placeholder-note">Open “Generate reading” in the actions panel for a suggested GPT handoff.</p></section>`;
 }
 
 function atlasRendererContext() {
@@ -704,17 +878,31 @@ function renderAll() {
 
 function handlePackageAction(action) {
   if (action === 'repo') {
-    setNotice('Case package loading from repo is reserved here. Full package workflow is not wired yet.');
+    setMode('open');
+    setNotice('Browse canonical repo cases from Open case. Local package import remains available in Open case package.');
     return;
   }
 
   if (action === 'import') {
-    setNotice('Case package import is reserved here. Full package workflow is not wired yet.');
+    const input = els.sidePanelBody.querySelector('[data-package-file-input]');
+    if (input) input.click();
   }
 }
 
-function handleReadingAction() {
-  setNotice('Use GPT to generate reading.');
+async function handleReadingAction() {
+  const cue = readingCueText();
+
+  try {
+    if (navigator?.clipboard?.writeText) {
+      await navigator.clipboard.writeText(cue);
+      setNotice('Suggested reading handoff copied. Use GPT to generate reading and save it when ready.');
+      return;
+    }
+  } catch (error) {
+    // Fall through to the non-clipboard notice.
+  }
+
+  setNotice('Use GPT to generate reading. The suggested handoff is shown in the side panel.');
 }
 
 function handleClear() {
@@ -767,6 +955,19 @@ function bindEvents() {
 
     const readingButton = event.target.closest('[data-reading-action]');
     if (readingButton) handleReadingAction();
+  });
+
+  els.sidePanelBody.addEventListener('change', async (event) => {
+    const input = event.target.closest('[data-package-file-input]');
+    if (!input?.files?.length) return;
+
+    try {
+      await importPackageFiles(input.files);
+    } catch (error) {
+      setNotice(`Could not import local package: ${error.message}`);
+    } finally {
+      input.value = '';
+    }
   });
 
   els.tabs.addEventListener('click', (event) => {
