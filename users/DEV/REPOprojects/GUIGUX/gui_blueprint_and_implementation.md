@@ -1,3 +1,16 @@
+<!--
+[GUIGUX_LEGACY_WORKING_BOARD]
+
+Note: This file pre-dates the locked pipeline/projection contract.
+Read and obey first:
+- `00_INDEX.md`
+- `10_SCOPE_LOCK_PIPELINE.md`  (LOCKED)
+- `20_WORKING_BOARD.md`        (ACTIVE)
+
+Last stamped: 2026-03-27
+-->
+
+
 # GUI Blueprint and Implementation (Working Board)
 
 **Purpose:** live working board for the canonical Workbench v3 GUI lane.
@@ -48,7 +61,7 @@ Current repo truth:
   - `/main/INSTRUCTIONS_INDEX.md`
 - GitHub Pages is now configured for **GitHub Actions** publishing
 - the canonical deploy lane is now working in steady state through `gui-deploy-verify.yml`
-- the Actions-based Pages deploy and deployed smoke completed green for commit `f7093fc21832d0419891f554ea56b529704bd81f`
+- the Actions-based Pages deploy and deployed smoke completed green for commit `f7093fc21832d0419891f554ea56b529704bd81fa`
 
 This means the GUI lane is no longer blocked on Pages bootstrap.
 The repo is now in the intended steady-state deploy model.
@@ -215,7 +228,6 @@ A user should be able to:
 - see the same intended wording locally and on live Pages
 - rely on the Actions deploy lane without manual “did it deploy?” checking
 
-
 ---
 
 ## Human-first frontend plan (planning note)
@@ -338,10 +350,10 @@ Scope:
 - preserve deploy confidence while polishing UX
 
 Primary files / tools:
-- `tools/js/gui-live-smoke.mjs`
-- `tools/js/gui-pages-live-smoke.mjs`
-- `tools/js/gui-validate-chain.mjs`
-- `.github/workflows/gui-deploy-verify.yml`
+- `/tools/js/gui-live-smoke.mjs`
+- `/tools/js/gui-pages-live-smoke.mjs`
+- `/tools/js/gui-validate-chain.mjs`
+- `/.github/workflows/gui-deploy-verify.yml`
 
 ### Immediate working order from this plan
 1. first-use workflow clarity
