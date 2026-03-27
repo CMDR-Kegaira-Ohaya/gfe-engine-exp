@@ -3,7 +3,7 @@
 
 ## Core rule
 [RID_EDIT_CORE_RULE]
-Edit the narrowest file set that can truthfully solve the task.
+Edit the narrowes file set that can truthfully solve the task.
 
 ## Governance rule
 [RID_EDIT_GOVERNANCE_RULE]
@@ -21,7 +21,7 @@ The assistant may inspect, analyze, compare, test, and report findings, but any 
 
 ### Engine/doctrine tasks
 Editable only with explicit human approval:
-- `/engine/*`
+- `/engine/**`
 - `/main/TOC.md`
 - `/main/GPT_OPERATOR_MANUAL.md`
 - `/main/SYSTEM_MAP.md`
@@ -62,6 +62,16 @@ When asked to “inspect the repo” or “Start from the TOC”:
 - verify branch/ref when branch-specific work is involved
 - avoid deleting branches or files unless explicitly requested
 - report findings in chat before proposing write actions
+
+
+### Transport encoding discipline
+[RID_EDIT_TRANSPORT_ENCODING_DISCIPLINE]
+- **Base64 is transport only.** Do not reason over opaque base64 blobs.
+- When reading repo files through tools/connectors that return base64, **decode once to plain UTF-8** before inspecting, diffing, or patching.
+- When writing repo files, **compose the new content as plain UTF-8** (Markdown/JSON/text) first, then encode to base64 only at the tool boundary.
+- Prefer stable, inspectable formats for operational state (Markdown or JSON) with explicit fields (e.g., `title`, `purpose`, `instructions`, `state`, `notes`).
+- Avoid nested encodings or extra transport wrappers unless a boundary strictly requires it; if required, document the boundary and keep the inner payload plain.
+
 
 ## Change categories
 - **Bootstrap docs**: safe to refine when architecture changes
