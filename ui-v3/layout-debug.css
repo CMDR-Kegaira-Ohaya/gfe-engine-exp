@@ -17,7 +17,7 @@
   -webkit-backdrop-filter: blur(6px);
 }
 
-gfe-layout-debug-btn:hover {
+#gfe-layout-debug-btn:hover {
   background: rgba(0, 0, 0, 0.7);
 }
 
@@ -102,9 +102,6 @@ gfe-layout-debug-btn:hover {
 }
 
 /* Outline boxes (toggle) */
-body.gfe-outline-boxes .grid * {}
-
-/* fix preview at build-time: scoped outline boxes */
 body.gfe-outline-boxes .grid * {
   outline: 1px solid rgba(255, 0, 255, 0.25);
   outline-offset: -1px;
