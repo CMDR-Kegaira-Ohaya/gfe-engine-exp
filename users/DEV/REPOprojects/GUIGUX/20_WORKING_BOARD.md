@@ -47,10 +47,13 @@ See: `10_SCOPE_LOCK_PIPELINE.md` → [GUIGUX_PIPELINE_CONTRACT] and [GUIGUX_GUI_
 - Catalog: `/catalog/index.json`
 - Smoke tools: `/tools/js/gui-live-smoke.mjs`, `/tools/js/gui-pages-live-smoke.mjs`
 - Deploy: `/.github/workflows/gui-deploy-verify.yml`
+- Operator check: `npm run gui:validate-chain -- --base-ref HEAD~1 --head-ref HEAD --copy-scan`
 
 ---
 
 ## Existing notes (do not lose)
-- `gui_blueprint_and_implementation.md` — older working board + file pointers (still useful; may contain legacy sections)
-- `gui_confirmed_findings_2026-03-26.md` — confirmed UI overload + smoke-fixture findings
-- `GFE_VisualCodex.md` — visual doctrine (palette + atlas projection rules)
+- `gui_confirmed_findings_2026-03-26.md` — confirmed UI overload + smoke-fixture findings (append-only)
+- `GFE_VisualCodex.md` — visual doctrine (palette + atlas/projection design rules)
+
+Note:
+- the prior `gui_blueprint_and_implementation.md` working board was consolidated into `10_SCOPE_LOCK_PIPELINE.md` and this `20_WORKING_BOARD.md` and then removed to reduce drift. Git history retains it if needed.
