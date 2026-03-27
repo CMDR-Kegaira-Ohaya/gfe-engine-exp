@@ -4,7 +4,8 @@
 */
 
 .grid {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(340px, 440px);
+  /* Left = atlas + aux, Center = main work, Right = stable docs */
+  grid-template-columns: minmax(280px, 1fr) minmax(0, 2fr) minmax(320px, 420px);
   align-items: stretch;
 }
 
@@ -12,12 +13,13 @@
 .center-panel,
 .right-panel {
   min-width: 0;
-  min-height: calc(100vh - 210px);
+  /* Target: fit a 1920x1080 screen at 100% zoom without requiring page zooming */
+  min-height: calc(100vh - 190px);
 }
 
 .left-panel {
   display: grid;
-  grid-template-rows: minmax(0, 1fr) minmax(180px, 24vh);
+  grid-template-rows: minmax(0, 1fr) minmax(160px, 22vh);
   align-content: stretch;
   gap: 12px;
 }
@@ -35,7 +37,7 @@
 
 .aux-shell {
   max-height: none;
-  min-height: 180px;
+  min-height: 160px;
   overflow: hidden;
 }
 
@@ -46,10 +48,11 @@
 
 .center-panel {
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr) minmax(220px, 30vh);
+  /* Give the map more room; keep timeline present but not dominant */
+  grid-template-rows: auto auto minmax(0, 1fr) minmax(170px, 22vh);
 }
 
-.tab-content {
+tab-content {
   min-height: 0;
   overflow: auto;
 }
@@ -60,7 +63,7 @@
 }
 
 .timeline-panel {
-  min-height: 220px;
+  min-height: 170px;
   max-height: 100%;
   overflow: hidden;
 }
