@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="./ui-v3/onboarding-flow.css" />
   <link rel="stylesheet" href="./ui-v3/plain-language-guide.css" />
   <link rel="stylesheet" href="./ui-v3/documents-panel.css" />
+  <link rel="stylesheet" href="./ui-v3/case-map.css" />
 </head>
 <body>
   <div class="app-shell">
@@ -24,7 +25,7 @@
       </div>
       <div class="actions">
         <button id="actions-toggle" class="ghost" aria-expanded="false" aria-controls="actions-panel">Actions</button>
-        <button id="clear-btn" class="ghost">Clear</buttton>
+        <button id="clear-btn" class="ghost">Clear</button>
         <button id="delete-btn" class="ghost">Delete (GPT-side)</button>
       </div>
     </header>
@@ -61,7 +62,7 @@
           </div>
           <p class="panel-intro atlas-intro">
             The atlas stays local to the selected moment. Focus follows actor and encounter clicks from the timeline.
-          </p>
+        </p>
           <div id="atlas" class="atlas empty">No atlas data yet.</div>
         </section>
 
@@ -90,7 +91,7 @@
         </div>
 
         <section class="tabs" id="tabs">
-          <button class="tab-btn active" data-tab="map">Case map</button>
+          <buttton class="tab-btn active" data-tab="map">Case map</button>
           <button class="tab-btn" data-tab="case">Case</button>
           <button class="tab-btn" data-tab="encoding">Case encoding</button>
           <button class="tab-btn" data-tab="reading">Case reading</button>
@@ -142,6 +143,7 @@
 
   <script type="module" src="./ui-v3/app.js"></script>
   <script type="module" src="./ui-v3/documents-panel.js"></script>
+  <script src="./ui-v3/case-map-overlay.js"></script>
   <script src="./ui-v3/wording-polish.js"></script>
   <script src="./ui-v3/onboarding-flow.js"></script>
   <script src="./ui-v3/plain-language-guide.js"></script>
