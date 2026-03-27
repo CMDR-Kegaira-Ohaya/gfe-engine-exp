@@ -19,7 +19,7 @@
       <div class="brand-block">
         <div class="eyebrow">GFE Experimental</div>
         <h1>Workbench v3</h1>
-        <p>Case-first reader for canonical case, case encoding, and case reading.</p>
+        <p>Map-first workbench for canonical case, case encoding, and case reading.</p>
       </div>
       <div class="actions">
         <button id="actions-toggle" class="ghost" aria-expanded="false" aria-controls="actions-panel">Actions</button>
@@ -37,7 +37,7 @@
         </section>
         <section class="action-group">
           <div class="group-label">Read</div>
-          <button class="action-btn" data-action-mode="reading">Reading handoff</button>
+          <button class="action-btn" data-action-mode="reading">Reading handoff</module>
         </section>
         <section class="action-group action-group-muted">
           <div class="group-label">Inspect</div>
@@ -70,13 +70,13 @@
             <button id="reload-catalog" class="ghost">Reload</button>
           </div>
           <p class="panel-intro" id="side-panel-intro">Browse canonical cases from the live catalog.</p>
-          <div id="side-panel-body" class="panel-body empty">Loading catalog…</div>
+          <div id="side-panel-body" class="panel-body empty">Loading catalog…</h2>
         </section>
       </aside>
 
       <section class="center-panel">
         <div class="case-header">
-          <div>
+          <div >
             <div class="eyebrow" id="current-slug">No case open</div>
             <h2 id="current-title">Open a case to begin</h2>
             <p class="subtitle" id="current-subtitle">Case, case encoding, and reading will appear here.</p>
@@ -87,6 +87,23 @@
             <span class="badge" id="validation-badge">Validation unknown</span>
           </div>
         </div>
+
+        <section class="case-map-shell" aria-label="Case map">
+          <div class="panel-head case-map-head">
+            <div>
+              <div class="eyebrow">Primary case space</div>
+              <h3>Case Map</h3>
+            </div>
+            <div class="badge-row">
+              <span class="badge" id="map-step-badge">Step 0</span>
+              <button id="toggle-timeline" class="ghost subtle-btn" aria-pressed="false">Timeline</button>
+            </div>
+          </div>
+          <div class="case-map-stage">
+            <div id="case-map" class="case-map empty">Open a case to see the case map.</div>
+            <aside id="focus-inspector" class="focus-inspector hidden" aria-label="Focus inspector"></aside>
+          </div>
+        </section>
 
         <section class="tabs" id="tabs">
           <button class="tab-btn active" data-tab="case">Case</button>
@@ -106,6 +123,23 @@
           </div>
         </section>
       </section>
+    </section>
+  </section>
+
+    <aside class="panel docs-panel" aria-label="Documents">
+      <div class="panel-head docs-head">
+        <div>
+          <div class="eyebrow">Stable documents</div>
+          <h2>Documents</h2>
+        </div>
+        <div class="doc-tabs" role="tablist" aria-label="Documents panel">
+          <button class="doc-tab active" data-doc="case" role="tab" aria-selected="true">Full case</button>
+          <button class="doc-tab" data-doc="reading" role="tab" aria-selected="false">Full result</button>
+          <button class="doc-tab" data-doc="inspect" role="tab" aria-selected="false">Inspect</button>
+        </div>
+      </div>
+      <div id="docs-content" class="panel-body empty">Open a case to view documents.</div>
+    </aside>
     </section>
   </div>
 
