@@ -162,7 +162,7 @@ function mapHtml({ encoding, slug, stepIndex }) {
           <button class="map-link" type="button"
             data-map-encounter="1"
             data-step-index="${stepIndex}"
-            data-encounter-focus="${idx}">
+            data-encounter-focus="${idx}" data-link-source="${esc(source ?? "")}" data-link-receiving="${esc(receiving ?? "")}" data-link-medium="${esc(medium ?? "")}">
             <div class="kicker">Link</div>
             <div class="title">${esc(endpoints)}</div>
             <div class="meta">${esc(metaParts.join(" ℧ "))}</div>
@@ -197,6 +197,85 @@ function mapHtml({ encoding, slug, stepIndex }) {
 function renderCaseMapIntoTab({ encoding, slug, stepIndex }) {
   if (!els.tabContent) return;
   els.tabContent.innerHTML = mapHtml({ encoding, slug, stepIndex });
+}
+
+
+
+function clearMapHighlights() {
+  const root = document.querySelector("[data-map-root]");
+  if (!root) return;
+  root.querySelectorAll(".selected, .neighbor").forEach((el) => {
+    el.classList.remove("selected");
+    el.classList.remove("neighbor");
+  });
+}
+
+function selectMapParticipant(id) {
+  const root = document.querySelector("[data-map-root]");
+  if (!root || !id) return;
+  clearMapHighlights();
+
+  const node = root.querySelector(`[data-map-participant="${CSS.escape(id)}"]`);
+  if (node) node.classList.add("selected");
+
+  const links = Array.from(root.querySelectorAll("[data-map-encounter]"));
+  for (const link of links) {
+    const src = link.dataset.linkSource || "";
+    const recv = link.dataset.linkReceiving || "";
+    const med = link.dataset.linkMedium || "";
+    if ([src, recv, med].includes(id)) {
+      link.classList.add("neighbor");
+      for (const other of [src, recv, med]) {
+        if (!other || other === id) continue;
+        const otherNode = root.querySelector(`[data-map-participant="${CSS.escape(other)}"]`);
+        if (otherNode) otherNode.classList.add("neighbor");
+      }
+    }
+  }
+}
+
+function selectMapLink(linkEl) {
+  const root = document.querySelector("[data-map-root]");
+  if (!root || !linkEl) return;
+  clearMapHighlights();
+
+  linkEl.classList.add("selected");
+  const src = linkEl.dataset.linkSource || "";
+  const recv = linkEl.dataset.linkReceiving || "";
+  const med = linkEl.dataset.linkMedium || "";
+  const endpoints = [src, recv, med].filter(Boolean);
+
+  for (const id of endpoints) {
+    const node = root.querySelector(`[data-map-participant="${CSS.escape(id)}"]`);
+    if (node) node.classList.add("neighbor");
+  }
+
+  // Lightly show neighborhood: other links sharing any endpoint.
+  const links = Array.from(root.querySelectorAll("[data-map-encounter]"));
+  for (const otherLink of links) {
+    if (otherLink === linkEl) continue;
+    const oSrc = otherLink.dataset.linkSource || "";
+    const oRecv = otherLink.dataset.linkReceiving || "";
+    const oMed = otherLink.dataset.linkMedium || "";
+    const otherEndpoints = [oSrc, oRecv, oMed].filter(Boolean);
+    if (otherEndpoints.some((x) => endpoints.includes(x))) otherLink.classList.add("neighbor");
+  }
+}
+
+function handleMapLocalSelection(target) {
+  const root = document.querySelector("[data-map-root]");
+  if (!root) return;
+
+  const node = target.closest("[data-map-participant]");
+  if (node?.dataset?.mapParticipant) {
+    selectMapParticipant(node.dataset.mapParticipant);
+    return;
+  }
+
+  const link = target.closest("[data-map-encounter]");
+  if (link) {
+    selectMapLink(link);
+  }
 }
 
 function proxyFocusToWorkbench(target) {
@@ -277,10 +356,11 @@ function bind() {
   // If app.js overwrites tab-content while Mas is active, put map back.
   if (els.tabContent) {
     const contentMo = new MutationObserver(() => requestAnimationFrame(() => ensureMapCurrent()));
-    contentMo.observe(els.abContent, { childList: true, subtree: false });
+    contentMo.observe(els.tabContent, { childList: true, subtree: false });
 
     els.tabContent.addEventListener("click", (event) => {
       if (getActiveTab() !== "map") return;
+      handleMapLocalSelection(event.target);
       if (proxyFocusToWorkbench(event.target)) event.preventDefault();
     });
   }
