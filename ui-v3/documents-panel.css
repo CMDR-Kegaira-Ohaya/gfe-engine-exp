@@ -1,0 +1,77 @@
+/* Documents panel + focus inspector
+   Purely UI
+  ------------------------------------- */
+
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.documents-shell {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.docs-tabs {
+  margin-top: 6px;
+}
+
+.documents-body {
+  min-height: 0;
+  overflow: auto;
+  padding: 0px;
+}
+
+.documents-pane {
+  padding: 16px 18px;
+  min-height: 0;
+}
+
+/* Focus inspector */
+.focus-inspector {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  width: min((100vw- 36px), 460px);
+  max-height: calc(100vh - 240px);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  z-index: 30;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.focus-inspector-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.focus-inspector-body {
+  min-height: 0;
+  overflow: auto;
+  padding: 16px 16px;
+}
+
+focus-inspector h.eyebrow {
+  margin: 0;
+ }
+
+@media (max-width: 1180px) {
+  .focus-inspector {
+    position: static;
+    width: auto;
+    max-height: none;
+    margin-top: 12px;
+  }
+}
