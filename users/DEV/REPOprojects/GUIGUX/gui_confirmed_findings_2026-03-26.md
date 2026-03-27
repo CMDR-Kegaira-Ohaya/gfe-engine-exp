@@ -1,3 +1,11 @@
+<!--
+[GUIGUX_CONFIRMED_FINDINGS_ROOT]
+
+Confirmed findings (append-only). Defer to `10_SCOPE_LOCK_PIPELINE.md` for scope/authority.
+Last stamped: 2026-03-27
+-->
+
+
 # GUI Confirmed Findings (2026-03-26)
 
 This note records confirmed findings from live GUI polish and smoke-fixture inspection so future sessions do not have to re-discover them from code each time.
