@@ -1,99 +1,93 @@
 /* Stable atlas / reader split
-   Keeps the left atlas as a permanent equal partner to the right reader column.
-   This is a layout override only; content and behavior remain unchanged.
+   Layout hardening for 1920×1080 at 100% zoom.
+   Goal: stop whole-page scroll; keep scrolling inside panels.
 */
 
-.grid {
-  /* Left = atlas + aux, Center = main work, Right = stable docs */
-  grid-template-columns: minmax(280px, 1fr) minmax(0, 2fr) minmax(320px, 420px);
-  align-items: stretch;
-}
+@media (min-width: 1181px) {
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
 
-.left-panel,
-.center-panel,
-.right-panel {
-  min-width: 0;
-  /* Target: fit a 1920x1080 screen at 100% zoom without requiring page zooming */
-  min-height: calc(100vh - 190px);
-}
+  .app-shell {
+    height: 100vh;
+    min-height: 100vh;
+    overflow: hidden;
+  }
 
-.left-panel {
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) minmax(160px, 22vh);
-  align-content: stretch;
-  gap: 12px;
-}
-
-.atlas-shell {
-  min-height: 0;
-  overflow: hidden;
-}
-
-.atlas {
-  height: 100%;
-  min-height: 0;
-  overflow: auto;
-}
-
-.aux-shell {
-  max-height: none;
-  min-height: 160px;
-  overflow: hidden;
-}
-
-.aux-shell .panel-body {
-  min-height: 0;
-  overflow: auto;
-}
-
-.center-panel {
-  display: grid;
-  /* Give the map more room; keep timeline present but not dominant */
-  grid-template-rows: auto auto minmax(0, 1fr) minmax(170px, 22vh);
-}
-
-tab-content {
-  min-height: 0;
-  overflow: auto;
-}
-
-.bottom-row {
-  padding-top: 0;
-  min-height: 0;
-}
-
-.timeline-panel {
-  min-height: 170px;
-  max-height: 100%;
-  overflow: hidden;
-}
-
-.timeline {
-  height: 100%;
-  min-height: 0;
-  overflow: auto;
-}
-
-@media (max-width: 1180px) {
+  /* Make the main grid consume remaining space under masthead + notice/actions. */
   .grid {
-    grid-template-columns: 1fr;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+
+    /* Left = atlas + aux, Center = main work, Right = stable docs */
+    grid-template-columns: minmax(280px, 1fr) minmax(0, 2fr) minmax(320px, 420px);
+    align-items: stretch;
   }
 
   .left-panel,
   .center-panel,
   .right-panel {
-    min-height: auto;
+    min-width: 0;
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  /* Remove the base 74vh min-height from styles.css (override for desktop). */
+  .left-panel,
+  .center-panel {
+    min-height: 0 !important;
   }
 
   .left-panel {
-    grid-template-rows: auto auto;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) minmax(160px, 22vh);
+    align-content: stretch;
+    gap: 12px;
   }
 
-  .atlas,
-  .timeline,
-  .aux-shell .panel-body,
-  .tab-content {
-    height: auto;
-    overflow: visible;
+  .atlas-shell { min-height: 0; overflow: hidden; }
+  .atlas { height: 100%; min-height: 0; overflow: auto; }
+
+  .aux-shell { max-height: none; min-height: 160px; overflow: hidden; }
+  .aux-shell .panel-body { min-height: 0; overflow: auto; }
+
+  /* Center panel: header, tabs, tab-content,  timeline */
+  .center-panel {
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr) minmax(170px, 22vh);
   }
+
+  /* IMPORTANT: correct selector is .tab-content / #tab-content (not the tag name) */
+  #tab-content,
+  .tab-content {
+    min-height: 0;
+    height: 100%;
+    overflow: auto;
+  }
+
+  .bottom-row {
+    padding-top: 0;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .timeline-panel {
+    min-height: 170px;
+    max-height: 100%;
+    overflow: hidden;
+  }
+
+  .timeline {
+    height: 100%;
+    min-height: 0;
+    overflow: auto;
+  }
+}
+
+/* Keep the existing small-screen behavior */
+@media (max-width: 1180px) {
+  .grid { grid-template-columns: 1fr; }
 }
