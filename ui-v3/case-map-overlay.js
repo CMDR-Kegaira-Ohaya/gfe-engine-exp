@@ -4,7 +4,7 @@
 // Strategy:
 // - When the "Case map" tab is active, we replace #tab-content with a navigable map.
 // - Map clicks proxy into existing Timeline/Atlas click targets (data-participant-focus / data-encounter-focus),
-//    so the underlying app.js state updates normally (atlas + timeline follow).
+//   so the underlying app.js state updates normally (atlas + timeline follow).
 //
 // Limitations:
 // - For canonical repo cases, we fetch encoding via catalog paths.
@@ -56,7 +56,7 @@ function getActiveStepIndex() {
 
 async function fetchJson(path) {
   const res = await fetch(path, { cache: "no-store" });
-  if (!res.ok) throw new Error(`Request failed for ${path} (${res.status})`i;
+  if (!res.ok) throw new Error(`Request failed for ${path} (${res.status})`);
   return res.json();
 }
 
@@ -126,11 +126,11 @@ function mapHtml({ encoding, slug, stepIndex }) {
           This case does not expose a fetchable encoding (or you're on an imported package).<br>
           If this is an imported package: open <b>Case encoding</b> once, then return to <b>Case map</b>.
         </div>
-      </section>`
+      </section>`;
   }
 
   const step = Array.isArray(encoding.timeline) ? encoding.timeline[stepIndex] : null;
-  const nodeIds = Object.keys(step?.participants || {}).length
+  const nodeIds = Object.keys(step?.participants ?? {}).length
     ? Object.keys(step.participants)
     : Array.isArray(encoding.participants) ? encoding.participants : [];
   const stepLabel = step?.timestep_label ? label(step.timestep_label) : `Step ${stepIndex}`;
@@ -138,7 +138,9 @@ function mapHtml({ encoding, slug, stepIndex }) {
   const events = eventsForStep(encoding, stepIndex);
 
   const nodeChips = nodeIds.length
-    ? nodeIds.map((id) => `<button class="map-node" type="button" data-map-participant="${esc(id)}">${esc(label(id))}</button>`).join("")
+    ? nodeIds.map((id) => `
+      <button class="map-node" type="button" data-map-participant="${esc(id)}">${esc(label(id))}</button>
+    `).join("")
     : `<div class="empty">No participants found for this step.</div>`;
 
   const links = events.length
@@ -149,7 +151,10 @@ function mapHtml({ encoding, slug, stepIndex }) {
         const interference = ev?.interference ? `interference: ${label(ev.interference)}` : null;
         const bundle = Array.isArray(ev?.payload_bundle) ? ev.payload_bundle : [];
         const primitives = bundle.length;
-        const endpoints = source && receiving ? `${label(source)} →> ${label(receiving)}` : source ? `${label(source)} emits` : receiving ? `${label(receiving)} receives` : "Encounter";
+        const endpoints = source && receiving ? `${label(source)} → ${label(receiving)}`
+          : source ? `${label(source)} emits`
+          : receiving ? `${label(receiving)} receives`
+          : "Encounter";
         const metaParts = [
           `axis: ${label(axis)}`,
           primitives ? `${primitives} primitives` : null,
@@ -162,11 +167,13 @@ function mapHtml({ encoding, slug, stepIndex }) {
           <button class="map-link" type="button"
             data-map-encounter="1"
             data-step-index="${stepIndex}"
-            data-encounter-focus="${idx}" data-link-source="${esc(source ?? "")}" data-link-receiving="${esc(receiving ?? "")}" data-link-medium="${esc(medium ?? "")}">
+            data-encounter-focus="${idx}"
+            data-link-source="${esc(source ?? "")}" data-link-receiving="${esc(receiving ?? "")}" data-link-medium="${esc(medium ?? "")}">
             <div class="kicker">Link</div>
             <div class="title">${esc(endpoints)}</div>
-            <div class="meta">${esc(metaParts.join(" ℧ "))}</div>
-          </button>`
+            <div class="meta">${esc(metaParts.join(" · "))}</div>
+          </button>
+        `;
       }).join("")
     : `<div class="empty">No payload links recorded for this step.</div>`;
 
@@ -198,8 +205,6 @@ function renderCaseMapIntoTab({ encoding, slug, stepIndex }) {
   if (!els.tabContent) return;
   els.tabContent.innerHTML = mapHtml({ encoding, slug, stepIndex });
 }
-
-
 
 function clearMapHighlights() {
   const root = document.querySelector("[data-map-root]");
@@ -336,7 +341,7 @@ function bind() {
       if (!slug) return;
 
       const active = getActiveTab();
-      const allowAuto = !active || active === "case" || active === "map";
+      const allowAuto = !active || active === "case" || active === "map" || active === "galaxy";
       if (!allowAuto) return;
 
       requestAnimationFrame(() => els.mapTabBtn?.click());
@@ -353,7 +358,7 @@ function bind() {
     stepMo.observe(els.timestepBadge, { childList: true, subtree: true });
   }
 
-  // If app.js overwrites tab-content while Mas is active, put map back.
+  // If app.js overwrites tab-content while Map is active, put map back.
   if (els.tabContent) {
     const contentMo = new MutationObserver(() => requestAnimationFrame(() => ensureMapCurrent()));
     contentMo.observe(els.tabContent, { childList: true, subtree: false });
