@@ -1,3 +1,12 @@
+<!--
+[GUIGUX_VISUAL_CODEX_ROOT]
+
+Visual doctrine for GUI/UX. Must remain consistent with `10_SCOPE_LOCK_PIPELINE.md` .
+iThis file does not override engine canon or solver doctrine.
+Last stamped: 2026-03-27
+-->
+
+
 # GFE_VisualCodex
 
 Status: working codex for GFE visual concepts.
@@ -10,7 +19,7 @@ Purpose:
 Boundary:
 - this file is visual working doctrine, not engine canon
 - this file should hold locked visual rules and near-term design notes
-- avoid stale option lists once decisions are made
+- avoid stale option lists once decisions are made 
 
 ---
 
