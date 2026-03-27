@@ -18,7 +18,7 @@ This project uses a strict separation of layers:
   Canonical model doctrine. Defines structural truth (formed existence model). Not UI. Not prose.
 
 - **Solver** (`/solver/*`)  
-  Executable mathematization of the engine. This is where a case becomes *solved structure*.  
+  Executable mathematization of the engine. This is where a case becomes **solved structure+*.  
   Solver determines structural state.
 
 - **GPT stack** (builder modules: control surface + router + lanes)  
@@ -30,7 +30,7 @@ This project uses a strict separation of layers:
   - produce briefs/readings as overlays  
   GPT must **not** substitute for solver truth.
 
-- **GUI** (`/workbench-v3.html`, `/ui-v3/*`)  
+- **GUI** (`/workbench-v3.html , `/ui-v3/**`)  
   Projection layer. Shows solved structure as primary and overlays (briefs/readings) as secondary.  
   Supports navigation/refocus which can trigger re-entry into the pipeline.
 
@@ -92,17 +92,38 @@ Source discipline:
 
 [GUIGUX_GUI_PROJECTION_CONTRACT]
 
-The GUI must support a human-first **Case Space** projection:
+The GUI must support a human-first **Case Map (Case Space)** experience:
 
-- Primary: solver/engine structure (navigable map/space)
-- Secondary: side panel overlay with:
-  - Full case (source)
-  - Synthesized result (reading/brief)
-- Optional: inspection views (encoding, timeline, atlas detail) without stealing focus
+Case Map ((Case Space)) primary:
+- projects solver/engine structure as a navigable map/space
+- shows nodes and links (participants, steps, encounters, payload relations, etc.)
+- preserves orientation (where you are, what is connected, what is selected)
 
-Rule:
-- navigation happens in the Case Space
-- interpretation happens in the overlay panel
+Stable documents panel (global):
+ - a single stable panel containing global documents:
+  - Full Case (source)
+  - Full Result (synthesized reading/brief)
+- these documents do **not** follow map clicks (no auto-jump / no scroll hijack)
+- fixed width; internal scroll; never resizes the Case Map
+
+Focus Inspector (click-following):
+ - map clicks change **focus** and open/update a Focus Inspector (drawer/popup)
+- the Focus Inspector must provide:
+  A) specifics of the selected node/link
+  B) its internal/external connections
+- connection surfacing must support:
+  - visual neighborhood (highlight neighbors; dim others; show direction/type)
+  - nested connection lists (grouped by relation type; expandable; clickable)
+
+Optional affordance (allowed):
+- “Find in Full Case” / “Find in Full Result” (highlight/search) without forcing a scroll jump.
+
+Such detail surfaces as encoding/timeline/atlas may exist behind an “Inspect” affordance, but must not compete with the Case Map as the default focal region.
+
+Rules:
+- navigation happens in the Case Map
+- focus changes happen via selection + Focus Inspector, not by rewriting global documents
+- interpretation lives in the Full Result document; it is an overlay, not a replacement for structure
 - technical detail appears only on demand
 
 ---
