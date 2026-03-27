@@ -1,0 +1,111 @@
+/* Layout debug overlay used for remote diagnostics. */
+
+/* For clarity, styles are conditional and only apply when the debug overlay is mounted. */
+#gfe-layout-debug-btn {
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  z-index: 9999;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.65);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 12px;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+gfe-layout-debug-btn:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+#gfe-layout-debug-overlay {
+  position: fixed;
+  inset: 12px;
+  z-index: 10000;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#gfe-layout-debug-overlay .header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+#gfe-layout-debug-overlay .header .left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+#gfe-layout-debug-overlay .header .headline {
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0.95;
+}
+
+#gfe-layout-debug-overlay .header .sub {
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+#gfe-layout-debug-overlay .btn-row {
+  display: flex;
+  gap: 8px;
+}
+
+#gfe-layout-debug-overlay .btn-row button {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+#gfe-layout-debug-overlay .btn-row button:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+#gfe-layout-debug-overlay .body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 12px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+#gfe-layout-debug-overlay pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+/* Outline boxes (toggle) */
+body.gfe-outline-boxes .grid * {}
+
+/* fix preview at build-time: scoped outline boxes */
+body.gfe-outline-boxes .grid * {
+  outline: 1px solid rgba(255, 0, 255, 0.25);
+  outline-offset: -1px;
+}
