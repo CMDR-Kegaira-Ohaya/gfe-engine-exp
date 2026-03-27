@@ -1,50 +1,61 @@
-
 /* Workbench v3 Case Map (Case Space) surface.
    Map is primary navigation; documents panel remains stable. */
 
-.case-map {
+case-map {
   display: flex;
   flex-direction: column;
   gap: 12px;
   padding: 12px;
+
+  /* Fill the tab-content region so we don't leave a "mystery void" */
+  height: 100%;
+  min-height: 0;
 }
 
-.case-map .map-intro {
+case-map .map-intro {
   margin: 0;
   opacity: 0.9;
 }
 
-.case-map .map-grid {
+case-map .map-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 10px;
 }
 
-.case-map .map-card {
-  border: 1px solid rgba(255,255,255,0.08);
+case-map .map-card {
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   padding: 10px;
-  background: rgba(255,255,255,0.03);
+  background: rgba(255, 255, 255, 0.03);
 }
 
-.case-map .map-card h3 {
+case-map .map-card h3 {
   margin: 0 0 8px 0;
   font-size: 14px;
 }
 
-.case-map .node-grid {
+case-map .node-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.case-map .map-node,
-.case-map .map-link {
+/* The Links card is the only map-card that is a direct child of .case-map */
+case-map > .map-card {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+case-map .map-node,
+case-map .map-link {
   appearance: none;
-  border: 1px solid rgba(255,255,255,0.12);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 999px;
   padding: 6px 10px;
-  background: rgba(255,255,255,0.04);
+  background: rgba(255, 255, 255, 0.04);
   cursor: pointer;
   text-align: left;
   font-size: 13px;
@@ -52,7 +63,7 @@
   max-width: 100%;
 }
 
-.case-map .map-link {
+case-map .map-link {
   border-radius: 12px;
   width: 100%;
   padding: 8px 10px;
@@ -61,40 +72,51 @@
   gap: 4px;
 }
 
-.case-map .map-link .kicker {
+case-map .map-link .kicker {
   font-size: 12px;
   opacity: 0.8;
 }
 
-.case-map .map-link .title {
+case-map .map-link .title {
   font-size: 13px;
 }
 
-.case-map .map-link .meta {
+case-map .map-link .meta {
   font-size: 12px;
   opacity: 0.75;
 }
 
-.case-map .map-node:hover,
-.case-map .map-link:hover {
-  background: rgba(255,255,255,0.06);
+/* Links list scrolls inside the Links card */
+case-map .map-links {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 2px; /* keep outlines visible next to scrollbar */
 }
 
-.case-map .map-node.selected,
-.case-map .map-link.selected {
+case-map .map-node:hover,
+case-map .map-link:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+case-map .map-node.selected,
+case-map .map-link.selected {
   outline: 2px solid rgba(185, 93, 255, 0.7);
   outline-offset: 2px;
 }
 
-.case-map .map-node.neighbor,
-.case-map .map-link.neighbor {
+case-map .map-node.neighbor,
+case-map .map-link.neighbor {
   outline: 2px solid rgba(140, 140, 255, 0.45);
   outline-offset: 2px;
 }
 
-.case-map .empty {
+case-map .empty {
   padding: 12px;
-  border: 1px dashed rgba(255,255,255,0.18);
+  border: 1px dashed rgba(255, 255, 255, 0.18);
   border-radius: 14px;
   opacity: 0.85;
 }
