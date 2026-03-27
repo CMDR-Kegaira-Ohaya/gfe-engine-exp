@@ -1,28 +1,12 @@
-/* Stable atlas / reader split
-   Layout hardening for 1920×1080 at 100% zoom.
-   Goal: stop whole-page scroll; keep scrolling inside panels.
+/* Desktop layout adjustments for the atlas / map workbench.
+  Goal: fit 1920x1080 at 100% zoom WITHOUT locking the whole page scroll.
+  We let the page scroll naturally, but ensure that the main tab content and panels scroll innerly when needed.
 */
 
 @media (min-width: 1181px) {
-  html, body {
-    height: 100%;
-    overflow: hidden;
-  }
-
-  .app-shell {
-    height: 100vh;
-    min-height: 100vh;
-    overflow: hidden;
-  }
-
-  /* Make the main grid consume remaining space under masthead + notice/actions. */
+  /* 3panel layout: left atlas/ aux, center work,  right stable docs */
   .grid {
-    flex: 1;
-    min-height: 0;
-    overflow: hidden;
-
-    /* Left = atlas + aux, Center = main work, Right = stable docs */
-    grid-template-columns: minmax(280px, 1fr) minmax(0, 2fr) minmax(320px, 420px);
+    grid-template-columns: minmax(340px, 1fr) minmax(0, 2fr) minmax(310px, 420px);
     align-items: stretch;
   }
 
@@ -30,53 +14,34 @@
   .center-panel,
   .right-panel {
     min-width: 0;
-    min-height: 0;
-    height: 100%;
-    overflow: hidden;
   }
 
-  /* Remove the base 74vh min-height from styles.css (override for desktop). */
+  /* Remove the base 74vh min-height from styles.css (override for desktop) */
   .left-panel,
   .center-panel {
     min-height: 0 !important;
   }
 
-  .left-panel {
-    display: grid;
-    grid-template-rows: minmax(0, 1fr) minmax(160px, 22vh);
-    align-content: stretch;
-    gap: 12px;
-  }
-
-  .atlas-shell { min-height: 0; overflow: hidden; }
-  .atlas { height: 100%; min-height: 0; overflow: auto; }
-
-  .aux-shell { max-height: none; min-height: 160px; overflow: hidden; }
-  .aux-shell .panel-body { min-height: 0; overflow: auto; }
-
-  /* Center panel: header, tabs, tab-content,  timeline */
+  /* Center panel gets more room: let tab content scroll inside */
   .center-panel {
     display: grid;
-    grid-template-rows: auto auto minmax(0, 1fr) minmax(170px, 22vh);
+    grid-template-rows: auto auto minmax(280px, 1fr) minmax(170px, 22vh);
+    overflow: hidden;
   }
 
-  /* IMPORTANT: correct selector is .tab-content / #tab-content (not the tag name) */
   #tab-content,
   .tab-content {
     min-height: 0;
-    height: 100%;
     overflow: auto;
   }
 
   .bottom-row {
-    padding-top: 0;
     min-height: 0;
     overflow: hidden;
   }
 
   .timeline-panel {
     min-height: 170px;
-    max-height: 100%;
     overflow: hidden;
   }
 
@@ -87,7 +52,8 @@
   }
 }
 
-/* Keep the existing small-screen behavior */
 @media (max-width: 1180px) {
-  .grid { grid-template-columns: 1fr; }
+  .grid {
+    grid-template-columns: 1fr;
+  }
 }
