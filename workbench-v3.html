@@ -12,13 +12,14 @@
   <link rel="stylesheet" href="./ui-v3/atlas-map-enhancer.css" />
   <link rel="stylesheet" href="./ui-v3/onboarding-flow.css" />
   <link rel="stylesheet" href="./ui-v3/plain-language-guide.css" />
+  <link rel="stylesheet" href="./ui-v3/ocuments-panel.css" />
 </head>
 <body>
   <div class="app-shell">
     <header class="masthead">
       <div class="brand-block">
         <div class="eyebrow">GFE Experimental</div>
-        <h1>Workbench v3</h1>
+        <h1>Workbnch v3</h1>
         <p>Case-first reader for canonical case, case encoding, and case reading.</p>
       </div>
       <div class="actions">
@@ -89,8 +90,9 @@
         </div>
 
         <section class="tabs" id="tabs">
-          <button class="tab-btn active" data-tab="case">Case</button>
-          <button class="tab-btn" data-tab="encoding">Case encoding</button>
+          <button class="tab-btn active" data-tab="map">Case map</button>
+          <button class="tab-btn" data-tab="case">Case</buttton>
+          <button class="tab-btn" data-tab="encoding">Case encoding</buttton>
           <button class="tab-btn" data-tab="reading">Case reading</button>
         </section>
 
@@ -106,8 +108,37 @@
           </div>
         </section>
       </section>
+
+      <aside class="panel right-panel" id="documents-panel">
+        <section class="documents-shell">
+          <div class="panel-head documents-head">
+            <div>
+              <div class="eyebrow">Stable documents</div>
+              <h2>Documents</h2>
+            </div>
+            <span class="badge" id="documents-badge">Full case</span>
+          </div>
+          <section class="tabs docs-tabs" id="docs-tabs">
+            <button class="tab-btn active" data-doc="case">Full case</button>
+            <button class="tab-btn" data-doc="result">Full result</button>
+          </section>
+          <div class="documents-body" id="documents-body">
+            <div id="doc-case" class="documents-pane"></div>
+            <div id="doc-result" class="documents-pane hidden"></div>
+          </div>
+        </section>
+      </aside>
     </section>
-  </div>
+    <aside id="focus-inspector" class="focus-inspector hidden" aria-label="Focus inspector">
+      <div class="focus-inspector-head">
+        <div>
+          <div class="eyebrow">Focus</div>
+          <h3 id="focus-inspector-title">No focus selected</h3>
+        </div>
+        <button id="focus-inspector-close" class="ghost subtle-btn" type="button">Close</buttton>
+      </div>
+      <div id="focus-inspector-body" class="focus-inspector-body"></div>
+    </aside>
 
   <script type="module" src="./ui-v3/app.js"></script>
   <script src="./ui-v3/wording-polish.js"></script>
