@@ -1,5 +1,6 @@
 import { escapeHtml, eventTitle, eventsForStep, label } from '../app/helpers.js';
 import { activeTraceTarget, buildTraceIndex, sameTarget, targetLabel } from '../app/interaction-state.js';
+import { lensLabel, normalizeLens } from '../app/lenses.js';
 
 export function renderSpecifiedView(container, state) {
   if (!container) return;
@@ -16,12 +17,14 @@ export function renderSpecifiedView(container, state) {
     return;
   }
 
+  const lens = normalizeLens(state.lens);
   const steps = Array.isArray(encoding.timeline) ? encoding.timeline : [];
   const events = Array.isArray(encoding.payload_events) ? encoding.payload_events : [];
   const selected = state.selection;
   const pinned = state.pinned;
   const traceTarget = activeTraceTarget(state);
   const trace = buildTraceIndex(bundle, traceTarget);
+  const momentsWithEvents = steps.reduce((count, _step, stepIndex) => count + (eventsForStep(events, stepIndex).length ? 1 : 0), 0);
 
   container.innerHTML = `
     <div class="map-summary">
@@ -30,6 +33,7 @@ export function renderSpecifiedView(container, state) {
         <h2>${escapeHtml(bundle.identity.title)}</h2>
         <p>${escapeHtml(bundle.identity.synopsis || 'Structured case projection')}</p>
         <div class="summary-note-strip">
+          <span class="badge badge-lens">lens: ${escapeHtml(lensLabel(lens))}</span>
           ${pinned ? `<span class="badge badge-pinned">pin: ${escapeHtml(targetLabel(bundle, pinned))}</span>` : ''}
           ${traceTarget ? `<span class="badge badge-traced">trace: ${escapeHtml(targetLabel(bundle, traceTarget))}</span>` : ''}
         </div>
@@ -42,18 +46,9 @@ export function renderSpecifiedView(container, state) {
       </div>
     </div>
 
-    ${traceTarget ? `
-      <div class="flow-strip">
-        <div class="eyebrow">Process flow</div>
-        <div class="flow-pill-row">
-          ${trace.flow.length
-            ? trace.flow.map((item) => `<span class="flow-pill${item.isAnchor ? ' anchor' : ''}">${escapeHtml(item.label)}</span>`).join('')
-            : '<span class="muted">No traced process flow yet.</span>'}
-        </div>
-      </div>
-    ` : ''}
+    ${renderLensStrip(lens, bundle, traceTarget, trace, momentsWithEvents, events.length)}
 
-    <div class="moment-grid">
+    <div class="moment-grid lens-${lens}">
       ${steps.map((step, stepIndex) => {
         const momentTarget = { type: 'moment', id: String(stepIndex) };
         const isSelected = sameTarget(selected, momentTarget);
@@ -62,9 +57,11 @@ export function renderSpecifiedView(container, state) {
         const isAnchor = trace.anchorMoment === stepIndex;
         const participantIds = Object.keys(step?.participants || {});
         const stepEvents = eventsForStep(events, stepIndex);
+        const muteForProcess = lens === 'process' && traceTarget && !isAnchor && !isTraced;
+        const muteForEvidence = lens === 'evidence' && !stepEvents.length && !isSelected && !isPinned;
 
         return `
-          <section class="moment-card${isSelected ? ' active' : ''}${isPinned ? ' pinned' : ''}${isTraced ? ' traced' : ''}${isAnchor ? ' flow-anchor' : ''}">
+          <section class="moment-card${isSelected ? ' active' : ''}${isPinned ? ' pinned' : ''}${isTraced ? ' traced' : ''}${isAnchor ? ' flow-anchor' : ''}${muteForProcess || muteForEvidence ? ' lens-muted' : ''}">
             <div class="moment-head">
               <div class="moment-head-main">
                 <button class="moment-title" type="button" data-select-type="moment" data-select-id="${stepIndex}">
@@ -73,13 +70,16 @@ export function renderSpecifiedView(container, state) {
                 ${isAnchor
                   ? '<span class="moment-flow-label anchor">Anchor</span>'
                   : (isTraced ? '<span class="moment-flow-label">On flow</span>' : '')}
+                ${lens === 'evidence' && stepEvents.length
+                  ? `<span class="moment-flow-label evidence">${escapeHtml(stepEvents.length)} evidence event${stepEvents.length === 1 ? '' : 's'}</span>`
+                  : ''}
               </div>
               <button class="pin-button" type="button" data-pin-type="moment" data-pin-id="${stepIndex}">
                 ${isPinned ? 'Unpin' : 'Pin'}
               </button>
             </div>
 
-            <div class="moment-block">
+            <div class="moment-block${lens === 'evidence' ? ' subdued-block' : ''}">
               <div class="moment-subhead">Participants</div>
               <div class="selectable-stack">
                 ${participantIds.length
@@ -106,7 +106,7 @@ export function renderSpecifiedView(container, state) {
               </div>
             </div>
 
-            <div class="moment-block">
+            <div class="moment-block${lens === 'evidence' && stepEvents.length ? ' evidence-block' : ''}">
               <div class="moment-subhead">Payload events</div>
               <div class="selectable-stack">
                 ${stepEvents.length
@@ -136,6 +136,52 @@ export function renderSpecifiedView(container, state) {
           </section>
         `;
       }).join('')}
+    </div>
+  `;
+}
+
+function renderLensStrip(lens, bundle, traceTarget, trace, momentsWithEvents, totalEvents) {
+  if (lens === 'process') {
+    return `
+      <div class="flow-strip lens-strip process-strip">
+        <div class="eyebrow">Process flow</div>
+        <div class="flow-pill-row">
+          ${traceTarget
+            ? (trace.flow.length
+                ? trace.flow.map((item) => `<span class="flow-pill${item.isAnchor ? ' anchor' : ''}">${escapeHtml(item.label)}</span>`).join('')
+                : '<span class="muted">No traced process flow yet.</span>')
+            : '<span class="muted">Trace a target to reveal process continuity through moments.</span>'}
+        </div>
+      </div>
+    `;
+  }
+
+  if (lens === 'evidence') {
+    return `
+      <div class="flow-strip lens-strip evidence-strip">
+        <div class="eyebrow">Evidence view</div>
+        <div class="flow-pill-row">
+          <span class="flow-pill evidence">source: ${bundle.status.artifacts.source ? 'present' : 'missing'}</span>
+          <span class="flow-pill evidence">narrative: ${bundle.status.artifacts.narrative ? 'present' : 'missing'}</span>
+          <span class="flow-pill evidence">moments with events: ${escapeHtml(momentsWithEvents)}</span>
+          <span class="flow-pill evidence">payload events: ${escapeHtml(totalEvents)}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  if (!traceTarget) {
+    return '';
+  }
+
+  return `
+    <div class="flow-strip lens-strip structure-strip">
+      <div class="eyebrow">Process trace</div>
+      <div class="flow-pill-row">
+        ${trace.flow.length
+          ? trace.flow.map((item) => `<span class="flow-pill${item.isAnchor ? ' anchor' : ''}">${escapeHtml(item.label)}</span>`).join('')
+          : '<span class="muted">No traced process flow yet.</span>'}
+      </div>
     </div>
   `;
 }

@@ -2,6 +2,7 @@ import { createShell } from './shell.js';
 import { createStore } from './store.js';
 import { loadCasesIndex, loadCaseBundle, resolveInitialSlug } from './case-bundle.js';
 import { activeTraceTarget, sameTarget } from './interaction-state.js';
+import { LENSES, lensLabel, lensNote, normalizeLens } from './lenses.js';
 import { renderSpecifiedView } from '../gui/specified-view.js';
 import { renderContextPanel } from '../gui/context-panel.js';
 import { renderDocumentsPanel } from '../gui/documents-panel.js';
@@ -26,6 +27,7 @@ const store = createStore({
   cases: [],
   slug: null,
   bundle: null,
+  lens: 'structure',
   selection: null,
   pinned: null,
   trace: {
@@ -82,15 +84,34 @@ function renderCaseList(state) {
     .join('');
 }
 
+function renderLensBar(state) {
+  const activeLens = normalizeLens(state.lens);
+  els.lensBar.innerHTML = LENSES.map((lens) => `
+    <button
+      type="button"
+      class="lens-button${lens.id === activeLens ? ' active' : ''}"
+      data-lens-id="${lens.id}"
+      aria-pressed="${lens.id === activeLens ? 'true' : 'false'}"
+      title="${escapeHtml(lens.description)}"
+    >
+      ${escapeHtml(lens.label)}
+    </button>
+  `).join('');
+}
+
 function render() {
   const state = store.getState();
   const bundle = state.bundle;
-  const mode = bundle?.projection?.mode || 'structure';
+  const activeLens = normalizeLens(state.lens);
 
   els.currentTitle.textContent = bundle?.identity?.title || 'Product Workbench';
   els.currentSlug.textContent = bundle?.identity?.slug || 'No case open';
-  els.currentMode.textContent = state.trace?.enabled ? `Mode: ${mode} + process trace` : `Mode: ${mode}`;
+  els.currentMode.textContent = state.trace?.enabled
+    ? `Lens: ${lensLabel(activeLens)} + process trace`
+    : `Lens: ${lensLabel(activeLens)}`;
+  els.currentNote.textContent = lensNote(activeLens);
 
+  renderLensBar(state);
   renderCaseList(state);
   renderSpecifiedView(els.mapView, state);
   renderContextPanel(els.contextPanel, state);
@@ -149,6 +170,10 @@ async function openCase(slug) {
   }
 }
 
+function setLens(lensId) {
+  store.setState({ lens: normalizeLens(lensId) });
+}
+
 function togglePinnedTarget(target) {
   if (!target) return;
 
@@ -169,6 +194,7 @@ function startTrace(target) {
   if (!target) return;
 
   store.setState({
+    lens: 'process',
     trace: {
       enabled: true,
       target,
@@ -365,6 +391,12 @@ function bind() {
     const caseButton = event.target.closest('[data-case-slug]');
     if (caseButton) {
       await openCase(caseButton.dataset.caseSlug);
+      return;
+    }
+
+    const lensButton = event.target.closest('[data-lens-id]');
+    if (lensButton) {
+      setLens(lensButton.dataset.lensId);
       return;
     }
 

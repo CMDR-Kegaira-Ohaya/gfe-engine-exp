@@ -1,5 +1,6 @@
 import { escapeHtml, eventsForStep, label, participantFromAlpha } from '../app/helpers.js';
 import { activeTraceTarget, buildTraceIndex, sameTarget, targetLabel } from '../app/interaction-state.js';
+import { lensDescription, lensLabel, normalizeLens } from '../app/lenses.js';
 
 export function renderContextPanel(container, state) {
   if (!container) return;
@@ -10,6 +11,7 @@ export function renderContextPanel(container, state) {
     return;
   }
 
+  const lens = normalizeLens(state.lens);
   const encoding = bundle.structure;
   const selection = state.selection;
   const pinned = state.pinned;
@@ -19,10 +21,19 @@ export function renderContextPanel(container, state) {
 
   container.innerHTML = `
     <h2>Context Panel</h2>
+    <div class="context-section">
+      <div class="eyebrow">Current lens</div>
+      <div class="detail-row"><span>Lens</span><strong>${escapeHtml(lensLabel(lens))}</strong></div>
+      <p>${escapeHtml(lensDescription(lens))}</p>
+    </div>
     ${renderInteractionStatus(bundle, state, trace)}
     ${traceTarget ? renderProcessFlow(trace) : ''}
-    ${focusTarget ? renderTargetDetails(bundle, focusTarget, selection, pinned, traceTarget, trace) : renderOverview(bundle, encoding)}
+    ${focusTarget ? renderTargetDetails(bundle, targetWithLens(focusTarget, lens), selection, pinned, traceTarget, trace) : renderOverview(bundle, encoding, lens)}
   `;
+}
+
+function targetWithLens(target, lens) {
+  return { ...target, lens };
 }
 
 function renderInteractionStatus(bundle, state, trace) {
@@ -106,9 +117,10 @@ function renderProcessFlow(trace) {
   `;
 }
 
-function renderOverview(bundle, encoding) {
+function renderOverview(bundle, encoding, lens) {
   const steps = Array.isArray(encoding?.timeline) ? encoding.timeline.length : 0;
   const participants = Array.isArray(encoding?.participants) ? encoding.participants.length : 0;
+  const events = Array.isArray(encoding?.payload_events) ? encoding.payload_events.length : 0;
 
   return `
     <div class="context-section">
@@ -120,6 +132,7 @@ function renderOverview(bundle, encoding) {
       <div class="detail-row"><span>Structural status</span><strong>${escapeHtml(bundle.status.structural)}</strong></div>
       <div class="detail-row"><span>Moments</span><strong>${escapeHtml(steps)}</strong></div>
       <div class="detail-row"><span>Participants</span><strong>${escapeHtml(participants)}</strong></div>
+      ${lens === 'evidence' ? `<div class="detail-row"><span>Payload events</span><strong>${escapeHtml(events)}</strong></div>` : ''}
     </div>
     <div class="context-section">
       <div class="eyebrow">Artifacts</div>

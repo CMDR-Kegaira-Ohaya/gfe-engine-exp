@@ -1,5 +1,6 @@
 import { escapeHtml, eventsForStep, label, participantFromAlpha } from '../app/helpers.js';
 import { activeTraceTarget, sameTarget, targetLabel } from '../app/interaction-state.js';
+import { lensDescription, lensLabel, normalizeLens } from '../app/lenses.js';
 
 export function renderDocumentsPanel(container, state) {
   if (!container) return;
@@ -10,6 +11,7 @@ export function renderDocumentsPanel(container, state) {
     return;
   }
 
+  const lens = normalizeLens(state.lens);
   const active = state.activeDocument || 'source';
   const sourceText = bundle.source?.text || '';
   const narrativeText = bundle.narrative?.text || '';
@@ -29,11 +31,12 @@ export function renderDocumentsPanel(container, state) {
 
     <div class="documents-context-strip">
       <div class="doc-focus-pills">
+        <span class="doc-focus-pill active"><strong>Lens:</strong> ${escapeHtml(lensLabel(lens))}</span>
         ${renderContextPill('Inspect', docContext.selectionLabel, docContext.selectionActive)}
         ${renderContextPill('Pin', docContext.pinnedLabel, docContext.pinnedActive)}
         ${renderContextPill('Trace', docContext.traceLabel, docContext.traceActive)}
       </div>
-      <div class="doc-context-note">Gentle highlights follow current context. Documents stay stable and do not auto-jump.</div>
+      <div class="doc-context-note">${escapeHtml(lensDescription(lens))} Gentle highlights follow current context. Documents stay stable and do not auto-jump.</div>
     </div>
 
     <div class="documents-body">

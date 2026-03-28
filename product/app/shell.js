@@ -9,7 +9,7 @@ export function createShell(root) {
           <h1 id="current-title">Product Workbench</h1>
         </div>
         <div class="topbar-meta">
-          <div id="current-mode">Mode: structure</div>
+          <div id="current-mode">Lens: Structure</div>
           <div id="notice">Booting…</div>
         </div>
       </header>
@@ -29,7 +29,10 @@ export function createShell(root) {
               <div class="eyebrow">Specified View</div>
               <div id="current-slug">No case open</div>
             </div>
-            <div class="status-note">Solved structure first. Source and narrative stay secondary.</div>
+            <div class="current-tools">
+              <div id="lens-bar" class="lens-bar"></div>
+              <div id="current-note" class="status-note">Whole structure first. Source and narrative remain stable companions.</div>
+            </div>
           </section>
 
           <section id="map-view" class="panel map-view" aria-label="Specified View"></section>
@@ -49,6 +52,8 @@ export function createShell(root) {
     currentTitle: root.querySelector('#current-title'),
     currentMode: root.querySelector('#current-mode'),
     currentSlug: root.querySelector('#current-slug'),
+    currentNote: root.querySelector('#current-note'),
+    lensBar: root.querySelector('#lens-bar'),
     caseList: root.querySelector('#case-list'),
     mapView: root.querySelector('#map-view'),
     contextPanel: root.querySelector('#context-panel'),
