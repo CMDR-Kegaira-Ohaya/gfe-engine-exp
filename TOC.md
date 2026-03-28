@@ -82,7 +82,8 @@
 │       │   ├── PROCEDURE_INDEX.md
 │       │   ├── README.md
 │       │   ├── repo_patch_tool.py
-│       │   └── repo_patch_tool_spec.md
+│       │   ├── repo_patch_tool_spec.md
+│       │   └── TROUBLESHOOTING_REPO_TIPS.md
 │       ├── REPOprojects/
 │       │   ├── GUIGUX/
 │       │   │   ├── 00_INDEX.md
