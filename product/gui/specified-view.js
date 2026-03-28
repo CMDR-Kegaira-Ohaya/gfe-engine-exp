@@ -1,4 +1,5 @@
 import { escapeHtml, eventTitle, eventsForStep, label } from '../app/helpers.js';
+import { normalizeFilters } from '../app/filters.js';
 import { activeTraceTarget, buildTraceIndex, sameTarget, targetLabel } from '../app/interaction-state.js';
 import { lensLabel, normalizeLens } from '../app/lenses.js';
 
@@ -18,6 +19,7 @@ export function renderSpecifiedView(container, state) {
   }
 
   const lens = normalizeLens(state.lens);
+  const filters = normalizeFilters(state.filters);
   const steps = Array.isArray(encoding.timeline) ? encoding.timeline : [];
   const events = Array.isArray(encoding.payload_events) ? encoding.payload_events : [];
   const selected = state.selection;
@@ -25,6 +27,21 @@ export function renderSpecifiedView(container, state) {
   const traceTarget = activeTraceTarget(state);
   const trace = buildTraceIndex(bundle, traceTarget);
   const momentsWithEvents = steps.reduce((count, _step, stepIndex) => count + (eventsForStep(events, stepIndex).length ? 1 : 0), 0);
+  const visibleSteps = steps.map((step, stepIndex) => ({
+    step,
+    stepIndex,
+    stepEvents: eventsForStep(events, stepIndex),
+  })).filter(({ stepIndex, stepEvents }) => {
+    if (filters.tracedFlowOnly && traceTarget && !trace.moments.has(String(stepIndex)) && trace.anchorMoment !== stepIndex) {
+      return false;
+    }
+
+    if (filters.payloadOnly && !stepEvents.length) {
+      return false;
+    }
+
+    return true;
+  });
 
   container.innerHTML = `
     <div class="map-summary">
@@ -46,101 +63,121 @@ export function renderSpecifiedView(container, state) {
       </div>
     </div>
 
-    ${renderLensStrip(lens, bundle, traceTarget, trace, momentsWithEvents, events.length)}
+    ${renderLensStrip(lens, bundle, traceTarget, trace, momentsWithEvents, events.length, visibleSteps.length, filters)}
 
     <div class="moment-grid lens-${lens}">
-      ${steps.map((step, stepIndex) => {
-        const momentTarget = { type: 'moment', id: String(stepIndex) };
-        const isSelected = sameTarget(selected, momentTarget);
-        const isPinned = sameTarget(pinned, momentTarget);
-        const isTraced = trace.moments.has(String(stepIndex));
-        const isAnchor = trace.anchorMoment === stepIndex;
-        const participantIds = Object.keys(step?.participants || {});
-        const stepEvents = eventsForStep(events, stepIndex);
-        const muteForProcess = lens === 'process' && traceTarget && !isAnchor && !isTraced;
-        const muteForEvidence = lens === 'evidence' && !stepEvents.length && !isSelected && !isPinned;
-
-        return `
-          <section class="moment-card${isSelected ? ' active' : ''}${isPinned ? ' pinned' : ''}${isTraced ? ' traced' : ''}${isAnchor ? ' flow-anchor' : ''}${muteForProcess || muteForEvidence ? ' lens-muted' : ''}">
-            <div class="moment-head">
-              <div class="moment-head-main">
-                <button class="moment-title" type="button" data-select-type="moment" data-select-id="${stepIndex}">
-                  ${escapeHtml(step?.timestep_label || `Step ${stepIndex + 1}`)}
-                </button>
-                ${isAnchor
-                  ? '<span class="moment-flow-label anchor">Anchor</span>'
-                  : (isTraced ? '<span class="moment-flow-label">On flow</span>' : '')}
-                ${lens === 'evidence' && stepEvents.length
-                  ? `<span class="moment-flow-label evidence">${escapeHtml(stepEvents.length)} evidence event${stepEvents.length === 1 ? '' : 's'}</span>`
-                  : ''}
-              </div>
-              <button class="pin-button" type="button" data-pin-type="moment" data-pin-id="${stepIndex}">
-                ${isPinned ? 'Unpin' : 'Pin'}
-              </button>
-            </div>
-
-            <div class="moment-block${lens === 'evidence' ? ' subdued-block' : ''}">
-              <div class="moment-subhead">Participants</div>
-              <div class="selectable-stack">
-                ${participantIds.length
-                  ? participantIds
-                      .map((participantId) => {
-                        const entityTarget = { type: 'entity', id: String(participantId) };
-                        const entityPinned = sameTarget(pinned, entityTarget);
-                        const entitySelected = sameTarget(selected, entityTarget);
-                        const showEntityTraceDetail = trace.entities.has(String(participantId)) && (entitySelected || entityPinned);
-
-                        return `
-                          <div class="selectable-row${entitySelected ? ' active' : ''}${entityPinned ? ' pinned' : ''}${showEntityTraceDetail ? ' trace-promoted' : ''}">
-                            <button class="chip" type="button" data-select-type="entity" data-select-id="${escapeHtml(participantId)}">
-                              ${escapeHtml(label(participantId))}
-                            </button>
-                            <button class="pin-button pin-button-small" type="button" data-pin-type="entity" data-pin-id="${escapeHtml(participantId)}">
-                              ${entityPinned ? 'Unpin' : 'Pin'}
-                            </button>
-                          </div>
-                        `;
-                      })
-                      .join('')
-                  : '<span class="muted">No participants in this moment.</span>'}
-              </div>
-            </div>
-
-            <div class="moment-block${lens === 'evidence' && stepEvents.length ? ' evidence-block' : ''}">
-              <div class="moment-subhead">Payload events</div>
-              <div class="selectable-stack">
-                ${stepEvents.length
-                  ? stepEvents
-                      .map((event, eventIndex) => {
-                        const eventId = `${stepIndex}:${eventIndex}`;
-                        const eventTarget = { type: 'event', id: eventId };
-                        const eventPinned = sameTarget(pinned, eventTarget);
-                        const eventSelected = sameTarget(selected, eventTarget);
-                        const showEventTraceDetail = trace.events.has(String(eventId)) && (eventSelected || eventPinned);
-
-                        return `
-                          <div class="selectable-row${eventSelected ? ' active' : ''}${eventPinned ? ' pinned' : ''}${showEventTraceDetail ? ' trace-promoted' : ''}">
-                            <button class="event-row" type="button" data-select-type="event" data-select-id="${eventId}">
-                              ${escapeHtml(eventTitle(event))}
-                            </button>
-                            <button class="pin-button pin-button-small" type="button" data-pin-type="event" data-pin-id="${eventId}">
-                              ${eventPinned ? 'Unpin' : 'Pin'}
-                            </button>
-                          </div>
-                        `;
-                      })
-                      .join('')
-                  : '<span class="muted">No payload events in this moment.</span>'}
-              </div>
-            </div>
-          </section>
-        `;
-      }).join('')}
+      ${visibleSteps.length
+        ? visibleSteps.map(({ step, stepIndex, stepEvents }) => renderMomentCard(bundle, step, stepIndex, stepEvents, state, trace, lens, filters)).join('')
+        : '<div class="empty-state">No moments match the current lens and filter settings.</div>'}
     </div>
   `;
 }
 
-function renderLensStrip(lens, bundle, traceTarget, trace, momentsWithEvents, totalEvents) {
+function renderMomentCard(bundle, step, stepIndex, stepEvents, state, trace, lens, filters) {
+  const selected = state.selection;
+  const pinned = state.pinned;
+  const momentTarget = { type: 'moment', id: String(stepIndex) };
+  const isSelected = sameTarget(selected, momentTarget);
+  const isPinned = sameTarget(pinned, momentTarget);
+  const isTraced = trace.moments.has(String(stepIndex));
+  const isAnchor = trace.anchorMoment === stepIndex;
+  const participantIds = Object.keys(step?.participants || {});
+  const muteForProcess = lens === 'process' && state.trace?.enabled && !isAnchor && !isTraced;
+  const muteForEvidence = lens === 'evidence' && !stepEvents.length && !isSelected && !isPinned;
+  const showSecondaryDetail = !filters.focusDetailsOnly || isSelected || isPinned || isAnchor;
+
+  return `
+    <section class="moment-card${isSelected ? ' active' : ''}${isPinned ? ' pinned' : ''}${isTraced ? ' traced' : ''}${isAnchor ? ' flow-anchor' : ''}${muteForProcess || muteForEvidence ? ' lens-muted' : ''}">
+      <div class="moment-head">
+        <div class="moment-head-main">
+          <button class="moment-title" type="button" data-select-type="moment" data-select-id="${stepIndex}">
+            ${escapeHtml(step?.timestep_label || `Step ${stepIndex + 1}`)}
+          </button>
+          <div class="moment-label-row">
+            ${isAnchor
+              ? '<span class="moment-flow-label anchor">Anchor</span>'
+              : (isTraced ? '<span class="moment-flow-label">On flow</span>' : '')}
+            ${lens === 'evidence'
+              ? `<span class="moment-flow-label evidence${stepEvents.length ? ' present' : ' absent'}">${stepEvents.length ? `${stepEvents.length} payload event${stepEvents.length === 1 ? '' : 's'}` : 'no payload evidence'}</span>`
+              : ''}
+          </div>
+        </div>
+        <button class="pin-button" type="button" data-pin-type="moment" data-pin-id="${stepIndex}">
+          ${isPinned ? 'Unpin' : 'Pin'}
+        </button>
+      </div>
+
+      ${showSecondaryDetail
+        ? `
+          <div class="moment-block${lens === 'evidence' ? ' subdued-block' : ''}">
+            <div class="moment-subhead">Participants</div>
+            <div class="selectable-stack">
+              ${participantIds.length
+                ? participantIds
+                    .map((participantId) => {
+                      const entityTarget = { type: 'entity', id: String(participantId) };
+                      const entityPinned = sameTarget(pinned, entityTarget);
+                      const entitySelected = sameTarget(selected, entityTarget);
+                      const showEntityTraceDetail = trace.entities.has(String(participantId)) && (entitySelected || entityPinned);
+
+                      return `
+                        <div class="selectable-row${entitySelected ? ' active' : ''}${entityPinned ? ' pinned' : ''}${showEntityTraceDetail ? ' trace-promoted' : ''}">
+                          <button class="chip" type="button" data-select-type="entity" data-select-id="${escapeHtml(participantId)}">
+                            ${escapeHtml(label(participantId))}
+                          </button>
+                          <button class="pin-button pin-button-small" type="button" data-pin-type="entity" data-pin-id="${escapeHtml(participantId)}">
+                            ${entityPinned ? 'Unpin' : 'Pin'}
+                          </button>
+                        </div>
+                      `;
+                    })
+                    .join('')
+                : '<span class="muted">No participants in this moment.</span>'}
+            </div>
+          </div>
+
+          <div class="moment-block${lens === 'evidence' && stepEvents.length ? ' evidence-block' : ''}">
+            <div class="moment-subhead">Payload events</div>
+            <div class="selectable-stack">
+              ${stepEvents.length
+                ? stepEvents
+                    .map((event, eventIndex) => {
+                      const eventId = `${stepIndex}:${eventIndex}`;
+                      const eventTarget = { type: 'event', id: eventId };
+                      const eventPinned = sameTarget(pinned, eventTarget);
+                      const eventSelected = sameTarget(selected, eventTarget);
+                      const showEventTraceDetail = trace.events.has(String(eventId)) && (eventSelected || eventPinned);
+
+                      return `
+                        <div class="selectable-row${eventSelected ? ' active' : ''}${eventPinned ? ' pinned' : ''}${showEventTraceDetail ? ' trace-promoted' : ''}">
+                          <button class="event-row" type="button" data-select-type="event" data-select-id="${eventId}">
+                            ${escapeHtml(eventTitle(event))}
+                          </button>
+                          <button class="pin-button pin-button-small" type="button" data-pin-type="event" data-pin-id="${eventId}">
+                            ${eventPinned ? 'Unpin' : 'Pin'}
+                          </button>
+                        </div>
+                      `;
+                    })
+                    .join('')
+                : '<span class="muted">No payload events in this moment.</span>'}
+            </div>
+          </div>
+        `
+        : `
+          <div class="moment-compact-summary">
+            <div class="compact-pill">participants: ${escapeHtml(participantIds.length)}</div>
+            <div class="compact-pill">payload events: ${escapeHtml(stepEvents.length)}</div>
+            <div class="compact-note">Secondary detail hidden until this moment is inspected or pinned.</div>
+          </div>
+        `}
+    </section>
+  `;
+}
+
+function renderLensStrip(lens, bundle, traceTarget, trace, momentsWithEvents, totalEvents, visibleMoments, filters) {
+  const activeFilters = Object.entries(filters).filter(([, value]) => value).map(([key]) => filterLabel(key));
+
   if (lens === 'process') {
     return `
       <div class="flow-strip lens-strip process-strip">
@@ -152,6 +189,7 @@ function renderLensStrip(lens, bundle, traceTarget, trace, momentsWithEvents, to
                 : '<span class="muted">No traced process flow yet.</span>')
             : '<span class="muted">Trace a target to reveal process continuity through moments.</span>'}
         </div>
+        ${activeFilters.length ? `<div class="lens-strip-note">Active filters: ${escapeHtml(activeFilters.join(' • '))}. Visible moments: ${escapeHtml(visibleMoments)}.</div>` : ''}
       </div>
     `;
   }
@@ -161,27 +199,39 @@ function renderLensStrip(lens, bundle, traceTarget, trace, momentsWithEvents, to
       <div class="flow-strip lens-strip evidence-strip">
         <div class="eyebrow">Evidence view</div>
         <div class="flow-pill-row">
-          <span class="flow-pill evidence">source: ${bundle.status.artifacts.source ? 'present' : 'missing'}</span>
-          <span class="flow-pill evidence">narrative: ${bundle.status.artifacts.narrative ? 'present' : 'missing'}</span>
-          <span class="flow-pill evidence">moments with events: ${escapeHtml(momentsWithEvents)}</span>
-          <span class="flow-pill evidence">payload events: ${escapeHtml(totalEvents)}</span>
+          <span class="flow-pill evidence ${bundle.status.artifacts.source ? 'present' : 'missing'}">source: ${bundle.status.artifacts.source ? 'present' : 'missing'}</span>
+          <span class="flow-pill evidence ${bundle.status.artifacts.narrative ? 'present' : 'missing'}">narrative: ${bundle.status.artifacts.narrative ? 'present' : 'missing'}</span>
+          <span class="flow-pill evidence present">payload moments: ${escapeHtml(momentsWithEvents)}</span>
+          <span class="flow-pill evidence ${totalEvents ? 'present' : 'missing'}">payload events: ${escapeHtml(totalEvents)}</span>
+          <span class="flow-pill evidence provisional">links: provisional</span>
         </div>
+        <div class="lens-strip-note">Evidence lens shows what artifacts and payload-bearing moments are available now. It does not claim solved correspondence beyond what exists.</div>
       </div>
     `;
   }
 
-  if (!traceTarget) {
+  if (!traceTarget && !activeFilters.length) {
     return '';
   }
 
   return `
     <div class="flow-strip lens-strip structure-strip">
-      <div class="eyebrow">Process trace</div>
+      <div class="eyebrow">Structure view</div>
       <div class="flow-pill-row">
-        ${trace.flow.length
-          ? trace.flow.map((item) => `<span class="flow-pill${item.isAnchor ? ' anchor' : ''}">${escapeHtml(item.label)}</span>`).join('')
-          : '<span class="muted">No traced process flow yet.</span>'}
+        ${traceTarget
+          ? (trace.flow.length
+              ? trace.flow.map((item) => `<span class="flow-pill${item.isAnchor ? ' anchor' : ''}">${escapeHtml(item.label)}</span>`).join('')
+              : '<span class="muted">No traced process flow yet.</span>')
+          : '<span class="muted">Whole arrangement remains primary. Trace appears here quietly when active.</span>'}
       </div>
+      ${activeFilters.length ? `<div class="lens-strip-note">Active filters: ${escapeHtml(activeFilters.join(' • '))}. Visible moments: ${escapeHtml(visibleMoments)}.</div>` : ''}
     </div>
   `;
+}
+
+function filterLabel(id) {
+  if (id === 'tracedFlowOnly') return 'traced flow only';
+  if (id === 'payloadOnly') return 'payload moments only';
+  if (id === 'focusDetailsOnly') return 'details on focus';
+  return id;
 }

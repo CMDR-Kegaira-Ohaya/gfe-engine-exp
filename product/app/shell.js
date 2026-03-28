@@ -31,6 +31,7 @@ export function createShell(root) {
             </div>
             <div class="current-tools">
               <div id="lens-bar" class="lens-bar"></div>
+              <div id="filter-bar" class="filter-bar"></div>
               <div id="current-note" class="status-note">Whole structure first. Source and narrative remain stable companions.</div>
             </div>
           </section>
@@ -54,6 +55,7 @@ export function createShell(root) {
     currentSlug: root.querySelector('#current-slug'),
     currentNote: root.querySelector('#current-note'),
     lensBar: root.querySelector('#lens-bar'),
+    filterBar: root.querySelector('#filter-bar'),
     caseList: root.querySelector('#case-list'),
     mapView: root.querySelector('#map-view'),
     contextPanel: root.querySelector('#context-panel'),

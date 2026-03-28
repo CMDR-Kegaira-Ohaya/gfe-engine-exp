@@ -2,6 +2,7 @@ import { createShell } from './shell.js';
 import { createStore } from './store.js';
 import { loadCasesIndex, loadCaseBundle, resolveInitialSlug } from './case-bundle.js';
 import { activeTraceTarget, sameTarget } from './interaction-state.js';
+import { FILTERS, activeFilterCount, normalizeFilters, toggleFilter } from './filters.js';
 import { LENSES, lensLabel, lensNote, normalizeLens } from './lenses.js';
 import { renderSpecifiedView } from '../gui/specified-view.js';
 import { renderContextPanel } from '../gui/context-panel.js';
@@ -28,6 +29,7 @@ const store = createStore({
   slug: null,
   bundle: null,
   lens: 'structure',
+  filters: normalizeFilters({}),
   selection: null,
   pinned: null,
   trace: {
@@ -99,6 +101,28 @@ function renderLensBar(state) {
   `).join('');
 }
 
+function renderFilterBar(state) {
+  const filters = normalizeFilters(state.filters);
+  const count = activeFilterCount(filters);
+
+  els.filterBar.innerHTML = `
+    <div class="filter-bar-label">Filters${count ? ` (${count})` : ''}</div>
+    <div class="filter-button-row">
+      ${FILTERS.map((filter) => `
+        <button
+          type="button"
+          class="filter-button${filters[filter.id] ? ' active' : ''}"
+          data-filter-id="${filter.id}"
+          aria-pressed="${filters[filter.id] ? 'true' : 'false'}"
+          title="${escapeHtml(filter.description)}"
+        >
+          ${escapeHtml(filter.label)}
+        </button>
+      `).join('')}
+    </div>
+  `;
+}
+
 function render() {
   const state = store.getState();
   const bundle = state.bundle;
@@ -112,6 +136,7 @@ function render() {
   els.currentNote.textContent = lensNote(activeLens);
 
   renderLensBar(state);
+  renderFilterBar(state);
   renderCaseList(state);
   renderSpecifiedView(els.mapView, state);
   renderContextPanel(els.contextPanel, state);
@@ -172,6 +197,11 @@ async function openCase(slug) {
 
 function setLens(lensId) {
   store.setState({ lens: normalizeLens(lensId) });
+}
+
+function toggleUiFilter(filterId) {
+  const filters = toggleFilter(store.getState().filters, filterId);
+  store.setState({ filters });
 }
 
 function togglePinnedTarget(target) {
@@ -397,6 +427,12 @@ function bind() {
     const lensButton = event.target.closest('[data-lens-id]');
     if (lensButton) {
       setLens(lensButton.dataset.lensId);
+      return;
+    }
+
+    const filterButton = event.target.closest('[data-filter-id]');
+    if (filterButton) {
+      toggleUiFilter(filterButton.dataset.filterId);
       return;
     }
 

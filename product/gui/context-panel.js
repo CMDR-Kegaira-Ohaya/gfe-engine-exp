@@ -1,4 +1,5 @@
 import { escapeHtml, eventsForStep, label, participantFromAlpha } from '../app/helpers.js';
+import { FILTERS, normalizeFilters } from '../app/filters.js';
 import { activeTraceTarget, buildTraceIndex, sameTarget, targetLabel } from '../app/interaction-state.js';
 import { lensDescription, lensLabel, normalizeLens } from '../app/lenses.js';
 
@@ -12,6 +13,7 @@ export function renderContextPanel(container, state) {
   }
 
   const lens = normalizeLens(state.lens);
+  const filters = normalizeFilters(state.filters);
   const encoding = bundle.structure;
   const selection = state.selection;
   const pinned = state.pinned;
@@ -26,14 +28,29 @@ export function renderContextPanel(container, state) {
       <div class="detail-row"><span>Lens</span><strong>${escapeHtml(lensLabel(lens))}</strong></div>
       <p>${escapeHtml(lensDescription(lens))}</p>
     </div>
+    ${renderFilterStatus(filters)}
     ${renderInteractionStatus(bundle, state, trace)}
     ${traceTarget ? renderProcessFlow(trace) : ''}
-    ${focusTarget ? renderTargetDetails(bundle, targetWithLens(focusTarget, lens), selection, pinned, traceTarget, trace) : renderOverview(bundle, encoding, lens)}
+    ${focusTarget ? renderTargetDetails(bundle, focusTarget, selection, pinned, traceTarget, trace) : renderOverview(bundle, encoding, lens)}
   `;
 }
 
-function targetWithLens(target, lens) {
-  return { ...target, lens };
+function renderFilterStatus(filters) {
+  const active = FILTERS.filter((filter) => filters[filter.id]);
+
+  return `
+    <div class="context-section">
+      <div class="eyebrow">Filters</div>
+      ${active.length
+        ? `
+          <div class="artifact-grid">
+            ${active.map((filter) => `<span class="artifact-pill present">${escapeHtml(filter.label)}</span>`).join('')}
+          </div>
+          <p>Filters reduce visible clutter only. They do not change case meaning.</p>
+        `
+        : '<p>No clutter-reduction filters are active.</p>'}
+    </div>
+  `;
 }
 
 function renderInteractionStatus(bundle, state, trace) {
@@ -121,6 +138,9 @@ function renderOverview(bundle, encoding, lens) {
   const steps = Array.isArray(encoding?.timeline) ? encoding.timeline.length : 0;
   const participants = Array.isArray(encoding?.participants) ? encoding.participants.length : 0;
   const events = Array.isArray(encoding?.payload_events) ? encoding.payload_events.length : 0;
+  const payloadMoments = Array.isArray(encoding?.timeline)
+    ? encoding.timeline.filter((_step, index) => eventsForStep(Array.isArray(encoding.payload_events) ? encoding.payload_events : [], index).length).length
+    : 0;
 
   return `
     <div class="context-section">
@@ -132,7 +152,11 @@ function renderOverview(bundle, encoding, lens) {
       <div class="detail-row"><span>Structural status</span><strong>${escapeHtml(bundle.status.structural)}</strong></div>
       <div class="detail-row"><span>Moments</span><strong>${escapeHtml(steps)}</strong></div>
       <div class="detail-row"><span>Participants</span><strong>${escapeHtml(participants)}</strong></div>
-      ${lens === 'evidence' ? `<div class="detail-row"><span>Payload events</span><strong>${escapeHtml(events)}</strong></div>` : ''}
+      ${lens === 'evidence' ? `
+        <div class="detail-row"><span>Payload events</span><strong>${escapeHtml(events)}</strong></div>
+        <div class="detail-row"><span>Payload moments</span><strong>${escapeHtml(payloadMoments)}</strong></div>
+        <div class="detail-row"><span>Linkage state</span><strong>Provisional</strong></div>
+      ` : ''}
     </div>
     <div class="context-section">
       <div class="eyebrow">Artifacts</div>
