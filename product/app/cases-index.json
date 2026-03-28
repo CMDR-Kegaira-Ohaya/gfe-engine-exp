@@ -1,20 +1,11 @@
 [
   {
-    "manifestPath": "../cases/gui_smoke_modern_case/manifest.json",
-    "summary": "Smoke case with source, encoding, and reading.",
-    "revision": "rev_smoke_v1",
-    "narrativePath": "./readings/current_model_reading.md"
+    "manifestPath": "../cases/gui_smoke_modern_case/manifest.json"
   },
   {
-    "manifestPath": "../cases/medical_breakthroughs_controversial_methods/manifest.json",
-    "summary": "Case with source and structural encoding.",
-    "revision": "rev_migrated_root",
-    "narrativePath": null
+    "manifestPath": "../cases/medical_breakthroughs_controversial_methods/manifest.json"
   },
   {
-    "manifestPath": "../cases/seed/manifest.json",
-    "summary": "Minimal seed case.",
-    "revision": "rev_migrated_root",
-    "narrativePath": null
+    "manifestPath": "../cases/seed/manifest.json"
   }
 ]

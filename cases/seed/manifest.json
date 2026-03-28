@@ -2,5 +2,7 @@
   "case_id": "seed",
   "title": "Seed",
   "slug": "seed",
-  "current_case_source": "./source/case.md"
+  "summary": "Minimal seed case.",
+  "current_case_source": "./source/case.md",
+  "current_encoding": "./revisions/rev_migrated_root/encoding.json"
 }

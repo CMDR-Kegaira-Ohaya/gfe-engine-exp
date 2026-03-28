@@ -9,18 +9,18 @@ export async function loadCasesIndex() {
       return {
         slug: manifest.slug || manifest.case_id,
         title: manifest.title || manifest.slug || 'Untitled case',
-        summary: entry.summary || manifest.summary || 'Case bundle',
+        summary: manifest.summary || 'Case bundle',
         manifest,
         manifestPath: entry.manifestPath,
         paths: {
           source: manifest.current_case_source
             ? new URL(manifest.current_case_source, caseBaseUrl).href
             : null,
-          encoding: entry.revision
-            ? new URL(`./revisions/${entry.revision}/encoding.json`, caseBaseUrl).href
+          encoding: manifest.current_encoding
+            ? new URL(manifest.current_encoding, caseBaseUrl).href
             : null,
-          narrative: entry.narrativePath
-            ? new URL(entry.narrativePath, caseBaseUrl).href
+          narrative: manifest.current_narrative
+            ? new URL(manifest.current_narrative, caseBaseUrl).href
             : null,
         },
       };
