@@ -1,10 +1,13 @@
 /* Desktop layout adjustments for the atlas / map workbench.
-  Goal: fit 1920x1080 at 100% zoom WITHOUT locking the whole page scroll.
-  We let the page scroll naturally, but ensure that the main tab content and panels scroll innerly when needed.
+   Goal: fit 1920x1080 at 100% zoom WITHOUT locking the whole page scroll.
+   We let the page scroll naturally, but ensure that the main tab content and panels
+   scroll internally when needed.
+
+   Added: Galaxy mode = one viewport (cases-as-stars), hides auxiliary panels.
 */
 
 @media (min-width: 1181px) {
-  /* 3panel layout: left atlas/ aux, center work,  right stable docs */
+  /* 3-panel layout: left atlas/aux, center work, right stable docs */
   .grid {
     grid-template-columns: minmax(340px, 1fr) minmax(0, 2fr) minmax(310px, 420px);
     align-items: stretch;
@@ -49,6 +52,36 @@
     height: 100%;
     min-height: 0;
     overflow: auto;
+  }
+
+  /* --- Galaxy mode: make it feel like a different page (one viewport) --- */
+  body.gfe-galaxy-mode .grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  body.gfe-galaxy-mode .left-panel,
+  body.gfe-galaxy-mode .right-panel,
+  body.gfe-galaxy-mode #documents-panel {
+    display: none !important;
+  }
+
+  body.gfe-galaxy-mode .center-panel {
+    /* Header + tabs + viewport (no timeline row) */
+    grid-template-rows: auto auto minmax(0, 1fr) !important;
+  }
+
+  body.gfe-galaxy-mode .bottom-row {
+    display: none !important;
+  }
+
+  /* While in Galaxy, present only the step-zoom tabs */
+  body.gfe-galaxy-mode #tabs .tab-btn {
+    display: none;
+  }
+
+  body.gfe-galaxy-mode #tabs .tab-btn[data-tab="galaxy"],
+  body.gfe-galaxy-mode #tabs .tab-btn[data-tab="map"] {
+    display: inline-flex;
   }
 }
 
