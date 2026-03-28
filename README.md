@@ -2,6 +2,7 @@
 
 This repo is now a lean preservation repo for the GFE core, not the old bootstrap/GUI/self-referential maze.
 
+See `TOC.md` for the current auto-generated repository map.
 
 ## What is kept here
 
@@ -33,4 +34,4 @@ This repo is now a lean preservation repo for the GFE core, not the old bootstra
 ## Next split
 
 This repo can stay as the core/archive source.
-Any new user-facing product, gui, or public projection should be built cleanly in a separate new repo.
+Any new user-facing product, GUI, or public projection should be built cleanly in a separate new repo.

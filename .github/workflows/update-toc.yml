@@ -1,0 +1,44 @@
+name: Update TOC
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - TOC.md
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-toc:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Regenerate TOC
+        run: python scripts/update_toc.py
+
+      - name: Commit TOC if changed
+        run: |
+          if git diff --quiet -- TOC.md; then
+            echo "TOC is already current."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add TOC.md
+          git commit -m "Auto-update TOC"
+          git push
