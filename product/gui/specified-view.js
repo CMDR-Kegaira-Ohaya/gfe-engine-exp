@@ -66,9 +66,14 @@ export function renderSpecifiedView(container, state) {
         return `
           <section class="moment-card${isSelected ? ' active' : ''}${isPinned ? ' pinned' : ''}${isTraced ? ' traced' : ''}${isAnchor ? ' flow-anchor' : ''}">
             <div class="moment-head">
-              <button class="moment-title" type="button" data-select-type="moment" data-select-id="${stepIndex}">
-                ${escapeHtml(step?.timestep_label || `Step ${stepIndex + 1}`)}
-              </button>
+              <div class="moment-head-main">
+                <button class="moment-title" type="button" data-select-type="moment" data-select-id="${stepIndex}">
+                  ${escapeHtml(step?.timestep_label || `Step ${stepIndex + 1}`)}
+                </button>
+                ${isAnchor
+                  ? '<span class="moment-flow-label anchor">Anchor</span>'
+                  : (isTraced ? '<span class="moment-flow-label">On flow</span>' : '')}
+              </div>
               <button class="pin-button" type="button" data-pin-type="moment" data-pin-id="${stepIndex}">
                 ${isPinned ? 'Unpin' : 'Pin'}
               </button>
@@ -83,10 +88,10 @@ export function renderSpecifiedView(container, state) {
                         const entityTarget = { type: 'entity', id: String(participantId) };
                         const entityPinned = sameTarget(pinned, entityTarget);
                         const entitySelected = sameTarget(selected, entityTarget);
-                        const entityTraced = trace.entities.has(String(participantId));
+                        const showEntityTraceDetail = trace.entities.has(String(participantId)) && (entitySelected || entityPinned);
 
                         return `
-                          <div class="selectable-row${entitySelected ? ' active' : ''}${entityPinned ? ' pinned' : ''}${entityTraced ? ' traced' : ''}">
+                          <div class="selectable-row${entitySelected ? ' active' : ''}${entityPinned ? ' pinned' : ''}${showEntityTraceDetail ? ' trace-promoted' : ''}">
                             <button class="chip" type="button" data-select-type="entity" data-select-id="${escapeHtml(participantId)}">
                               ${escapeHtml(label(participantId))}
                             </button>
@@ -111,10 +116,10 @@ export function renderSpecifiedView(container, state) {
                         const eventTarget = { type: 'event', id: eventId };
                         const eventPinned = sameTarget(pinned, eventTarget);
                         const eventSelected = sameTarget(selected, eventTarget);
-                        const eventTraced = trace.events.has(String(eventId));
+                        const showEventTraceDetail = trace.events.has(String(eventId)) && (eventSelected || eventPinned);
 
                         return `
-                          <div class="selectable-row${eventSelected ? ' active' : ''}${eventPinned ? ' pinned' : ''}${eventTraced ? ' traced' : ''}">
+                          <div class="selectable-row${eventSelected ? ' active' : ''}${eventPinned ? ' pinned' : ''}${showEventTraceDetail ? ' trace-promoted' : ''}">
                             <button class="event-row" type="button" data-select-type="event" data-select-id="${eventId}">
                               ${escapeHtml(eventTitle(event))}
                             </button>

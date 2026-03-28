@@ -60,17 +60,20 @@ textarea { font: inherit; }
 .moment-card { border: 1px solid var(--line); border-radius: 16px; padding: 14px; background: rgba(255,255,255,0.02); display: grid; gap: 14px; transition: border-color var(--motion-fast) var(--ease-soft), box-shadow var(--motion-medium) var(--ease-soft), background-color var(--motion-medium) var(--ease-soft), transform var(--motion-medium) var(--ease-soft), opacity var(--motion-medium) var(--ease-soft); }
 .moment-card.active { border-color: var(--accent); box-shadow: inset 0 0 0 1px rgba(124, 196, 255, 0.18), 0 0 22px rgba(124, 196, 255, 0.08); }
 .moment-card.pinned { box-shadow: inset 0 0 0 1px rgba(124, 196, 255, 0.45), 0 0 20px rgba(124, 196, 255, 0.06); }
-.moment-card.traced { box-shadow: inset 0 0 0 1px rgba(122, 211, 155, 0.35), 0 0 20px rgba(122, 211, 155, 0.06); }
+.moment-card.traced { box-shadow: inset 0 0 0 1px rgba(122, 211, 155, 0.24), 0 0 14px rgba(122, 211, 155, 0.04); }
 .moment-card.flow-anchor { box-shadow: inset 0 0 0 1px rgba(124, 196, 255, 0.6), 0 0 24px rgba(124, 196, 255, 0.12); animation: soft-pulse-anchor var(--motion-slow) ease-in-out infinite; }
-.moment-head, .selectable-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.moment-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: start; }
+.moment-head-main { display: grid; gap: 6px; min-width: 0; }
+.moment-flow-label { display: inline-flex; align-items: center; width: fit-content; border: 1px solid rgba(122, 211, 155, 0.18); border-radius: 999px; padding: 4px 8px; font-size: 0.74rem; color: var(--muted); background: rgba(122, 211, 155, 0.06); transition: border-color var(--motion-fast) var(--ease-soft), box-shadow var(--motion-medium) var(--ease-soft), background-color var(--motion-medium) var(--ease-soft), color var(--motion-fast) var(--ease-soft), opacity var(--motion-medium) var(--ease-soft); }
+.moment-flow-label.anchor { border-color: rgba(124, 196, 255, 0.32); color: var(--text); background: rgba(124, 196, 255, 0.08); box-shadow: 0 0 12px rgba(124, 196, 255, 0.06); }
 .moment-title { width: 100%; text-align: left; border: none; padding: 0; background: none; color: var(--text); font-size: 1rem; font-weight: 700; }
 .moment-block { display: grid; gap: 8px; }
 .moment-subhead { font-size: 0.82rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
 .selectable-stack, .chip-row, .event-list, .timeline-list { display: grid; gap: 8px; }
-.selectable-row { border: 1px solid rgba(255,255,255,0.04); border-radius: 14px; padding: 6px; background: rgba(255,255,255,0.01); transition: border-color var(--motion-fast) var(--ease-soft), box-shadow var(--motion-medium) var(--ease-soft), background-color var(--motion-medium) var(--ease-soft), opacity var(--motion-medium) var(--ease-soft); }
+.selectable-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; border: 1px solid rgba(255,255,255,0.04); border-radius: 14px; padding: 6px; background: rgba(255,255,255,0.01); transition: border-color var(--motion-fast) var(--ease-soft), box-shadow var(--motion-medium) var(--ease-soft), background-color var(--motion-medium) var(--ease-soft), opacity var(--motion-medium) var(--ease-soft); }
 .selectable-row.active { border-color: rgba(124, 196, 255, 0.45); box-shadow: 0 0 16px rgba(124, 196, 255, 0.05); }
 .selectable-row.pinned { border-color: rgba(124, 196, 255, 0.3); }
-.selectable-row.traced { border-color: rgba(122, 211, 155, 0.28); box-shadow: 0 0 16px rgba(122, 211, 155, 0.04); }
+.selectable-row.trace-promoted { border-color: rgba(122, 211, 155, 0.24); box-shadow: 0 0 16px rgba(122, 211, 155, 0.05); }
 .chip { border: 1px solid var(--line); background: rgba(255,255,255,0.03); color: var(--text); border-radius: 999px; padding: 8px 10px; text-align: left; width: 100%; transition: border-color var(--motion-fast) var(--ease-soft), box-shadow var(--motion-medium) var(--ease-soft), background-color var(--motion-medium) var(--ease-soft), color var(--motion-fast) var(--ease-soft); }
 .event-row, .doc-tab, .repo-save-button, .context-action-button, .pin-button { border: 1px solid var(--line); background: rgba(255,255,255,0.03); color: var(--text); border-radius: 12px; padding: 10px 12px; text-align: left; transition: border-color var(--motion-fast) var(--ease-soft), box-shadow var(--motion-medium) var(--ease-soft), background-color var(--motion-medium) var(--ease-soft), color var(--motion-fast) var(--ease-soft), opacity var(--motion-medium) var(--ease-soft); }
 .event-row { width: 100%; }
