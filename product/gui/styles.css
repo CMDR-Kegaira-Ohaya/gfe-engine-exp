@@ -86,7 +86,14 @@ textarea { font: inherit; }
 .timeline-list-item.flow-anchor { border-color: rgba(124, 196, 255, 0.5); box-shadow: 0 0 20px rgba(124, 196, 255, 0.08); animation: soft-pulse-anchor var(--motion-slow) ease-in-out infinite; }
 .documents-head, .repo-head { display: flex; justify-content: space-between; gap: 12px; align-items: end; margin-bottom: 12px; }
 .doc-tabs { display: flex; gap: 8px; }
+.documents-context-strip { display: grid; gap: 10px; margin-bottom: 12px; padding: 10px 12px; border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; background: rgba(255,255,255,0.02); transition: border-color var(--motion-medium) var(--ease-soft), box-shadow var(--motion-medium) var(--ease-soft), background-color var(--motion-medium) var(--ease-soft), opacity var(--motion-medium) var(--ease-soft); }
+.doc-focus-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+.doc-focus-pill { display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(255,255,255,0.08); border-radius: 999px; padding: 6px 10px; font-size: 0.82rem; color: var(--muted); background: rgba(255,255,255,0.02); transition: border-color var(--motion-fast) var(--ease-soft), box-shadow var(--motion-medium) var(--ease-soft), background-color var(--motion-medium) var(--ease-soft), color var(--motion-fast) var(--ease-soft), opacity var(--motion-medium) var(--ease-soft); }
+.doc-focus-pill.active { color: var(--text); border-color: rgba(124, 196, 255, 0.26); box-shadow: 0 0 14px rgba(124, 196, 255, 0.05); }
+.doc-context-note { color: var(--muted); font-size: 0.84rem; }
 .documents-body { max-height: 48vh; overflow: auto; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px; transition: border-color var(--motion-medium) var(--ease-soft), opacity var(--motion-medium) var(--ease-soft); }
+.doc-pre { line-height: 1.55; }
+.doc-highlight { background: rgba(124, 196, 255, 0.14); color: inherit; border-radius: 4px; padding: 0 1px; box-shadow: 0 0 0 1px rgba(124, 196, 255, 0.1); transition: background-color var(--motion-medium) var(--ease-soft), box-shadow var(--motion-medium) var(--ease-soft), opacity var(--motion-medium) var(--ease-soft); }
 .repo-section { border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px; }
 .repo-textarea { width: 100%; min-height: 180px; resize: vertical; border: 1px solid var(--line); background: rgba(255,255,255,0.03); color: var(--text); border-radius: 12px; padding: 12px; transition: border-color var(--motion-fast) var(--ease-soft), box-shadow var(--motion-medium) var(--ease-soft), background-color var(--motion-medium) var(--ease-soft); }
 .repo-textarea:focus { outline: none; border-color: rgba(124, 196, 255, 0.45); box-shadow: 0 0 0 1px rgba(124, 196, 255, 0.2), 0 0 18px rgba(124, 196, 255, 0.08); }
