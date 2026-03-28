@@ -7,6 +7,7 @@ Purpose: this is the current working plan for the next GUI/workbench rebuild.
 Authority:
 - if anything here conflicts with `10_SCOPE_LOCK_PIPELINE.md`, the scope lock wins
 - `20_WORKING_BOARD.md` now serves as **memory/reference material**, not as the primary plan
+- `22_PRODUCT_OPERATING_MAP.md` now holds the **whole-product layer map** so feature work does not drift into isolated additions
 
 ---
 
@@ -169,14 +170,21 @@ That means:
    - add filters
    - add richer repo-edit flows
 
+5. After the first formal lens layer:
+   - refine **Evidence lens**
+   - add **filters** as clutter control only
+   - strengthen **source ↔ structure ↔ narrative** correspondence hints carefully
+   - only then add richer mutation/edit flows
+
 ---
 
 ## 9) How to use this file
 
 - use this as the current next-build plan
 - use `20_WORKING_BOARD.md` to mine old ideas, not to decide structural truth
+- use `22_PRODUCT_OPERATING_MAP.md` to keep the whole product readable as one system
 - any new GUI/UX notes should extend this direction, not reset back into the old shell
 
 ---
 
-Last updated: 2026-03-28
+Last updated: 2026-03-29
