@@ -20,7 +20,8 @@ export function renderContextPanel(container, state) {
   container.innerHTML = `
     <h2>Context Panel</h2>
     ${renderInteractionStatus(bundle, state, trace)}
-    ${focusTarget ? renderTargetDetails(bundle, focusTarget, traceTarget, trace, selection) : renderOverview(bundle, encoding)}
+    ${traceTarget ? renderProcessFlow(trace) : ''}
+    ${focusTarget ? renderTargetDetails(bundle, focusTarget, selection, pinned, traceTarget, trace) : renderOverview(bundle, encoding)}
   `;
 }
 
@@ -35,7 +36,7 @@ function renderInteractionStatus(bundle, state, trace) {
       <div class="detail-row"><span>Inspect</span><strong>${escapeHtml(selection ? targetLabel(bundle, selection) : 'None')}</strong></div>
       <div class="detail-row"><span>Pin</span><strong>${escapeHtml(pinned ? targetLabel(bundle, pinned) : 'None')}</strong></div>
       <div class="detail-row"><span>Trace</span><strong>${escapeHtml(traceTarget ? targetLabel(bundle, traceTarget) : 'Off')}</strong></div>
-      ${traceTarget ? `<p>Trace reaches ${escapeHtml(trace.counts.moments)} moment(s), ${escapeHtml(trace.counts.entities)} entit${trace.counts.entities === 1 ? 'y' : 'ies'}, and ${escapeHtml(trace.counts.events)} event(s).</p>` : '<p>Inspect a target, then pin or trace it explicitly.</p>'}
+      ${traceTarget ? `<p>Process trace currently spans ${escapeHtml(trace.counts.moments)} moment(s), ${escapeHtml(trace.counts.entities)} entit${trace.counts.entities === 1 ? 'y' : 'ies'}, and ${escapeHtml(trace.counts.events)} event(s).</p>` : '<p>Inspect a target, then pin or trace it explicitly.</p>'}
       ${renderInteractionActions(selection, pinned, traceTarget)}
     </div>
   `;
@@ -83,6 +84,28 @@ function renderTraceAction(target, traceTarget, labelText) {
   `;
 }
 
+function renderProcessFlow(trace) {
+  return `
+    <div class="context-section">
+      <div class="eyebrow">Process flow</div>
+      <div class="timeline-list">
+        ${trace.flow.length
+          ? trace.flow
+              .map(
+                (item) => `
+                  <div class="timeline-list-item${item.isAnchor ? ' flow-anchor' : ''}">
+                    <strong>${escapeHtml(item.label)}</strong>
+                    <span>${escapeHtml(item.isAnchor ? 'trace anchor' : 'process continuation')}</span>
+                  </div>
+                `,
+              )
+              .join('')
+          : '<span class="muted">No process flow is currently traced.</span>'}
+      </div>
+    </div>
+  `;
+}
+
 function renderOverview(bundle, encoding) {
   const steps = Array.isArray(encoding?.timeline) ? encoding.timeline.length : 0;
   const participants = Array.isArray(encoding?.participants) ? encoding.participants.length : 0;
@@ -109,8 +132,8 @@ function renderOverview(bundle, encoding) {
   `;
 }
 
-function renderTargetDetails(bundle, target, traceTarget, trace, selection) {
-  const prefix = sameTarget(target, selection) ? 'Inspect' : sameTarget(target, bundle?.pinned) ? 'Pinned' : 'Focus';
+function renderTargetDetails(bundle, target, selection, pinned, traceTarget, trace) {
+  const prefix = sameTarget(target, selection) ? 'Inspect' : sameTarget(target, pinned) ? 'Pinned' : 'Focus';
 
   if (target.type === 'moment') {
     return renderMomentDetails(bundle, target, traceTarget, trace, prefix);
@@ -138,7 +161,7 @@ function renderMomentDetails(bundle, target, traceTarget, trace, prefix) {
     <div class="context-section">
       <div class="eyebrow">${escapeHtml(prefix)} moment</div>
       <h3>${escapeHtml(step?.timestep_label || `Step ${stepIndex + 1}`)}</h3>
-      ${sameTarget(target, traceTarget) ? `<p>Trace currently expands from this moment into ${escapeHtml(trace.counts.entities)} entities and ${escapeHtml(trace.counts.events)} events.</p>` : ''}
+      ${sameTarget(target, traceTarget) ? `<p>Process trace expands from this moment across ${escapeHtml(trace.counts.moments)} total moment(s).</p>` : ''}
     </div>
     <div class="context-section">
       <div class="detail-row"><span>Participants</span><strong>${escapeHtml(participantIds.length)}</strong></div>
@@ -166,7 +189,7 @@ function renderEntityDetails(bundle, target, traceTarget, trace, prefix) {
     <div class="context-section">
       <div class="eyebrow">${escapeHtml(prefix)} entity</div>
       <h3>${escapeHtml(label(participantId))}</h3>
-      <p>Appears in ${escapeHtml(appearances.length)} moment(s). ${sameTarget(target, traceTarget) ? `Trace reaches ${escapeHtml(trace.counts.events)} linked event(s).` : ''}</p>
+      <p>Appears in ${escapeHtml(appearances.length)} moment(s). ${sameTarget(target, traceTarget) ? `Process trace follows its timeline across ${escapeHtml(trace.counts.moments)} traced moment(s).` : ''}</p>
     </div>
     <div class="context-section">
       <div class="eyebrow">Moments</div>
@@ -195,7 +218,7 @@ function renderEventDetails(bundle, target, traceTarget, trace, prefix) {
     <div class="context-section">
       <div class="eyebrow">${escapeHtml(prefix)} event</div>
       <h3>${escapeHtml(source && receiving ? `${source} → ${receiving}` : 'Payload event')}</h3>
-      ${sameTarget(target, traceTarget) ? `<p>Trace currently follows this event through ${escapeHtml(trace.counts.entities)} entity endpoint(s).</p>` : ''}
+      ${sameTarget(target, traceTarget) ? `<p>Process trace follows this event through ${escapeHtml(trace.counts.moments)} moment(s) in the current flow.</p>` : ''}
     </div>
     <div class="context-section">
       <div class="detail-row"><span>Axis</span><strong>${escapeHtml(label(event?.axis || 'unknown'))}</strong></div>

@@ -89,7 +89,7 @@ function render() {
 
   els.currentTitle.textContent = bundle?.identity?.title || 'Product Workbench';
   els.currentSlug.textContent = bundle?.identity?.slug || 'No case open';
-  els.currentMode.textContent = state.trace?.enabled ? `Mode: ${mode} + trace` : `Mode: ${mode}`;
+  els.currentMode.textContent = state.trace?.enabled ? `Mode: ${mode} + process trace` : `Mode: ${mode}`;
 
   renderCaseList(state);
   renderSpecifiedView(els.mapView, state);

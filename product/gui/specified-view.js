@@ -42,17 +42,29 @@ export function renderSpecifiedView(container, state) {
       </div>
     </div>
 
+    ${traceTarget ? `
+      <div class="flow-strip">
+        <div class="eyebrow">Process flow</div>
+        <div class="flow-pill-row">
+          ${trace.flow.length
+            ? trace.flow.map((item) => `<span class="flow-pill${item.isAnchor ? ' anchor' : ''}">${escapeHtml(item.label)}</span>`).join('')
+            : '<span class="muted">No traced process flow yet.</span>'}
+        </div>
+      </div>
+    ` : ''}
+
     <div class="moment-grid">
       ${steps.map((step, stepIndex) => {
         const momentTarget = { type: 'moment', id: String(stepIndex) };
         const isSelected = sameTarget(selected, momentTarget);
         const isPinned = sameTarget(pinned, momentTarget);
         const isTraced = trace.moments.has(String(stepIndex));
+        const isAnchor = trace.anchorMoment === stepIndex;
         const participantIds = Object.keys(step?.participants || {});
         const stepEvents = eventsForStep(events, stepIndex);
 
         return `
-          <section class="moment-card${isSelected ? ' active' : ''}${isPinned ? ' pinned' : ''}${isTraced ? ' traced' : ''}">
+          <section class="moment-card${isSelected ? ' active' : ''}${isPinned ? ' pinned' : ''}${isTraced ? ' traced' : ''}${isAnchor ? ' flow-anchor' : ''}">
             <div class="moment-head">
               <button class="moment-title" type="button" data-select-type="moment" data-select-id="${stepIndex}">
                 ${escapeHtml(step?.timestep_label || `Step ${stepIndex + 1}`)}

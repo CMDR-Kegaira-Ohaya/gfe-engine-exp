@@ -35,26 +35,27 @@ export function targetLabel(bundle, target) {
 
 export function buildTraceIndex(bundle, target) {
   const encoding = bundle?.structure;
+  const steps = Array.isArray(encoding?.timeline) ? encoding.timeline : [];
+  const eventRefs = enumerateEventRefs(Array.isArray(encoding?.payload_events) ? encoding.payload_events : []);
   const result = {
     target,
     moments: new Set(),
     entities: new Set(),
     events: new Set(),
+    anchorMoment: null,
   };
 
   if (!encoding || !target) {
-    return finalizeTrace(result);
+    return finalizeTrace(result, steps);
   }
-
-  const steps = Array.isArray(encoding.timeline) ? encoding.timeline : [];
-  const eventRefs = enumerateEventRefs(Array.isArray(encoding.payload_events) ? encoding.payload_events : []);
 
   if (target.type === 'moment') {
     const stepIndex = Number(target.id);
     const step = steps[stepIndex];
     if (step) {
+      result.anchorMoment = stepIndex;
       result.moments.add(String(stepIndex));
-      Object.keys(step.participants || {}).forEach((participantId) => result.entities.add(String(participantId)));
+      Object.keys(step.participants || {}).forEach((participantId) => addEntityProcess(result, participantId, steps, eventRefs));
       eventRefs
         .filter((eventRef) => eventRef.stepIndex === stepIndex)
         .forEach((eventRef) => addEventRefToTrace(result, eventRef));
@@ -62,35 +63,35 @@ export function buildTraceIndex(bundle, target) {
   }
 
   if (target.type === 'entity') {
-    const participantId = String(target.id);
-    result.entities.add(participantId);
-
-    steps.forEach((step, stepIndex) => {
-      if (step?.participants?.[participantId]) {
-        result.moments.add(String(stepIndex));
-      }
-    });
-
-    eventRefs.forEach((eventRef) => {
-      if (eventParticipants(eventRef.event).has(participantId)) {
-        addEventRefToTrace(result, eventRef);
-      }
-    });
+    addEntityProcess(result, String(target.id), steps, eventRefs);
   }
 
   if (target.type === 'event') {
     const eventRef = eventRefs.find((entry) => entry.id === String(target.id));
     if (eventRef) {
+      result.anchorMoment = eventRef.stepIndex;
       addEventRefToTrace(result, eventRef);
+      eventParticipants(eventRef.event).forEach((participantId) => addEntityProcess(result, participantId, steps, eventRefs));
     }
   }
 
-  return finalizeTrace(result);
+  return finalizeTrace(result, steps);
 }
 
-function finalizeTrace(result) {
+function finalizeTrace(result, steps) {
+  const orderedMoments = Array.from(result.moments)
+    .map((value) => Number(value))
+    .filter((value) => Number.isFinite(value))
+    .sort((left, right) => left - right);
+
   return {
     ...result,
+    orderedMoments,
+    flow: orderedMoments.map((stepIndex) => ({
+      stepIndex,
+      label: steps?.[stepIndex]?.timestep_label || `Step ${stepIndex + 1}`,
+      isAnchor: result.anchorMoment === stepIndex,
+    })),
     counts: {
       moments: result.moments.size,
       entities: result.entities.size,
@@ -99,10 +100,36 @@ function finalizeTrace(result) {
   };
 }
 
+function addEntityProcess(result, participantId, steps, eventRefs) {
+  const normalized = String(participantId);
+  result.entities.add(normalized);
+
+  steps.forEach((step, stepIndex) => {
+    if (step?.participants?.[normalized]) {
+      result.moments.add(String(stepIndex));
+    }
+  });
+
+  eventRefs.forEach((eventRef) => {
+    if (eventParticipants(eventRef.event).has(normalized)) {
+      addEventRefToTrace(result, eventRef);
+    }
+  });
+
+  if (result.anchorMoment === null) {
+    result.anchorMoment = result.orderedMoments?.[0] ?? findFirstMomentForEntity(steps, normalized);
+  }
+}
+
+function findFirstMomentForEntity(steps, participantId) {
+  const foundIndex = steps.findIndex((step) => step?.participants?.[participantId]);
+  return foundIndex >= 0 ? foundIndex : null;
+}
+
 function addEventRefToTrace(result, eventRef) {
   result.events.add(eventRef.id);
   result.moments.add(String(eventRef.stepIndex));
-  eventParticipants(eventRef.event).forEach((participantId) => result.entities.add(participantId));
+  eventParticipants(eventRef.event).forEach((participantId) => result.entities.add(String(participantId)));
 }
 
 function enumerateEventRefs(events) {
