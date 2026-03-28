@@ -63,7 +63,9 @@ textarea { font: inherit; }
 .documents-head, .repo-head { display: flex; justify-content: space-between; gap: 12px; align-items: end; margin-bottom: 12px; }
 .doc-tabs { display: flex; gap: 8px; }
 .documents-body { max-height: 48vh; overflow: auto; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px; }
+.repo-section { border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px; }
 .repo-textarea { width: 100%; min-height: 180px; resize: vertical; border: 1px solid var(--line); background: rgba(255,255,255,0.03); color: var(--text); border-radius: 12px; padding: 12px; }
+.repo-textarea-large { min-height: 240px; }
 .repo-actions { display: flex; justify-content: flex-end; margin-top: 16px; }
 .repo-save-button[disabled] { opacity: 0.6; cursor: default; }
 

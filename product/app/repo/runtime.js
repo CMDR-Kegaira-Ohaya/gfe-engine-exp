@@ -1,6 +1,7 @@
 import { createRepoConnector } from './connector.js';
 
 const LOCAL_NOTE_KEY = 'gfe.product.workbench-note';
+const LOCAL_CASE_PREFIX = 'gfe.product.case-source.';
 const NOTE_TEMPLATE_PATH = './assets/notes/workbench-note.md';
 
 export function resolveRuntimeRepoConnector() {
@@ -56,6 +57,21 @@ export async function loadInitialProductNote() {
   }
 }
 
+export async function loadInitialCaseSource(slug, fallbackText) {
+  const local = readLocalCaseSource(slug);
+  if (local !== null) {
+    return {
+      text: local,
+      source: 'local-draft',
+    };
+  }
+
+  return {
+    text: String(fallbackText ?? ''),
+    source: 'bundle',
+  };
+}
+
 export function storeLocalProductNote(text) {
   try {
     window.localStorage.setItem(LOCAL_NOTE_KEY, String(text ?? ''));
@@ -64,9 +80,29 @@ export function storeLocalProductNote(text) {
   }
 }
 
+export function storeLocalCaseSource(slug, text) {
+  if (!slug) return;
+
+  try {
+    window.localStorage.setItem(`${LOCAL_CASE_PREFIX}${slug}`, String(text ?? ''));
+  } catch {
+    // local storage is optional; ignore failures
+  }
+}
+
 function readLocalProductNote() {
   try {
     return window.localStorage.getItem(LOCAL_NOTE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function readLocalCaseSource(slug) {
+  if (!slug) return null;
+
+  try {
+    return window.localStorage.getItem(`${LOCAL_CASE_PREFIX}${slug}`);
   } catch {
     return null;
   }

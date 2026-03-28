@@ -5,8 +5,15 @@ import { renderSpecifiedView } from '../gui/specified-view.js';
 import { renderContextPanel } from '../gui/context-panel.js';
 import { renderDocumentsPanel } from '../gui/documents-panel.js';
 import { renderRepoPanel } from '../gui/repo-panel.js';
-import { resolveRuntimeRepoConnector, loadInitialProductNote, storeLocalProductNote } from './repo/runtime.js';
+import {
+  resolveRuntimeRepoConnector,
+  loadInitialProductNote,
+  storeLocalProductNote,
+  loadInitialCaseSource,
+  storeLocalCaseSource,
+} from './repo/runtime.js';
 import { upsertProductFile } from './repo/commands/upsert-product-file.js';
+import { upsertCaseSource } from './repo/commands/upsert-case-source.js';
 
 const PRODUCT_NOTE_PATH = 'product/assets/notes/workbench-note.md';
 
@@ -22,13 +29,25 @@ const store = createStore({
   activeDocument: 'source',
   noteDraft: '',
   noteSource: 'template',
+  caseSourceDraft: '',
+  caseSourceSource: 'bundle',
   repoBridge: {
     mode: repoRuntime.mode,
-    message: repoRuntime.message,
-    targetPath: PRODUCT_NOTE_PATH,
-    saving: false,
-    lastSavedAt: null,
-    lastSavedSha: null,
+    globalMessage: repoRuntime.message,
+    productNote: {
+      targetPath: PRODUCT_NOTE_PATH,
+      saving: false,
+      lastSavedAt: null,
+      lastSavedSha: null,
+      message: repoRuntime.message,
+    },
+    caseSource: {
+      targetPath: null,
+      saving: false,
+      lastSavedAt: null,
+      lastSavedSha: null,
+      message: 'No case source draft loaded yet.',
+    },
   },
 });
 
@@ -79,11 +98,32 @@ async function openCase(slug) {
 
   try {
     const bundle = await loadCaseBundle(slug, store.getState().cases);
+    const caseDraft = await loadInitialCaseSource(slug, bundle.source?.text || '');
+    const repoBridge = store.getState().repoBridge;
+
     store.setState({
       slug,
-      bundle,
+      bundle: {
+        ...bundle,
+        source: {
+          ...bundle.source,
+          text: caseDraft.text,
+        },
+      },
       selection: null,
       activeDocument: bundle.status.artifacts.source ? 'source' : 'narrative',
+      caseSourceDraft: caseDraft.text,
+      caseSourceSource: caseDraft.source,
+      repoBridge: {
+        ...repoBridge,
+        caseSource: {
+          targetPath: `cases/${slug}/source/case.md`,
+          saving: false,
+          lastSavedAt: null,
+          lastSavedSha: null,
+          message: `Case source draft loaded from ${caseDraft.source}.`,
+        },
+      },
     });
 
     const url = new URL(window.location.href);
@@ -103,30 +143,36 @@ async function saveProductNote() {
   store.setState({
     repoBridge: {
       ...currentBridge,
-      saving: true,
-      message: repoRuntime.connector
-        ? 'Saving product-local note to repo…'
-        : 'No repo connector attached. Saving draft locally only…',
+      productNote: {
+        ...currentBridge.productNote,
+        saving: true,
+        message: repoRuntime.connector
+          ? 'Saving product-local note to repo…'
+          : 'No repo connector attached. Saving draft locally only…',
+      },
     },
   });
 
   if (!repoRuntime.connector) {
     storeLocalProductNote(state.noteDraft);
     store.setState({
+      noteSource: 'local-draft',
       repoBridge: {
         ...store.getState().repoBridge,
-        saving: false,
-        lastSavedAt: new Date().toISOString(),
-        message: 'No repo connector attached. Draft saved locally only.',
+        productNote: {
+          ...store.getState().repoBridge.productNote,
+          saving: false,
+          lastSavedAt: new Date().toISOString(),
+          message: 'No repo connector attached. Draft saved locally only.',
+        },
       },
-      noteSource: 'local-draft',
     });
     return;
   }
 
   try {
     const result = await upsertProductFile(repoRuntime.connector, {
-      path: currentBridge.targetPath,
+      path: currentBridge.productNote.targetPath,
       content: state.noteDraft,
       message: 'Update product workbench note',
       branch: 'main',
@@ -134,25 +180,126 @@ async function saveProductNote() {
 
     storeLocalProductNote(state.noteDraft);
     store.setState({
+      noteSource: 'repo-saved-draft',
       repoBridge: {
         ...store.getState().repoBridge,
-        saving: false,
-        lastSavedAt: new Date().toISOString(),
-        lastSavedSha: result.sha,
-        message: `Saved product note to ${result.path}.`,
+        productNote: {
+          ...store.getState().repoBridge.productNote,
+          saving: false,
+          lastSavedAt: new Date().toISOString(),
+          lastSavedSha: result.sha,
+          message: `Saved product note to ${result.path}.`,
+        },
       },
-      noteSource: 'local-draft',
     });
   } catch (error) {
     storeLocalProductNote(state.noteDraft);
     store.setState({
+      noteSource: 'local-draft',
       repoBridge: {
         ...store.getState().repoBridge,
-        saving: false,
-        lastSavedAt: new Date().toISOString(),
-        message: `Repo save failed: ${error.message}. Draft preserved locally only.`,
+        productNote: {
+          ...store.getState().repoBridge.productNote,
+          saving: false,
+          lastSavedAt: new Date().toISOString(),
+          message: `Repo save failed: ${error.message}. Draft preserved locally only.`,
+        },
       },
-      noteSource: 'local-draft',
+    });
+  }
+}
+
+async function saveControlledCaseSource() {
+  const state = store.getState();
+  if (!state.slug) return;
+
+  const currentBridge = state.repoBridge;
+  store.setState({
+    repoBridge: {
+      ...currentBridge,
+      caseSource: {
+        ...currentBridge.caseSource,
+        saving: true,
+        message: repoRuntime.connector
+          ? 'Saving controlled case source to repo…'
+          : 'No repo connector attached. Saving controlled draft locally only…',
+      },
+    },
+  });
+
+  if (!repoRuntime.connector) {
+    storeLocalCaseSource(state.slug, state.caseSourceDraft);
+    store.setState({
+      caseSourceSource: 'local-draft',
+      bundle: {
+        ...state.bundle,
+        source: {
+          ...state.bundle.source,
+          text: state.caseSourceDraft,
+        },
+      },
+      repoBridge: {
+        ...store.getState().repoBridge,
+        caseSource: {
+          ...store.getState().repoBridge.caseSource,
+          saving: false,
+          lastSavedAt: new Date().toISOString(),
+          message: 'No repo connector attached. Controlled case draft saved locally only.',
+        },
+      },
+    });
+    return;
+  }
+
+  try {
+    const result = await upsertCaseSource(repoRuntime.connector, {
+      slug: state.slug,
+      content: state.caseSourceDraft,
+      message: `Update case source for ${state.slug} from product workbench`,
+      branch: 'main',
+    });
+
+    storeLocalCaseSource(state.slug, state.caseSourceDraft);
+    store.setState({
+      caseSourceSource: 'repo-saved-draft',
+      bundle: {
+        ...state.bundle,
+        source: {
+          ...state.bundle.source,
+          text: state.caseSourceDraft,
+        },
+      },
+      repoBridge: {
+        ...store.getState().repoBridge,
+        caseSource: {
+          ...store.getState().repoBridge.caseSource,
+          saving: false,
+          lastSavedAt: new Date().toISOString(),
+          lastSavedSha: result.sha,
+          message: `Saved controlled case source to ${result.path}.`,
+        },
+      },
+    });
+  } catch (error) {
+    storeLocalCaseSource(state.slug, state.caseSourceDraft);
+    store.setState({
+      caseSourceSource: 'local-draft',
+      bundle: {
+        ...state.bundle,
+        source: {
+          ...state.bundle.source,
+          text: state.caseSourceDraft,
+        },
+      },
+      repoBridge: {
+        ...store.getState().repoBridge,
+        caseSource: {
+          ...store.getState().repoBridge.caseSource,
+          saving: false,
+          lastSavedAt: new Date().toISOString(),
+          message: `Controlled repo save failed: ${error.message}. Draft preserved locally only.`,
+        },
+      },
     });
   }
 }
@@ -185,6 +332,11 @@ function bind() {
     const repoAction = event.target.closest('[data-repo-action]');
     if (repoAction?.dataset.repoAction === 'save-product-note') {
       await saveProductNote();
+      return;
+    }
+
+    if (repoAction?.dataset.repoAction === 'save-case-source') {
+      await saveControlledCaseSource();
     }
   });
 
@@ -192,6 +344,12 @@ function bind() {
     const noteInput = event.target.closest('[data-repo-note-input]');
     if (noteInput) {
       store.setState({ noteDraft: noteInput.value });
+      return;
+    }
+
+    const caseInput = event.target.closest('[data-case-source-input]');
+    if (caseInput) {
+      store.setState({ caseSourceDraft: caseInput.value });
     }
   });
 }
@@ -208,7 +366,10 @@ async function init() {
       noteSource: note.source,
       repoBridge: {
         ...store.getState().repoBridge,
-        message: `${repoRuntime.message} Draft source: ${note.source}.`,
+        productNote: {
+          ...store.getState().repoBridge.productNote,
+          message: `${repoRuntime.message} Product note source: ${note.source}.`,
+        },
       },
     });
 
