@@ -67,6 +67,15 @@
 │   └── spec_v15_7.md
 ├── product/
 │   ├── app/
+│   │   ├── repo/
+│   │   │   ├── commands/
+│   │   │   │   ├── save-case-source.js
+│   │   │   │   └── save-product-file.js
+│   │   │   ├── connector.js
+│   │   │   ├── guardrails.js
+│   │   │   ├── README.md
+│   │   │   ├── repo-profile.js
+│   │   │   └── verify.js
 │   │   ├── boot.js
 │   │   ├── case-bundle.js
 │   │   ├── cases-index.json
@@ -83,7 +92,8 @@
 │   │   ├── specified-view.js
 │   │   └── styles.css
 │   ├── workflows/
-│   │   └── README.md
+│   │   ├── README.md
+│   │   └── REPO_INTEGRATION.md
 │   ├── index.html
 │   └── README.md
 ├── scripts/
