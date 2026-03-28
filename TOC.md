@@ -84,6 +84,7 @@
 │   │   ├── cases-index.json
 │   │   ├── helpers.js
 │   │   ├── interaction-state.js
+│   │   ├── lenses.js
 │   │   ├── README.md
 │   │   ├── shell.js
 │   │   └── store.js
