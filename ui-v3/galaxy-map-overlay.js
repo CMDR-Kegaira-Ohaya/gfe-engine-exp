@@ -1,14 +1,19 @@
 // Workbench v3: Galaxy Map overlay (cases as stars).
-// UI-only glue: reads catalog, renders stars, opens cases via existing left-panel click targets.
+// UX contract: one viewport, step-zoom navigation (Galaxy -> System).
+// - Galaxy is a distinct mode (body.gfe-galaxy-mode) so it feels like a different page.
+// - Click star = inspect (in-viewport focus card).
+// - Double-click star = open case (delegates to existing left-panel [data-slug] button).
+//
+// UI-only: does not touch engine/solver.
 
 (function () {
   const $ = (sel) => document.querySelector(sel);
 
+  const MODE_CLASS = "gfe-galaxy-mode";
+
   const els = {
     tabs: $("#tabs"),
     tabContent: $("#tab-content"),
-    focusTitle: null,
-    focusMeta: null,
   };
 
   let catalogCases = null;
@@ -27,6 +32,12 @@
     return $("#tabs .tab-btn.active")?.dataset?.tab ?? null;
   }
 
+  function syncModeClass() {
+    const isGalaxy = getActiveTab() === "galaxy";
+    document.body.classList.toggle(MODE_CLASS, isGalaxy);
+  }
+
+  // Deterministic hash for stable star positions
   function fnv1a(str) {
     let h = 2166136261;
     for (let i = 0; i < str.length; i += 1) {
@@ -66,7 +77,7 @@
 
   function renderGalaxyShell(cases) {
     const focusEntry = selectedSlug ? getCaseBySlug(selectedSlug) : null;
-    const focusTitle = focusEntry ? focusEntry.title : "Galaxy";
+    const focusTitle = focusEntry ? focusEntry.title || focusEntry.slug : "Galaxy";
     const focusMeta = focusEntry
       ? `${focusEntry.slug} · ${focusEntry.timesteps ?? 0} steps · ${focusEntry.participants ?? 0} participants`
       : "Click a star to inspect. Double‑click to open a case (zoom to System).";
@@ -146,7 +157,6 @@
 
   function openCase(slug) {
     if (!slug) return false;
-    // The left panel renders canonical cases as buttons with [data-slug].
     const btn = document.querySelector(`[data-slug="${CSS.escape(slug)}"]`);
     if (!btn) return false;
     try {
@@ -172,9 +182,9 @@
     markSelectedStar();
     updateFocusUI();
 
-    // Attempt open immediately; if list not ready, retry briefly.
     if (openCase(slug)) return;
 
+    // If the left catalog list isn't ready yet, retry briefly.
     let tries = 0;
     const t = setInterval(() => {
       tries += 1;
@@ -184,6 +194,10 @@
 
   async function ensureGalaxyCurrent() {
     if (!els.tabContent) return;
+
+    // Keep mode class in sync even if the tab changed.
+    syncModeClass();
+
     if (getActiveTab() !== "galaxy") return;
 
     // If already rendered, just refresh focus UI and selection.
@@ -212,10 +226,15 @@
   function bind() {
     if (!els.tabContent) return;
 
-    // Restore when tabs change.
-    els.tabs?.addEventListener("click", () => requestAnimationFrame(() => ensureGalaxyCurrent()));
+    // Whenever tabs change, sync the mode class and (if Galaxy) ensure it is rendered.
+    els.tabs?.addEventListener("click", () =>
+      requestAnimationFrame(() => {
+        syncModeClass();
+        ensureGalaxyCurrent();
+      })
+    );
 
-    // Restore if app.js overwrites tab content while Galaxy is active.
+    // If app.js overwrites tab content while Galaxy is active, put Galaxy back.
     const contentMo = new MutationObserver(() => requestAnimationFrame(() => ensureGalaxyCurrent()));
     contentMo.observe(els.tabContent, { childList: true, subtree: false });
 
