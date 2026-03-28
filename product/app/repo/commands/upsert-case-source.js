@@ -1,7 +1,7 @@
 import { saveCaseSource } from './save-case-source.js';
 
 export async function upsertCaseSource(connector, input) {
-  const path = `cases/${input.slug}/source/case.md`;
+  const path = input.path || `cases/${input.slug}/source/case.md`;
   let sha = input.sha || null;
 
   if (!sha) {
@@ -20,6 +20,7 @@ export async function upsertCaseSource(connector, input) {
 
   return saveCaseSource(connector, {
     ...input,
+    path,
     ...(sha ? { sha } : {}),
   });
 }

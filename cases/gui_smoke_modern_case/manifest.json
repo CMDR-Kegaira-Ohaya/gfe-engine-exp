@@ -2,8 +2,5 @@
   "case_id": "gui_smoke_modern_case",
   "title": "GUI smoke modern case",
   "slug": "gui_smoke_modern_case",
-  "summary": "Smoke case with source, encoding, and reading.",
-  "current_case_source": "./source/case.md",
-  "current_encoding": "./revisions/rev_smoke_v1/encoding.json",
-  "current_narrative": "./readings/current_model_reading.md"
+  "current_case_source": "./source/case.md"
 }

@@ -3,9 +3,9 @@ import { encodeUtf8ToBase64 } from '../connector.js';
 import { verifyWriteResult } from '../verify.js';
 
 export async function saveCaseSource(connector, input) {
-  const { slug, content, message, branch = 'main', sha } = input;
-  const path = `cases/${slug}/source/case.md`;
-  const checked = assertControlledCasePath(path);
+  const { slug, path, content, message, branch = 'main', sha } = input;
+  const targetPath = path || `cases/${slug}/source/case.md`;
+  const checked = assertControlledCasePath(targetPath);
 
   const result = await connector.saveFile({
     path: checked.path,

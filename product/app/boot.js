@@ -100,6 +100,7 @@ async function openCase(slug) {
     const bundle = await loadCaseBundle(slug, store.getState().cases);
     const caseDraft = await loadInitialCaseSource(slug, bundle.source?.text || '');
     const repoBridge = store.getState().repoBridge;
+    const sourceTargetPath = bundle.repoPaths?.source || `cases/${slug}/source/case.md`;
 
     store.setState({
       slug,
@@ -117,7 +118,7 @@ async function openCase(slug) {
       repoBridge: {
         ...repoBridge,
         caseSource: {
-          targetPath: `cases/${slug}/source/case.md`,
+          targetPath: sourceTargetPath,
           saving: false,
           lastSavedAt: null,
           lastSavedSha: null,
@@ -214,11 +215,14 @@ async function saveControlledCaseSource() {
   if (!state.slug) return;
 
   const currentBridge = state.repoBridge;
+  const targetPath = currentBridge.caseSource.targetPath || state.bundle?.repoPaths?.source || `cases/${state.slug}/source/case.md`;
+
   store.setState({
     repoBridge: {
       ...currentBridge,
       caseSource: {
         ...currentBridge.caseSource,
+        targetPath,
         saving: true,
         message: repoRuntime.connector
           ? 'Saving controlled case source to repo…'
@@ -242,6 +246,7 @@ async function saveControlledCaseSource() {
         ...store.getState().repoBridge,
         caseSource: {
           ...store.getState().repoBridge.caseSource,
+          targetPath,
           saving: false,
           lastSavedAt: new Date().toISOString(),
           message: 'No repo connector attached. Controlled case draft saved locally only.',
@@ -254,6 +259,7 @@ async function saveControlledCaseSource() {
   try {
     const result = await upsertCaseSource(repoRuntime.connector, {
       slug: state.slug,
+      path: targetPath,
       content: state.caseSourceDraft,
       message: `Update case source for ${state.slug} from product workbench`,
       branch: 'main',
@@ -273,6 +279,7 @@ async function saveControlledCaseSource() {
         ...store.getState().repoBridge,
         caseSource: {
           ...store.getState().repoBridge.caseSource,
+          targetPath,
           saving: false,
           lastSavedAt: new Date().toISOString(),
           lastSavedSha: result.sha,
@@ -295,6 +302,7 @@ async function saveControlledCaseSource() {
         ...store.getState().repoBridge,
         caseSource: {
           ...store.getState().repoBridge.caseSource,
+          targetPath,
           saving: false,
           lastSavedAt: new Date().toISOString(),
           message: `Controlled repo save failed: ${error.message}. Draft preserved locally only.`,

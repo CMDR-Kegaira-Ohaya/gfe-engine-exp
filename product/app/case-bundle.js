@@ -5,6 +5,7 @@ export async function loadCasesIndex() {
     catalog.map(async (entry) => {
       const manifest = await fetchJson(entry.manifestPath);
       const caseBaseUrl = new URL('./', new URL(entry.manifestPath, window.location.href));
+      const manifestRepoPath = repoPathFromCatalogPath(entry.manifestPath);
 
       return {
         slug: manifest.slug || manifest.case_id,
@@ -12,6 +13,18 @@ export async function loadCasesIndex() {
         summary: manifest.summary || 'Case bundle',
         manifest,
         manifestPath: entry.manifestPath,
+        repoPaths: {
+          manifest: manifestRepoPath,
+          source: manifest.current_case_source
+            ? resolveRepoRelativePath(manifestRepoPath, manifest.current_case_source)
+            : null,
+          encoding: manifest.current_encoding
+            ? resolveRepoRelativePath(manifestRepoPath, manifest.current_encoding)
+            : null,
+          narrative: manifest.current_narrative
+            ? resolveRepoRelativePath(manifestRepoPath, manifest.current_narrative)
+            : null,
+        },
         paths: {
           source: manifest.current_case_source
             ? new URL(manifest.current_case_source, caseBaseUrl).href
@@ -62,6 +75,7 @@ export async function loadCaseBundle(slug, entries) {
       },
     },
     manifest: entry.manifest,
+    repoPaths: entry.repoPaths,
     source: {
       text: sourceText,
     },
@@ -81,6 +95,16 @@ export async function loadCaseBundle(slug, entries) {
       sourceToNarrative: [],
     },
   };
+}
+
+function repoPathFromCatalogPath(path) {
+  return String(path || '').replace(/^\.\//, '').replace(/^\.\.\//, '');
+}
+
+function resolveRepoRelativePath(baseRepoPath, relativePath) {
+  const baseUrl = new URL(baseRepoPath, 'https://repo.local/');
+  const resolved = new URL(relativePath, baseUrl);
+  return resolved.pathname.replace(/^\//, '');
 }
 
 async function fetchJson(path) {
