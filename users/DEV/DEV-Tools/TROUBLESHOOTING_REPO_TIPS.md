@@ -17,6 +17,16 @@ Current core-protected areas:
 Current DEV/reference area:
 - `/users/DEV/`
 
+
+## Connector boundary rule
+
+Use Base64 for transport only. Decode once at the connector boundary. Do reasoning, comparison, summarization, and planning on plain UTF-8 text, Markdown, or JSON.
+
+Working rule:
+- avoid nested encodings or extra transport wrappers unless they are strictly necessary
+- when writing, prefer small surgical patches over large whole-file rewrites whenever the tooling allows it
+- connector Base64 is a transport concern, not a repo-format concern
+
 ## Known likely errors
 
 - `401 / `403`
