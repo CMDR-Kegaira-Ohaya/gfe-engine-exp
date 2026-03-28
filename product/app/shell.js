@@ -38,6 +38,7 @@ export function createShell(root) {
         <aside class="right-column">
           <section id="context-panel" class="panel context-panel"></section>
           <section id="documents-panel" class="panel documents-panel"></section>
+          <section id="repo-panel" class="panel repo-panel"></section>
         </aside>
       </main>
     </div>
@@ -52,5 +53,6 @@ export function createShell(root) {
     mapView: root.querySelector('#map-view'),
     contextPanel: root.querySelector('#context-panel'),
     documentsPanel: root.querySelector('#documents-panel'),
+    repoPanel: root.querySelector('#repo-panel'),
   };
 }

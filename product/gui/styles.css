@@ -19,6 +19,7 @@ html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--te
 body { padding: 20px; }
 button { cursor: pointer; font: inherit; }
 pre { margin: 0; white-space: pre-wrap; word-break: break-word; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+textarea { font: inherit; }
 
 .app-shell { display: grid; gap: 16px; }
 .layout { display: grid; grid-template-columns: 280px minmax(0, 1fr) 360px; gap: 16px; align-items: start; }
@@ -28,7 +29,7 @@ pre { margin: 0; white-space: pre-wrap; word-break: break-word; font-family: ui-
 .topbar { display: flex; justify-content: space-between; align-items: end; gap: 16px; padding: 16px; }
 .topbar h1 { margin: 4px 0 0; font-size: 1.5rem; }
 .topbar-meta { display: grid; gap: 6px; justify-items: end; }
-.panel-head, .current-strip, .map-view, .context-panel, .documents-panel { padding: 16px; }
+.panel-head, .current-strip, .map-view, .context-panel, .documents-panel, .repo-panel { padding: 16px; }
 .current-strip { display: flex; justify-content: space-between; align-items: end; gap: 12px; }
 .status-note { color: var(--muted); max-width: 28ch; text-align: right; }
 .eyebrow { color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.76rem; }
@@ -40,9 +41,9 @@ pre { margin: 0; white-space: pre-wrap; word-break: break-word; font-family: ui-
 .map-summary { display: flex; justify-content: space-between; gap: 16px; align-items: start; margin-bottom: 16px; }
 .map-summary h2 { margin: 4px 0 8px; }
 .summary-badges { display: flex; gap: 8px; flex-wrap: wrap; justify-content: end; }
-.badge, .artifact-pill { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 999px; padding: 6px 10px; font-size: 0.85rem; }
-.artifact-pill.present { color: var(--good); }
-.artifact-pill.missing { color: var(--bad); }
+.badge, .artifact-pill, .repo-mode-pill { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 999px; padding: 6px 10px; font-size: 0.85rem; }
+.artifact-pill.present, .repo-mode-pill.connected { color: var(--good); }
+.artifact-pill.missing, .repo-mode-pill.local { color: var(--bad); }
 .artifact-grid { display: flex; flex-wrap: wrap; gap: 8px; }
 .moment-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
 .moment-card { border: 1px solid var(--line); border-radius: 16px; padding: 14px; background: rgba(255,255,255,0.02); display: grid; gap: 14px; }
@@ -52,16 +53,19 @@ pre { margin: 0; white-space: pre-wrap; word-break: break-word; font-family: ui-
 .moment-subhead { font-size: 0.82rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
 .chip-row, .event-list, .timeline-list { display: grid; gap: 8px; }
 .chip { border: 1px solid var(--line); background: rgba(255,255,255,0.03); color: var(--text); border-radius: 999px; padding: 8px 10px; text-align: left; }
-.event-row, .doc-tab { border: 1px solid var(--line); background: rgba(255,255,255,0.03); color: var(--text); border-radius: 12px; padding: 10px 12px; text-align: left; }
-.case-card:hover, .moment-title:hover, .chip:hover, .event-row:hover, .doc-tab:hover, .doc-tab.active { border-color: var(--accent); color: var(--accent-strong); }
-.context-panel h2, .documents-panel h2 { margin: 0; }
+.event-row, .doc-tab, .repo-save-button { border: 1px solid var(--line); background: rgba(255,255,255,0.03); color: var(--text); border-radius: 12px; padding: 10px 12px; text-align: left; }
+.case-card:hover, .moment-title:hover, .chip:hover, .event-row:hover, .doc-tab:hover, .doc-tab.active, .repo-save-button:hover { border-color: var(--accent); color: var(--accent-strong); }
+.context-panel h2, .documents-panel h2, .repo-panel h2 { margin: 0; }
 .context-section { display: grid; gap: 10px; margin-top: 16px; }
 .context-section h3 { margin: 0; }
 .detail-row { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 8px; }
 .timeline-list-item { display: grid; gap: 4px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,0.02); }
-.documents-head { display: flex; justify-content: space-between; gap: 12px; align-items: end; margin-bottom: 12px; }
+.documents-head, .repo-head { display: flex; justify-content: space-between; gap: 12px; align-items: end; margin-bottom: 12px; }
 .doc-tabs { display: flex; gap: 8px; }
 .documents-body { max-height: 48vh; overflow: auto; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px; }
+.repo-textarea { width: 100%; min-height: 180px; resize: vertical; border: 1px solid var(--line); background: rgba(255,255,255,0.03); color: var(--text); border-radius: 12px; padding: 12px; }
+.repo-actions { display: flex; justify-content: flex-end; margin-top: 16px; }
+.repo-save-button[disabled] { opacity: 0.6; cursor: default; }
 
 @media (max-width: 1200px) {
   .layout { grid-template-columns: 1fr; }

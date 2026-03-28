@@ -4,9 +4,15 @@ import { loadCasesIndex, loadCaseBundle, resolveInitialSlug } from './case-bundl
 import { renderSpecifiedView } from '../gui/specified-view.js';
 import { renderContextPanel } from '../gui/context-panel.js';
 import { renderDocumentsPanel } from '../gui/documents-panel.js';
+import { renderRepoPanel } from '../gui/repo-panel.js';
+import { resolveRuntimeRepoConnector, loadInitialProductNote, storeLocalProductNote } from './repo/runtime.js';
+import { upsertProductFile } from './repo/commands/upsert-product-file.js';
+
+const PRODUCT_NOTE_PATH = 'product/assets/notes/workbench-note.md';
 
 const root = document.getElementById('app');
 const els = createShell(root);
+const repoRuntime = resolveRuntimeRepoConnector();
 
 const store = createStore({
   cases: [],
@@ -14,6 +20,16 @@ const store = createStore({
   bundle: null,
   selection: null,
   activeDocument: 'source',
+  noteDraft: '',
+  noteSource: 'template',
+  repoBridge: {
+    mode: repoRuntime.mode,
+    message: repoRuntime.message,
+    targetPath: PRODUCT_NOTE_PATH,
+    saving: false,
+    lastSavedAt: null,
+    lastSavedSha: null,
+  },
 });
 
 function setNotice(message) {
@@ -53,6 +69,7 @@ function render() {
   renderSpecifiedView(els.mapView, state);
   renderContextPanel(els.contextPanel, state);
   renderDocumentsPanel(els.documentsPanel, state);
+  renderRepoPanel(els.repoPanel, state);
 }
 
 async function openCase(slug) {
@@ -79,6 +96,67 @@ async function openCase(slug) {
   }
 }
 
+async function saveProductNote() {
+  const state = store.getState();
+  const currentBridge = state.repoBridge;
+
+  store.setState({
+    repoBridge: {
+      ...currentBridge,
+      saving: true,
+      message: repoRuntime.connector
+        ? 'Saving product-local note to repo…'
+        : 'No repo connector attached. Saving draft locally only…',
+    },
+  });
+
+  if (!repoRuntime.connector) {
+    storeLocalProductNote(state.noteDraft);
+    store.setState({
+      repoBridge: {
+        ...store.getState().repoBridge,
+        saving: false,
+        lastSavedAt: new Date().toISOString(),
+        message: 'No repo connector attached. Draft saved locally only.',
+      },
+      noteSource: 'local-draft',
+    });
+    return;
+  }
+
+  try {
+    const result = await upsertProductFile(repoRuntime.connector, {
+      path: currentBridge.targetPath,
+      content: state.noteDraft,
+      message: 'Update product workbench note',
+      branch: 'main',
+    });
+
+    storeLocalProductNote(state.noteDraft);
+    store.setState({
+      repoBridge: {
+        ...store.getState().repoBridge,
+        saving: false,
+        lastSavedAt: new Date().toISOString(),
+        lastSavedSha: result.sha,
+        message: `Saved product note to ${result.path}.`,
+      },
+      noteSource: 'local-draft',
+    });
+  } catch (error) {
+    storeLocalProductNote(state.noteDraft);
+    store.setState({
+      repoBridge: {
+        ...store.getState().repoBridge,
+        saving: false,
+        lastSavedAt: new Date().toISOString(),
+        message: `Repo save failed: ${error.message}. Draft preserved locally only.`,
+      },
+      noteSource: 'local-draft',
+    });
+  }
+}
+
 function bind() {
   document.addEventListener('click', async (event) => {
     const caseButton = event.target.closest('[data-case-slug]');
@@ -101,6 +179,19 @@ function bind() {
     const documentTab = event.target.closest('[data-document-tab]');
     if (documentTab) {
       store.setState({ activeDocument: documentTab.dataset.documentTab });
+      return;
+    }
+
+    const repoAction = event.target.closest('[data-repo-action]');
+    if (repoAction?.dataset.repoAction === 'save-product-note') {
+      await saveProductNote();
+    }
+  });
+
+  document.addEventListener('input', (event) => {
+    const noteInput = event.target.closest('[data-repo-note-input]');
+    if (noteInput) {
+      store.setState({ noteDraft: noteInput.value });
     }
   });
 }
@@ -111,6 +202,16 @@ async function init() {
   render();
 
   try {
+    const note = await loadInitialProductNote();
+    store.setState({
+      noteDraft: note.text,
+      noteSource: note.source,
+      repoBridge: {
+        ...store.getState().repoBridge,
+        message: `${repoRuntime.message} Draft source: ${note.source}.`,
+      },
+    });
+
     setNotice('Loading cases…');
     const cases = await loadCasesIndex();
     store.setState({ cases });
