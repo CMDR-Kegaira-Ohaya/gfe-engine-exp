@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GFE Experimental — Workbench</title>
+    <link rel="stylesheet" href="./ui-v3/styles.css">
+  </head>
+  <body>
+    <div id="app-shell">
+      <header class="topbar">
+        <div class="brand-block">
+          <div class="eyebrow">GFE Experimental</div>
+          <h1 id="current-case-title">Workbench v3</h1>
+        </div>
+        <div class="topbar-meta">
+          <div id="current-mode">Mode: structure</div>
+          <div id="notice">Loading catalog…</div>
+        </div>
+      </header>
+
+      <main class="layout">
+        <aside class="left-panel panel">
+          <div class="panel-head">
+            <h2>Overall View</h2>
+            <p>Choose a case, then inspect the whole transformed structure.</p>
+          </div>
+          <div id="case-list" class="case-list"></div>
+        </aside>
+
+        <section class="center-panel">
+          <div class="panel current-strip">
+            <div>
+              <div class="eyebrow">Specified View</div>
+              <div id="current-slug">No case open</div>
+            </div>
+            <div class="status-note">Solved structure first. Documents stay secondary.</div>
+          </div>
+
+          <section id="atlas" class="panel atlas-panel" aria-label="Specified View">
+            Loading case map…
+          </section>
+
+          <section id="timeline" class="panel timeline-panel" aria-label="Timeline">
+            Loading timeline…
+          </section>
+        </section>
+
+        <aside class="right-panel">
+          <section id="side-panel-body" class="panel context-panel">
+            Loading catalog…
+          </section>
+
+          <section id="documents-panel" class="panel documents-panel">
+            <div class="documents-empty">Documents will appear here when a case loads.</div>
+          </section>
+        </aside>
+      </main>
+    </div>
+
+    <script type="module" src="./ui-v3/app.js"></script>
+  </body>
+</html>
