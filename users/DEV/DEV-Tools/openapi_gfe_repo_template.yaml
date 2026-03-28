@@ -1,0 +1,480 @@
+openapi: 3.1.1
+info:
+  title: GFE Core Repo Control
+  description: >-
+    Read, write, inspect, and manage a per-recipient copy of the GFE core repo
+    through the GitHub REST API. This template is intended for cloned/copy repos,
+    not for one shared multi-user writable instance.
+  version: 3.3-template
+servers:
+  - url: https://api.github.com/repos/OWNER_PLACEHOLDER/REPO_PLACEHOLDER
+    description: Recipient GFE Core Repository
+components:
+  schemas:
+    Branch:
+      type: object
+      properties:
+        name:
+          type: string
+        commit:
+          type: object
+          properties:
+            sha:
+              type: string
+    GitRef:
+      type: object
+      properties:
+        ref:
+          type: string
+        object:
+          type: object
+          properties:
+            sha:
+              type: string
+  securitySchemes:
+    githubToken:
+      type: http
+      scheme: bearer
+      bearerFormat: GitHubPAT
+security:
+  - githubToken: []
+paths:
+  /contents:
+    get:
+      operationId: listRoot
+      summary: List repository root contents
+      parameters:
+        - name: ref
+          in: query
+          required: false
+          schema:
+            type: string
+            default: main
+      responses:
+        '200':
+          description: Root contents
+  /contents/{path}:
+    get:
+      operationId: getPath
+      summary: Get repository file or directory by path
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Any repository path, including nested case artifacts under cases/<slug>/...
+        - name: ref
+          in: query
+          required: false
+          schema:
+            type: string
+            default: main
+      responses:
+        '200':
+          description: File or directory payload
+      description: Canonical generic file/directory read operation for the lean core repo.
+    put:
+      operationId: saveFile
+      summary: Save any repository file by path
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Any repository path in the recipient repo copy.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message, content, branch]
+              properties:
+                message:
+                  type: string
+                content:
+                  type: string
+                  description: Base64-encoded UTF-8 file content
+                branch:
+                  type: string
+                sha:
+                  type: string
+                  description: Required for updates
+      responses:
+        '201':
+          description: Created
+        '200':
+          description: Updated
+      description: Create or update any repository file by path. Prefer this for normal repo maintenance.
+    delete:
+      operationId: deleteFile
+      summary: Delete any repository file by path
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Any repository path in the recipient repo copy.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message, sha, branch]
+              properties:
+                message:
+                  type: string
+                sha:
+                  type: string
+                branch:
+                  type: string
+      responses:
+        '200':
+          description: Deleted
+  /contents/cases:
+    get:
+      operationId: listCases
+      summary: List top-level entries under /cases on a branch
+      parameters:
+        - name: ref
+          in: query
+          required: false
+          schema:
+            type: string
+            default: main
+      responses:
+        '200':
+          description: Cases directory listing
+  /branches:
+    get:
+      operationId: listBranches
+      summary: List all branches
+      responses:
+        '200':
+          description: Branch list
+  /git/ref/heads/{branch}:
+    get:
+      operationId: getBranchRef
+      summary: Get HEAD SHA of a branch
+      parameters:
+        - name: branch
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ref object
+  /git/ref/{ref}:
+    get:
+      operationId: getRef
+      summary: Get a git reference by ref
+      parameters:
+        - name: ref
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ref object
+  /git/refs:
+    post:
+      operationId: createBranch
+      summary: Create a new branch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ref, sha]
+              properties:
+                ref:
+                  type: string
+                  description: Full ref, e.g. refs/heads/feature/demo
+                sha:
+                  type: string
+      responses:
+        '201':
+          description: Branch created
+  /git/trees/{tree_sha}:
+    get:
+      operationId: getTree
+      summary: Get a git tree
+      parameters:
+        - name: tree_sha
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: recursive
+          in: query
+          required: false
+          schema:
+            type: string
+            default: '0'
+      responses:
+        '200':
+          description: Tree payload
+  /git/blobs:
+    post:
+      operationId: createBlob
+      summary: Create a blob from text or base64 content
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content, encoding]
+              properties:
+                content:
+                  type: string
+                encoding:
+                  type: string
+                  enum: [utf-8, base64]
+      responses:
+        '201':
+          description: Blob created
+  /git/trees:
+    post:
+      operationId: createTree
+      summary: Create a git tree for one or more files
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tree]
+              properties:
+                base_tree:
+                  type: string
+                tree:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      path:
+                        type: string
+                      mode:
+                        type: string
+                      type:
+                        type: string
+                      sha:
+                        type: string
+                      content:
+                        type: string
+      responses:
+        '201':
+          description: Tree created
+  /git/commits/{commit_sha}:
+    get:
+      operationId: getCommit
+      summary: Get a git commit object
+      parameters:
+        - name: commit_sha
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Commit payload
+  /git/commits:
+    post:
+      operationId: createCommit
+      summary: Create a commit from a tree and parent commits
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message, tree, parents]
+              properties:
+                message:
+                  type: string
+                tree:
+                  type: string
+                parents:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '201':
+          description: Commit created
+  /merges:
+    post:
+      operationId: mergeBranch
+      summary: Merge a source branch into a target branch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [base, head]
+              properties:
+                base:
+                  type: string
+                  description: Target branch
+                  default: main
+                head:
+                  type: string
+                  description: Source branch
+                commit_message:
+                  type: string
+      responses:
+        '201':
+          description: Merged
+  /pages:
+    get:
+      operationId: getPagesSite
+      summary: Get GitHub Pages site settings and status
+      responses:
+        '200':
+          description: Pages payload
+    put:
+      operationId: updatePagesSite
+      summary: Update GitHub Pages site settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cname:
+                  type: string
+                https_enforced:
+                  type: boolean
+                build_type:
+                  type: string
+                  enum: [legacy, workflow]
+                source:
+                  type: object
+                  properties:
+                    branch:
+                      type: string
+                    path:
+                      type: string
+                      enum: ['/', '/docs']
+      responses:
+        '204':
+          description: Pages site updated
+  /actions/workflows:
+    get:
+      operationId: listWorkflows
+      summary: List repository workflows
+      responses:
+        '200':
+          description: Workflow list
+  /actions/workflows/{workflow_id}/runs:
+    get:
+      operationId: listWorkflowRuns
+      summary: List runs for a workflow
+      parameters:
+        - name: workflow_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: branch
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Workflow runs
+  /actions/runs/{run_id}:
+    get:
+      operationId: getWorkflowRun
+      summary: Get a single workflow run
+      parameters:
+        - name: run_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Workflow run payload
+  /actions/workflows/{workflow_id}/dispatches:
+    post:
+      operationId: dispatchWorkflow
+      summary: Trigger a workflow_dispatch workflow
+      parameters:
+        - name: workflow_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ref]
+              properties:
+                ref:
+                  type: string
+                inputs:
+                  type: object
+                  additionalProperties: true
+      responses:
+        '204':
+          description: Workflow dispatched
+  /git/refs/{ref}:
+    patch:
+      operationId: updateRef
+      summary: Update a git reference to a new SHA
+      parameters:
+        - name: ref
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sha]
+              properties:
+                sha:
+                  type: string
+                force:
+                  type: boolean
+                  default: false
+      responses:
+        '200':
+          description: Ref updated
+  /pages/builds:
+    post:
+      operationId: requestPagesBuild
+      summary: Request a GitHub Pages build
+      responses:
+        '202':
+          description: Pages build requested
+  /pages/builds/latest:
+    get:
+      operationId: getLatestPagesBuild
+      summary: Get latest GitHub Pages build
+      responses:
+        '200':
+          description: Latest Pages build
