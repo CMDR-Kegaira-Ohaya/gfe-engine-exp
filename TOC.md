@@ -71,6 +71,7 @@
 │   │   │   ├── commands/
 │   │   │   │   ├── save-case-source.js
 │   │   │   │   ├── save-product-file.js
+│   │   │   │   ├── upsert-case-source.js
 │   │   │   │   └── upsert-product-file.js
 │   │   │   ├── connector.js
 │   │   │   ├── guardrails.js
