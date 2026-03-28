@@ -1,32 +1,20 @@
 [
   {
-    "slug": "gui_smoke_modern_case",
-    "title": "GUI smoke modern case",
+    "manifestPath": "../cases/gui_smoke_modern_case/manifest.json",
     "summary": "Smoke case with source, encoding, and reading.",
-    "paths": {
-      "source": "../cases/gui_smoke_modern_case/source/case.md",
-      "encoding": "../cases/gui_smoke_modern_case/revisions/rev_smoke_v1/encoding.json",
-      "narrative": "../cases/gui_smoke_modern_case/readings/current_model_reading.md"
-    }
+    "revision": "rev_smoke_v1",
+    "narrativePath": "./readings/current_model_reading.md"
   },
   {
-    "slug": "medical_breakthroughs_controversial_methods",
-    "title": "Medical breakthroughs and controversial methods",
+    "manifestPath": "../cases/medical_breakthroughs_controversial_methods/manifest.json",
     "summary": "Case with source and structural encoding.",
-    "paths": {
-      "source": "../cases/medical_breakthroughs_controversial_methods/source/case.md",
-      "encoding": "../cases/medical_breakthroughs_controversial_methods/revisions/rev_migrated_root/encoding.json",
-      "narrative": null
-    }
+    "revision": "rev_migrated_root",
+    "narrativePath": null
   },
   {
-    "slug": "seed",
-    "title": "Seed",
+    "manifestPath": "../cases/seed/manifest.json",
     "summary": "Minimal seed case.",
-    "paths": {
-      "source": "../cases/seed/source/case.md",
-      "encoding": "../cases/seed/revisions/rev_migrated_root/encoding.json",
-      "narrative": null
-    }
+    "revision": "rev_migrated_root",
+    "narrativePath": null
   }
 ]

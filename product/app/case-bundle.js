@@ -1,5 +1,31 @@
 export async function loadCasesIndex() {
-  return fetchJson('./app/cases-index.json');
+  const catalog = await fetchJson('./app/cases-index.json');
+
+  return Promise.all(
+    catalog.map(async (entry) => {
+      const manifest = await fetchJson(entry.manifestPath);
+      const caseBaseUrl = new URL('./', new URL(entry.manifestPath, window.location.href));
+
+      return {
+        slug: manifest.slug || manifest.case_id,
+        title: manifest.title || manifest.slug || 'Untitled case',
+        summary: entry.summary || manifest.summary || 'Case bundle',
+        manifest,
+        manifestPath: entry.manifestPath,
+        paths: {
+          source: manifest.current_case_source
+            ? new URL(manifest.current_case_source, caseBaseUrl).href
+            : null,
+          encoding: entry.revision
+            ? new URL(`./revisions/${entry.revision}/encoding.json`, caseBaseUrl).href
+            : null,
+          narrative: entry.narrativePath
+            ? new URL(entry.narrativePath, caseBaseUrl).href
+            : null,
+        },
+      };
+    }),
+  );
 }
 
 export function resolveInitialSlug(entries, requested) {
@@ -35,6 +61,7 @@ export async function loadCaseBundle(slug, entries) {
         narrative: Boolean(entry.paths.narrative),
       },
     },
+    manifest: entry.manifest,
     source: {
       text: sourceText,
     },
