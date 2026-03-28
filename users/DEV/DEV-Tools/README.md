@@ -11,17 +11,22 @@ Scope:
 - avoid vague utility sprawl
 
 Current intent:
-- start with a safe repo patch/search-replace tool
-- expand only when a tool has a clear repeated use case
+- start with narrow, re-usable DEV assets
+- expand only when a tool or note has a clear repeated use case
 
 ## Key working notes
 
 - `OPERATING_DEFAULTS.md` = standing DEV working discipline for this lean core repo
 - `TROUBLESHOOTING_REPO_TIPS.md` = repeatable write/recovery/solved-problem procedures
+- `GPT_DISTRIBUTION_MODEL.md` = per-recipient GPT + repo + token distribution model
+- `REPO_COPY_HANDOFF_CHECKLIST.md` = hand-off checklist for recipient instances
+- `openapi_gfe_repo_template.yaml` = action schema template with replaceable owner/repo placeholders
 - `repo_patch_tool.py` + `repo_patch_tool_spec.md` = narrow patching helpers/references
 
-Working rules:
+## Working rules
+
 - prefer narrow tools over general-purpose dangerous tools
 - require explicit anchors and predictable failure behavior
 - prefer preview/diff before mutation
 - fail loudly on ambiguity
+- keep per-recipient GPT/repo/token distribution sealed, not shared
