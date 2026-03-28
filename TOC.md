@@ -142,6 +142,7 @@
 │       │   │   ├── 10_SCOPE_LOCK_PIPELINE.md
 │       │   │   ├── 20_WORKING_BOARD.md
 │       │   │   ├── 21_REBUILD_PLAN.md
+│       │   │   ├── 22_PRODUCT_OPERATING_MAP.md
 │       │   │   ├── GFE_VisualCodex.md
 │       │   │   └── gui_confirmed_findings_2026-03-26.md
 │       │   └── 00_INDEX.md
