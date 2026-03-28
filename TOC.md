@@ -79,9 +79,12 @@
 ├── users/
 │   └── DEV/
 │       ├── DEV-Tools/
+│       │   ├── GPT_DISTRIBUTION_MODEL.md
+│       │   ├── openapi_gfe_repo_template.yaml
 │       │   ├── OPERATING_DEFAULTS.md
 │       │   ├── PROCEDURE_INDEX.md
 │       │   ├── README.md
+│       │   ├── REPO_COPY_HANDOFF_CHECKLIST.md
 │       │   ├── repo_patch_tool.py
 │       │   ├── repo_patch_tool_spec.md
 │       │   └── TROUBLESHOOTING_REPO_TIPS.md
