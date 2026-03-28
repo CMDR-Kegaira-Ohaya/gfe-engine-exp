@@ -83,6 +83,7 @@
 │   │   ├── case-bundle.js
 │   │   ├── cases-index.json
 │   │   ├── helpers.js
+│   │   ├── interaction-state.js
 │   │   ├── README.md
 │   │   ├── shell.js
 │   │   └── store.js
