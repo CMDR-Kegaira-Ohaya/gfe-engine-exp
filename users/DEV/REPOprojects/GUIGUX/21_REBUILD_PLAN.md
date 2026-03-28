@@ -2,7 +2,7 @@
 
 [GUIGUX_REBUILD_PLAN_ROOT]
 
-Purpose: this is the current working plan for the next GUE/WUB rebuild.
+Purpose: this is the current working plan for the next GUI/workbench rebuild.
 
 Authority:
 - if anything here conflicts with `10_SCOPE_LOCK_PIPELINE.md`, the scope lock wins
@@ -26,7 +26,6 @@ Authority:
 - solved structure before commentary
 - transformation before explanation
 - orientation must survive every click
-
 - documents stay stable and secondary: source and narrative are companion surfaces, not the main view
 
 ---
@@ -56,12 +55,13 @@ Do not carry over blindly:
 - thin shell, strong modules, explicit state
 - each file owns one job only
 - missing artifacts must fail honestly, not mysteriously
+- DEV notes guide development but do not become runtime dependencies
 
 ---
 
 ## 5) Current modular target shape
 
-New product/GUI rebuild should be based on small cooperating modules:
+The product rebuild inside `product/` should be based on small cooperating modules:
 
 - boot shell
 - app shell
@@ -73,8 +73,9 @@ New product/GUI rebuild should be based on small cooperating modules:
 - interactions (selection, pin, trace)
 - lenses (structure, relations, process, evidence)
 - filters (visibility reduction only)
+- repo bridge (profile, guardrails, commands, verification)
 
-## CaseBundle minimum
+### CaseBundle minimum
 
 CaseBundle must contain:
 - identity
@@ -86,59 +87,95 @@ CaseBundle must contain:
 - solve
 - narrative
 - projection hints
-- links layer (source → structure → narrative)
+- links layer (source ↔ structure ↔ narrative)
 
 ---
 
-## 6) Repo split (locked)
+## 6) Repo-aware GUI bridge (locked)
 
-`gfe-engine-exp` now serves as **core/archive**:
+The GUI will eventually perform saves, edits, and other repo actions.
+
+To keep this useful but not tangled:
+- repo knowledge stays in DEV docs as human-facing memory/doctrine
+- runtime uses a distilled machine contract under `product/app/repo/`
+- the GUI must **not** mine `users/DEV/` markdown directly at runtime
+- when a DEV rule becomes runtime-relevant, promote it once into the repo bridge layer
+
+### Bridge shape
+
+Under `product/app/repo/` keep:
+- `repo-profile.js`
+- `guardrails.js`
+- `verify.js`
+- `connector.js` or equivalent connector boundary module
+- `commands/`
+
+### Bridge rules
+
+- GUI intent → command → guardrail check → connector call → verification → UI update
+- Base64 is transport-only at the connector boundary
+- prefer `saveFile` for normal writes
+- verify writes actually landed
+- keep core and product write zones distinct
+
+### Repo zones
+
+Protected:
 - `engine/`
 - `solver/`
-- `cases/`
-- `users/DEV/`
 - `privacy.html`
+- `/.github/workflows/` unless explicitly allowed
 
-The next public product/GUI should be built in a**fresh repo**.
+Controlled:
+- `cases/`
 
-This board describes that next repo direction, not a new monolith inside the core repo.
+Normal product-local:
+- `product/`
 
 ---
 
-## 7) Next actual build steps
+## 7) Build location (locked)
 
-1. Keep this repo clean as core/archive and DEV reference.
+This repo now supports a quarantined product area under `product/`.
 
-2. When the fresh product repo is created, start with:
-  - root README
-  - tiny entrypoints (`index.html` or equivalent)
-  - modular UI folder
-  - case loader
-   - CaseBundle
-   - store
-   - specified-view render
-   - context panel
-   - documents panel
+That means:
+- core remains protected in `engine/`, `solver/`, `cases/`, and `privacy.html`
+- GUI/app runtime work lives in `product/`
+- DEV notes stay in `users/DEV/`
+- the repo remains the canonical template/source
 
-3. First working slice must do:
-  - open one case
-  - show the whole solved map
-  - let the user click around
-  - keep source and narrative visibly connected without hijacking the map
+---
 
-4. Only after that slice is stable:
-  - add pin behavior
-  - add trace behavior
+## 8) Next actual build steps
+
+1. Keep this repo clean as core/template plus quarantined product area.
+
+2. First working slice must do:
+   - open one case
+   - show the whole solved map
+   - let the user click around
+   - keep source and narrative visibly connected without hijacking the map
+
+3. Before deeper mutation features, add the repo-aware bridge layer:
+   - repo profile
+   - guardrails
+   - verification
+   - first commands for product-local save and controlled case save
+
+4. Only after the current slice and repo bridge are stable:
+   - add pin behavior
+   - add trace behavior
    - add lenses
    - add filters
+   - add richer repo-edit flows
 
 ---
 
-## 8) How to use this file
+## 9) How to use this file
 
 - use this as the current next-build plan
 - use `20_WORKING_BOARD.md` to mine old ideas, not to decide structural truth
-- any new GU/UX notes should extend this direction, not reset back into the old shell
+- any new GUI/UX notes should extend this direction, not reset back into the old shell
 
 ---
 
