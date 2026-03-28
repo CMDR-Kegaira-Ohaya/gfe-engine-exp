@@ -6,18 +6,26 @@
 ## Key areas
 
 - `.github/` — lightweight repo automation, including TOC maintenance
-- `README.md` — lean core repo overview
+- `README.md` — core-first repo overview and boundary rules
 - `TOC.md` — current auto-generated repository map
 - `cases/` — reference, demo, and smoke case material
 - `engine/` — canonical GFE source texts
 - `privacy.html` — privacy page required by the GPT custom action connector
+- `product/` — quarantined product area for new GUI/app work
 - `scripts/` — small repo maintenance scripts
 - `solver/` — executable solver core and validation implementation
 - `users/DEV/` — DEV-local tools and surviving migration references
 
+## Product work areas
+
+- `product/gui/` — user-facing GUI surfaces and presentation modules
+- `product/app/` — app-level loading, state, and runtime wiring
+- `product/assets/` — static product-local assets
+- `product/workflows/` — product-local workflow notes and templates
+
 ## DEV reference areas
 
-- `users/DEV/DEV-Tools/` — narrow helper tools and tool specs for repo work
+- `users/DEV/DEV-Tools/` — narrow helper tools, operating notes, and handoff assets
 - `users/DEV/REPOprojects/` — surviving project notes and migration references
 
 ## Full tree
@@ -58,10 +66,19 @@
 │   ├── kernel_v15_7.md
 │   └── spec_v15_7.md
 ├── product/
+│   ├── app/
+│   │   └── README.md
+│   ├── assets/
+│   │   └── README.md
+│   ├── gui/
+│   │   └── README.md
+│   ├── workflows/
+│   │   └── README.md
 │   └── README.md
 ├── scripts/
 │   └── update_toc.py
 ├── solver/
+│   ├── README.md
 │   ├── cascade.js
 │   ├── check-cases.js
 │   ├── compensation.js
@@ -73,7 +90,6 @@
 │   ├── index.js
 │   ├── payload.js
 │   ├── prevalence.js
-│   ├── README.md
 │   ├── selftest.js
 │   ├── state.js
 │   ├── utils.js
@@ -82,14 +98,14 @@
 │   └── DEV/
 │       ├── DEV-Tools/
 │       │   ├── GPT_DISTRIBUTION_MODEL.md
-│       │   ├── openapi_gfe_repo_template.yaml
 │       │   ├── OPERATING_DEFAULTS.md
 │       │   ├── PROCEDURE_INDEX.md
 │       │   ├── README.md
 │       │   ├── REPO_COPY_HANDOFF_CHECKLIST.md
+│       │   ├── TROUBLESHOOTING_REPO_TIPS.md
+│       │   ├── openapi_gfe_repo_template.yaml
 │       │   ├── repo_patch_tool.py
-│       │   ├── repo_patch_tool_spec.md
-│       │   └── TROUBLESHOOTING_REPO_TIPS.md
+│       │   └── repo_patch_tool_spec.md
 │       ├── REPOprojects/
 │       │   ├── GUIGUX/
 │       │   │   ├── 00_INDEX.md

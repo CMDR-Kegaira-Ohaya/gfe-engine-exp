@@ -15,18 +15,26 @@ SKIP_FILES = {".gitkeep"}
 
 ROOT_DESCRIPTIONS = {
     ".github/": "lightweight repo automation, including TOC maintenance",
-    "README.md": "lean core repo overview",
+    "README.md": "core-first repo overview and boundary rules",
     "TOC.md": "current auto-generated repository map",
     "cases/": "reference, demo, and smoke case material",
     "engine/": "canonical GFE source texts",
     "privacy.html": "privacy page required by the GPT custom action connector",
+    "product/": "quarantined product area for new GUI/app work",
     "scripts/": "small repo maintenance scripts",
     "solver/": "executable solver core and validation implementation",
     "users/DEV/": "DEV-local tools and surviving migration references",
 }
 
+PRODUCT_DESCRIPTIONS = {
+    "product/gui/": "user-facing GUI surfaces and presentation modules",
+    "product/app/": "app-level loading, state, and runtime wiring",
+    "product/assets/": "static product-local assets",
+    "product/workflows/": "product-local workflow notes and templates",
+}
+
 DEV_DESCRIPTIONS = {
-    "users/DEV/DEV-Tools/": "narrow helper tools and tool specs for repo work",
+    "users/DEV/DEV-Tools/": "narrow helper tools, operating notes, and handoff assets",
     "users/DEV/REPOprojects/": "surviving project notes and migration references",
 }
 
@@ -78,6 +86,10 @@ def render_toc() -> str:
         "## Key areas",
         "",
         *bullet_lines(ROOT_DESCRIPTIONS),
+        "",
+        "## Product work areas",
+        "",
+        *bullet_lines(PRODUCT_DESCRIPTIONS),
         "",
         "## DEV reference areas",
         "",
