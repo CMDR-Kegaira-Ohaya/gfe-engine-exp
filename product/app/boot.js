@@ -1,6 +1,7 @@
 import { createShell } from './shell.js';
 import { createStore } from './store.js';
 import { loadCasesIndex, loadCaseBundle, resolveInitialSlug } from './case-bundle.js';
+import { activeTraceTarget, sameTarget } from './interaction-state.js';
 import { renderSpecifiedView } from '../gui/specified-view.js';
 import { renderContextPanel } from '../gui/context-panel.js';
 import { renderDocumentsPanel } from '../gui/documents-panel.js';
@@ -26,6 +27,11 @@ const store = createStore({
   slug: null,
   bundle: null,
   selection: null,
+  pinned: null,
+  trace: {
+    enabled: false,
+    target: null,
+  },
   activeDocument: 'source',
   noteDraft: '',
   noteSource: 'template',
@@ -79,10 +85,11 @@ function renderCaseList(state) {
 function render() {
   const state = store.getState();
   const bundle = state.bundle;
+  const mode = bundle?.projection?.mode || 'structure';
 
   els.currentTitle.textContent = bundle?.identity?.title || 'Product Workbench';
   els.currentSlug.textContent = bundle?.identity?.slug || 'No case open';
-  els.currentMode.textContent = `Mode: ${bundle?.projection?.mode || 'structure'}`;
+  els.currentMode.textContent = state.trace?.enabled ? `Mode: ${mode} + trace` : `Mode: ${mode}`;
 
   renderCaseList(state);
   renderSpecifiedView(els.mapView, state);
@@ -112,6 +119,11 @@ async function openCase(slug) {
         },
       },
       selection: null,
+      pinned: null,
+      trace: {
+        enabled: false,
+        target: null,
+      },
       activeDocument: bundle.status.artifacts.source ? 'source' : 'narrative',
       caseSourceDraft: caseDraft.text,
       caseSourceSource: caseDraft.source,
@@ -135,6 +147,42 @@ async function openCase(slug) {
     setNotice('Case load failed');
     els.mapView.innerHTML = `<div class="empty-state">Could not load case: ${escapeHtml(error.message)}</div>`;
   }
+}
+
+function togglePinnedTarget(target) {
+  if (!target) return;
+
+  const state = store.getState();
+  const nextPinned = sameTarget(state.pinned, target) ? null : target;
+  const traceTarget = activeTraceTarget(state);
+  const nextTrace = state.trace?.enabled && sameTarget(traceTarget, state.pinned)
+    ? (nextPinned ? { enabled: true, target: nextPinned } : { enabled: false, target: null })
+    : state.trace;
+
+  store.setState({
+    pinned: nextPinned,
+    trace: nextTrace,
+  });
+}
+
+function startTrace(target) {
+  if (!target) return;
+
+  store.setState({
+    trace: {
+      enabled: true,
+      target,
+    },
+  });
+}
+
+function stopTrace() {
+  store.setState({
+    trace: {
+      enabled: false,
+      target: null,
+    },
+  });
 }
 
 async function saveProductNote() {
@@ -327,6 +375,29 @@ function bind() {
           type: selectionButton.dataset.selectType,
           id: selectionButton.dataset.selectId,
         },
+      });
+      return;
+    }
+
+    const pinButton = event.target.closest('[data-pin-type]');
+    if (pinButton) {
+      togglePinnedTarget({
+        type: pinButton.dataset.pinType,
+        id: pinButton.dataset.pinId,
+      });
+      return;
+    }
+
+    const traceButton = event.target.closest('[data-trace-action]');
+    if (traceButton) {
+      if (traceButton.dataset.traceAction === 'stop-trace') {
+        stopTrace();
+        return;
+      }
+
+      startTrace({
+        type: traceButton.dataset.traceType,
+        id: traceButton.dataset.traceId,
       });
       return;
     }
