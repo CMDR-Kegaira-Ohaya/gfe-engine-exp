@@ -60,7 +60,6 @@
 ├── scripts/
 │   └── update_toc.py
 ├── solver/
-│   ├── README.md
 │   ├── cascade.js
 │   ├── check-cases.js
 │   ├── compensation.js
@@ -72,6 +71,7 @@
 │   ├── index.js
 │   ├── payload.js
 │   ├── prevalence.js
+│   ├── README.md
 │   ├── selftest.js
 │   ├── state.js
 │   ├── utils.js
