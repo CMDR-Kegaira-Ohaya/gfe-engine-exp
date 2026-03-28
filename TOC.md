@@ -70,11 +70,13 @@
 │   │   ├── repo/
 │   │   │   ├── commands/
 │   │   │   │   ├── save-case-source.js
-│   │   │   │   └── save-product-file.js
+│   │   │   │   ├── save-product-file.js
+│   │   │   │   └── upsert-product-file.js
 │   │   │   ├── connector.js
 │   │   │   ├── guardrails.js
 │   │   │   ├── README.md
 │   │   │   ├── repo-profile.js
+│   │   │   ├── runtime.js
 │   │   │   └── verify.js
 │   │   ├── boot.js
 │   │   ├── case-bundle.js
@@ -84,11 +86,15 @@
 │   │   ├── shell.js
 │   │   └── store.js
 │   ├── assets/
+│   │   ├── notes/
+│   │   │   ├── README.md
+│   │   │   └── workbench-note.md
 │   │   └── README.md
 │   ├── gui/
 │   │   ├── context-panel.js
 │   │   ├── documents-panel.js
 │   │   ├── README.md
+│   │   ├── repo-panel.js
 │   │   ├── specified-view.js
 │   │   └── styles.css
 │   ├── workflows/
