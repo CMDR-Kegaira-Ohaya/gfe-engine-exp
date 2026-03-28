@@ -78,7 +78,6 @@
 ├── scripts/
 │   └── update_toc.py
 ├── solver/
-│   ├── README.md
 │   ├── cascade.js
 │   ├── check-cases.js
 │   ├── compensation.js
@@ -90,6 +89,7 @@
 │   ├── index.js
 │   ├── payload.js
 │   ├── prevalence.js
+│   ├── README.md
 │   ├── selftest.js
 │   ├── state.js
 │   ├── utils.js
@@ -98,14 +98,14 @@
 │   └── DEV/
 │       ├── DEV-Tools/
 │       │   ├── GPT_DISTRIBUTION_MODEL.md
+│       │   ├── openapi_gfe_repo_template.yaml
 │       │   ├── OPERATING_DEFAULTS.md
 │       │   ├── PROCEDURE_INDEX.md
 │       │   ├── README.md
 │       │   ├── REPO_COPY_HANDOFF_CHECKLIST.md
-│       │   ├── TROUBLESHOOTING_REPO_TIPS.md
-│       │   ├── openapi_gfe_repo_template.yaml
 │       │   ├── repo_patch_tool.py
-│       │   └── repo_patch_tool_spec.md
+│       │   ├── repo_patch_tool_spec.md
+│       │   └── TROUBLESHOOTING_REPO_TIPS.md
 │       ├── REPOprojects/
 │       │   ├── GUIGUX/
 │       │   │   ├── 00_INDEX.md
