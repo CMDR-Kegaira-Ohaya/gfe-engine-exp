@@ -67,13 +67,24 @@
 │   └── spec_v15_7.md
 ├── product/
 │   ├── app/
-│   │   └── README.md
+│   │   ├── boot.js
+│   │   ├── case-bundle.js
+│   │   ├── cases-index.json
+│   │   ├── helpers.js
+│   │   ├── README.md
+│   │   ├── shell.js
+│   │   └── store.js
 │   ├── assets/
 │   │   └── README.md
 │   ├── gui/
-│   │   └── README.md
+│   │   ├── context-panel.js
+│   │   ├── documents-panel.js
+│   │   ├── README.md
+│   │   ├── specified-view.js
+│   │   └── styles.css
 │   ├── workflows/
 │   │   └── README.md
+│   ├── index.html
 │   └── README.md
 ├── scripts/
 │   └── update_toc.py
