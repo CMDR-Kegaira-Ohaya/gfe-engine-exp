@@ -1,7 +1,7 @@
 openapi: 3.1.1
 info:
   title: GFE Core Repo Control
-  description: Read, write, inspect, and manage a per-recipient copy of the GFE core repo through the GitHub REST API. This template is intended for cloned/copy repos, not for one shared multi-user writable instance. It reflects the lean core write-path defaults: prefer saveFile for routine maintenance, use Base64 only at the connector boundary, and reserve low-level git-object flows for advanced recovery or multi-file construction.
+  description: 'Read, write, inspect, and manage a per-recipient copy of the GFE core repo through the GitHub REST API. This template is intended for cloned/copy repos, not for one shared multi-user writable instance. It reflects the lean core write-path defaults: prefer saveFile for routine maintenance, use Base64 only at the connector boundary, and reserve low-level git-object flows for advanced recovery or multi-file construction.'
   version: 3.4-template
 servers:
 - url: https://api.github.com/repos/OWNER_PLACEHOLDER/REPO_PLACEHOLDER
@@ -117,7 +117,7 @@ paths:
           description: Conflict or stale SHA / branch moved ahead of the base used for the write.
         '422':
           description: Malformed payload, invalid Base64 content, or missing/invalid SHA for the requested update.
-      description: Create or update any repository file by path, including core repo files and DEV reference material. Use serially; do not run in parallel with delete operations on the same file. Prepare final UTF-8 text first, then Base64-encode it exactly once at the connector boundary. When updating an existing file, read the current SHA via getPath immediately before saveFile. Prefer saveFile for routine repo maintenance.
+      description: Create or update any repository file by path. Use serially. Prepare final UTF-8 text first, then Base64-encode once at the connector boundary. For updates, read the current SHA with getPath immediately before saveFile.
     delete:
       operationId: deleteFile
       summary: Delete any repository file by path
@@ -158,7 +158,7 @@ paths:
           description: Conflict or stale SHA / branch moved ahead of the base used for the write.
         '422':
           description: Malformed delete payload or missing/invalid SHA for the current file version.
-      description: Delete any repository file by path. Use serially; do not run in parallel with create/update operations on the same file. Always read the current file SHA with getPath immediately before deleteFile. This operation depends on a DELETE request body carrying message, sha, and branch; if a given connector handles that path unreliably, fall back to the low-level git object flow already exposed here (createTree/createCommit/updateRef).
+      description: Delete any repository file by path. Use serially and read the current file SHA with getPath immediately before deleteFile. If a connector mishandles DELETE bodies, use the low-level git flow instead: createTree with sha:null, then createCommit and updateRef.
   /contents/cases:
     get:
       operationId: listCases
@@ -321,8 +321,8 @@ paths:
                         description: Usually blob
                       sha:
                         type:
-                        - string
-                        - 'null'
+                          - string
+                          - 'null'
                         description: Blob SHA, if using a pre-created blob. Use null to remove an entry in the new tree.
                       content:
                         type: string
