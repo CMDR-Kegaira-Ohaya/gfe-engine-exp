@@ -2,5 +2,6 @@
   "case_id": "medical_breakthroughs_controversial_methods",
   "title": "Medical breakthroughs and controversial methods",
   "slug": "medical_breakthroughs_controversial_methods",
-  "current_case_source": "./source/case.md"
+  "current_case_source": "./source/case.md",
+  "current_encoding": "./revisions/rev_migrated_root/encoding.json"
 }
