@@ -95,6 +95,7 @@
 │   │   └── store.js
 │   ├── assets/
 │   │   ├── notes/
+│   │   │   ├── _deletefile_smoketest.md
 │   │   │   ├── README.md
 │   │   │   └── workbench-note.md
 │   │   └── README.md
