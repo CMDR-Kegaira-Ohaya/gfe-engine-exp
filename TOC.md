@@ -82,6 +82,7 @@
 │   │   ├── boot.js
 │   │   ├── case-bundle.js
 │   │   ├── cases-index.json
+│   │   ├── correspondence.js
 │   │   ├── filters.js
 │   │   ├── helpers.js
 │   │   ├── interaction-state.js
