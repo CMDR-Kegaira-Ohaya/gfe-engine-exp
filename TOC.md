@@ -95,7 +95,6 @@
 │   │   └── store.js
 │   ├── assets/
 │   │   ├── notes/
-│   │   │   ├── _savefile_smoketest.md
 │   │   │   ├── README.md
 │   │   │   └── workbench-note.md
 │   │   └── README.md
