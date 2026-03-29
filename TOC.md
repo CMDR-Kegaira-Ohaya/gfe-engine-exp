@@ -158,6 +158,7 @@
 │       │   │   └── gui_confirmed_findings_2026-03-26.md
 │       │   └── 00_INDEX.md
 │       └── DEV-README.md
+├── index.html
 ├── privacy.html
 ├── README.md
 └── TOC.md
