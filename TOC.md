@@ -77,6 +77,7 @@
 │   │   │   ├── errors.js
 │   │   │   ├── file-state.js
 │   │   │   ├── guardrails.js
+│   │   │   ├── low-level-delete.js
 │   │   │   ├── README.md
 │   │   │   ├── repo-profile.js
 │   │   │   ├── runtime.js
