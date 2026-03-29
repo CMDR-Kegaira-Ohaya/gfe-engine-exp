@@ -69,6 +69,7 @@
 │   ├── app/
 │   │   ├── repo/
 │   │   │   ├── commands/
+│   │   │   │   ├── delete-product-file.js
 │   │   │   │   ├── save-case-source.js
 │   │   │   │   ├── save-product-file.js
 │   │   │   │   ├── upsert-case-source.js
