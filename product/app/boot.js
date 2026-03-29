@@ -38,8 +38,10 @@ const store = createStore({
   },
   activeDocument: 'source',
   noteDraft: '',
+  noteBaseline: '',
   noteSource: 'template',
   caseSourceDraft: '',
+  caseSourceBaseline: '',
   caseSourceSource: 'bundle',
   repoBridge: {
     mode: repoRuntime.mode,
@@ -186,6 +188,7 @@ async function openCase(slug) {
       },
       activeDocument: bundle.status.artifacts.source ? 'source' : 'narrative',
       caseSourceDraft: caseDraft.text,
+      caseSourceBaseline: caseDraft.text,
       caseSourceSource: caseDraft.source,
       repoBridge: {
         ...repoBridge,
@@ -255,6 +258,49 @@ function stopTrace() {
   });
 }
 
+function restoreProductNoteDraft() {
+  const state = store.getState();
+  const baseline = state.noteBaseline ?? '';
+
+  store.setState({
+    noteDraft: baseline,
+    noteSource: 'restored-loaded',
+    repoBridge: {
+      ...state.repoBridge,
+      productNote: {
+        ...state.repoBridge.productNote,
+        message: 'Product note draft restored to the currently loaded baseline.',
+      },
+    },
+  });
+}
+
+function restoreCaseSourceDraft() {
+  const state = store.getState();
+  const baseline = state.caseSourceBaseline ?? '';
+
+  store.setState({
+    caseSourceDraft: baseline,
+    caseSourceSource: 'restored-loaded',
+    bundle: state.bundle
+      ? {
+          ...state.bundle,
+          source: {
+            ...state.bundle.source,
+            text: baseline,
+          },
+        }
+      : state.bundle,
+    repoBridge: {
+      ...state.repoBridge,
+      caseSource: {
+        ...state.repoBridge.caseSource,
+        message: 'Controlled case draft restored to the currently loaded baseline.',
+      },
+    },
+  });
+}
+
 async function saveProductNote() {
   const state = store.getState();
   const currentBridge = state.repoBridge;
@@ -275,6 +321,7 @@ async function saveProductNote() {
   if (!repoRuntime.connector) {
     storeLocalProductNote(state.noteDraft);
     store.setState({
+      noteBaseline: state.noteDraft,
       noteSource: 'local-draft',
       repoBridge: {
         ...store.getState().repoBridge,
@@ -299,6 +346,7 @@ async function saveProductNote() {
 
     storeLocalProductNote(state.noteDraft);
     store.setState({
+      noteBaseline: state.noteDraft,
       noteSource: 'repo-saved-draft',
       repoBridge: {
         ...store.getState().repoBridge,
@@ -352,6 +400,7 @@ async function saveControlledCaseSource() {
   if (!repoRuntime.connector) {
     storeLocalCaseSource(state.slug, state.caseSourceDraft);
     store.setState({
+      caseSourceBaseline: state.caseSourceDraft,
       caseSourceSource: 'local-draft',
       bundle: {
         ...state.bundle,
@@ -385,6 +434,7 @@ async function saveControlledCaseSource() {
 
     storeLocalCaseSource(state.slug, state.caseSourceDraft);
     store.setState({
+      caseSourceBaseline: state.caseSourceDraft,
       caseSourceSource: 'repo-saved-draft',
       bundle: {
         ...state.bundle,
@@ -491,6 +541,16 @@ function bind() {
     }
 
     const repoAction = event.target.closest('[data-repo-action]');
+    if (repoAction?.dataset.repoAction === 'restore-product-note') {
+      restoreProductNoteDraft();
+      return;
+    }
+
+    if (repoAction?.dataset.repoAction === 'restore-case-source') {
+      restoreCaseSourceDraft();
+      return;
+    }
+
     if (repoAction?.dataset.repoAction === 'save-product-note') {
       await saveProductNote();
       return;
@@ -524,6 +584,7 @@ async function init() {
     const note = await loadInitialProductNote();
     store.setState({
       noteDraft: note.text,
+      noteBaseline: note.text,
       noteSource: note.source,
       repoBridge: {
         ...store.getState().repoBridge,
