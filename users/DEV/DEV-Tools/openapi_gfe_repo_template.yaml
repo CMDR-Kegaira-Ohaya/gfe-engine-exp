@@ -1,14 +1,11 @@
 openapi: 3.1.1
 info:
   title: GFE Core Repo Control
-  description: >-
-    Read, write, inspect, and manage a per-recipient copy of the GFE core repo
-    through the GitHub REST API. This template is intended for cloned/copy repos,
-    not for one shared multi-user writable instance.
-  version: 3.3-template
+  description: Read, write, inspect, and manage a per-recipient copy of the GFE core repo through the GitHub REST API. This template is intended for cloned/copy repos, not for one shared multi-user writable instance. It reflects the lean core write-path defaults: prefer saveFile for routine maintenance, use Base64 only at the connector boundary, and reserve low-level git-object flows for advanced recovery or multi-file construction.
+  version: 3.4-template
 servers:
-  - url: https://api.github.com/repos/OWNER_PLACEHOLDER/REPO_PLACEHOLDER
-    description: Recipient GFE Core Repository
+- url: https://api.github.com/repos/OWNER_PLACEHOLDER/REPO_PLACEHOLDER
+  description: Recipient GFE Core Repository
 components:
   schemas:
     Branch:
@@ -37,19 +34,19 @@ components:
       scheme: bearer
       bearerFormat: GitHubPAT
 security:
-  - githubToken: []
+- githubToken: []
 paths:
   /contents:
     get:
       operationId: listRoot
       summary: List repository root contents
       parameters:
-        - name: ref
-          in: query
-          required: false
-          schema:
-            type: string
-            default: main
+      - name: ref
+        in: query
+        required: false
+        schema:
+          type: string
+          default: main
       responses:
         '200':
           description: Root contents
@@ -58,73 +55,89 @@ paths:
       operationId: getPath
       summary: Get repository file or directory by path
       parameters:
-        - name: path
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Any repository path, including nested case artifacts under cases/<slug>/...
-        - name: ref
-          in: query
-          required: false
-          schema:
-            type: string
-            default: main
+      - name: path
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Any repository path, including nested case artifacts under cases/<slug>/...
+      - name: ref
+        in: query
+        required: false
+        schema:
+          type: string
+          default: main
       responses:
         '200':
           description: File or directory payload
-      description: Canonical generic file/directory read operation for the lean core repo.
+      description: Canonical generic file/directory read operation for the lean core repo. Use this to capture the current file SHA immediately before update or delete operations.
     put:
       operationId: saveFile
       summary: Save any repository file by path
       parameters:
-        - name: path
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Any repository path in the recipient repo copy.
+      - name: path
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Any repository path in the recipient repo copy.
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [message, content, branch]
+              required:
+              - message
+              - content
+              - branch
               properties:
                 message:
                   type: string
                 content:
                   type: string
-                  description: Base64-encoded UTF-8 file content
+                  description: Base64-encoded UTF-8 file content. Transport-only encoding: prepare final plain UTF-8 text first, then encode once.
                 branch:
                   type: string
                 sha:
                   type: string
-                  description: Required for updates
+                  description: Required for updates. Capture the current file SHA with getPath immediately before saveFile.
       responses:
         '201':
           description: Created
         '200':
           description: Updated
-      description: Create or update any repository file by path. Prefer this for normal repo maintenance.
+        '401':
+          description: Unauthorized or bad token.
+        '403':
+          description: Forbidden by permissions, token scope, or protected resource policy.
+        '404':
+          description: Path not found or repository resource unavailable at the requested location.
+        '409':
+          description: Conflict or stale SHA / branch moved ahead of the base used for the write.
+        '422':
+          description: Malformed payload, invalid Base64 content, or missing/invalid SHA for the requested update.
+      description: Create or update any repository file by path, including core repo files and DEV reference material. Use serially; do not run in parallel with delete operations on the same file. Prepare final UTF-8 text first, then Base64-encode it exactly once at the connector boundary. When updating an existing file, read the current SHA via getPath immediately before saveFile. Prefer saveFile for routine repo maintenance.
     delete:
       operationId: deleteFile
       summary: Delete any repository file by path
       parameters:
-        - name: path
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Any repository path in the recipient repo copy.
+      - name: path
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Any repository path in the recipient repo copy.
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [message, sha, branch]
+              required:
+              - message
+              - sha
+              - branch
               properties:
                 message:
                   type: string
@@ -135,20 +148,32 @@ paths:
       responses:
         '200':
           description: Deleted
+        '401':
+          description: Unauthorized or bad token.
+        '403':
+          description: Forbidden by permissions, token scope, or protected resource policy.
+        '404':
+          description: Path not found or repository resource unavailable at the requested location.
+        '409':
+          description: Conflict or stale SHA / branch moved ahead of the base used for the write.
+        '422':
+          description: Malformed delete payload or missing/invalid SHA for the current file version.
+      description: Delete any repository file by path. Use serially; do not run in parallel with create/update operations on the same file. Always read the current file SHA with getPath immediately before deleteFile. This operation depends on a DELETE request body carrying message, sha, and branch; if a given connector handles that path unreliably, fall back to the low-level git object flow already exposed here (createTree/createCommit/updateRef).
   /contents/cases:
     get:
       operationId: listCases
-      summary: List top-level entries under /cases on a branch
+      summary: List top-level case folders under /cases
       parameters:
-        - name: ref
-          in: query
-          required: false
-          schema:
-            type: string
-            default: main
+      - name: ref
+        in: query
+        required: false
+        schema:
+          type: string
+          default: main
       responses:
         '200':
           description: Cases directory listing
+      description: Lists only the top-level case slug directories under /cases, one of the protected core areas. For nested case files, use getPath/saveFile/deleteFile with a full path beginning with cases/.
   /branches:
     get:
       operationId: listBranches
@@ -156,32 +181,46 @@ paths:
       responses:
         '200':
           description: Branch list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Branch'
   /git/ref/heads/{branch}:
     get:
       operationId: getBranchRef
       summary: Get HEAD SHA of a branch
       parameters:
-        - name: branch
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: branch
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Ref object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GitRef'
   /git/ref/{ref}:
     get:
       operationId: getRef
       summary: Get a git reference by ref
       parameters:
-        - name: ref
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: ref
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Ref object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GitRef'
   /git/refs:
     post:
       operationId: createBranch
@@ -192,32 +231,37 @@ paths:
           application/json:
             schema:
               type: object
-              required: [ref, sha]
+              required:
+              - ref
+              - sha
               properties:
                 ref:
                   type: string
-                  description: Full ref, e.g. refs/heads/feature/demo
+                  description: Full ref, e.g. refs/heads/cases/users/alice
                 sha:
                   type: string
+                  description: SHA to branch from
       responses:
         '201':
           description: Branch created
+      description: Create a new ref. For branches, send a full ref such as refs/heads/cases/users/alice.
   /git/trees/{tree_sha}:
     get:
       operationId: getTree
       summary: Get a git tree
       parameters:
-        - name: tree_sha
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: recursive
-          in: query
-          required: false
-          schema:
-            type: string
-            default: '0'
+      - name: tree_sha
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: recursive
+        in: query
+        required: false
+        schema:
+          type: string
+          default: '0'
+        description: Use "1" for recursive tree listing
       responses:
         '200':
           description: Tree payload
@@ -231,16 +275,21 @@ paths:
           application/json:
             schema:
               type: object
-              required: [content, encoding]
+              required:
+              - content
+              - encoding
               properties:
                 content:
                   type: string
                 encoding:
                   type: string
-                  enum: [utf-8, base64]
+                  enum:
+                  - utf-8
+                  - base64
       responses:
         '201':
           description: Blob created
+      description: Advanced low-level git operation. Use only when the normal saveFile path is clearly not enough.
   /git/trees:
     post:
       operationId: createTree
@@ -251,10 +300,12 @@ paths:
           application/json:
             schema:
               type: object
-              required: [tree]
+              required:
+              - tree
               properties:
                 base_tree:
                   type: string
+                  description: Optional parent tree SHA
                 tree:
                   type: array
                   items:
@@ -264,25 +315,32 @@ paths:
                         type: string
                       mode:
                         type: string
+                        description: Usually 100644 for files
                       type:
                         type: string
+                        description: Usually blob
                       sha:
-                        type: string
+                        type:
+                        - string
+                        - 'null'
+                        description: Blob SHA, if using a pre-created blob. Use null to remove an entry in the new tree.
                       content:
                         type: string
+                        description: Raw UTF-8 text content, if not using sha.
       responses:
         '201':
           description: Tree created
+      description: Advanced low-level git operation for multi-file construction or recovery work. Prefer saveFile for routine writes. To remove a path from the new tree, include the entry with sha: null.
   /git/commits/{commit_sha}:
     get:
       operationId: getCommit
       summary: Get a git commit object
       parameters:
-        - name: commit_sha
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: commit_sha
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Commit payload
@@ -296,30 +354,43 @@ paths:
           application/json:
             schema:
               type: object
-              required: [message, tree, parents]
+              required:
+              - message
+              - tree
+              - parents
               properties:
                 message:
                   type: string
                 tree:
                   type: string
+                  description: Tree SHA
                 parents:
                   type: array
                   items:
                     type: string
+                author:
+                  type: object
+                  additionalProperties: true
+                committer:
+                  type: object
+                  additionalProperties: true
       responses:
         '201':
           description: Commit created
+      description: Advanced low-level git operation. A created commit is not live until updateRef advances the intended branch ref.
   /merges:
     post:
       operationId: mergeBranch
-      summary: Merge a source branch into a target branch
+      summary: Merge one branch into another
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [base, head]
+              required:
+              - base
+              - head
               properties:
                 base:
                   type: string
@@ -327,12 +398,14 @@ paths:
                   default: main
                 head:
                   type: string
-                  description: Source branch
+                  description: Source branch, e.g. cases/users/alice
                 commit_message:
                   type: string
+                  description: Optional merge commit message
       responses:
         '201':
           description: Merged
+      description: Create a merge commit by merging a source branch into a target branch. Useful for controlled promotion or branch consolidation in the lean core repo.
   /pages:
     get:
       operationId: getPagesSite
@@ -356,7 +429,10 @@ paths:
                   type: boolean
                 build_type:
                   type: string
-                  enum: [legacy, workflow]
+                  enum:
+                  - legacy
+                  - workflow
+                  description: Set to workflow to make GitHub Actions the Pages publishing source
                 source:
                   type: object
                   properties:
@@ -364,7 +440,12 @@ paths:
                       type: string
                     path:
                       type: string
-                      enum: ['/', '/docs']
+                      enum:
+                      - /
+                      - /docs
+                  required:
+                  - branch
+                  - path
       responses:
         '204':
           description: Pages site updated
@@ -380,22 +461,23 @@ paths:
       operationId: listWorkflowRuns
       summary: List runs for a workflow
       parameters:
-        - name: workflow_id
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: branch
-          in: query
-          required: false
-          schema:
-            type: string
-        - name: per_page
-          in: query
-          required: false
-          schema:
-            type: integer
-            default: 10
+      - name: workflow_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Workflow ID or filename, e.g. index-cases.yml
+      - name: branch
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: per_page
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 10
       responses:
         '200':
           description: Workflow runs
@@ -404,11 +486,11 @@ paths:
       operationId: getWorkflowRun
       summary: Get a single workflow run
       parameters:
-        - name: run_id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: run_id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Workflow run payload
@@ -417,21 +499,24 @@ paths:
       operationId: dispatchWorkflow
       summary: Trigger a workflow_dispatch workflow
       parameters:
-        - name: workflow_id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: workflow_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Workflow ID or filename, e.g. setup-repo.yml
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [ref]
+              required:
+              - ref
               properties:
                 ref:
                   type: string
+                  description: Branch or tag to run against
                 inputs:
                   type: object
                   additionalProperties: true
@@ -443,18 +528,19 @@ paths:
       operationId: updateRef
       summary: Update a git reference to a new SHA
       parameters:
-        - name: ref
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: ref
+        in: path
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [sha]
+              required:
+              - sha
               properties:
                 sha:
                   type: string
@@ -464,6 +550,7 @@ paths:
       responses:
         '200':
           description: Ref updated
+      description: Update a git reference to a new SHA. The ref must be a full ref such as heads/main, heads/ui/actions-shell, or tags/v1. A low-level git change is not live until updateRef succeeds and a follow-up getRef/getBranchRef confirms the new head SHA.
   /pages/builds:
     post:
       operationId: requestPagesBuild
