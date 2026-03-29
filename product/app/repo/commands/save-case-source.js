@@ -1,24 +1,16 @@
 import { assertControlledCasePath } from '../guardrails.js';
-import { encodeUtf8ToBase64 } from '../connector.js';
-import { verifyWriteResult } from '../verify.js';
+import { writeTextFileWithPolicy } from '../write-text-file.js';
 
 export async function saveCaseSource(connector, input) {
   const { slug, path, content, message, branch = 'main', sha } = input;
   const targetPath = path || `cases/${slug}/source/case.md`;
   const checked = assertControlledCasePath(targetPath);
 
-  const result = await connector.saveFile({
+  return writeTextFileWithPolicy(connector, {
     path: checked.path,
+    content,
     message,
-    content: encodeUtf8ToBase64(content),
     branch,
-    ...(sha ? { sha } : {}),
-  });
-
-  return verifyWriteResult(connector, result, {
-    expectedPath: checked.path,
-    previousSha: sha || null,
-    expectedText: content,
-    branch,
+    sha: sha || null,
   });
 }
