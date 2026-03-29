@@ -1,11 +1,11 @@
 [
   {
-    "manifestPath": "../../cases/gui_smoke_modern_case/manifest.json"
+    "manifestPath": "../cases/gui_smoke_modern_case/manifest.json"
   },
   {
-    "manifestPath": "../../cases/medical_breakthroughs_controversial_methods/manifest.json"
+    "manifestPath": "../cases/medical_breakthroughs_controversial_methods/manifest.json"
   },
   {
-    "manifestPath": "../../cases/seed/manifest.json"
+    "manifestPath": "../cases/seed/manifest.json"
   }
 ]
