@@ -1,3 +1,4 @@
+
 import { createRepoConnector } from './connector.js';
 
 const LOCAL_NOTE_KEY = 'gfe.product.workbench-note';
@@ -75,6 +76,14 @@ export async function loadInitialCaseSource(slug, fallbackText) {
 export function storeLocalProductNote(text) {
   try {
     window.localStorage.setItem(LOCAL_NOTE_KEY, String(text ?? ''));
+  } catch {
+    // local storage is optional; ignore failures
+  }
+}
+
+export function clearLocalProductNote() {
+  try {
+    window.localStorage.removeItem(LOCAL_NOTE_KEY);
   } catch {
     // local storage is optional; ignore failures
   }
