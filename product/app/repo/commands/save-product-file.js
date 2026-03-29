@@ -14,8 +14,10 @@ export async function saveProductFile(connector, input) {
     ...(sha ? { sha } : {}),
   });
 
-  return verifyWriteResult(result, {
+  return verifyWriteResult(connector, result, {
     expectedPath: checked.path,
     previousSha: sha || null,
+    expectedText: content,
+    branch,
   });
 }

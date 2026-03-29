@@ -355,7 +355,7 @@ async function saveProductNote() {
           saving: false,
           lastSavedAt: new Date().toISOString(),
           lastSavedSha: result.sha,
-          message: `Saved product note to ${result.path}.`,
+          message: `Verified product note write at ${result.path}. Read-back matched the saved draft.${result.commitSha ? ` Commit: ${result.commitSha}.` : ''}`,
         },
       },
     });
@@ -451,7 +451,7 @@ async function saveControlledCaseSource() {
           saving: false,
           lastSavedAt: new Date().toISOString(),
           lastSavedSha: result.sha,
-          message: `Saved controlled case source to ${result.path}.`,
+          message: `Verified controlled case write at ${result.path}. Read-back matched the saved draft.${result.commitSha ? ` Commit: ${result.commitSha}.` : ''}`,
         },
       },
     });

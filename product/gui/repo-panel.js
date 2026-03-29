@@ -17,6 +17,7 @@ export function renderRepoPanel(container, state) {
   const caseSaveLabel = caseSource.saving ? 'Saving…' : 'Save controlled case source';
   const noteDraftState = summarizeDraftState(noteBaseline, noteDraft);
   const caseDraftState = summarizeDraftState(caseBaseline, caseDraft);
+  const saveRowLabel = repoBridge.mode === 'repo' ? 'Last verified write' : 'Last local save';
 
   container.innerHTML = `
     <div class="repo-head">
@@ -32,7 +33,8 @@ export function renderRepoPanel(container, state) {
       <div class="detail-row"><span>Target path</span><strong>${escapeHtml(productNote.targetPath || '—')}</strong></div>
       <div class="detail-row"><span>Draft source</span><strong>${escapeHtml(noteSource)}</strong></div>
       <div class="detail-row"><span>Draft state</span><strong>${escapeHtml(noteDraftState.label)}</strong></div>
-      <div class="detail-row"><span>Last save</span><strong>${escapeHtml(formatTimestamp(productNote.lastSavedAt))}</strong></div>
+      <div class="detail-row"><span>${escapeHtml(saveRowLabel)}</span><strong>${escapeHtml(formatTimestamp(productNote.lastSavedAt))}</strong></div>
+      <div class="detail-row"><span>Verified SHA</span><strong>${escapeHtml(productNote.lastSavedSha || '—')}</strong></div>
       <div class="repo-write-badges">
         ${renderDraftBadge(noteDraftState)}
       </div>
@@ -60,7 +62,8 @@ export function renderRepoPanel(container, state) {
           <div class="detail-row"><span>Target path</span><strong>${escapeHtml(caseSource.targetPath || `cases/${state.slug}/source/case.md`)}</strong></div>
           <div class="detail-row"><span>Draft source</span><strong>${escapeHtml(caseSourceOrigin)}</strong></div>
           <div class="detail-row"><span>Draft state</span><strong>${escapeHtml(caseDraftState.label)}</strong></div>
-          <div class="detail-row"><span>Last save</span><strong>${escapeHtml(formatTimestamp(caseSource.lastSavedAt))}</strong></div>
+          <div class="detail-row"><span>${escapeHtml(saveRowLabel)}</span><strong>${escapeHtml(formatTimestamp(caseSource.lastSavedAt))}</strong></div>
+          <div class="detail-row"><span>Verified SHA</span><strong>${escapeHtml(caseSource.lastSavedSha || '—')}</strong></div>
           <div class="repo-write-badges">
             ${renderDraftBadge(caseDraftState)}
           </div>

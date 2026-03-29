@@ -15,8 +15,10 @@ export async function saveCaseSource(connector, input) {
     ...(sha ? { sha } : {}),
   });
 
-  return verifyWriteResult(result, {
+  return verifyWriteResult(connector, result, {
     expectedPath: checked.path,
     previousSha: sha || null,
+    expectedText: content,
+    branch,
   });
 }
