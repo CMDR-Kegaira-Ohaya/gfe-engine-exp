@@ -31,3 +31,9 @@ Write-path defaults:
   - `createCommit`
   - `updateRef`
 - after updateRef, confirm the path is gone with `getPath`
+
+ Helpers now added:
+- `product/app/repo/low-level-delete.js` exports `deletePathWithLowLevelGit`
+- `product/app/repo/commands/delete-product-file.js` exports `deleteProductFile`
+- `product/app/repo/commands/delete-case-source.js` exports `deleteCaseSource`
+- connectors that provide `getRef` or `getBranchRef`, with `getCommit`, `createTree`, `createCommit`, and `updateRef`, are now marked as `supportsLowLevelDelete`
