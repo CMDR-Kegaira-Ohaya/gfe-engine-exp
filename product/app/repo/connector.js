@@ -3,10 +3,42 @@ export function createRepoConnector(api) {
     throw new Error('Repo connector requires getPath() and saveFile() functions.');
   }
 
-  return {
+  const connector = {
     getPath: api.getPath,
     saveFile: api.saveFile,
   };
+
+  const optionalMethods = [
+    'getBranchRef',
+    'getRef',
+    'getCommit',
+    'createTree',
+    'createCommit',
+    'updateRef',
+  ];
+
+  for (const method of optionalMethods) {
+    if (typeof api[method] === 'function') {
+      connector[method] = api[method];
+    }
+  }
+
+  connector.supportsLowLevelDelete = supportsLowLevelDelete(connector);
+  return connector;
+}
+
+export function supportsLowLevelDelete(connector) {
+  const required = [
+    'getCommit',
+    'createTree',
+    'createCommit',
+    'updateRef',
+  ];
+
+  const hasHeadReader =
+    typeof connector?.getRef === 'function' || typeof connector?.getBranchRef === 'function';
+
+  return hasHeadReader && required.every((method) => typeof connector?.[method] === 'function');
 }
 
 export function encodeUtf8ToBase64(text) {
