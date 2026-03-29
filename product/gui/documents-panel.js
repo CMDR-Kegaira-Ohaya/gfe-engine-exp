@@ -1,4 +1,5 @@
 import { escapeHtml } from '../app/helpers.js';
+import { resolveFilterState } from '../app/filters.js';
 import { activeTraceTarget, targetLabel } from '../app/interaction-state.js';
 import { lensDescription, lensLabel, normalizeLens } from '../app/lenses.js';
 import { buildCorrespondenceHints, highlightTermsForState } from '../app/correspondence.js';
@@ -18,6 +19,7 @@ export function renderDocumentsPanel(container, state) {
   const narrativeText = bundle.narrative?.text || '';
   const docContext = buildDocumentContext(bundle, state);
   const correspondence = buildCorrespondenceHints(bundle, state);
+  const filterState = resolveFilterState(state.filters, { traceActive: Boolean(state.trace?.enabled) });
 
   container.innerHTML = `
     <div class="documents-head">
@@ -38,8 +40,10 @@ export function renderDocumentsPanel(container, state) {
         ${renderContextPill('Pin', docContext.pinnedLabel, docContext.pinnedActive)}
         ${renderContextPill('Trace', docContext.traceLabel, docContext.traceActive)}
         <span class="doc-focus-pill provisional active"><strong>Correspondence:</strong> provisional</span>
+        ${renderFilterPills(filterState)}
       </div>
       <div class="doc-context-note">${escapeHtml(lensDescription(lens))} Gentle highlights follow current context. Documents stay stable and do not auto-jump.</div>
+      ${renderFilterSummary(filterState)}
       <div class="doc-correspondence-strip">
         ${renderDocCorrespondenceItem('Source', correspondence.source)}
         ${renderDocCorrespondenceItem('Narrative', correspondence.narrative)}
@@ -77,6 +81,36 @@ function buildDocumentContext(bundle, state) {
 
 function renderContextPill(name, value, active) {
   return `<span class="doc-focus-pill${active ? ' active' : ''}"><strong>${escapeHtml(name)}:</strong> ${escapeHtml(value)}</span>`;
+}
+
+function renderFilterPills(filterState) {
+  const active = filterState.items.filter((item) => item.effective);
+  const waiting = filterState.items.filter((item) => item.requested && !item.available);
+
+  return [
+    ...active.map((item) => `<span class="doc-focus-pill filter active"><strong>Filter:</strong> ${escapeHtml(item.label)}</span>`),
+    ...waiting.map((item) => `<span class="doc-focus-pill filter waiting"><strong>Waiting:</strong> ${escapeHtml(item.label)}</span>`),
+  ].join('');
+}
+
+function renderFilterSummary(filterState) {
+  const active = filterState.items.filter((item) => item.effective).map((item) => item.label);
+  const waiting = filterState.items.filter((item) => item.requested && !item.available).map((item) => item.label);
+
+  if (!active.length && !waiting.length) {
+    return '';
+  }
+
+  const lines = [];
+  if (active.length) {
+    lines.push(`Effective map filters: ${active.join(' • ')}.`);
+  }
+  if (waiting.length) {
+    lines.push(`Waiting on trace: ${waiting.join(' • ')}.`);
+  }
+  lines.push('Filters change map density only; they do not alter document text or correspondence truth claims.');
+
+  return `<div class="doc-filter-note">${escapeHtml(lines.join(' '))}</div>`;
 }
 
 function renderDocCorrespondenceItem(name, item) {

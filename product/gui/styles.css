@@ -124,7 +124,8 @@ textarea { font: inherit; }
 .doc-focus-pill { display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(255,255,255,0.08); border-radius: 999px; padding: 6px 10px; font-size: 0.82rem; color: var(--muted); background: rgba(255,255,255,0.02); transition: border-color var(--motion-fast) var(--ease-soft), box-shadow var(--motion-medium) var(--ease-soft), background-color var(--motion-medium) var(--ease-soft), color var(--motion-fast) var(--ease-soft), opacity var(--motion-medium) var(--ease-soft); }
 .doc-focus-pill.active { color: var(--text); border-color: rgba(124, 196, 255, 0.26); box-shadow: 0 0 14px rgba(124, 196, 255, 0.05); }
 .doc-focus-pill.provisional { border-style: dashed; }
-.doc-context-note, .doc-correspondence-note { color: var(--muted); font-size: 0.84rem; }
+.doc-focus-pill.filter.waiting { border-style: dashed; border-color: rgba(255,255,255,0.16); color: var(--text); }
+.doc-context-note, .doc-correspondence-note, .doc-filter-note { color: var(--muted); font-size: 0.84rem; }
 .doc-correspondence-strip { display: grid; gap: 8px; }
 .doc-correspondence-item { display: grid; gap: 4px; padding: 9px 11px; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; background: rgba(255,255,255,0.02); }
 .documents-body { max-height: 48vh; overflow: auto; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px; transition: border-color var(--motion-medium) var(--ease-soft), opacity var(--motion-medium) var(--ease-soft); }
