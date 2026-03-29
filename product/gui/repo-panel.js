@@ -1,3 +1,4 @@
+
 import { escapeHtml } from '../app/helpers.js';
 
 export function renderRepoPanel(container, state) {
@@ -14,10 +15,21 @@ export function renderRepoPanel(container, state) {
   const caseSourceOrigin = state.caseSourceSource || 'unknown';
   const modeLabel = repoBridge.mode === 'repo' ? 'repo-connected' : 'local-only';
   const noteSaveLabel = productNote.saving ? 'Saving…' : 'Save product note';
+  const noteDeleteLabel = productNote.deleting ? 'Deleting…' : 'Delete product note';
   const caseSaveLabel = caseSource.saving ? 'Saving…' : 'Save controlled case source';
   const noteDraftState = summarizeDraftState(noteBaseline, noteDraft);
   const caseDraftState = summarizeDraftState(caseBaseline, caseDraft);
   const saveRowLabel = repoBridge.mode === 'repo' ? 'Last verified write' : 'Last local save';
+  const deleteRowLabel = repoBridge.mode === 'repo' ? 'Last verified delete' : 'Last local delete';
+  const deleteReady = Boolean(productNote.lowLevelDeleteAvailable);
+  const noteDeleteBlockedByDraft = noteDraftState.dirty;
+  const noteDeleteBlockedByMode = repoBridge.mode !== 'repo' || !deleteReady;
+  const noteDeleteDisabled = noteDeleteBlockedByDraft || noteDeleteBlockedByMode || productNote.saving || productNote.deleting;
+  const deleteGuardLabel = noteDeleteBlockedByDraft
+    ? 'Delete blocked until the loaded baseline is clean.'
+    : noteDeleteBlockedByMode
+      ? 'Delete requires repo mode and low-level git delete support.'
+      : 'Delete ready for this product-local path.';
 
   container.innerHTML = `
     <div class="repo-head">
@@ -35,8 +47,11 @@ export function renderRepoPanel(container, state) {
       <div class="detail-row"><span>Draft state</span><strong>${escapeHtml(noteDraftState.label)}</strong></div>
       <div class="detail-row"><span>${escapeHtml(saveRowLabel)}</span><strong>${escapeHtml(formatTimestamp(productNote.lastSavedAt))}</strong></div>
       <div class="detail-row"><span>Verified SHA</span><strong>${escapeHtml(productNote.lastSavedSha || '—')}</strong></div>
+      <div class="detail-row"><span>Low-level delete</span><strong>${escapeHtml(deleteReady ? 'ready' : 'unavailable')}</strong></div>
+      <div class="detail-row"><span>${escapeHtml(deleteRowLabel)}</span><strong>${escapeHtml(formatTimestamp(productNote.lastDeletedAt))}</strong></div>
       <div class="repo-write-badges">
         ${renderDraftBadge(noteDraftState)}
+        ${renderDeleteBadge(deleteReady, noteDeleteBlockedByDraft)}
       </div>
       <p>${escapeHtml(productNote.message || 'No product-note status yet.')}</p>
       <div class="repo-guard-note">This path is product-local. Restore returns to the currently loaded baseline and does not touch case truth.</div>
@@ -50,8 +65,18 @@ export function renderRepoPanel(container, state) {
         <div class="detail-row"><span>Draft state</span><strong>${escapeHtml(noteDraftState.dirty ? noteDraftState.label : 'No unsaved changes')}</strong></div>
       </div>
       <div class="repo-actions repo-actions-split">
-        <button type="button" class="repo-secondary-button" data-repo-action="restore-product-note" ${!noteDraftState.dirty || productNote.saving ? 'disabled' : ''}>Restore loaded</button>
-        <button type="button" class="repo-save-button" data-repo-action="save-product-note" ${productNote.saving || !noteDraftState.dirty ? 'disabled' : ''}>${escapeHtml(noteSaveLabel)}</button>
+        <button type="button" class="repo-secondary-button" data-repo-action="restore-product-note" ${!noteDraftState.dirty || productNote.saving || productNote.deleting ? 'disabled' : ''}>Restore loaded</button>
+        <button type="button" class="repo-save-button" data-repo-action="save-product-note" ${productNote.saving || productNote.deleting || !noteDraftState.dirty ? 'disabled' : ''}>${escapeHtml(noteSaveLabel)}</button>
+      </div>
+      <div class="repo-presave-summary ${noteDeleteDisabled ? 'idle' : 'ready'}">
+        <div class="moment-subhead">Guarded delete summary</div>
+        <div class="detail-row"><span>Scope</span><strong>product-local</strong></div>
+        <div class="detail-row"><span>Will remove</span><strong>${escapeHtml(productNote.targetPath || '—')}</strong></div>
+        <div class="detail-row"><span>Connector mode</span><strong>${escapeHtml(modeLabel)}</strong></div>
+        <div class="detail-row"><span>Delete guard</span><strong>${escapeHtml(deleteGuardLabel)}</strong></div>
+      </div>
+      <div class="repo-actions">
+        <button type="button" class="repo-secondary-button" data-repo-action="delete-product-note" ${noteDeleteDisabled ? 'disabled' : ''}>${escapeHtml(noteDeleteLabel)}</button>
       </div>
     </div>
 
@@ -107,6 +132,16 @@ function renderDraftBadge(draftState) {
   return `<span class="artifact-pill ${draftState.dirty ? 'waiting' : 'present'}">${escapeHtml(draftState.dirty ? 'unsaved draft' : 'baseline matched')}</span>`;
 }
 
+function renderDeleteBadge(deleteReady, blockedByDraft) {
+  const label = blockedByDraft
+    ? 'delete blocked by draft'
+    : deleteReady
+      ? 'low-level delete ready'
+      : 'low-level delete unavailable';
+  const stateClass = blockedByDraft ? 'waiting' : (deleteReady ? 'present' : 'missing');
+  return `<span class="artifact-pill ${stateClass}">${escapeHtml(label)}</span>`;
+}
+
 function countLines(value) {
   if (!value) return 0;
   return String(value).split('\n').length;
@@ -119,6 +154,6 @@ function formatSigned(value) {
 }
 
 function formatTimestamp(value) {
-  if (!value) return 'Not saved yet';
+  if (!value) return 'Not recorded yet';
   return value;
 }
