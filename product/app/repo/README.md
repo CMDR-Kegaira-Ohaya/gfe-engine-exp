@@ -22,3 +22,12 @@ Write-path defaults:
 - verify writes with read-back, not only with the save response
 - allow one bounded stale-SHA recovery retry when the repo moved between SHA read and write
 - classify common write failures so the UI can report permission/path/stale-state/payload problems more clearly
+
+ Hard-delete defaults:
+- do not rely on `deleteFile` as ha core runtime path
+- use the proven low-level git flow instead:
+  - `commit.tree` → `getCommit` or `getTree`
+  - `createTree` with the target path set to `sha: null`
+  - `createCommit`
+  - `updateRef`
+- after updateRef, confirm the path is gone with `getPath`
