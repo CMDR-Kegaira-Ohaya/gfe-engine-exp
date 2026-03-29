@@ -74,11 +74,14 @@
 │   │   │   │   ├── upsert-case-source.js
 │   │   │   │   └── upsert-product-file.js
 │   │   │   ├── connector.js
+│   │   │   ├── errors.js
+│   │   │   ├── file-state.js
 │   │   │   ├── guardrails.js
 │   │   │   ├── README.md
 │   │   │   ├── repo-profile.js
 │   │   │   ├── runtime.js
-│   │   │   └── verify.js
+│   │   │   ├── verify.js
+│   │   │   └── write-text-file.js
 │   │   ├── boot.js
 │   │   ├── case-bundle.js
 │   │   ├── cases-index.json
