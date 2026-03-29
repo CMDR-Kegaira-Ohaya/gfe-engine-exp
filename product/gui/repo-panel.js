@@ -1,5 +1,9 @@
 
 import { escapeHtml } from '../app/helpers.js';
+import { resolveRuntimeRepoConnector, clearLocalProductNote } from '../app/repo/runtime.js';
+import { deleteProductFile } from '../app/repo/commands/delete-product-file.js';
+
+bindRepoPanelDeleteHandler();
 
 export function renderRepoPanel(container, state) {
   if (!container) return;
@@ -40,7 +44,12 @@ export function renderRepoPanel(container, state) {
       <div class="repo-mode-pill ${repoBridge.mode === 'repo' ? 'connected' : 'local'}">${escapeHtml(modeLabel)}</div>
     </div>
 
-    <div class="context-section repo-section">
+    <div
+      class="context-section repo-section"
+      data-product-note-delete-panel="true"
+      data-product-note-target-path="${escapeHtml(productNote.targetPath || '')}"
+      data-product-note-baseline="${escapeHtml(noteBaseline)}"
+    >
       <div class="eyebrow">Product-local write</div>
       <div class="detail-row"><span>Target path</span><strong>${escapeHtml(productNote.targetPath || '—')}</strong></div>
       <div class="detail-row"><span>Draft source</span><strong>${escapeHtml(noteSource)}</strong></div>
@@ -53,7 +62,7 @@ export function renderRepoPanel(container, state) {
         ${renderDraftBadge(noteDraftState)}
         ${renderDeleteBadge(deleteReady, noteDeleteBlockedByDraft)}
       </div>
-      <p>${escapeHtml(productNote.message || 'No product-note status yet.')}</p>
+      <p data-product-note-status="true">${escapeHtml(productNote.message || 'No product-note status yet.')}</p>
       <div class="repo-guard-note">This path is product-local. Restore returns to the currently loaded baseline and does not touch case truth.</div>
       <label class="moment-subhead" for="product-note-input">Product note</label>
       <textarea id="product-note-input" class="repo-textarea" data-repo-note-input="true">${escapeHtml(noteDraft)}</textarea>
@@ -111,6 +120,71 @@ export function renderRepoPanel(container, state) {
         : '<p>No case loaded yet. Controlled case save becomes available after a case opens.</p>'}
     </div>
   `;
+}
+
+function bindRepoPanelDeleteHandler() {
+  if (window.__GFE_PRODUCT_NOTE_DELETE_BOUND__) return;
+  window.__GFE_PRODUCT_NOTE_DELETE_BOUND__ = true;
+
+  document.addEventListener('click', async (event) => {
+    const button = event.target.closest('[data-repo-action="delete-product-note"]');
+    if (!button) return;
+
+    const panel = button.closest('[data-product-note-delete-panel]');
+    if (!panel || button.disabled) return;
+
+    const textarea = panel.querySelector('[data-repo-note-input]');
+    const statusNode = panel.querySelector('[data-product-note-status]');
+    const baseline = panel.dataset.productNoteBaseline || '';
+    const draft = textarea?.value || '';
+    if (draft !== baseline) {
+      setDeleteStatus(statusNode, 'Delete blocked: restore or save the product note so the loaded baseline is clean first.');
+      return;
+    }
+
+    const runtime = resolveRuntimeRepoConnector();
+    if (!runtime.connector) {
+      setDeleteStatus(statusNode, 'Delete blocked: no repo connector attached.');
+      return;
+    }
+
+    if (!runtime.connector.supportsLowLevelDelete) {
+      setDeleteStatus(statusNode, 'Delete blocked: connector does not expose the proven low-level delete path.');
+      return;
+    }
+
+    const targetPath = panel.dataset.productNoteTargetPath || '';
+    if (!targetPath) {
+      setDeleteStatus(statusNode, 'Delete blocked: no product-note target path is loaded.');
+      return;
+    }
+
+    button.disabled = true;
+    const originalLabel = button.textContent;
+    button.textContent = 'Deleting…';
+    setDeleteStatus(statusNode, 'Deleting product-local note through the proven low-level git path…');
+
+    try {
+      const result = await deleteProductFile(runtime.connector, {
+        path: targetPath,
+        message: 'Delete product workbench note from product workbench',
+        branch: 'main',
+      });
+
+      clearLocalProductNote();
+      setDeleteStatus(statusNode, `Verified product note delete at ${result.path}. Reloading…`);
+      window.location.reload();
+    } catch (error) {
+      button.disabled = false;
+      button.textContent = originalLabel;
+      setDeleteStatus(statusNode, `Product note delete failed: ${error.message}.`);
+    }
+  });
+}
+
+function setDeleteStatus(node, message) {
+  if (!node) return;
+  node.textContent = String(message ?? '');
 }
 
 function summarizeDraftState(baseline, draft) {
