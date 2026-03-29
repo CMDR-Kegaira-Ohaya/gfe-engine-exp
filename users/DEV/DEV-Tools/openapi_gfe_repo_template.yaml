@@ -1,8 +1,16 @@
 openapi: 3.1.1
 info:
   title: GFE Core Repo Control
-  description: 'Read, write, inspect, and manage a per-recipient copy of the GFE core repo through the GitHub REST API. This template is intended for cloned/copy repos, not for one shared multi-user writable instance. It reflects the lean core write-path defaults: prefer saveFile for routine maintenance, use Base64 only at the connector boundary, and reserve low-level git-object flows for advanced recovery or multi-file construction.'
-  version: 3.4-template
+  description: 'Read, write, inspect, and manage a per-recipient copy of the GFE core repo
+    through the GitHub REST API.
+    This template is intended for cloned/copy repos, not for one shared
+    multi-user writable instance.
+    It reflects the lean core write-path defaults: prefer saveFile for routine
+    maintenance, use Base64 only at the connector boundary, and reserve
+    low-level git-object flows for advanced recovery or multi-file
+    construction. Hard deletes should use the low-level git flow
+    (createTree with sha:null, createCommit, updateRef) instead of deleteFile.'
+  version: 3.5-template
 servers:
 - url: https://api.github.com/repos/OWNER_PLACEHOLDER/REPO_PLACEHOLDER
   description: Recipient GFE Core Repository
@@ -118,47 +126,6 @@ paths:
         '422':
           description: Malformed payload, invalid Base64 content, or missing/invalid SHA for the requested update.
       description: Create or update any repository file by path. Use serially. Prepare final UTF-8 text first, then Base64-encode once at the connector boundary. For updates, read the current SHA with getPath immediately before saveFile.
-    delete:
-      operationId: deleteFile
-      summary: Delete any repository file by path
-      parameters:
-      - name: path
-        in: path
-        required: true
-        schema:
-          type: string
-        description: Any repository path in the recipient repo copy.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-              - message
-              - sha
-              - branch
-              properties:
-                message:
-                  type: string
-                sha:
-                  type: string
-                branch:
-                  type: string
-      responses:
-        '200':
-          description: Deleted
-        '401':
-          description: Unauthorized or bad token.
-        '403':
-          description: Forbidden by permissions, token scope, or protected resource policy.
-        '404':
-          description: Path not found or repository resource unavailable at the requested location.
-        '409':
-          description: Conflict or stale SHA / branch moved ahead of the base used for the write.
-        '422':
-          description: Malformed delete payload or missing/invalid SHA for the current file version.
-      description: Delete any repository file by path. Use serially and read the current file SHA with getPath immediately before deleteFile. If a connector mishandles DELETE bodies, use the low-level git flow instead: createTree with sha:null, then createCommit and updateRef.
   /contents/cases:
     get:
       operationId: listCases
@@ -293,7 +260,7 @@ paths:
   /git/trees:
     post:
       operationId: createTree
-      summary: Create a git tree for one or more files
+      summary: Create a git tree for one or more file changes
       requestBody:
         required: true
         content:
@@ -321,8 +288,8 @@ paths:
                         description: Usually blob
                       sha:
                         type:
-                          - string
-                          - 'null'
+                        - string
+                        - 'null'
                         description: Blob SHA, if using a pre-created blob. Use null to remove an entry in the new tree.
                       content:
                         type: string
@@ -330,7 +297,7 @@ paths:
       responses:
         '201':
           description: Tree created
-      description: Advanced low-level git operation for multi-file construction or recovery work. Prefer saveFile for routine writes. To remove a path from the new tree, include the entry with sha: null.
+      description: Advanced low-level git operation for multi-file construction or delete flows. Prefer saveFile for routine writes. To remove a path from the new tree, include the entry with sha: null.
   /git/commits/{commit_sha}:
     get:
       operationId: getCommit
@@ -377,7 +344,7 @@ paths:
       responses:
         '201':
           description: Commit created
-      description: Advanced low-level git operation. A created commit is not live until updateRef advances the intended branch ref.
+      description: Advanced low-level git operation. Use after createTree when building a delete or recovery change. A created commit is not live until updateRef advances the target ref.
   /merges:
     post:
       operationId: mergeBranch
@@ -550,7 +517,7 @@ paths:
       responses:
         '200':
           description: Ref updated
-      description: Update a git reference to a new SHA. The ref must be a full ref such as heads/main, heads/ui/actions-shell, or tags/v1. A low-level git change is not live until updateRef succeeds and a follow-up getRef/getBranchRef confirms the new head SHA.
+      description: Advance a git ref to a new SHA. Use after createCommit to make a low-level delete or recovery change live, then confirm with getRef or getBranchRef.
   /pages/builds:
     post:
       operationId: requestPagesBuild
