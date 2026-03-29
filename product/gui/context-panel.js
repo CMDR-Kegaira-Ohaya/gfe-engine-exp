@@ -1,5 +1,5 @@
 import { escapeHtml, eventsForStep, label, participantFromAlpha } from '../app/helpers.js';
-import { FILTERS, normalizeFilters } from '../app/filters.js';
+import { resolveFilterState } from '../app/filters.js';
 import { activeTraceTarget, buildTraceIndex, sameTarget, targetLabel } from '../app/interaction-state.js';
 import { lensDescription, lensLabel, normalizeLens } from '../app/lenses.js';
 import { buildCorrespondenceHints } from '../app/correspondence.js';
@@ -14,7 +14,7 @@ export function renderContextPanel(container, state) {
   }
 
   const lens = normalizeLens(state.lens);
-  const filters = normalizeFilters(state.filters);
+  const filterState = resolveFilterState(state.filters, { traceActive: Boolean(state.trace?.enabled) });
   const encoding = bundle.structure;
   const selection = state.selection;
   const pinned = state.pinned;
@@ -30,7 +30,7 @@ export function renderContextPanel(container, state) {
       <div class="detail-row"><span>Lens</span><strong>${escapeHtml(lensLabel(lens))}</strong></div>
       <p>${escapeHtml(lensDescription(lens))}</p>
     </div>
-    ${renderFilterStatus(filters)}
+    ${renderFilterStatus(filterState)}
     ${renderInteractionStatus(bundle, state, trace)}
     ${renderCorrespondenceStatus(correspondence)}
     ${traceTarget ? renderProcessFlow(trace) : ''}
@@ -38,8 +38,9 @@ export function renderContextPanel(container, state) {
   `;
 }
 
-function renderFilterStatus(filters) {
-  const active = FILTERS.filter((filter) => filters[filter.id]);
+function renderFilterStatus(filterState) {
+  const active = filterState.items.filter((item) => item.effective);
+  const waiting = filterState.items.filter((item) => item.requested && !item.available);
 
   return `
     <div class="context-section">
@@ -47,11 +48,19 @@ function renderFilterStatus(filters) {
       ${active.length
         ? `
           <div class="artifact-grid">
-            ${active.map((filter) => `<span class="artifact-pill present">${escapeHtml(filter.label)}</span>`).join('')}
+            ${active.map((item) => `<span class="artifact-pill present">${escapeHtml(item.label)}</span>`).join('')}
           </div>
           <p>Filters reduce visible clutter only. They do not change case meaning.</p>
         `
-        : '<p>No clutter-reduction filters are active.</p>'}
+        : '<p>No clutter-reduction filters are currently active.</p>'}
+      ${waiting.length
+        ? `
+          <div class="artifact-grid">
+            ${waiting.map((item) => `<span class="artifact-pill waiting">${escapeHtml(item.label)}</span>`).join('')}
+          </div>
+          <p>Waiting filters are armed but not yet effective. ${escapeHtml(waiting.map((item) => item.reason).join(' '))}</p>
+        `
+        : ''}
     </div>
   `;
 }

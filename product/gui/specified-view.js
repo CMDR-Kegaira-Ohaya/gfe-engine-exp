@@ -1,5 +1,5 @@
 import { escapeHtml, eventTitle, eventsForStep, label } from '../app/helpers.js';
-import { normalizeFilters } from '../app/filters.js';
+import { resolveFilterState } from '../app/filters.js';
 import { activeTraceTarget, buildTraceIndex, sameTarget, targetLabel } from '../app/interaction-state.js';
 import { lensLabel, normalizeLens } from '../app/lenses.js';
 
@@ -19,20 +19,21 @@ export function renderSpecifiedView(container, state) {
   }
 
   const lens = normalizeLens(state.lens);
-  const filters = normalizeFilters(state.filters);
   const steps = Array.isArray(encoding.timeline) ? encoding.timeline : [];
   const events = Array.isArray(encoding.payload_events) ? encoding.payload_events : [];
   const selected = state.selection;
   const pinned = state.pinned;
   const traceTarget = activeTraceTarget(state);
   const trace = buildTraceIndex(bundle, traceTarget);
+  const filterState = resolveFilterState(state.filters, { traceActive: Boolean(traceTarget) });
+  const filters = filterState.effective;
   const momentsWithEvents = steps.reduce((count, _step, stepIndex) => count + (eventsForStep(events, stepIndex).length ? 1 : 0), 0);
   const visibleSteps = steps.map((step, stepIndex) => ({
     step,
     stepIndex,
     stepEvents: eventsForStep(events, stepIndex),
   })).filter(({ stepIndex, stepEvents }) => {
-    if (filters.tracedFlowOnly && traceTarget && !trace.moments.has(String(stepIndex)) && trace.anchorMoment !== stepIndex) {
+    if (filters.tracedFlowOnly && !trace.moments.has(String(stepIndex)) && trace.anchorMoment !== stepIndex) {
       return false;
     }
 
@@ -63,12 +64,12 @@ export function renderSpecifiedView(container, state) {
       </div>
     </div>
 
-    ${renderLensStrip(lens, bundle, traceTarget, trace, momentsWithEvents, events.length, visibleSteps.length, filters)}
+    ${renderLensStrip(lens, bundle, traceTarget, trace, momentsWithEvents, events.length, visibleSteps.length, filterState)}
 
     <div class="moment-grid lens-${lens}">
       ${visibleSteps.length
         ? visibleSteps.map(({ step, stepIndex, stepEvents }) => renderMomentCard(bundle, step, stepIndex, stepEvents, state, trace, lens, filters)).join('')
-        : '<div class="empty-state">No moments match the current lens and filter settings.</div>'}
+        : renderEmptyFilteredState(filterState)}
     </div>
   `;
 }
@@ -175,8 +176,9 @@ function renderMomentCard(bundle, step, stepIndex, stepEvents, state, trace, len
   `;
 }
 
-function renderLensStrip(lens, bundle, traceTarget, trace, momentsWithEvents, totalEvents, visibleMoments, filters) {
-  const activeFilters = Object.entries(filters).filter(([, value]) => value).map(([key]) => filterLabel(key));
+function renderLensStrip(lens, bundle, traceTarget, trace, momentsWithEvents, totalEvents, visibleMoments, filterState) {
+  const effectiveFilters = filterState.items.filter((item) => item.effective).map((item) => item.label);
+  const waitingFilters = filterState.items.filter((item) => item.requested && !item.available).map((item) => item.label);
 
   if (lens === 'process') {
     return `
@@ -189,7 +191,7 @@ function renderLensStrip(lens, bundle, traceTarget, trace, momentsWithEvents, to
                 : '<span class="muted">No traced process flow yet.</span>')
             : '<span class="muted">Trace a target to reveal process continuity through moments.</span>'}
         </div>
-        ${activeFilters.length ? `<div class="lens-strip-note">Active filters: ${escapeHtml(activeFilters.join(' • '))}. Visible moments: ${escapeHtml(visibleMoments)}.</div>` : ''}
+        ${renderFilterNotes(effectiveFilters, waitingFilters, visibleMoments)}
       </div>
     `;
   }
@@ -206,11 +208,12 @@ function renderLensStrip(lens, bundle, traceTarget, trace, momentsWithEvents, to
           <span class="flow-pill evidence provisional">links: provisional</span>
         </div>
         <div class="lens-strip-note">Evidence lens shows what artifacts and payload-bearing moments are available now. It does not claim solved correspondence beyond what exists.</div>
+        ${renderFilterNotes(effectiveFilters, waitingFilters, visibleMoments)}
       </div>
     `;
   }
 
-  if (!traceTarget && !activeFilters.length) {
+  if (!traceTarget && !filterState.counts.requested) {
     return '';
   }
 
@@ -224,14 +227,39 @@ function renderLensStrip(lens, bundle, traceTarget, trace, momentsWithEvents, to
               : '<span class="muted">No traced process flow yet.</span>')
           : '<span class="muted">Whole arrangement remains primary. Trace appears here quietly when active.</span>'}
       </div>
-      ${activeFilters.length ? `<div class="lens-strip-note">Active filters: ${escapeHtml(activeFilters.join(' • '))}. Visible moments: ${escapeHtml(visibleMoments)}.</div>` : ''}
+      ${renderFilterNotes(effectiveFilters, waitingFilters, visibleMoments)}
     </div>
   `;
 }
 
-function filterLabel(id) {
-  if (id === 'tracedFlowOnly') return 'traced flow only';
-  if (id === 'payloadOnly') return 'payload moments only';
-  if (id === 'focusDetailsOnly') return 'details on focus';
-  return id;
+function renderFilterNotes(effectiveFilters, waitingFilters, visibleMoments) {
+  const lines = [];
+
+  if (effectiveFilters.length) {
+    lines.push(`Active filters: ${effectiveFilters.join(' • ')}. Visible moments: ${visibleMoments}.`);
+  }
+
+  if (waitingFilters.length) {
+    lines.push(`Waiting: ${waitingFilters.join(' • ')}.`);
+  }
+
+  if (!lines.length) {
+    return '';
+  }
+
+  return `<div class="lens-strip-note">${escapeHtml(lines.join(' '))}</div>`;
+}
+
+function renderEmptyFilteredState(filterState) {
+  const effective = filterState.items.filter((item) => item.effective).map((item) => item.label);
+  const waiting = filterState.items.filter((item) => item.requested && !item.available).map((item) => item.label);
+
+  return `
+    <div class="empty-state filter-empty-state">
+      <strong>No moments match the current lens and filter settings.</strong>
+      ${effective.length ? `<div>Active filters: ${escapeHtml(effective.join(' • '))}</div>` : ''}
+      ${waiting.length ? `<div>Waiting filters: ${escapeHtml(waiting.join(' • '))}</div>` : ''}
+      <div>Relax one filter or change focus to restore the wider field.</div>
+    </div>
+  `;
 }

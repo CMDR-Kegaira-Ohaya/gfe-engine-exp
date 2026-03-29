@@ -2,7 +2,7 @@ import { createShell } from './shell.js';
 import { createStore } from './store.js';
 import { loadCasesIndex, loadCaseBundle, resolveInitialSlug } from './case-bundle.js';
 import { activeTraceTarget, sameTarget } from './interaction-state.js';
-import { FILTERS, activeFilterCount, normalizeFilters, toggleFilter } from './filters.js';
+import { FILTERS, normalizeFilters, resolveFilterState, toggleFilter } from './filters.js';
 import { LENSES, lensLabel, lensNote, normalizeLens } from './lenses.js';
 import { renderSpecifiedView } from '../gui/specified-view.js';
 import { renderContextPanel } from '../gui/context-panel.js';
@@ -102,24 +102,38 @@ function renderLensBar(state) {
 }
 
 function renderFilterBar(state) {
-  const filters = normalizeFilters(state.filters);
-  const count = activeFilterCount(filters);
+  const filterState = resolveFilterState(state.filters, { traceActive: Boolean(state.trace?.enabled) });
+  const requestedCount = filterState.counts.requested;
+  const waiting = filterState.items.filter((item) => item.requested && !item.available);
 
   els.filterBar.innerHTML = `
-    <div class="filter-bar-label">Filters${count ? ` (${count})` : ''}</div>
+    <div class="filter-bar-label">Filters${requestedCount ? ` (${requestedCount})` : ''}</div>
     <div class="filter-button-row">
-      ${FILTERS.map((filter) => `
-        <button
-          type="button"
-          class="filter-button${filters[filter.id] ? ' active' : ''}"
-          data-filter-id="${filter.id}"
-          aria-pressed="${filters[filter.id] ? 'true' : 'false'}"
-          title="${escapeHtml(filter.description)}"
-        >
-          ${escapeHtml(filter.label)}
-        </button>
-      `).join('')}
+      ${FILTERS.map((filter) => {
+        const status = filterState.items.find((item) => item.id === filter.id);
+        const stateClass = status.requested
+          ? (status.available ? ' active' : ' waiting')
+          : (status.available ? '' : ' unavailable');
+        const title = status.available
+          ? filter.description
+          : `${filter.description} ${status.reason}`;
+
+        return `
+          <button
+            type="button"
+            class="filter-button${stateClass}"
+            data-filter-id="${filter.id}"
+            aria-pressed="${status.requested ? 'true' : 'false'}"
+            title="${escapeHtml(title)}"
+          >
+            ${escapeHtml(filter.label)}
+          </button>
+        `;
+      }).join('')}
     </div>
+    ${waiting.length
+      ? `<div class="filter-bar-note">Waiting: ${escapeHtml(waiting.map((item) => item.label).join(' • '))}. Start a trace to activate.</div>`
+      : ''}
   `;
 }
 
