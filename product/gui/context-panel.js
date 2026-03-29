@@ -2,6 +2,7 @@ import { escapeHtml, eventsForStep, label, participantFromAlpha } from '../app/h
 import { FILTERS, normalizeFilters } from '../app/filters.js';
 import { activeTraceTarget, buildTraceIndex, sameTarget, targetLabel } from '../app/interaction-state.js';
 import { lensDescription, lensLabel, normalizeLens } from '../app/lenses.js';
+import { buildCorrespondenceHints } from '../app/correspondence.js';
 
 export function renderContextPanel(container, state) {
   if (!container) return;
@@ -20,6 +21,7 @@ export function renderContextPanel(container, state) {
   const traceTarget = activeTraceTarget(state);
   const trace = buildTraceIndex(bundle, traceTarget);
   const focusTarget = selection || pinned || traceTarget;
+  const correspondence = buildCorrespondenceHints(bundle, state);
 
   container.innerHTML = `
     <h2>Context Panel</h2>
@@ -30,6 +32,7 @@ export function renderContextPanel(container, state) {
     </div>
     ${renderFilterStatus(filters)}
     ${renderInteractionStatus(bundle, state, trace)}
+    ${renderCorrespondenceStatus(correspondence)}
     ${traceTarget ? renderProcessFlow(trace) : ''}
     ${focusTarget ? renderTargetDetails(bundle, focusTarget, selection, pinned, traceTarget, trace) : renderOverview(bundle, encoding, lens)}
   `;
@@ -66,6 +69,46 @@ function renderInteractionStatus(bundle, state, trace) {
       <div class="detail-row"><span>Trace</span><strong>${escapeHtml(traceTarget ? targetLabel(bundle, traceTarget) : 'Off')}</strong></div>
       ${traceTarget ? `<p>Process trace currently spans ${escapeHtml(trace.counts.moments)} moment(s), ${escapeHtml(trace.counts.entities)} entit${trace.counts.entities === 1 ? 'y' : 'ies'}, and ${escapeHtml(trace.counts.events)} event(s).</p>` : '<p>Inspect a target, then pin or trace it explicitly.</p>'}
       ${renderInteractionActions(selection, pinned, traceTarget)}
+    </div>
+  `;
+}
+
+function renderCorrespondenceStatus(correspondence) {
+  return `
+    <div class="context-section">
+      <div class="eyebrow">Correspondence hints</div>
+      <div class="detail-row"><span>Basis</span><strong>${escapeHtml(correspondence.basisLabel)}</strong></div>
+      <div class="detail-row"><span>State</span><strong>Provisional</strong></div>
+      <p>${escapeHtml(correspondence.note)}</p>
+      <div class="timeline-list correspondence-list">
+        ${renderCorrespondenceItem('Source', correspondence.source)}
+        ${renderCorrespondenceItem('Narrative', correspondence.narrative)}
+        ${renderStructureItem(correspondence.structure)}
+      </div>
+    </div>
+  `;
+}
+
+function renderCorrespondenceItem(name, item) {
+  const matched = item.matchedTerms?.length
+    ? `matched terms: ${item.matchedTerms.join(', ')}`
+    : item.present
+      ? 'artifact present, but no current term hint matched'
+      : 'artifact missing';
+
+  return `
+    <div class="timeline-list-item correspondence-item ${escapeHtml(item.status)}">
+      <strong>${escapeHtml(name)}</strong>
+      <span>${escapeHtml(matched)}</span>
+    </div>
+  `;
+}
+
+function renderStructureItem(item) {
+  return `
+    <div class="timeline-list-item correspondence-item ${item.present ? 'anchored' : 'missing'}">
+      <strong>Structure</strong>
+      <span>${escapeHtml(item.note)}</span>
     </div>
   `;
 }

@@ -1,6 +1,7 @@
-import { escapeHtml, eventsForStep, label, participantFromAlpha } from '../app/helpers.js';
-import { activeTraceTarget, sameTarget, targetLabel } from '../app/interaction-state.js';
+import { escapeHtml } from '../app/helpers.js';
+import { activeTraceTarget, targetLabel } from '../app/interaction-state.js';
 import { lensDescription, lensLabel, normalizeLens } from '../app/lenses.js';
+import { buildCorrespondenceHints, highlightTermsForState } from '../app/correspondence.js';
 
 export function renderDocumentsPanel(container, state) {
   if (!container) return;
@@ -16,6 +17,7 @@ export function renderDocumentsPanel(container, state) {
   const sourceText = bundle.source?.text || '';
   const narrativeText = bundle.narrative?.text || '';
   const docContext = buildDocumentContext(bundle, state);
+  const correspondence = buildCorrespondenceHints(bundle, state);
 
   container.innerHTML = `
     <div class="documents-head">
@@ -35,8 +37,14 @@ export function renderDocumentsPanel(container, state) {
         ${renderContextPill('Inspect', docContext.selectionLabel, docContext.selectionActive)}
         ${renderContextPill('Pin', docContext.pinnedLabel, docContext.pinnedActive)}
         ${renderContextPill('Trace', docContext.traceLabel, docContext.traceActive)}
+        <span class="doc-focus-pill provisional active"><strong>Correspondence:</strong> provisional</span>
       </div>
       <div class="doc-context-note">${escapeHtml(lensDescription(lens))} Gentle highlights follow current context. Documents stay stable and do not auto-jump.</div>
+      <div class="doc-correspondence-strip">
+        ${renderDocCorrespondenceItem('Source', correspondence.source)}
+        ${renderDocCorrespondenceItem('Narrative', correspondence.narrative)}
+      </div>
+      <div class="doc-correspondence-note">${escapeHtml(correspondence.note)}</div>
     </div>
 
     <div class="documents-body">
@@ -63,7 +71,7 @@ function buildDocumentContext(bundle, state) {
     selectionActive: Boolean(selection),
     pinnedActive: Boolean(pinned),
     traceActive: Boolean(traceTarget),
-    highlightTerms: deriveHighlightTerms(bundle, [selection, pinned, traceTarget]),
+    highlightTerms: highlightTermsForState(bundle, state),
   };
 }
 
@@ -71,69 +79,19 @@ function renderContextPill(name, value, active) {
   return `<span class="doc-focus-pill${active ? ' active' : ''}"><strong>${escapeHtml(name)}:</strong> ${escapeHtml(value)}</span>`;
 }
 
-function deriveHighlightTerms(bundle, targets) {
-  const encoding = bundle?.structure;
-  const collected = [];
+function renderDocCorrespondenceItem(name, item) {
+  const statusLabel = item.status === 'term-hints'
+    ? `matched: ${item.matchedTerms.join(', ')}`
+    : item.present
+      ? 'present, no current term hint matched'
+      : 'missing';
 
-  targets.filter(Boolean).forEach((target) => {
-    if (target.type === 'entity') {
-      collected.push(target.id, label(target.id));
-      return;
-    }
-
-    if (target.type === 'moment') {
-      const step = encoding?.timeline?.[Number(target.id)];
-      if (step?.timestep_label) {
-        collected.push(step.timestep_label);
-      }
-      return;
-    }
-
-    if (target.type === 'event') {
-      const event = findEventById(encoding, target.id);
-      if (!event) return;
-
-      [
-        event?.sourceParticipantId,
-        participantFromAlpha(event?.alpha_source),
-        event?.receivingParticipantId,
-        participantFromAlpha(event?.alpha_receiving),
-        event?.mediumParticipantId,
-        participantFromAlpha(event?.alpha_medium),
-      ].forEach((value) => {
-        if (value) {
-          collected.push(value, label(value));
-        }
-      });
-    }
-  });
-
-  const deduped = [];
-  const seen = new Set();
-
-  collected
-    .map((value) => String(value || '').trim())
-    .filter((value) => value.length >= 3)
-    .sort((left, right) => right.length - left.length)
-    .forEach((value) => {
-      const key = value.toLowerCase();
-      if (!seen.has(key)) {
-        seen.add(key);
-        deduped.push(value);
-      }
-    });
-
-  return deduped.slice(0, 10);
-}
-
-function findEventById(encoding, id) {
-  if (!encoding) return null;
-
-  const [stepRaw, eventRaw] = String(id).split(':');
-  const stepIndex = Number(stepRaw);
-  const eventIndex = Number(eventRaw);
-  const stepEvents = eventsForStep(Array.isArray(encoding.payload_events) ? encoding.payload_events : [], stepIndex);
-  return stepEvents[eventIndex] || null;
+  return `
+    <div class="doc-correspondence-item ${escapeHtml(item.status)}">
+      <strong>${escapeHtml(name)}</strong>
+      <span>${escapeHtml(statusLabel)}</span>
+    </div>
+  `;
 }
 
 function highlightText(text, terms) {
