@@ -142,11 +142,12 @@
       "target_state": "full",
       "required_fixture_classes": ["golden", "contrast", "anti-collapse", "integration"],
       "runtime_surface": "solver/relation.js face-aware continuity/transfer/emission handling",
-      "packs": ["face_split.json", "face_anti_collapse.json"],
-      "fixture_ids": ["FX-FACE-01", "FX-FACE-02"],
+      "packs": ["face_split.json", "face_anti_collapse.json", "face_integration.json"],
+      "fixture_ids": ["FX-FACE-01", "FX-FACE-02", "FX-INT-10"],
       "notes": [
         "Inner vs outer face is solver-operative and hard-gated.",
         "A dedicated anti-collapse face fixture now protects inner landing against outer-emission flattening under a broadly similar relation frame.",
+        "A row-scoped integration fixture now proves face-facing coexistence with relation, order, distributed Leg, recursive field, envelope, and cascade outputs.",
         "Still requires fuller corpus and invariant depth before full."
       ]
     },
