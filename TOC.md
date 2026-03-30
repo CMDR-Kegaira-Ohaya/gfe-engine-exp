@@ -128,6 +128,7 @@
 │   ├── dashboard.js
 │   ├── engine.js
 │   ├── envelope.js
+│   ├── failure.js
 │   ├── index.js
 │   ├── payload.js
 │   ├── phase0-audit.js
