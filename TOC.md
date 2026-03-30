@@ -122,6 +122,7 @@
 │   │       ├── failure_projection.json
 │   │       ├── failure_split.json
 │   │       ├── family_truth.json
+│   │       ├── leg_distributed.json
 │   │       ├── manifest.json
 │   │       ├── order_split.json
 │   │       ├── README.md
@@ -137,6 +138,7 @@
 │   ├── envelope.js
 │   ├── failure.js
 │   ├── index.js
+│   ├── leg_distributed.js
 │   ├── order.js
 │   ├── payload.js
 │   ├── phase0-audit.js
