@@ -104,12 +104,13 @@
       "target_state": "full",
       "required_fixture_classes": ["golden", "contrast", "anti-collapse", "integration"],
       "runtime_surface": "solver/failure.js plastic-deformation grammar candidate",
-      "packs": ["failure_split.json", "failure_plastic_deformation_anti_collapse.json"],
-      "fixture_ids": ["FX-FAIL-02", "FX-FAIL-10"],
+      "packs": ["failure_split.json", "failure_plastic_deformation_anti_collapse.json", "failure_plastic_deformation_integration.json"],
+      "fixture_ids": ["FX-FAIL-02", "FX-FAIL-10", "FX-INT-13"],
       "notes": [
         "Plastic deformation is executable and contrast-tested against transient stress.",
         "A dedicated anti-collapse plastic-deformation fixture now protects maintained-form deformation against collapse shorthand under a broadly similar accumulated-pressure frame.",
-        "It remains the least mature failure row and still lacks integration proof."
+        "A row-scoped integration fixture now proves plastic-facing coexistence of maintained-form deformation with relation, face, order, distributed Leg, recursive field, envelope, prevalence, and cascade outputs.",
+        "It remains partial because the fuller corpus and invariant depth required for full are still missing."
       ]
     },
     {
