@@ -11,6 +11,7 @@ Boundary:
 - this is not yet the polished final validation corpus
 - fixture names and purposes are contract-facing
 - contrast pairs are allowed to *fail to differ* at first; that is useful audit information during phased work
+- invariant-suite declarations may exist here as scaffold before executable suite enforcement is added
 
 Primary entrypoints:
 - `solver/phase0-audit.js`
@@ -26,12 +27,15 @@ Primary entrypoints:
 - `solver/fixtures/phase0/field_recursion.json`
 - `solver/fixtures/phase0/anti_collapse.json`
 - `solver/fixtures/phase0/integration_paths.json`
+- `solver/fixtures/phase0/invariant_registry.json`
 - `solver/fixtures/phase0/coverage_rows.json`
 
 Audit loading rule:
 - the Phase 0 audit now loads **all** `.json` fixture packs in this directory
 - `manifest.json` remains the base scaffold pack
 - focused packs such as `failure_split.json`, `failure_projection.json`, `relation_split.json`, `threshold_split.json`, `family_truth.json`, `face_split.json`, `order_split.json`, `leg_distributed.json`, `field_recursion.json`, `anti_collapse.json`, and `integration_paths.json` are supplemental, not competing authority surfaces
+- row-scoped packs such as `core_contrast.json`, `core_anti_collapse.json`, `core_integration.json`, `face_anti_collapse.json`, `face_integration.json`, `failure_collapse_anti_collapse.json`, `failure_collapse_integration.json`, `failure_plastic_deformation_anti_collapse.json`, `failure_plastic_deformation_integration.json`, and `failure_substitution_anti_collapse.json` remain supplemental, not competing authority surfaces
+- `invariant_registry.json` is a contract-facing scaffold for named cross-phase invariants and row-local invariant suites; it does **not** by itself redefine `full` or upgrade row status
 - `coverage_rows.json` is a status/memory surface for current row state and does **not** redefine the formal coverage contract
 
 Fixture-class rule:
@@ -54,6 +58,11 @@ Divergence-invariant rule:
 - invariants are informative by default
 - selected fixtures may now set `enforce_invariants: true`
 - when enabled, failed divergence invariants become an audit hard failure for that fixture
+
+Invariant-registry rule:
+- `invariant_registry.json` may declare named `cross_phase_invariants` and `row_local_suites`
+- registry declarations are scaffold/state for invariant-deepening, not yet executable suite enforcement
+- they should carry stable ids, minimum expectations, and falsification conditions aligned with the coverage contract
 
 Coverage-row status rule:
 - `coverage_rows.json` tracks current working state by contract row (`parsed-only`, `partial`, `full`)
