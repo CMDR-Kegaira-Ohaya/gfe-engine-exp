@@ -5,7 +5,7 @@
   "fixture_pack": "anti-collapse",
   "notes": [
     "This pack starts the anti-collapse corpus class required by the v15.7 coverage contract.",
-    "The current targets are relation triad non-collapse, failure suppression remaining distinct from collapse under pressure, order depth remaining distinct from scan-led flattening, distributed Leg persistence remaining distinct from local flattening, threshold behavior remaining distinct from threshold flattening, recursive field behavior remaining distinct from local field flattening, and family-truth handling remaining distinct from same-family shorthand collapse.",
+    "The current targets are relation triad non-collapse, failure suppression remaining distinct from collapse under pressure, failure overflow remaining distinct from substitution shorthand, order depth remaining distinct from scan-led flattening, distributed Leg persistence remaining distinct from local flattening, threshold behavior remaining distinct from threshold flattening, recursive field behavior remaining distinct from local field flattening, and family-truth handling remaining distinct from same-family shorthand collapse.",
     "These fixtures are still Phase 0 scaffolds; they sharpen corpus shape without claiming full validation completeness."
   ],
   "fixtures": [
@@ -114,6 +114,68 @@
           { "timestep_idx": 0, "alpha_source": "p1.Dir", "alpha_medium": "p3.Dir", "alpha_receiving": "p2.Leg", "sigma": "Dst", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "overflow", "magnitude": 0.84 }
         ],
         "analysis": { "key_finding": "Collapse under pressure seed." }
+      }
+    },
+    {
+      "id": "FX-FAIL-07",
+      "row": "FAILURE_OVERFLOW",
+      "kind": "contrast",
+      "fixture_class": "anti-collapse",
+      "enforce_invariants": true,
+      "purpose": "Overflow should remain solver-distinct from substitution shorthand even when the relation frame and receiving side stay broadly similar.",
+      "compare_paths": [
+        "timeline.0.participants.p2.failure.primary",
+        "timeline.0.participants.p2.failure.grammars.overflow",
+        "timeline.0.participants.p2.failure.grammars.substitution",
+        "timeline.0.participants.p2.compensation",
+        "timeline.0.participants.p2.cascade.projection_mode",
+        "timeline.0.participants.p2.cascade.rerouted",
+        "timeline.0.participants.p2.solver_debug.relation_summary"
+      ],
+      "divergence_invariants": [
+        {
+          "label": "overflow grammar non-collapse",
+          "class": "overflow_noncollapse_divergence",
+          "expectation": "all_must_differ",
+          "paths": [
+            "timeline.0.participants.p2.failure.primary",
+            "timeline.0.participants.p2.failure.grammars.overflow",
+            "timeline.0.participants.p2.failure.grammars.substitution"
+          ]
+        },
+        {
+          "label": "overflow projection non-collapse",
+          "class": "overflow_projection_noncollapse",
+          "expectation": "some_must_differ",
+          "paths": [
+            "timeline.0.participants.p2.compensation",
+            "timeline.0.participants.p2.cascade.projection_mode",
+            "timeline.0.participants.p2.cascade.rerouted",
+            "timeline.0.participants.p2.solver_debug.relation_summary"
+          ]
+        }
+      ],
+      "case_a_data": {
+        "system_name": "fx-fail-07-overflow-preserved",
+        "participants": [{ "id": "p1", "name": "P1" }, { "id": "p2", "name": "P2" }, { "id": "p3", "name": "P3" }],
+        "timeline": [{ "timestep_label": "T0", "participants": { "p1": { "axes": { "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Emb": { "A": 79, "R": 79, "I": 79, "sigma": "L" }, "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" }, "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" } } }, "p2": { "cascade": { "attempts": [{ "axis": "Cfg" }, { "axis": "Dir" }, { "axis": "Leg" }] }, "axes": { "Cfg": { "A": 24, "R": 34, "I": 76, "sigma": "L" }, "Emb": { "A": 45, "R": 45, "I": 62, "sigma": "L" }, "Org": { "A": 48, "R": 48, "I": 60, "sigma": "L" }, "Dir": { "A": 38, "R": 38, "I": 68, "sigma": "L" }, "Leg": { "A": 36, "R": 36, "I": 64, "sigma": "L" } } }, "p3": { "axes": { "Cfg": { "A": 78, "R": 78, "I": 78, "sigma": "L" }, "Emb": { "A": 77, "R": 77, "I": 77, "sigma": "L" }, "Org": { "A": 80, "R": 80, "I": 80, "sigma": "L" }, "Dir": { "A": 76, "R": 76, "I": 76, "sigma": "L" }, "Leg": { "A": 75, "R": 75, "I": 75, "sigma": "L" } } } } }],
+        "payload_events": [
+          { "timestep_idx": 0, "alpha_source": "p1.Dir", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Leg", "sigma": "M", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "overflow", "magnitude": 0.90 },
+          { "timestep_idx": 0, "alpha_source": "p1.Cfg", "alpha_medium": "p3.Cfg", "alpha_receiving": "p2.Cfg", "sigma": "M", "axis": "Cfg", "unfolding": "acute", "register": "retained", "mode": "overflow", "magnitude": 0.85 },
+          { "timestep_idx": 0, "alpha_source": "p1.Dir", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Dir", "sigma": "L", "axis": "Dir", "unfolding": "acute", "register": "retained", "mode": "overflow", "magnitude": 0.80 }
+        ],
+        "analysis": { "key_finding": "Overflow-preserved non-collapse seed." }
+      },
+      "case_b_data": {
+        "system_name": "fx-fail-07-substitution-shorthand-pressure",
+        "participants": [{ "id": "p1", "name": "P1" }, { "id": "p2", "name": "P2" }, { "id": "p3", "name": "P3" }],
+        "timeline": [{ "timestep_label": "T0", "participants": { "p1": { "axes": { "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Emb": { "A": 79, "R": 79, "I": 79, "sigma": "L" }, "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" }, "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" } } }, "p2": { "cascade": { "attempts": [{ "axis": "Cfg" }, { "axis": "Dir" }, { "axis": "Leg" }] }, "axes": { "Cfg": { "A": 46, "R": 50, "I": 56, "sigma": "L" }, "Emb": { "A": 54, "R": 54, "I": 58, "sigma": "L" }, "Org": { "A": 52, "R": 52, "I": 57, "sigma": "L" }, "Dir": { "A": 49, "R": 49, "I": 55, "sigma": "L" }, "Leg": { "A": 50, "R": 50, "I": 55, "sigma": "L" } } }, "p3": { "axes": { "Cfg": { "A": 72, "R": 72, "I": 72, "sigma": "L" }, "Emb": { "A": 70, "R": 70, "I": 70, "sigma": "L" }, "Org": { "A": 74, "R": 74, "I": 74, "sigma": "L" }, "Dir": { "A": 69, "R": 69, "I": 69, "sigma": "L" }, "Leg": { "A": 71, "R": 71, "I": 71, "sigma": "L" } } } } }],
+        "payload_events": [
+          { "timestep_idx": 0, "alpha_source": "p1.Org", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Leg", "sigma": "L", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "substitute", "magnitude": 0.70 },
+          { "timestep_idx": 0, "alpha_source": "p1.Cfg", "alpha_medium": "p3.Cfg", "alpha_receiving": "p2.Cfg", "sigma": "L", "axis": "Cfg", "unfolding": "acute", "register": "retained", "mode": "substitute", "magnitude": 0.68 },
+          { "timestep_idx": 0, "alpha_source": "p1.Dir", "alpha_medium": "p3.Dir", "alpha_receiving": "p2.Dir", "sigma": "L", "axis": "Dir", "unfolding": "acute", "register": "retained", "mode": "route", "magnitude": 0.60 }
+        ],
+        "analysis": { "key_finding": "Substitution-shorthand pressure seed." }
       }
     },
     {

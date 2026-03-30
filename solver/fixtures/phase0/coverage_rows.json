@@ -71,10 +71,11 @@
       "target_state": "full",
       "required_fixture_classes": ["golden", "contrast", "anti-collapse", "integration"],
       "runtime_surface": "solver/failure.js distinct grammar candidate and projection surfaces",
-      "packs": ["failure_split.json"],
-      "fixture_ids": ["FX-FAIL-01"],
+      "packs": ["failure_split.json", "anti_collapse.json"],
+      "fixture_ids": ["FX-FAIL-01", "FX-FAIL-07"],
       "notes": [
         "Overflow is contrast-tested against substitution and hard-gated in Phase 0.",
+        "A dedicated anti-collapse overflow fixture now protects overflow against substitution shorthand under a broadly similar relation frame.",
         "Still requires fuller corpus and invariant depth before full."
       ]
     },
