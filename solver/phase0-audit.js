@@ -318,10 +318,115 @@ function summarizeExecutableCrossPhaseInvariantChecks(checks = {}) {
   };
 }
 
-function buildCoverageRows(rowDeclarations = [], fixtures = [], invariantRegistry = {}) {
+function getRowLocalSuiteSeedMap() {
+  return {
+    'INV-ROW-CORE-01': ['FX-CORE-02', 'FX-CORE-03'],
+    'INV-ROW-REL-01': ['FX-REL-02'],
+    'INV-ROW-THR-01': ['FX-THR-02'],
+    'INV-ROW-FAM-01': ['FX-FAM-02'],
+    'INV-ROW-FAIL-OVF-01': ['FX-FAIL-07'],
+    'INV-ROW-FAIL-SUB-01': ['FX-FAIL-08'],
+    'INV-ROW-FAIL-PLA-01': ['FX-FAIL-10'],
+    'INV-ROW-FAIL-SUP-01': ['FX-FAIL-06'],
+    'INV-ROW-FAIL-COL-01': ['FX-FAIL-09'],
+    'INV-ROW-FACE-01': ['FX-FACE-02'],
+    'INV-ROW-ORD-01': ['FX-ORD-02'],
+    'INV-ROW-LEG-01': ['FX-LEG-02'],
+    'INV-ROW-FLD-01': ['FX-FLD-02'],
+  };
+}
+
+function evaluateExecutableRowLocalSuiteChecks(fixtures = [], invariantRegistry = {}) {
+  const fixtureMap = new Map(fixtures.map(fixture => [fixture.id || '(unknown-fixture)', fixture]));
+  const suites = Array.isArray(invariantRegistry.row_local_suites) ? invariantRegistry.row_local_suites : [];
+  const suiteSeedMap = getRowLocalSuiteSeedMap();
+
+  return suites.map(suite => {
+    const suiteId = suite.suite_id || '(unnamed-suite)';
+    const seed_fixture_ids = suiteSeedMap[suiteId] || [];
+    const executable_slice = seed_fixture_ids.length > 0;
+    const referencedFixtures = seed_fixture_ids
+      .map(fixtureId => fixtureMap.get(fixtureId))
+      .filter(Boolean);
+    const missing_fixture_ids = seed_fixture_ids.filter(fixtureId => !fixtureMap.has(fixtureId)).sort();
+    const unenforced_fixture_ids = referencedFixtures
+      .filter(fixture => !fixture.divergence_invariants?.enforced)
+      .map(fixture => fixture.id || '(unknown-fixture)')
+      .sort();
+    const failing_fixture_ids = referencedFixtures
+      .filter(fixture => !!fixture.hard_gated_failure)
+      .map(fixture => fixture.id || '(unknown-fixture)')
+      .sort();
+
+    const pass = !executable_slice
+      ? null
+      : missing_fixture_ids.length === 0 &&
+        unenforced_fixture_ids.length === 0 &&
+        failing_fixture_ids.length === 0;
+
+    return {
+      suite_id: suiteId,
+      row: suite.row || '(unmapped-row)',
+      label: suite.label || '',
+      executable_slice,
+      enforced: executable_slice,
+      seed_fixture_ids,
+      missing_fixture_ids,
+      unenforced_fixture_ids,
+      failing_fixture_ids,
+      pass,
+    };
+  });
+}
+
+function summarizeExecutableRowLocalSuiteChecks(checks = []) {
+  const executableChecks = checks.filter(check => check.executable_slice);
+  const failingSuiteIds = executableChecks
+    .filter(check => !check.pass)
+    .map(check => check.suite_id)
+    .sort();
+  const rowsWithExecutableChecks = Array.from(
+    new Set(executableChecks.map(check => check.row).filter(Boolean))
+  ).sort();
+
+  return {
+    declared_suites: checks.length,
+    executable_checks: executableChecks.length,
+    passed_checks: executableChecks.filter(check => check.pass).length,
+    failed_checks: executableChecks.filter(check => !check.pass).length,
+    rows_with_executable_checks: rowsWithExecutableChecks.length,
+    failing_suite_ids: failingSuiteIds,
+  };
+}
+
+function buildRowLocalSuiteCheckMap(rowLocalSuiteChecks = []) {
+  const rowMap = new Map();
+
+  for (const check of rowLocalSuiteChecks) {
+    const row = check.row || '(unmapped-row)';
+    if (!rowMap.has(row)) rowMap.set(row, []);
+    rowMap.get(row).push(check);
+  }
+
+  for (const checks of rowMap.values()) {
+    checks.sort((left, right) =>
+      String(left.suite_id || '').localeCompare(String(right.suite_id || ''))
+    );
+  }
+
+  return rowMap;
+}
+
+function buildCoverageRows(
+  rowDeclarations = [],
+  fixtures = [],
+  invariantRegistry = {},
+  rowLocalSuiteChecks = []
+) {
   const declaredRows = Array.isArray(rowDeclarations) ? rowDeclarations : [];
   const aggregation = buildRowAggregation(fixtures);
   const rowLocalSuiteMap = buildRowLocalSuiteMap(invariantRegistry.row_local_suites || []);
+  const rowLocalSuiteCheckMap = buildRowLocalSuiteCheckMap(rowLocalSuiteChecks);
   const rows = [];
   const seen = new Set();
 
@@ -346,6 +451,9 @@ function buildCoverageRows(rowDeclarations = [], fixtures = [], invariantRegistr
       fixtureClass => !observed.fixture_classes.has(fixtureClass)
     );
     const rowLocalSuites = rowLocalSuiteMap.get(row) || [];
+    const suiteChecks = rowLocalSuiteCheckMap.get(row) || [];
+    const executableSuiteChecks = suiteChecks.filter(check => check.executable_slice);
+    const failingSuiteChecks = executableSuiteChecks.filter(check => !check.pass);
 
     seen.add(row);
     rows.push({
@@ -363,6 +471,12 @@ function buildCoverageRows(rowDeclarations = [], fixtures = [], invariantRegistr
       row_local_suite_count: rowLocalSuites.length,
       has_row_local_suite: rowLocalSuites.length > 0,
       missing_row_local_suite: rowLocalSuites.length === 0,
+      executable_row_local_suite_check_ids: executableSuiteChecks.map(check => check.suite_id),
+      executable_row_local_suite_check_count: executableSuiteChecks.length,
+      passed_row_local_suite_check_count: executableSuiteChecks.filter(check => check.pass).length,
+      failed_row_local_suite_check_ids: failingSuiteChecks.map(check => check.suite_id),
+      failed_row_local_suite_check_count: failingSuiteChecks.length,
+      has_executable_row_local_suite_checks: executableSuiteChecks.length > 0,
       observed_packs: Array.from(observed.packs).sort(),
       observed_files: Array.from(observed.files).sort(),
       observed_fixture_ids: Array.from(observed.fixture_ids).sort(),
@@ -382,6 +496,10 @@ function buildCoverageRows(rowDeclarations = [], fixtures = [], invariantRegistr
     if (seen.has(row)) continue;
     const observedFixtureClasses = Array.from(observed.fixture_classes).sort();
     const rowLocalSuites = rowLocalSuiteMap.get(row) || [];
+    const suiteChecks = rowLocalSuiteCheckMap.get(row) || [];
+    const executableSuiteChecks = suiteChecks.filter(check => check.executable_slice);
+    const failingSuiteChecks = executableSuiteChecks.filter(check => !check.pass);
+
     rows.push({
       row,
       current_state: inferCoverageState({}, observed),
@@ -397,6 +515,12 @@ function buildCoverageRows(rowDeclarations = [], fixtures = [], invariantRegistr
       row_local_suite_count: rowLocalSuites.length,
       has_row_local_suite: rowLocalSuites.length > 0,
       missing_row_local_suite: rowLocalSuites.length === 0,
+      executable_row_local_suite_check_ids: executableSuiteChecks.map(check => check.suite_id),
+      executable_row_local_suite_check_count: executableSuiteChecks.length,
+      passed_row_local_suite_check_count: executableSuiteChecks.filter(check => check.pass).length,
+      failed_row_local_suite_check_ids: failingSuiteChecks.map(check => check.suite_id),
+      failed_row_local_suite_check_count: failingSuiteChecks.length,
+      has_executable_row_local_suite_checks: executableSuiteChecks.length > 0,
       observed_packs: Array.from(observed.packs).sort(),
       observed_files: Array.from(observed.files).sort(),
       observed_fixture_ids: Array.from(observed.fixture_ids).sort(),
@@ -426,6 +550,8 @@ function summarizeCoverageRows(coverageRows = []) {
     rows_with_complete_fixture_class_set: 0,
     rows_with_row_local_suites: 0,
     rows_missing_row_local_suites: 0,
+    rows_with_executable_row_local_suite_checks: 0,
+    rows_with_failed_row_local_suite_checks: 0,
   };
 
   for (const row of coverageRows) {
@@ -435,6 +561,8 @@ function summarizeCoverageRows(coverageRows = []) {
     if (row.has_complete_fixture_class_set) summary.rows_with_complete_fixture_class_set += 1;
     if (row.has_row_local_suite) summary.rows_with_row_local_suites += 1;
     if (row.missing_row_local_suite) summary.rows_missing_row_local_suites += 1;
+    if (row.has_executable_row_local_suite_checks) summary.rows_with_executable_row_local_suite_checks += 1;
+    if (row.failed_row_local_suite_check_count > 0) summary.rows_with_failed_row_local_suite_checks += 1;
   }
 
   return summary;
@@ -457,6 +585,8 @@ const report = {
   invariant_summary: summarizeInvariantRegistry(invariantRegistry),
   cross_phase_invariant_checks: {},
   cross_phase_invariant_check_summary: {},
+  row_local_suite_checks: [],
+  row_local_suite_check_summary: {},
   fixtures: [],
   coverage_rows: [],
   coverage_summary: {},
@@ -571,7 +701,19 @@ if (report.cross_phase_invariant_checks.determinism?.failed_fixtures > 0) {
   hardFailure = true;
 }
 
-report.coverage_rows = buildCoverageRows(coverageRowDeclarations, report.fixtures, invariantRegistry);
+report.row_local_suite_checks = evaluateExecutableRowLocalSuiteChecks(report.fixtures, invariantRegistry);
+report.row_local_suite_check_summary = summarizeExecutableRowLocalSuiteChecks(report.row_local_suite_checks);
+
+if (report.row_local_suite_check_summary.failed_checks > 0) {
+  hardFailure = true;
+}
+
+report.coverage_rows = buildCoverageRows(
+  coverageRowDeclarations,
+  report.fixtures,
+  invariantRegistry,
+  report.row_local_suite_checks
+);
 report.coverage_summary = summarizeCoverageRows(report.coverage_rows);
 
 console.log(JSON.stringify(report, null, 2));
