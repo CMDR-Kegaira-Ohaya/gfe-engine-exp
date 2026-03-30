@@ -1,4 +1,5 @@
 import { clip01, stableNumber, toCanonicalScale } from './utils.js';
+import { resolveOrderProfile } from './order.js';
 
 function mean(values = []) {
   const nums = values.filter(Number.isFinite);
@@ -99,6 +100,7 @@ export function deriveRelationParticipation(
   const mediumConductance = mean([mediumState.A, mediumState.R]);
   const receivingHold = mean([receivingState.A, receivingState.R]);
   const faceProfile = resolveFaceProfile(event.face, weights);
+  const orderProfile = resolveOrderProfile(event, weights);
 
   const triadContinuity = clip01(
     1 -
@@ -112,8 +114,12 @@ export function deriveRelationParticipation(
       (0.20 * receivingHold)
   );
 
-  const adjustedTriadContinuity = clip01(triadContinuity + faceProfile.continuityBias);
-  const adjustedRelationTransfer = clip01(relationTransfer * faceProfile.receivingMultiplier);
+  const adjustedTriadContinuity = clip01(
+    triadContinuity + faceProfile.continuityBias + orderProfile.continuityBias
+  );
+  const adjustedRelationTransfer = clip01(
+    relationTransfer * faceProfile.receivingMultiplier * orderProfile.receivingMultiplier
+  );
   const scaledMagnitude = clip01(stableNumber(primitive.magnitude, 0));
 
   const receivingShift =
@@ -126,7 +132,8 @@ export function deriveRelationParticipation(
     (1 - mediumConductance) *
     scaledMagnitude *
     stableNumber(weights.relationEmissionCost, 0) *
-    faceProfile.emissionMultiplier;
+    faceProfile.emissionMultiplier *
+    orderProfile.emissionMultiplier;
 
   const mediumBurden =
     mean([sourceDrive, receivingHold]) *
@@ -157,7 +164,7 @@ export function deriveRelationParticipation(
   if (participantId === event.receivingParticipantId && axis === primitive.axis) {
     role = 'receiving';
     aggregate.deltaRIn += receivingShift;
-    aggregate.deltaIEvent += receivingShift * faceProfile.retentionMultiplier;
+    aggregate.deltaIEvent += receivingShift * faceProfile.retentionMultiplier * orderProfile.retentionMultiplier;
     if (primitive.sigma === 'M') aggregate.contestM += contestGain;
     if (primitive.sigma === 'Dst') aggregate.contractDst += destructiveGain;
     aggregate.eventCount += 1;
@@ -185,6 +192,10 @@ export function deriveRelationParticipation(
       axis,
       primitiveAxis: primitive.axis,
       face: faceProfile.face,
+      order_depth: orderProfile.order_depth,
+      scan_index: orderProfile.scan_index,
+      recursion_signal: orderProfile.recursion_signal,
+      order_note: orderProfile.note,
       source: {
         participantId: event.sourceParticipantId,
         axis: sourceAxis,

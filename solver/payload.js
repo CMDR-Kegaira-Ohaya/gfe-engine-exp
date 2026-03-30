@@ -74,6 +74,8 @@ export function normalizePayloadEvent(event = {}) {
     receivingAxis: normalizeAxis(receiving.axis, fallbackAxis),
     axis: fallbackAxis,
     face: event.face || null,
+    order_depth: Math.max(0, stableNumber(event.order_depth ?? event.orderDepth, 0)),
+    scan_index: Math.max(0, stableNumber(event.scan_index ?? event.scanIndex, 0)),
     interference: event.interference || '',
     payload_bundle: payloadBundleRaw.map(atom => normalizePrimitive(atom, fallbackAxis))
   };
@@ -87,6 +89,19 @@ export function groupEventsByStep(payloadEvents = []) {
     bucket.push(event);
     grouped.set(event.timestep_idx, bucket);
   }
+
+  for (const [stepIndex, bucket] of grouped.entries()) {
+    bucket.sort((left, right) => {
+      const leftDepth = stableNumber(left.order_depth, 0);
+      const rightDepth = stableNumber(right.order_depth, 0);
+      if (leftDepth !== rightDepth) return rightDepth - leftDepth;
+      const leftScan = stableNumber(left.scan_index, 0);
+      const rightScan = stableNumber(right.scan_index, 0);
+      return leftScan - rightScan;
+    });
+    grouped.set(stepIndex, bucket);
+  }
+
   return grouped;
 }
 
@@ -122,30 +137,44 @@ export function summarizeRelationTraces(relationTraces = []) {
     trace_count: relationTraces.length,
     roles: {},
     faces: {},
+    order_notes: {},
     medium_participants: {},
     source_participants: {},
     receiving_participants: {},
     average_transfer: 0,
     average_continuity: 0,
+    average_order_depth: 0,
+    average_scan_index: 0,
+    average_recursion_signal: 0,
   };
 
   if (!relationTraces.length) return summary;
 
   let transferSum = 0;
   let continuitySum = 0;
+  let depthSum = 0;
+  let scanSum = 0;
+  let recursionSignalSum = 0;
 
   for (const trace of relationTraces) {
     incrementCounter(summary.roles, trace.role || 'unknown');
     incrementCounter(summary.faces, trace.face || 'neutral');
+    incrementCounter(summary.order_notes, trace.order_note || 'scan-led-order');
     incrementCounter(summary.medium_participants, trace.medium?.participantId || 'unknown');
     incrementCounter(summary.source_participants, trace.source?.participantId || 'unknown');
     incrementCounter(summary.receiving_participants, trace.receiving?.participantId || 'unknown');
     transferSum += stableNumber(trace.adjusted_relation_transfer ?? trace.relation_transfer, 0);
     continuitySum += stableNumber(trace.adjusted_triad_continuity ?? trace.triad_continuity, 0);
+    depthSum += stableNumber(trace.order_depth, 0);
+    scanSum += stableNumber(trace.scan_index, 0);
+    recursionSignalSum += stableNumber(trace.recursion_signal, 0);
   }
 
   summary.average_transfer = transferSum / relationTraces.length;
   summary.average_continuity = continuitySum / relationTraces.length;
+  summary.average_order_depth = depthSum / relationTraces.length;
+  summary.average_scan_index = scanSum / relationTraces.length;
+  summary.average_recursion_signal = recursionSignalSum / relationTraces.length;
   return summary;
 }
 

@@ -7,6 +7,7 @@ export { deriveEnvelope } from './envelope.js';
 export { deriveCompensation } from './compensation.js';
 export { deriveCascade } from './cascade.js';
 export { deriveFailureGrammar } from './failure.js';
+export { resolveOrderProfile } from './order.js';
 export { updateParticipantAxes } from './state.js';
 export { buildEncounterContext, deriveRelationParticipation } from './relation.js';
 export { DEFAULT_WEIGHTS } from './config.js';
