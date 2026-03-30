@@ -24,13 +24,24 @@ Primary entrypoints:
 - `solver/fixtures/phase0/order_split.json`
 - `solver/fixtures/phase0/leg_distributed.json`
 - `solver/fixtures/phase0/field_recursion.json`
+- `solver/fixtures/phase0/anti_collapse.json`
+- `solver/fixtures/phase0/integration_paths.json`
 - `solver/fixtures/phase0/coverage_rows.json`
 
 Audit loading rule:
 - the Phase 0 audit now loads **all** `.json` fixture packs in this directory
 - `manifest.json` remains the base scaffold pack
-- focused packs such as `failure_split.json`, `failure_projection.json`, `relation_split.json`, `threshold_split.json`, `family_truth.json`, `face_split.json`, `order_split.json`, `leg_distributed.json`, and `field_recursion.json` are supplemental, not competing authority surfaces
+- focused packs such as `failure_split.json`, `failure_projection.json`, `relation_split.json`, `threshold_split.json`, `family_truth.json`, `face_split.json`, `order_split.json`, `leg_distributed.json`, `field_recursion.json`, `anti_collapse.json`, and `integration_paths.json` are supplemental, not competing authority surfaces
 - `coverage_rows.json` is a status/memory surface for current row state and does **not** redefine the formal coverage contract
+
+Fixture-class rule:
+- fixture `kind` and fixture `class` are distinct
+- `kind` is runtime shape (`single` or `contrast`)
+- `fixture_class` is corpus role (`golden`, `contrast`, `anti-collapse`, `integration`)
+- the audit infers defaults when `fixture_class` is omitted:
+  - `single` -> `golden`
+  - `contrast` -> `contrast`
+- explicit `fixture_class` should be used when a fixture plays a special corpus role such as `anti-collapse` or `integration`
 
 Divergence-invariant rule:
 - contrast fixtures may declare `divergence_invariants`
@@ -47,4 +58,4 @@ Divergence-invariant rule:
 Coverage-row status rule:
 - `coverage_rows.json` tracks current working state by contract row (`parsed-only`, `partial`, `full`)
 - the file is a memory board tied to the audit surface, not an authority override on what `full` means
-- the audit now emits per-row summaries that merge declared status with observed fixture / gating evidence
+- the audit now emits per-row summaries that merge declared status with observed fixture / gating / fixture-class evidence

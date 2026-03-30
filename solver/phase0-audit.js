@@ -76,6 +76,13 @@ function buildParticipantSnapshots(solvedCase) {
   });
 }
 
+function inferFixtureClass(fixture = {}) {
+  if (fixture.fixture_class) return fixture.fixture_class;
+  if (fixture.kind === 'single') return 'golden';
+  if (fixture.kind === 'contrast') return 'contrast';
+  return 'unclassified';
+}
+
 function evaluateDivergenceInvariant(invariant = {}, comparisons = []) {
   const expectation = invariant.expectation || 'all_must_differ';
   const requestedPaths = Array.isArray(invariant.paths) ? invariant.paths : [];
@@ -135,6 +142,7 @@ function buildRowAggregation(fixtures = []) {
     if (!rowMap.has(row)) {
       rowMap.set(row, {
         fixture_ids: new Set(),
+        fixture_classes: new Set(),
         packs: new Set(),
         files: new Set(),
         single_fixture_ids: new Set(),
@@ -146,6 +154,7 @@ function buildRowAggregation(fixtures = []) {
 
     const entry = rowMap.get(row);
     entry.fixture_ids.add(fixture.id || '(unknown-fixture)');
+    if (fixture.fixture_class) entry.fixture_classes.add(fixture.fixture_class);
     if (fixture.fixture_pack) entry.packs.add(fixture.fixture_pack);
     if (fixture.file) entry.files.add(fixture.file);
     if (fixture.kind === 'single') entry.single_fixture_ids.add(fixture.id || '(unknown-fixture)');
@@ -173,6 +182,7 @@ function buildCoverageRows(rowDeclarations = [], fixtures = []) {
     const row = declaration.row;
     const observed = aggregation.get(row) || {
       fixture_ids: new Set(),
+      fixture_classes: new Set(),
       packs: new Set(),
       files: new Set(),
       single_fixture_ids: new Set(),
@@ -180,6 +190,14 @@ function buildCoverageRows(rowDeclarations = [], fixtures = []) {
       enforced_fixture_ids: new Set(),
       failing_enforced_fixture_ids: new Set(),
     };
+
+    const requiredFixtureClasses = Array.isArray(declaration.required_fixture_classes)
+      ? declaration.required_fixture_classes
+      : ['golden', 'contrast', 'anti-collapse', 'integration'];
+    const observedFixtureClasses = Array.from(observed.fixture_classes).sort();
+    const missingFixtureClasses = requiredFixtureClasses.filter(
+      fixtureClass => !observed.fixture_classes.has(fixtureClass)
+    );
 
     seen.add(row);
     rows.push({
@@ -189,22 +207,27 @@ function buildCoverageRows(rowDeclarations = [], fixtures = []) {
       authority_note: declaration.authority_note || '',
       runtime_surface: declaration.runtime_surface || '',
       notes: declaration.notes || [],
+      required_fixture_classes: requiredFixtureClasses,
       declared_packs: declaration.packs || [],
       declared_fixture_ids: declaration.fixture_ids || [],
       observed_packs: Array.from(observed.packs).sort(),
       observed_files: Array.from(observed.files).sort(),
       observed_fixture_ids: Array.from(observed.fixture_ids).sort(),
+      observed_fixture_classes: observedFixtureClasses,
+      missing_fixture_classes: missingFixtureClasses,
       single_fixture_ids: Array.from(observed.single_fixture_ids).sort(),
       contrast_fixture_ids: Array.from(observed.contrast_fixture_ids).sort(),
       enforced_fixture_ids: Array.from(observed.enforced_fixture_ids).sort(),
       failing_enforced_fixture_ids: Array.from(observed.failing_enforced_fixture_ids).sort(),
       hard_gated_phase0: Array.from(observed.enforced_fixture_ids).length > 0,
       hard_gated_failures: Array.from(observed.failing_enforced_fixture_ids).length,
+      has_complete_fixture_class_set: missingFixtureClasses.length === 0,
     });
   }
 
   for (const [row, observed] of aggregation.entries()) {
     if (seen.has(row)) continue;
+    const observedFixtureClasses = Array.from(observed.fixture_classes).sort();
     rows.push({
       row,
       current_state: inferCoverageState({}, observed),
@@ -212,17 +235,23 @@ function buildCoverageRows(rowDeclarations = [], fixtures = []) {
       authority_note: 'undeclared-row-observation',
       runtime_surface: '',
       notes: [],
+      required_fixture_classes: ['golden', 'contrast', 'anti-collapse', 'integration'],
       declared_packs: [],
       declared_fixture_ids: [],
       observed_packs: Array.from(observed.packs).sort(),
       observed_files: Array.from(observed.files).sort(),
       observed_fixture_ids: Array.from(observed.fixture_ids).sort(),
+      observed_fixture_classes: observedFixtureClasses,
+      missing_fixture_classes: ['golden', 'contrast', 'anti-collapse', 'integration'].filter(
+        fixtureClass => !observed.fixture_classes.has(fixtureClass)
+      ),
       single_fixture_ids: Array.from(observed.single_fixture_ids).sort(),
       contrast_fixture_ids: Array.from(observed.contrast_fixture_ids).sort(),
       enforced_fixture_ids: Array.from(observed.enforced_fixture_ids).sort(),
       failing_enforced_fixture_ids: Array.from(observed.failing_enforced_fixture_ids).sort(),
       hard_gated_phase0: Array.from(observed.enforced_fixture_ids).length > 0,
       hard_gated_failures: Array.from(observed.failing_enforced_fixture_ids).length,
+      has_complete_fixture_class_set: false,
     });
   }
 
@@ -235,12 +264,14 @@ function summarizeCoverageRows(coverageRows = []) {
     by_state: {},
     hard_gated_rows: 0,
     rows_with_failing_gates: 0,
+    rows_with_complete_fixture_class_set: 0,
   };
 
   for (const row of coverageRows) {
     summary.by_state[row.current_state] = (summary.by_state[row.current_state] || 0) + 1;
     if (row.hard_gated_phase0) summary.hard_gated_rows += 1;
     if (row.hard_gated_failures > 0) summary.rows_with_failing_gates += 1;
+    if (row.has_complete_fixture_class_set) summary.rows_with_complete_fixture_class_set += 1;
   }
 
   return summary;
@@ -269,6 +300,8 @@ for (const manifest of manifests) {
   const fixturePack = manifest.data.fixture_pack || manifest.file;
 
   for (const fixture of manifest.data.fixtures || []) {
+    const fixtureClass = inferFixtureClass(fixture);
+
     if (fixture.kind === 'single') {
       const caseData = fixture.case_data;
       const validation = validateCase(caseData);
@@ -291,6 +324,7 @@ for (const manifest of manifests) {
         id: fixture.id,
         row: fixture.row,
         kind: fixture.kind,
+        fixture_class: fixtureClass,
         validation: summarizeValidation(validation),
         solve_ok: !!solved,
         path_checks: pathChecks,
@@ -325,6 +359,7 @@ for (const manifest of manifests) {
         id: fixture.id,
         row: fixture.row,
         kind: fixture.kind,
+        fixture_class: fixtureClass,
         validation_a: summarizeValidation(validationA),
         validation_b: summarizeValidation(validationB),
         differs_somewhere: differsSomewhere,
@@ -343,6 +378,9 @@ for (const manifest of manifests) {
       fixture_pack: fixturePack,
       file: manifest.file,
       id: fixture.id || '(unknown)',
+      row: fixture.row || '(unmapped-row)',
+      kind: fixture.kind || '(unknown-kind)',
+      fixture_class: fixtureClass,
       error: `Unsupported fixture kind: ${fixture.kind}`,
     });
   }
