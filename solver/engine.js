@@ -4,6 +4,7 @@ import { derivePrevalence, deriveTheta } from './prevalence.js';
 import { deriveEnvelope, buildEnvelopeSummary } from './envelope.js';
 import { deriveCompensation } from './compensation.js';
 import { deriveCascade, buildCascadeSummary } from './cascade.js';
+import { deriveFailureGrammar } from './failure.js';
 import { updateParticipantAxes, cfgGate } from './state.js';
 import { buildEncounterContext } from './relation.js';
 import { deepClone, defaultParticipantState, ensureAxesContainer } from './utils.js';
@@ -28,12 +29,22 @@ export function solveParticipantStep(previousParticipant = {}, events = [], weig
   const theta = deriveTheta(updatedAxes.canonical, prevalence, weights);
   const mode_counts = countParticipantModes(events, participant.id);
   const compensation = deriveCompensation(mode_counts, theta);
+  const failure = deriveFailureGrammar(
+    updatedAxes.canonical,
+    mode_counts,
+    prevalence,
+    theta,
+    compensation,
+    payloadAudit.relation_summary,
+    weights
+  );
   const envelope = deriveEnvelope(updatedAxes.canonical);
   const cascade = deriveCascade({
     ...participant,
     axes: updatedAxes.display,
     _canonical_axes: updatedAxes.canonical,
     compensation,
+    failure,
   });
 
   return {
@@ -43,6 +54,7 @@ export function solveParticipantStep(previousParticipant = {}, events = [], weig
     prevalence,
     theta,
     compensation,
+    failure,
     envelope,
     cascade,
     solver_debug: {
@@ -51,6 +63,7 @@ export function solveParticipantStep(previousParticipant = {}, events = [], weig
       mode_counts,
       relation_traces: payloadAudit.relation_traces,
       relation_summary: payloadAudit.relation_summary,
+      failure_summary: failure,
     },
   };
 }
@@ -61,7 +74,7 @@ export function solveCase(caseData, options = {}) {
   const solved = deepClone(caseData);
 
   solved.solver = {
-    version: '0.3.2',
+    version: '0.4.0',
     mode: 'canon-locked-runtime',
     weights,
   };
