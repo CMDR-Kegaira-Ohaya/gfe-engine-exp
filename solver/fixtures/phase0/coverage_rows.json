@@ -14,13 +14,14 @@
       "target_state": "full",
       "required_fixture_classes": ["golden", "contrast", "anti-collapse", "integration"],
       "runtime_surface": "canonical local-axis ARI math in solver/state.js and solver/engine.js",
-      "packs": ["manifest.json", "core_anti_collapse.json", "core_integration.json"],
-      "fixture_ids": ["FX-CORE-01", "FX-CORE-02", "FX-INT-12"],
+      "packs": ["manifest.json", "core_contrast.json", "core_anti_collapse.json", "core_integration.json"],
+      "fixture_ids": ["FX-CORE-01", "FX-CORE-02", "FX-CORE-03", "FX-INT-12"],
       "notes": [
         "Public-path executable surface exists.",
+        "A row-scoped core contrast fixture now proves maintained local-axis profile changes produce different canonical outputs under a fixed event frame.",
         "A dedicated anti-collapse core fixture now protects local-axis ARI math against cross-axis local-shell flattening under a stable runtime frame.",
         "A row-scoped integration fixture now proves core-facing coexistence of canonical local-axis outputs with relation, envelope, and cascade outputs.",
-        "Still missing the row-local contrast and fuller invariant bundle required for full."
+        "Still missing the fuller invariant bundle required for full."
       ]
     },
     {

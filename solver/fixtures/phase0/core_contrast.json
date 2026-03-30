@@ -1,0 +1,172 @@
+{
+  "version": "0.1.0",
+  "canon": "v15.7",
+  "mode": "phase0-audit",
+  "fixture_pack": "core_contrast",
+  "notes": [
+    "This row-scoped pack extends the Phase 0 contrast corpus for AXIS_LOCAL_CORE without reopening the shared manifest pack.",
+    "The target is canonical local-axis ARI math changing when the maintained local-axis profile changes, even when the event frame stays fixed.",
+    "This fixture is still a Phase 0 scaffold and should not be mistaken for the final modern validation corpus."
+  ],
+  "fixtures": [
+    {
+      "id": "FX-CORE-03",
+      "row": "AXIS_LOCAL_CORE",
+      "kind": "contrast",
+      "enforce_invariants": true,
+      "purpose": "Changing the maintained local-axis profile while holding the event frame fixed should change canonical local-axis outputs and local solver-state footprint.",
+      "compare_paths": [
+        "timeline.0.participants.p2._canonical_axes.Cfg",
+        "timeline.0.participants.p2._canonical_axes.Emb",
+        "timeline.0.participants.p2._canonical_axes.Org",
+        "timeline.0.participants.p2._canonical_axes.Dir",
+        "timeline.0.participants.p2._canonical_axes.Leg",
+        "timeline.0.participants.p2.axes.Cfg",
+        "timeline.0.participants.p2.axes.Emb",
+        "timeline.0.participants.p2.axes.Org",
+        "timeline.0.participants.p2.axes.Dir",
+        "timeline.0.participants.p2.axes.Leg"
+      ],
+      "divergence_invariants": [
+        {
+          "label": "canonical local-axis contrast",
+          "class": "core_local_axis_contrast",
+          "expectation": "all_must_differ",
+          "paths": [
+            "timeline.0.participants.p2._canonical_axes.Cfg",
+            "timeline.0.participants.p2._canonical_axes.Emb",
+            "timeline.0.participants.p2._canonical_axes.Org",
+            "timeline.0.participants.p2._canonical_axes.Dir",
+            "timeline.0.participants.p2._canonical_axes.Leg"
+          ]
+        },
+        {
+          "label": "raw local-axis contrast footprint",
+          "class": "core_local_raw_contrast",
+          "expectation": "some_must_differ",
+          "paths": [
+            "timeline.0.participants.p2.axes.Cfg",
+            "timeline.0.participants.p2.axes.Emb",
+            "timeline.0.participants.p2.axes.Org",
+            "timeline.0.participants.p2.axes.Dir",
+            "timeline.0.participants.p2.axes.Leg"
+          ]
+        }
+      ],
+      "case_a_data": {
+        "system_name": "fx-core-03-profile-a",
+        "participants": [
+          { "id": "p1", "name": "P1" },
+          { "id": "p2", "name": "P2" },
+          { "id": "p3", "name": "P3" }
+        ],
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": { "A": 80, "R": 80, "I": 80, "sigma": "L" },
+                  "Emb": { "A": 78, "R": 78, "I": 78, "sigma": "L" },
+                  "Org": { "A": 79, "R": 79, "I": 79, "sigma": "L" },
+                  "Dir": { "A": 76, "R": 76, "I": 76, "sigma": "L" },
+                  "Leg": { "A": 77, "R": 77, "I": 77, "sigma": "L" }
+                }
+              },
+              "p2": {
+                "axes": {
+                  "Cfg": { "A": 22, "R": 28, "I": 82, "sigma": "L" },
+                  "Emb": { "A": 60, "R": 60, "I": 62, "sigma": "L" },
+                  "Org": { "A": 70, "R": 70, "I": 74, "sigma": "L" },
+                  "Dir": { "A": 38, "R": 44, "I": 78, "sigma": "L" },
+                  "Leg": { "A": 72, "R": 72, "I": 76, "sigma": "L" }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" },
+                  "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" },
+                  "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" },
+                  "Dir": { "A": 78, "R": 78, "I": 78, "sigma": "L" },
+                  "Leg": { "A": 79, "R": 79, "I": 79, "sigma": "L" }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Dir",
+            "alpha_medium": "p1.Org",
+            "alpha_receiving": "p2.Leg",
+            "sigma": "L",
+            "axis": "Leg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "load",
+            "magnitude": 0.40
+          }
+        ],
+        "analysis": { "key_finding": "Profile A local-axis seed." }
+      },
+      "case_b_data": {
+        "system_name": "fx-core-03-profile-b",
+        "participants": [
+          { "id": "p1", "name": "P1" },
+          { "id": "p2", "name": "P2" },
+          { "id": "p3", "name": "P3" }
+        ],
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": { "A": 80, "R": 80, "I": 80, "sigma": "L" },
+                  "Emb": { "A": 78, "R": 78, "I": 78, "sigma": "L" },
+                  "Org": { "A": 79, "R": 79, "I": 79, "sigma": "L" },
+                  "Dir": { "A": 76, "R": 76, "I": 76, "sigma": "L" },
+                  "Leg": { "A": 77, "R": 77, "I": 77, "sigma": "L" }
+                }
+              },
+              "p2": {
+                "axes": {
+                  "Cfg": { "A": 68, "R": 68, "I": 72, "sigma": "L" },
+                  "Emb": { "A": 34, "R": 40, "I": 80, "sigma": "L" },
+                  "Org": { "A": 32, "R": 36, "I": 84, "sigma": "L" },
+                  "Dir": { "A": 74, "R": 74, "I": 70, "sigma": "L" },
+                  "Leg": { "A": 28, "R": 34, "I": 86, "sigma": "L" }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" },
+                  "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" },
+                  "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" },
+                  "Dir": { "A": 78, "R": 78, "I": 78, "sigma": "L" },
+                  "Leg": { "A": 79, "R": 79, "I": 79, "sigma": "L" }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Dir",
+            "alpha_medium": "p1.Org",
+            "alpha_receiving": "p2.Leg",
+            "sigma": "L",
+            "axis": "Leg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "load",
+            "magnitude": 0.40
+          }
+        ],
+        "analysis": { "key_finding": "Profile B local-axis seed." }
+      }
+    }
+  ]
+}
