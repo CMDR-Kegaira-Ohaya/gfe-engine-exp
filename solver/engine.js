@@ -43,6 +43,8 @@ export function solveParticipantStep(previousParticipant = {}, events = [], weig
     ...participant,
     axes: updatedAxes.display,
     _canonical_axes: updatedAxes.canonical,
+    prevalence,
+    theta,
     compensation,
     failure,
   });
@@ -74,7 +76,7 @@ export function solveCase(caseData, options = {}) {
   const solved = deepClone(caseData);
 
   solved.solver = {
-    version: '0.4.0',
+    version: '0.4.1',
     mode: 'canon-locked-runtime',
     weights,
   };

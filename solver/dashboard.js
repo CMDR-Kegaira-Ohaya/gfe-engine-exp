@@ -38,7 +38,21 @@ export function buildDashboardChunks(caseData) {
           axes: AXES.reduce((acc, axis) => {
             acc[axis] = item.participant.axes?.[axis] || { A: 0, R: 0, I: 0, sigma: 'L' };
             return acc;
-          }, {})
+          }, {}),
+          prevalence: item.participant.prevalence || { family: 'L', note: '' },
+          theta: item.participant.theta || { active: false, blocked_family: null, note: '' },
+          compensation: item.participant.compensation || { active: false, type: null, note: '' },
+          failure: item.participant.failure || { active: false, primary: null, note: '' },
+          cascade: item.participant.cascade || {
+            active: false,
+            blocked: false,
+            degraded: false,
+            rerouted: false,
+            primary_failure: null,
+            projection_mode: '',
+            local_completions: [],
+            note: '',
+          },
         }))
       };
 
