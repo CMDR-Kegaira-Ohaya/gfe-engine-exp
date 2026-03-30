@@ -104,11 +104,12 @@
       "target_state": "full",
       "required_fixture_classes": ["golden", "contrast", "anti-collapse", "integration"],
       "runtime_surface": "solver/failure.js plastic-deformation grammar candidate",
-      "packs": ["failure_split.json"],
-      "fixture_ids": ["FX-FAIL-02"],
+      "packs": ["failure_split.json", "failure_plastic_deformation_anti_collapse.json"],
+      "fixture_ids": ["FX-FAIL-02", "FX-FAIL-10"],
       "notes": [
         "Plastic deformation is executable and contrast-tested against transient stress.",
-        "It remains the least mature failure row and is not hard-gated yet."
+        "A dedicated anti-collapse plastic-deformation fixture now protects maintained-form deformation against collapse shorthand under a broadly similar accumulated-pressure frame.",
+        "It remains the least mature failure row and still lacks integration proof."
       ]
     },
     {
