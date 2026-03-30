@@ -1,0 +1,74 @@
+{
+  "version": "0.1.0",
+  "canon": "v15.7",
+  "mode": "phase0-audit",
+  "fixture_pack": "failure-collapse-anti-collapse",
+  "notes": [
+    "This row-scoped pack extends the Phase 0 anti-collapse corpus for FAILURE_COLLAPSE without reopening the shared anti_collapse pack.",
+    "The target is collapse remaining solver-distinct from suppression under a broadly similar relation frame, rather than flattening collapse into a generic blocked-pressure shell.",
+    "This fixture is still a Phase 0 scaffold and should not be mistaken for the final modern validation corpus."
+  ],
+  "fixtures": [
+    {
+      "id": "FX-FAIL-09",
+      "row": "FAILURE_COLLAPSE",
+      "kind": "contrast",
+      "fixture_class": "anti-collapse",
+      "enforce_invariants": true,
+      "purpose": "Collapse should remain solver-distinct from suppression under a broadly similar relation frame, rather than collapsing into the same blocked-pressure grammar and projection shell.",
+      "compare_paths": [
+        "timeline.0.participants.p2.failure.primary",
+        "timeline.0.participants.p2.failure.grammars.collapse",
+        "timeline.0.participants.p2.failure.grammars.suppression",
+        "timeline.0.participants.p2.envelope.status",
+        "timeline.0.participants.p2.cascade.projection_mode",
+        "timeline.0.participants.p2.cascade.blocked",
+        "timeline.0.participants.p2.solver_debug.relation_summary"
+      ],
+      "divergence_invariants": [
+        {
+          "label": "collapse grammar non-collapse",
+          "class": "collapse_noncollapse_divergence",
+          "expectation": "all_must_differ",
+          "paths": [
+            "timeline.0.participants.p2.failure.primary",
+            "timeline.0.participants.p2.failure.grammars.collapse",
+            "timeline.0.participants.p2.failure.grammars.suppression",
+            "timeline.0.participants.p2.envelope.status"
+          ]
+        },
+        {
+          "label": "collapse projection non-collapse",
+          "class": "collapse_projection_noncollapse",
+          "expectation": "some_must_differ",
+          "paths": [
+            "timeline.0.participants.p2.cascade.projection_mode",
+            "timeline.0.participants.p2.cascade.blocked",
+            "timeline.0.participants.p2.solver_debug.relation_summary"
+          ]
+        }
+      ],
+      "case_a_data": {
+        "system_name": "fx-fail-09-collapse-preserved",
+        "participants": [{ "id": "p1", "name": "P1" }, { "id": "p2", "name": "P2" }, { "id": "p3", "name": "P3" }],
+        "timeline": [{ "timestep_label": "T0", "participants": { "p1": { "axes": { "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" }, "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Dir": { "A": 83, "R": 83, "I": 83, "sigma": "L" }, "Leg": { "A": 79, "R": 79, "I": 79, "sigma": "L" } } }, "p2": { "cascade": { "attempts": [{ "axis": "Cfg" }, { "axis": "Dir" }, { "axis": "Leg" }] }, "axes": { "Cfg": { "A": 10, "R": 18, "I": 85, "sigma": "Dst" }, "Emb": { "A": 20, "R": 24, "I": 80, "sigma": "Dst" }, "Org": { "A": 18, "R": 22, "I": 76, "sigma": "Dst" }, "Dir": { "A": 15, "R": 20, "I": 80, "sigma": "Dst" }, "Leg": { "A": 10, "R": 18, "I": 75, "sigma": "Dst" } } }, "p3": { "axes": { "Cfg": { "A": 8, "R": 8, "I": 8, "sigma": "L" }, "Emb": { "A": 10, "R": 10, "I": 10, "sigma": "L" }, "Org": { "A": 8, "R": 8, "I": 8, "sigma": "L" }, "Dir": { "A": 9, "R": 9, "I": 9, "sigma": "L" }, "Leg": { "A": 8, "R": 8, "I": 8, "sigma": "L" } } } } }],
+        "payload_events": [
+          { "timestep_idx": 0, "alpha_source": "p1.Cfg", "alpha_medium": "p3.Cfg", "alpha_receiving": "p2.Cfg", "sigma": "Dst", "axis": "Cfg", "unfolding": "acute", "register": "retained", "mode": "overflow", "magnitude": 0.88 },
+          { "timestep_idx": 0, "alpha_source": "p1.Dir", "alpha_medium": "p3.Dir", "alpha_receiving": "p2.Leg", "sigma": "Dst", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "overflow", "magnitude": 0.84 }
+        ],
+        "analysis": { "key_finding": "Collapse-preserved non-collapse seed." }
+      },
+      "case_b_data": {
+        "system_name": "fx-fail-09-suppression-pressure-shell",
+        "participants": [{ "id": "p1", "name": "P1" }, { "id": "p2", "name": "P2" }, { "id": "p3", "name": "P3" }],
+        "timeline": [{ "timestep_label": "T0", "participants": { "p1": { "axes": { "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" }, "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Dir": { "A": 83, "R": 83, "I": 83, "sigma": "L" }, "Leg": { "A": 79, "R": 79, "I": 79, "sigma": "L" } } }, "p2": { "cascade": { "attempts": [{ "axis": "Cfg" }, { "axis": "Emb" }, { "axis": "Leg" }] }, "axes": { "Cfg": { "A": 40, "R": 45, "I": 70, "sigma": "M" }, "Emb": { "A": 35, "R": 40, "I": 65, "sigma": "M" }, "Org": { "A": 44, "R": 46, "I": 62, "sigma": "M" }, "Dir": { "A": 45, "R": 47, "I": 60, "sigma": "M" }, "Leg": { "A": 40, "R": 42, "I": 60, "sigma": "M" } } }, "p3": { "axes": { "Cfg": { "A": 12, "R": 12, "I": 12, "sigma": "L" }, "Emb": { "A": 14, "R": 14, "I": 14, "sigma": "L" }, "Org": { "A": 10, "R": 10, "I": 10, "sigma": "L" }, "Dir": { "A": 11, "R": 11, "I": 11, "sigma": "L" }, "Leg": { "A": 12, "R": 12, "I": 12, "sigma": "L" } } } } }],
+        "payload_events": [
+          { "timestep_idx": 0, "alpha_source": "p1.Org", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Emb", "sigma": "M", "axis": "Emb", "unfolding": "acute", "register": "retained", "mode": "suppress", "magnitude": 0.78 },
+          { "timestep_idx": 0, "alpha_source": "p1.Cfg", "alpha_medium": "p3.Cfg", "alpha_receiving": "p2.Cfg", "sigma": "M", "axis": "Cfg", "unfolding": "acute", "register": "retained", "mode": "suppress", "magnitude": 0.70 },
+          { "timestep_idx": 0, "alpha_source": "p1.Dir", "alpha_medium": "p3.Dir", "alpha_receiving": "p2.Leg", "sigma": "M", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "overflow", "magnitude": 0.42 }
+        ],
+        "analysis": { "key_finding": "Suppression-shell pressure seed." }
+      }
+    }
+  ]
+}
