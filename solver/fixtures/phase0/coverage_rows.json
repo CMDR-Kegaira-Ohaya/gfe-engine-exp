@@ -106,10 +106,11 @@
       "target_state": "full",
       "required_fixture_classes": ["golden", "contrast", "anti-collapse", "integration"],
       "runtime_surface": "solver/failure.js plus envelope/cascade projection surfaces",
-      "packs": ["failure_split.json", "failure_projection.json"],
-      "fixture_ids": ["FX-FAIL-03", "FX-FAIL-05"],
+      "packs": ["failure_split.json", "failure_projection.json", "anti_collapse.json"],
+      "fixture_ids": ["FX-FAIL-03", "FX-FAIL-05", "FX-FAIL-06"],
       "notes": [
         "Suppression is contrast-tested against collapse and hard-gated in grammar and envelope space.",
+        "A dedicated anti-collapse suppression fixture now exists in Phase 0.",
         "Still requires fuller corpus and invariant depth before full."
       ]
     },
@@ -171,10 +172,11 @@
       "target_state": "full",
       "required_fixture_classes": ["golden", "contrast", "anti-collapse", "integration"],
       "runtime_surface": "solver/field_recursion.js plus field-aware relation handling",
-      "packs": ["field_recursion.json"],
-      "fixture_ids": ["FX-FLD-01"],
+      "packs": ["field_recursion.json", "integration_paths.json"],
+      "fixture_ids": ["FX-FLD-01", "FX-INT-02"],
       "notes": [
         "Local vs recursive field behavior is solver-operative and hard-gated.",
+        "A broader integration fixture now proves field/order/Leg-facing public-path coexistence.",
         "Still requires fuller corpus and invariant depth before full."
       ]
     }
