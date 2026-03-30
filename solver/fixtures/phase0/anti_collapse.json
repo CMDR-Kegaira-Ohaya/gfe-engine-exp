@@ -5,7 +5,7 @@
   "fixture_pack": "anti-collapse",
   "notes": [
     "This pack starts the anti-collapse corpus class required by the v15.7 coverage contract.",
-    "The current targets are relation triad non-collapse, failure suppression remaining distinct from collapse under pressure, order depth remaining distinct from scan-led flattening, and distributed Leg persistence remaining distinct from local flattening.",
+    "The current targets are relation triad non-collapse, failure suppression remaining distinct from collapse under pressure, order depth remaining distinct from scan-led flattening, distributed Leg persistence remaining distinct from local flattening, and threshold behavior remaining distinct from threshold flattening.",
     "These fixtures are still Phase 0 scaffolds; they sharpen corpus shape without claiming full validation completeness."
   ],
   "fixtures": [
@@ -332,6 +332,86 @@
           { "timestep_idx": 0, "scan_index": 2, "order_depth": 2, "leg_scope": "local", "trace_persistence": 0, "distributed_span": 0, "alpha_source": "p1.Dir", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Leg", "sigma": "L", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "threshold-transfer", "magnitude": 0.62 }
         ],
         "analysis": { "key_finding": "Local flattening pressure seed." }
+      }
+    },
+    {
+      "id": "FX-THR-02",
+      "row": "THRESHOLD_PREVALENCE",
+      "kind": "contrast",
+      "fixture_class": "anti-collapse",
+      "enforce_invariants": true,
+      "purpose": "Threshold-active mirrored behavior should remain solver-distinct from threshold flattening even when the surrounding event family remains similar.",
+      "compare_paths": [
+        "timeline.0.participants.p2.prevalence",
+        "timeline.0.participants.p2.theta",
+        "timeline.0.participants.p2.solver_debug.cfg_gate",
+        "timeline.0.participants.p2.solver_debug.relation_summary",
+        "timeline.0.participants.p2._canonical_axes.Cfg"
+      ],
+      "divergence_invariants": [
+        {
+          "label": "threshold non-collapse split",
+          "class": "threshold_noncollapse_divergence",
+          "expectation": "all_must_differ",
+          "paths": [
+            "timeline.0.participants.p2.prevalence",
+            "timeline.0.participants.p2.theta",
+            "timeline.0.participants.p2.solver_debug.cfg_gate",
+            "timeline.0.participants.p2.solver_debug.relation_summary"
+          ]
+        },
+        {
+          "label": "threshold cfg footprint non-collapse",
+          "class": "threshold_cfg_noncollapse",
+          "expectation": "some_must_differ",
+          "paths": [
+            "timeline.0.participants.p2._canonical_axes.Cfg"
+          ]
+        }
+      ],
+      "case_a_data": {
+        "system_name": "fx-thr-02-threshold-preserved",
+        "participants": [
+          { "id": "p1", "name": "P1" },
+          { "id": "p2", "name": "P2" },
+          { "id": "p3", "name": "P3" }
+        ],
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": { "axes": { "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" }, "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" }, "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" } } },
+              "p2": { "axes": { "Cfg": { "A": 22, "R": 30, "I": 82, "sigma": "L" }, "Emb": { "A": 58, "R": 58, "I": 60, "sigma": "L" }, "Org": { "A": 70, "R": 70, "I": 72, "sigma": "L" }, "Dir": { "A": 36, "R": 40, "I": 78, "sigma": "L" }, "Leg": { "A": 72, "R": 72, "I": 74, "sigma": "L" } } },
+              "p3": { "axes": { "Cfg": { "A": 28, "R": 34, "I": 82, "sigma": "M" }, "Emb": { "A": 32, "R": 35, "I": 78, "sigma": "M" }, "Org": { "A": 22, "R": 30, "I": 88, "sigma": "M" }, "Dir": { "A": 26, "R": 32, "I": 84, "sigma": "M" }, "Leg": { "A": 30, "R": 36, "I": 80, "sigma": "M" } } }
+            }
+          }
+        ],
+        "payload_events": [
+          { "timestep_idx": 0, "alpha_source": "p1.Dir", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Leg", "sigma": "L", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "threshold-transfer", "magnitude": 0.60 }
+        ],
+        "analysis": { "key_finding": "Threshold-active mirrored behavior is preserved." }
+      },
+      "case_b_data": {
+        "system_name": "fx-thr-02-threshold-flattening-pressure",
+        "participants": [
+          { "id": "p1", "name": "P1" },
+          { "id": "p2", "name": "P2" },
+          { "id": "p3", "name": "P3" }
+        ],
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": { "axes": { "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" }, "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" }, "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" } } },
+              "p2": { "axes": { "Cfg": { "A": 56, "R": 58, "I": 60, "sigma": "L" }, "Emb": { "A": 58, "R": 58, "I": 60, "sigma": "L" }, "Org": { "A": 70, "R": 70, "I": 72, "sigma": "L" }, "Dir": { "A": 36, "R": 40, "I": 78, "sigma": "L" }, "Leg": { "A": 72, "R": 72, "I": 74, "sigma": "L" } } },
+              "p3": { "axes": { "Cfg": { "A": 28, "R": 34, "I": 82, "sigma": "M" }, "Emb": { "A": 32, "R": 35, "I": 78, "sigma": "M" }, "Org": { "A": 22, "R": 30, "I": 88, "sigma": "M" }, "Dir": { "A": 26, "R": 32, "I": 84, "sigma": "M" }, "Leg": { "A": 30, "R": 36, "I": 80, "sigma": "M" } } }
+            }
+          }
+        ],
+        "payload_events": [
+          { "timestep_idx": 0, "alpha_source": "p1.Dir", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Leg", "sigma": "L", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "threshold-transfer", "magnitude": 0.60 }
+        ],
+        "analysis": { "key_finding": "Threshold flattening pressure seed." }
       }
     }
   ]

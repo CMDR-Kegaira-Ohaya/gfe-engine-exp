@@ -41,10 +41,12 @@
       "target_state": "full",
       "required_fixture_classes": ["golden", "contrast", "anti-collapse", "integration"],
       "runtime_surface": "solver/prevalence.js mirrored threshold behavior via prevalence / theta",
-      "packs": ["threshold_split.json"],
-      "fixture_ids": ["FX-THR-01"],
+      "packs": ["threshold_split.json", "anti_collapse.json", "integration_paths.json"],
+      "fixture_ids": ["FX-THR-01", "FX-THR-02", "FX-INT-05"],
       "notes": [
         "Mirrored threshold contrast is hard-gated in Phase 0.",
+        "A dedicated anti-collapse threshold fixture now protects mirrored threshold behavior against threshold flattening.",
+        "A broader integration fixture now proves threshold-facing coexistence with relation, face, order, distributed Leg, field, envelope, and cascade outputs.",
         "Still not full because row-local and cross-phase invariant suites remain incomplete."
       ]
     },
