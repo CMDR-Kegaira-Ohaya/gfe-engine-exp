@@ -1,0 +1,193 @@
+{
+  "version": "0.1.0",
+  "canon": "v15.7",
+  "mode": "phase0-audit",
+  "fixture_pack": "failure-projection",
+  "notes": [
+    "This pack focuses Phase 0 on higher-level cascade projection behavior, not only low-level failure scores.",
+    "The goal is to force visible divergence between rerouted failure projection and blocked collapse projection.",
+    "These fixtures remain audit scaffolds and do not by themselves certify full failure-grammar coverage."
+  ],
+  "fixtures": [
+    {
+      "id": "FX-FAIL-04",
+      "row": "FAILURE_COLLAPSE",
+      "kind": "contrast",
+      "purpose": "Cascade projection should diverge between rerouted substitution and blocked collapse.",
+      "compare_paths": [
+        "timeline.0.participants.p2.failure.primary",
+        "timeline.0.participants.p2.cascade.primary_failure",
+        "timeline.0.participants.p2.cascade.projection_mode",
+        "timeline.0.participants.p2.cascade.blocked",
+        "timeline.0.participants.p2.cascade.rerouted",
+        "timeline.0.participants.p2.cascade.degraded",
+        "timeline.0.participants.p2.cascade.local_completions",
+        "cascade_summary.0.participants.p2"
+      ],
+      "case_a_data": {
+        "system_name": "fx-fail-04-rerouted-substitution",
+        "participants": [
+          { "id": "p1", "name": "P1" },
+          { "id": "p2", "name": "P2" },
+          { "id": "p3", "name": "P3" }
+        ],
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" },
+                  "Emb": { "A": 79, "R": 79, "I": 79, "sigma": "L" },
+                  "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" },
+                  "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" },
+                  "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" }
+                }
+              },
+              "p2": {
+                "cascade": {
+                  "attempts": [
+                    { "axis": "Cfg" },
+                    { "axis": "Dir" },
+                    { "axis": "Leg" }
+                  ]
+                },
+                "axes": {
+                  "Cfg": { "A": 46, "R": 50, "I": 56, "sigma": "L" },
+                  "Emb": { "A": 54, "R": 54, "I": 58, "sigma": "L" },
+                  "Org": { "A": 52, "R": 52, "I": 57, "sigma": "L" },
+                  "Dir": { "A": 49, "R": 49, "I": 55, "sigma": "L" },
+                  "Leg": { "A": 50, "R": 50, "I": 55, "sigma": "L" }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": { "A": 72, "R": 72, "I": 72, "sigma": "L" },
+                  "Emb": { "A": 70, "R": 70, "I": 70, "sigma": "L" },
+                  "Org": { "A": 74, "R": 74, "I": 74, "sigma": "L" },
+                  "Dir": { "A": 69, "R": 69, "I": 69, "sigma": "L" },
+                  "Leg": { "A": 71, "R": 71, "I": 71, "sigma": "L" }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Org",
+            "alpha_medium": "p3.Org",
+            "alpha_receiving": "p2.Leg",
+            "sigma": "L",
+            "axis": "Leg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "substitute",
+            "magnitude": 0.72
+          },
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Cfg",
+            "alpha_medium": "p3.Cfg",
+            "alpha_receiving": "p2.Cfg",
+            "sigma": "L",
+            "axis": "Cfg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "substitute",
+            "magnitude": 0.68
+          },
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Dir",
+            "alpha_medium": "p3.Dir",
+            "alpha_receiving": "p2.Dir",
+            "sigma": "L",
+            "axis": "Dir",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "route",
+            "magnitude": 0.60
+          }
+        ],
+        "analysis": { "key_finding": "Rerouted cascade projection seed." }
+      },
+      "case_b_data": {
+        "system_name": "fx-fail-04-blocked-collapse",
+        "participants": [
+          { "id": "p1", "name": "P1" },
+          { "id": "p2", "name": "P2" },
+          { "id": "p3", "name": "P3" }
+        ],
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" },
+                  "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" },
+                  "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" },
+                  "Dir": { "A": 83, "R": 83, "I": 83, "sigma": "L" },
+                  "Leg": { "A": 79, "R": 79, "I": 79, "sigma": "L" }
+                }
+              },
+              "p2": {
+                "cascade": {
+                  "attempts": [
+                    { "axis": "Cfg" },
+                    { "axis": "Dir" },
+                    { "axis": "Leg" }
+                  ]
+                },
+                "axes": {
+                  "Cfg": { "A": 10, "R": 18, "I": 85, "sigma": "Dst" },
+                  "Emb": { "A": 20, "R": 24, "I": 80, "sigma": "Dst" },
+                  "Org": { "A": 18, "R": 22, "I": 76, "sigma": "Dst" },
+                  "Dir": { "A": 15, "R": 20, "I": 80, "sigma": "Dst" },
+                  "Leg": { "A": 10, "R": 18, "I": 75, "sigma": "Dst" }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": { "A": 8, "R": 8, "I": 8, "sigma": "L" },
+                  "Emb": { "A": 10, "R": 10, "I": 10, "sigma": "L" },
+                  "Org": { "A": 8, "R": 8, "I": 8, "sigma": "L" },
+                  "Dir": { "A": 9, "R": 9, "I": 9, "sigma": "L" },
+                  "Leg": { "A": 8, "R": 8, "I": 8, "sigma": "L" }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Cfg",
+            "alpha_medium": "p3.Cfg",
+            "alpha_receiving": "p2.Cfg",
+            "sigma": "Dst",
+            "axis": "Cfg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "overflow",
+            "magnitude": 0.88
+          },
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Dir",
+            "alpha_medium": "p3.Dir",
+            "alpha_receiving": "p2.Leg",
+            "sigma": "Dst",
+            "axis": "Leg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "overflow",
+            "magnitude": 0.84
+          }
+        ],
+        "analysis": { "key_finding": "Blocked collapse projection seed." }
+      }
+    }
+  ]
+}

@@ -16,8 +16,9 @@ Primary entrypoints:
 - `solver/phase0-audit.js`
 - `solver/fixtures/phase0/manifest.json`
 - `solver/fixtures/phase0/failure_split.json`
+- `solver/fixtures/phase0/failure_projection.json`
 
 Audit loading rule:
 - the Phase 0 audit now loads **all** `.json` fixture packs in this directory
 - `manifest.json` remains the base scaffold pack
-- focused packs such as `failure_split.json` are supplemental, not competing authority surfaces
+- focused packs such as `failure_split.json` and `failure_projection.json` are supplemental, not competing authority surfaces
