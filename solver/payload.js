@@ -79,6 +79,9 @@ export function normalizePayloadEvent(event = {}) {
     leg_scope: event.leg_scope || event.legScope || 'local',
     trace_persistence: Math.max(0, stableNumber(event.trace_persistence ?? event.tracePersistence, 0)),
     distributed_span: Math.max(0, stableNumber(event.distributed_span ?? event.distributedSpan, 0)),
+    field_scope: event.field_scope || event.fieldScope || 'local',
+    field_feedback: Math.max(0, stableNumber(event.field_feedback ?? event.fieldFeedback, 0)),
+    field_depth: Math.max(0, stableNumber(event.field_depth ?? event.fieldDepth, 0)),
     interference: event.interference || '',
     payload_bundle: payloadBundleRaw.map(atom => normalizePrimitive(atom, fallbackAxis))
   };
@@ -143,6 +146,8 @@ export function summarizeRelationTraces(relationTraces = []) {
     order_notes: {},
     leg_scopes: {},
     leg_notes: {},
+    field_scopes: {},
+    field_notes: {},
     medium_participants: {},
     source_participants: {},
     receiving_participants: {},
@@ -154,6 +159,9 @@ export function summarizeRelationTraces(relationTraces = []) {
     average_trace_persistence: 0,
     average_distributed_span: 0,
     average_persistence_signal: 0,
+    average_field_feedback: 0,
+    average_field_depth: 0,
+    average_field_signal: 0,
   };
 
   if (!relationTraces.length) return summary;
@@ -166,6 +174,9 @@ export function summarizeRelationTraces(relationTraces = []) {
   let tracePersistenceSum = 0;
   let distributedSpanSum = 0;
   let persistenceSignalSum = 0;
+  let fieldFeedbackSum = 0;
+  let fieldDepthSum = 0;
+  let fieldSignalSum = 0;
 
   for (const trace of relationTraces) {
     incrementCounter(summary.roles, trace.role || 'unknown');
@@ -173,6 +184,8 @@ export function summarizeRelationTraces(relationTraces = []) {
     incrementCounter(summary.order_notes, trace.order_note || 'scan-led-order');
     incrementCounter(summary.leg_scopes, trace.leg_scope || 'non-leg');
     incrementCounter(summary.leg_notes, trace.leg_note || 'non-leg-event');
+    incrementCounter(summary.field_scopes, trace.field_scope || 'non-field');
+    incrementCounter(summary.field_notes, trace.field_note || 'non-field-event');
     incrementCounter(summary.medium_participants, trace.medium?.participantId || 'unknown');
     incrementCounter(summary.source_participants, trace.source?.participantId || 'unknown');
     incrementCounter(summary.receiving_participants, trace.receiving?.participantId || 'unknown');
@@ -184,6 +197,9 @@ export function summarizeRelationTraces(relationTraces = []) {
     tracePersistenceSum += stableNumber(trace.trace_persistence, 0);
     distributedSpanSum += stableNumber(trace.distributed_span, 0);
     persistenceSignalSum += stableNumber(trace.persistence_signal, 0);
+    fieldFeedbackSum += stableNumber(trace.field_feedback, 0);
+    fieldDepthSum += stableNumber(trace.field_depth, 0);
+    fieldSignalSum += stableNumber(trace.field_signal, 0);
   }
 
   summary.average_transfer = transferSum / relationTraces.length;
@@ -194,6 +210,9 @@ export function summarizeRelationTraces(relationTraces = []) {
   summary.average_trace_persistence = tracePersistenceSum / relationTraces.length;
   summary.average_distributed_span = distributedSpanSum / relationTraces.length;
   summary.average_persistence_signal = persistenceSignalSum / relationTraces.length;
+  summary.average_field_feedback = fieldFeedbackSum / relationTraces.length;
+  summary.average_field_depth = fieldDepthSum / relationTraces.length;
+  summary.average_field_signal = fieldSignalSum / relationTraces.length;
   return summary;
 }
 

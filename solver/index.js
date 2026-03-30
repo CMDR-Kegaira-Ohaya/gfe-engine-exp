@@ -9,6 +9,7 @@ export { deriveCascade } from './cascade.js';
 export { deriveFailureGrammar } from './failure.js';
 export { resolveOrderProfile } from './order.js';
 export { resolveDistributedLegProfile } from './leg_distributed.js';
+export { resolveFieldRecursionProfile } from './field_recursion.js';
 export { updateParticipantAxes } from './state.js';
 export { buildEncounterContext, deriveRelationParticipation } from './relation.js';
 export { DEFAULT_WEIGHTS } from './config.js';
