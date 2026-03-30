@@ -136,6 +136,7 @@
 │   │       ├── family_truth.json
 │   │       ├── field_recursion.json
 │   │       ├── integration_paths.json
+│   │       ├── invariant_registry.json
 │   │       ├── leg_distributed.json
 │   │       ├── manifest.json
 │   │       ├── order_split.json
