@@ -1,5 +1,6 @@
 import { AXES, MODES, REGISTERS, SIGMA, UNFOLDING } from './constants.js';
 import { clip01, parseAlphaRef, stableNumber, toMagnitudeScale } from './utils.js';
+import { deriveRelationParticipation } from './relation.js';
 
 export function normalizeMode(mode) {
   const normalized = String(mode || 'load').replaceAll('_', '-');
@@ -68,6 +69,9 @@ export function normalizePayloadEvent(event = {}) {
     sourceParticipantId: source.participantId,
     mediumParticipantId: medium.participantId,
     receivingParticipantId: receiving.participantId,
+    sourceAxis: normalizeAxis(source.axis, fallbackAxis),
+    mediumAxis: normalizeAxis(medium.axis, fallbackAxis),
+    receivingAxis: normalizeAxis(receiving.axis, fallbackAxis),
     axis: fallbackAxis,
     face: event.face || null,
     interference: event.interference || '',
@@ -97,8 +101,20 @@ function defaultAggregateRow() {
   };
 }
 
-export function aggregateAxisPayload(events = [], participantId, axis, weights) {
+function mergeAggregateRow(target = defaultAggregateRow(), source = {}) {
+  target.deltaRIn += source.deltaRIn || 0;
+  target.deltaROut += source.deltaROut || 0;
+  target.deltaIEvent += source.deltaIEvent || 0;
+  target.contestM += source.contestM || 0;
+  target.contractDst += source.contractDst || 0;
+  target.eventCount += source.eventCount || 0;
+  return target;
+}
+
+export function aggregateAxisPayload(events = [], participantId, axis, weights, options = {}) {
   const totals = defaultAggregateRow();
+  const relationTraces = [];
+  const encounterContext = options.encounterContext || {};
 
   for (const event of events) {
     for (const primitive of event.payload_bundle || []) {
@@ -122,16 +138,41 @@ export function aggregateAxisPayload(events = [], participantId, axis, weights) 
         totals.deltaROut += (weights.emissionCostByMode[primitive.mode] || 0) * scaled;
         totals.eventCount += 1;
       }
+
+      const relation = deriveRelationParticipation(
+        event,
+        primitive,
+        participantId,
+        axis,
+        encounterContext,
+        weights
+      );
+
+      mergeAggregateRow(totals, relation.aggregate);
+      if (relation.trace) relationTraces.push(relation.trace);
     }
   }
 
-  return totals;
+  return { totals, relationTraces };
 }
 
-export function aggregateParticipantPayload(events = [], participantId, weights) {
-  return Object.fromEntries(
-    AXES.map(axis => [axis, aggregateAxisPayload(events, participantId, axis, weights)])
-  );
+export function aggregateParticipantPayload(events = [], participantId, weights, options = {}) {
+  const byAxis = {};
+  const relationTraces = [];
+
+  for (const axis of AXES) {
+    const { totals, relationTraces: axisRelationTraces } = aggregateAxisPayload(
+      events,
+      participantId,
+      axis,
+      weights,
+      options
+    );
+    byAxis[axis] = totals;
+    relationTraces.push(...axisRelationTraces);
+  }
+
+  return { byAxis, relation_traces: relationTraces };
 }
 
 export function countParticipantModes(events = [], participantId) {

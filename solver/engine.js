@@ -5,6 +5,7 @@ import { deriveEnvelope, buildEnvelopeSummary } from './envelope.js';
 import { deriveCompensation } from './compensation.js';
 import { deriveCascade, buildCascadeSummary } from './cascade.js';
 import { updateParticipantAxes, cfgGate } from './state.js';
+import { buildEncounterContext } from './relation.js';
 import { deepClone, defaultParticipantState, ensureAxesContainer } from './utils.js';
 
 function mergeParticipantBase(previousParticipant = {}, participantData = {}, participantId = null) {
@@ -18,9 +19,10 @@ function mergeParticipantBase(previousParticipant = {}, participantData = {}, pa
   };
 }
 
-export function solveParticipantStep(previousParticipant = {}, events = [], weights = DEFAULT_WEIGHTS) {
+export function solveParticipantStep(previousParticipant = {}, events = [], weights = DEFAULT_WEIGHTS, options = {}) {
   const participant = mergeParticipantBase(previousParticipant, previousParticipant, previousParticipant.id || null);
-  const aggregates = aggregateParticipantPayload(events, participant.id, weights);
+  const payloadAudit = aggregateParticipantPayload(events, participant.id, weights, options);
+  const aggregates = payloadAudit.byAxis;
   const updatedAxes = updateParticipantAxes(participant.axes, aggregates, weights);
   const prevalence = derivePrevalence(updatedAxes.canonical, weights);
   const theta = deriveTheta(updatedAxes.canonical, prevalence, weights);
@@ -47,6 +49,7 @@ export function solveParticipantStep(previousParticipant = {}, events = [], weig
       cfg_gate: updatedAxes.cfg_gate,
       aggregates,
       mode_counts,
+      relation_traces: payloadAudit.relation_traces,
     },
   };
 }
@@ -57,7 +60,7 @@ export function solveCase(caseData, options = {}) {
   const solved = deepClone(caseData);
 
   solved.solver = {
-    version: '0.2.1',
+    version: '0.3.0',
     mode: 'canon-locked-runtime',
     weights,
   };
@@ -70,9 +73,18 @@ export function solveCase(caseData, options = {}) {
     const stepEvents = groupedEvents.get(stepIndex) || [];
     const stepParticipants = step.participants || {};
 
+    const mergedParticipants = new Map();
     for (const [participantId, participantData] of Object.entries(stepParticipants)) {
-      const merged = mergeParticipantBase(previousParticipants.get(participantId), participantData, participantId);
-      const solvedParticipant = solveParticipantStep(merged, stepEvents, weights);
+      mergedParticipants.set(
+        participantId,
+        mergeParticipantBase(previousParticipants.get(participantId), participantData, participantId)
+      );
+    }
+
+    const encounterContext = buildEncounterContext(Object.fromEntries(mergedParticipants.entries()));
+
+    for (const [participantId, mergedParticipant] of mergedParticipants.entries()) {
+      const solvedParticipant = solveParticipantStep(mergedParticipant, stepEvents, weights, { encounterContext });
       stepParticipants[participantId] = solvedParticipant;
       previousParticipants.set(participantId, solvedParticipant);
     }

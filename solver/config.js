@@ -44,6 +44,11 @@ export const DEFAULT_WEIGHTS = Object.freeze({
     amplify: 0.11,
     'threshold-transfer': 0.09
   },
+  relationReceivingGain: 0.08,
+  relationEmissionCost: 0.06,
+  relationMediumBurden: 0.05,
+  relationContestGain: 0.04,
+  relationDestructiveGain: 0.05,
   acuteWeight: 1.0,
   accumulatedWeight: 0.7,
   lambdaEmit: 1.0,

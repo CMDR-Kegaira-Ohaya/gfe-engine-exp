@@ -7,4 +7,5 @@ export { deriveEnvelope } from './envelope.js';
 export { deriveCompensation } from './compensation.js';
 export { deriveCascade } from './cascade.js';
 export { updateParticipantAxes } from './state.js';
+export { buildEncounterContext, deriveRelationParticipation } from './relation.js';
 export { DEFAULT_WEIGHTS } from './config.js';
