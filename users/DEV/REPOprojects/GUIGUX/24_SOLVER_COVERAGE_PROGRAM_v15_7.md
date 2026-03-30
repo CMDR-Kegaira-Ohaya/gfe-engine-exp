@@ -4,24 +4,27 @@
 
 Links back to:
 - `[GUIGUX_LAYER_OWNERSHIP]`
-- `[GUIGUX_PIPELINE_CONTRACT]
-- `[GUIGUX_SOLVER_AUTHORITY_LAW]
-
+- `[GUIGUX_PIPELINE_CONTRACT]`
+- `[GUIGUX_SOLVER_AUTHORITY_LAW]`
 - `[GUIGUX_GUI_PROJECTION_CONTRACT]`
 
 ---
 
 ## 1) Purpose
 
-This note locks the solver-expansion program against the frozen engine canon at v15.7. It exists to prevent solver work from drifting into either a) patch-stacking on top of an old runtime or b) vague "make it smarter" scope creep.
+This note locks the solver-expansion program against the frozen engine canon at v15.7. It exists to prevent solver work from drifting into either a) patch-stacking on top of an old runtime or b) vague “make it smarter” scope creep.
 
 Target: move every solver-coverage matrix entry to **Full** against the v15.7 engine only.
+
+Formal contract note:
+- `25_SOLVER_COVERAGE_CONTRACT_v15_7.md` now owns the formal meaning of coverage status, `Full`, Phase 0 proof base, and final validation target.
+- This file remains the program / phasing note, not a competing acceptance contract.
 
 ---
 
 ## 2) Frozen target
 
-Canon fozen:
+Canon frozen:
 - `engine/spec_v15_7.md`
 - `engine/gfe_exp_engine_core_v15_7.md`
 
@@ -59,9 +62,10 @@ The solver should be reshaped into a process-grammar runtime, not merely extende
 
 That means:
 - keep the valuable core local-axis math where it still fits
-- move the solver center of gravity from "aggregate events → update axes" 
-  toward "encounter grammar → process distinctions → local state participation → output"
+- move the solver center of gravity from "aggregate events -> update axes"  
+  toward "encounter grammar -> process distinctions -> local state participation -> output"
 - make relation, face, family, failure, order, and distributed Leg first-class solver processes
+
 ## 5) Target shape of the single runtime
 
 Likely module families:
@@ -75,17 +79,18 @@ Likely module families:
 - `solver/axis-local.js` — local axis ARI math (reshaped from current state/envelope/prevalence core where appropriate)
 
 The public solver api should remain clean:
-- `solveCase``
-- `solveParticipantStep``
-- validation entries
- (number of internal modules may grow as needed)
+- `solveCase`
+- `solveParticipantStep`
+- validation entrypoints
+(number of internal modules may grow as needed)
 
 ---
 
 ## 6) Coverage goal status target
 
 Every coverage-matrix entry must move through:
-**parsed-only → partial → full**
+
+**parsed-only -> partial -> full**
 
 Full target includes:
 - executable logic
@@ -124,7 +129,7 @@ Full target includes:
 
 ### Phase 5 — Order recursion
 - make formed-order recursion explicit
-- done when the solver can execute order-sensitive processes without fakes flattening into single-level timestep logic
+- done when the solver can execute order-sensitive processes without fake flattening into single-level timestep logic
 
 ### Phase 6 — Leg distributed behavior
 - add trace persistence, distributed pattern behavior, and local vs distributed Leg logic
@@ -154,7 +159,7 @@ These are not optional; without them, "Full" becomes a claim without proof.
 
 ## 9) Rules during the migration
 - do not call two solvers live truths
-- do not let GUI narrow dr GPT interpretation substitute for solver execution
+- do not let GUI narrow or GPT interpretation substitute for solver execution
 - do not mark a coverage entry "full" because it is parsed, named, or approximated
 - do not add new canon during this program; the target is frozen v15.7
 - keep public solver entrypoints as stable as practical while internals are reshaped
@@ -163,4 +168,6 @@ These are not optional; without them, "Full" becomes a claim without proof.
 
 ## 10) Simple decision line
 
-We will not run two live solver rights. We will reshape the current solver into a single v 15.7 canon-faithful runtime, proving full coverage process-by-process with modern golden cases and invariant tests.
+We will not run two live solver truths. We will reshape the current solver into a single v 15.7 canon-faithful runtime, proving full coverage process-by-process with modern golden cases and invariant tests.
+
+Last updated: 2026-03-30
