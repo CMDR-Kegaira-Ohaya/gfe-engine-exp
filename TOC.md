@@ -129,6 +129,7 @@
 │   │       ├── failure_collapse_anti_collapse.json
 │   │       ├── failure_collapse_integration.json
 │   │       ├── failure_plastic_deformation_anti_collapse.json
+│   │       ├── failure_plastic_deformation_integration.json
 │   │       ├── failure_projection.json
 │   │       ├── failure_split.json
 │   │       ├── failure_substitution_anti_collapse.json
