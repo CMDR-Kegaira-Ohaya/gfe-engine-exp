@@ -121,7 +121,8 @@
 │   │       ├── failure_projection.json
 │   │       ├── failure_split.json
 │   │       ├── manifest.json
-│   │       └── README.md
+│   │       ├── README.md
+│   │       └── relation_split.json
 │   ├── cascade.js
 │   ├── check-cases.js
 │   ├── compensation.js
