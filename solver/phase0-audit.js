@@ -22,7 +22,12 @@ function comparePaths(solvedA, solvedB, paths) {
     const left = getAtPath(solvedA, comparePath);
     const right = getAtPath(solvedB, comparePath);
     const differs = JSON.stringify(left) !== JSON.stringify(right);
-    return { path: comparePath, differs };
+    return {
+      path: comparePath,
+      differs,
+      left,
+      right,
+    };
   });
 }
 
@@ -32,6 +37,28 @@ function summarizeValidation(validation) {
     errors: validation.issues.filter(issue => issue.level === 'error').length,
     warnings: validation.issues.filter(issue => issue.level === 'warning').length,
   };
+}
+
+function buildParticipantSnapshots(solvedCase) {
+  const timeline = Array.isArray(solvedCase?.timeline) ? solvedCase.timeline : [];
+  return timeline.map((step, stepIndex) => {
+    const participants = Object.fromEntries(
+      Object.entries(step?.participants || {}).map(([participantId, participant]) => [
+        participantId,
+        {
+          relation_summary: participant?.solver_debug?.relation_summary || null,
+          relation_traces: participant?.solver_debug?.relation_traces || [],
+          canonical_axes: participant?._canonical_axes || null,
+          display_axes: participant?.axes || null,
+        },
+      ])
+    );
+
+    return {
+      step_index: stepIndex,
+      participants,
+    };
+  });
 }
 
 const report = {
@@ -69,6 +96,7 @@ for (const fixture of manifest.fixtures || []) {
       validation: summarizeValidation(validation),
       solve_ok: !!solved,
       path_checks: pathChecks,
+      participant_snapshots: buildParticipantSnapshots(solved),
       purpose: fixture.purpose,
     });
     continue;
@@ -95,6 +123,8 @@ for (const fixture of manifest.fixtures || []) {
       validation_b: summarizeValidation(validationB),
       differs_somewhere: differsSomewhere,
       comparisons,
+      snapshots_a: buildParticipantSnapshots(solvedA),
+      snapshots_b: buildParticipantSnapshots(solvedB),
       purpose: fixture.purpose,
     });
     continue;

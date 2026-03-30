@@ -111,6 +111,42 @@ function mergeAggregateRow(target = defaultAggregateRow(), source = {}) {
   return target;
 }
 
+function incrementCounter(bucket = {}, key) {
+  if (!key) return bucket;
+  bucket[key] = (bucket[key] || 0) + 1;
+  return bucket;
+}
+
+export function summarizeRelationTraces(relationTraces = []) {
+  const summary = {
+    trace_count: relationTraces.length,
+    roles: {},
+    medium_participants: {},
+    source_participants: {},
+    receiving_participants: {},
+    average_transfer: 0,
+    average_continuity: 0,
+  };
+
+  if (!relationTraces.length) return summary;
+
+  let transferSum = 0;
+  let continuitySum = 0;
+
+  for (const trace of relationTraces) {
+    incrementCounter(summary.roles, trace.role || 'unknown');
+    incrementCounter(summary.medium_participants, trace.medium?.participantId || 'unknown');
+    incrementCounter(summary.source_participants, trace.source?.participantId || 'unknown');
+    incrementCounter(summary.receiving_participants, trace.receiving?.participantId || 'unknown');
+    transferSum += stableNumber(trace.relation_transfer, 0);
+    continuitySum += stableNumber(trace.triad_continuity, 0);
+  }
+
+  summary.average_transfer = transferSum / relationTraces.length;
+  summary.average_continuity = continuitySum / relationTraces.length;
+  return summary;
+}
+
 export function aggregateAxisPayload(events = [], participantId, axis, weights, options = {}) {
   const totals = defaultAggregateRow();
   const relationTraces = [];
@@ -172,7 +208,11 @@ export function aggregateParticipantPayload(events = [], participantId, weights,
     relationTraces.push(...axisRelationTraces);
   }
 
-  return { byAxis, relation_traces: relationTraces };
+  return {
+    byAxis,
+    relation_traces: relationTraces,
+    relation_summary: summarizeRelationTraces(relationTraces),
+  };
 }
 
 export function countParticipantModes(events = [], participantId) {

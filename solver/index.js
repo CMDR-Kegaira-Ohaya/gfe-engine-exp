@@ -1,7 +1,7 @@
 export { validateCase } from './validate.js';
 export { solveCase, solveParticipantStep, buildEnvelopeSummary, buildCascadeSummary, cfgGate } from './engine.js';
 export { buildDashboardChunks } from './dashboard.js';
-export { normalizePayloadEvent, groupEventsByStep, aggregateParticipantPayload, countParticipantModes } from './payload.js';
+export { normalizePayloadEvent, groupEventsByStep, aggregateParticipantPayload, countParticipantModes, summarizeRelationTraces } from './payload.js';
 export { derivePrevalence, deriveTheta } from './prevalence.js';
 export { deriveEnvelope } from './envelope.js';
 export { deriveCompensation } from './compensation.js';

@@ -50,6 +50,7 @@ export function solveParticipantStep(previousParticipant = {}, events = [], weig
       aggregates,
       mode_counts,
       relation_traces: payloadAudit.relation_traces,
+      relation_summary: payloadAudit.relation_summary,
     },
   };
 }
@@ -60,7 +61,7 @@ export function solveCase(caseData, options = {}) {
   const solved = deepClone(caseData);
 
   solved.solver = {
-    version: '0.3.0',
+    version: '0.3.1',
     mode: 'canon-locked-runtime',
     weights,
   };
