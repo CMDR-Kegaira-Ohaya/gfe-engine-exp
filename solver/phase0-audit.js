@@ -172,9 +172,78 @@ function inferCoverageState(rowDeclaration = {}, aggregation = null) {
   return 'parsed-only';
 }
 
-function buildCoverageRows(rowDeclarations = [], fixtures = []) {
+
+function extractInvariantRegistry(manifests = []) {
+  const crossPhaseInvariants = manifests.flatMap(manifest =>
+    (manifest.data.cross_phase_invariants || []).map(invariant => ({
+      file: manifest.file,
+      fixture_pack: manifest.data.fixture_pack || manifest.file,
+      ...invariant,
+    }))
+  );
+
+  const rowLocalSuites = manifests.flatMap(manifest =>
+    (manifest.data.row_local_suites || []).map(suite => ({
+      file: manifest.file,
+      fixture_pack: manifest.data.fixture_pack || manifest.file,
+      ...suite,
+    }))
+  );
+
+  return {
+    cross_phase_invariants: crossPhaseInvariants,
+    row_local_suites: rowLocalSuites,
+  };
+}
+
+function buildRowLocalSuiteMap(rowLocalSuites = []) {
+  const rowMap = new Map();
+
+  for (const suite of rowLocalSuites) {
+    const row = suite.row || '(unmapped-row)';
+    if (!rowMap.has(row)) rowMap.set(row, []);
+    rowMap.get(row).push(suite);
+  }
+
+  for (const suites of rowMap.values()) {
+    suites.sort((left, right) =>
+      String(left.suite_id || '').localeCompare(String(right.suite_id || ''))
+    );
+  }
+
+  return rowMap;
+}
+
+function summarizeInvariantRegistry(invariantRegistry = {}) {
+  const crossPhaseInvariants = Array.isArray(invariantRegistry.cross_phase_invariants)
+    ? invariantRegistry.cross_phase_invariants
+    : [];
+  const rowLocalSuites = Array.isArray(invariantRegistry.row_local_suites)
+    ? invariantRegistry.row_local_suites
+    : [];
+  const rowsWithSuites = Array.from(
+    new Set(rowLocalSuites.map(suite => suite.row).filter(Boolean))
+  ).sort();
+
+  return {
+    cross_phase_invariants: {
+      count: crossPhaseInvariants.length,
+      ids: crossPhaseInvariants.map(invariant => invariant.id || '(unnamed-invariant)'),
+    },
+    row_local_suites: {
+      count: rowLocalSuites.length,
+      rows_covered: rowsWithSuites.length,
+      rows: rowsWithSuites,
+      suite_ids: rowLocalSuites.map(suite => suite.suite_id || '(unnamed-suite)'),
+    },
+  };
+}
+
+
+function buildCoverageRows(rowDeclarations = [], fixtures = [], invariantRegistry = {}) {
   const declaredRows = Array.isArray(rowDeclarations) ? rowDeclarations : [];
   const aggregation = buildRowAggregation(fixtures);
+  const rowLocalSuiteMap = buildRowLocalSuiteMap(invariantRegistry.row_local_suites || []);
   const rows = [];
   const seen = new Set();
 
@@ -198,6 +267,7 @@ function buildCoverageRows(rowDeclarations = [], fixtures = []) {
     const missingFixtureClasses = requiredFixtureClasses.filter(
       fixtureClass => !observed.fixture_classes.has(fixtureClass)
     );
+    const rowLocalSuites = rowLocalSuiteMap.get(row) || [];
 
     seen.add(row);
     rows.push({
@@ -210,6 +280,11 @@ function buildCoverageRows(rowDeclarations = [], fixtures = []) {
       required_fixture_classes: requiredFixtureClasses,
       declared_packs: declaration.packs || [],
       declared_fixture_ids: declaration.fixture_ids || [],
+      row_local_suite_ids: rowLocalSuites.map(suite => suite.suite_id || '(unnamed-suite)'),
+      row_local_suite_labels: rowLocalSuites.map(suite => suite.label || ''),
+      row_local_suite_count: rowLocalSuites.length,
+      has_row_local_suite: rowLocalSuites.length > 0,
+      missing_row_local_suite: rowLocalSuites.length === 0,
       observed_packs: Array.from(observed.packs).sort(),
       observed_files: Array.from(observed.files).sort(),
       observed_fixture_ids: Array.from(observed.fixture_ids).sort(),
@@ -228,6 +303,7 @@ function buildCoverageRows(rowDeclarations = [], fixtures = []) {
   for (const [row, observed] of aggregation.entries()) {
     if (seen.has(row)) continue;
     const observedFixtureClasses = Array.from(observed.fixture_classes).sort();
+    const rowLocalSuites = rowLocalSuiteMap.get(row) || [];
     rows.push({
       row,
       current_state: inferCoverageState({}, observed),
@@ -238,6 +314,11 @@ function buildCoverageRows(rowDeclarations = [], fixtures = []) {
       required_fixture_classes: ['golden', 'contrast', 'anti-collapse', 'integration'],
       declared_packs: [],
       declared_fixture_ids: [],
+      row_local_suite_ids: rowLocalSuites.map(suite => suite.suite_id || '(unnamed-suite)'),
+      row_local_suite_labels: rowLocalSuites.map(suite => suite.label || ''),
+      row_local_suite_count: rowLocalSuites.length,
+      has_row_local_suite: rowLocalSuites.length > 0,
+      missing_row_local_suite: rowLocalSuites.length === 0,
       observed_packs: Array.from(observed.packs).sort(),
       observed_files: Array.from(observed.files).sort(),
       observed_fixture_ids: Array.from(observed.fixture_ids).sort(),
@@ -258,6 +339,7 @@ function buildCoverageRows(rowDeclarations = [], fixtures = []) {
   return rows.sort((left, right) => String(left.row).localeCompare(String(right.row)));
 }
 
+
 function summarizeCoverageRows(coverageRows = []) {
   const summary = {
     total_rows: coverageRows.length,
@@ -265,6 +347,8 @@ function summarizeCoverageRows(coverageRows = []) {
     hard_gated_rows: 0,
     rows_with_failing_gates: 0,
     rows_with_complete_fixture_class_set: 0,
+    rows_with_row_local_suites: 0,
+    rows_missing_row_local_suites: 0,
   };
 
   for (const row of coverageRows) {
@@ -272,6 +356,8 @@ function summarizeCoverageRows(coverageRows = []) {
     if (row.hard_gated_phase0) summary.hard_gated_rows += 1;
     if (row.hard_gated_failures > 0) summary.rows_with_failing_gates += 1;
     if (row.has_complete_fixture_class_set) summary.rows_with_complete_fixture_class_set += 1;
+    if (row.has_row_local_suite) summary.rows_with_row_local_suites += 1;
+    if (row.missing_row_local_suite) summary.rows_missing_row_local_suites += 1;
   }
 
   return summary;
@@ -280,6 +366,7 @@ function summarizeCoverageRows(coverageRows = []) {
 const coverageRowDeclarations = manifests.flatMap(item =>
   Array.isArray(item.data.rows) ? item.data.rows : []
 );
+const invariantRegistry = extractInvariantRegistry(manifests);
 
 const report = {
   manifests: manifests.map(item => ({
@@ -289,6 +376,8 @@ const report = {
     mode: item.data.mode,
     fixture_pack: item.data.fixture_pack || null,
   })),
+  invariant_registry: invariantRegistry,
+  invariant_summary: summarizeInvariantRegistry(invariantRegistry),
   fixtures: [],
   coverage_rows: [],
   coverage_summary: {},
@@ -386,7 +475,7 @@ for (const manifest of manifests) {
   }
 }
 
-report.coverage_rows = buildCoverageRows(coverageRowDeclarations, report.fixtures);
+report.coverage_rows = buildCoverageRows(coverageRowDeclarations, report.fixtures, invariantRegistry);
 report.coverage_summary = summarizeCoverageRows(report.coverage_rows);
 
 console.log(JSON.stringify(report, null, 2));
