@@ -213,6 +213,39 @@
         ],
         "analysis": { "key_finding": "Integrated overflow-facing public-path seed." }
       }
+    },
+    {
+      "id": "FX-INT-08",
+      "row": "FAILURE_SUBSTITUTION",
+      "kind": "single",
+      "fixture_class": "integration",
+      "purpose": "Canonical runtime should expose integrated substitution failure grammar, relation, face, order, distributed Leg, recursive field, envelope, compensation, reroute, and cascade outputs in one substitution-facing solved case.",
+      "assertions": [
+        "validate_ok",
+        "solve_ok",
+        "path_exists:timeline.0.participants.p2.failure.primary",
+        "path_exists:timeline.0.participants.p2.failure.grammars.substitution",
+        "path_exists:timeline.0.participants.p2.solver_debug.relation_summary.faces",
+        "path_exists:timeline.0.participants.p2.solver_debug.relation_summary.order_notes",
+        "path_exists:timeline.0.participants.p2.solver_debug.relation_summary.leg_scopes",
+        "path_exists:timeline.0.participants.p2.solver_debug.relation_summary.field_scopes",
+        "path_exists:timeline.0.participants.p2.envelope.status",
+        "path_exists:timeline.0.participants.p2.compensation",
+        "path_exists:timeline.0.participants.p2.cascade.projection_mode",
+        "path_exists:timeline.0.participants.p2.cascade.rerouted"
+      ],
+      "case_data": {
+        "system_name": "fx-int-08-substitution-facing-integration",
+        "participants": [{ "id": "p1", "name": "P1" }, { "id": "p2", "name": "P2" }, { "id": "p3", "name": "P3" }],
+        "timeline": [{ "timestep_label": "T0", "participants": { "p1": { "axes": { "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Emb": { "A": 79, "R": 79, "I": 79, "sigma": "L" }, "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" }, "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" } } }, "p2": { "cascade": { "attempts": [{ "axis": "Cfg" }, { "axis": "Dir" }, { "axis": "Leg" }, { "axis": "Org" }] }, "axes": { "Cfg": { "A": 46, "R": 50, "I": 56, "sigma": "L" }, "Emb": { "A": 54, "R": 54, "I": 58, "sigma": "L" }, "Org": { "A": 52, "R": 52, "I": 57, "sigma": "L" }, "Dir": { "A": 49, "R": 49, "I": 55, "sigma": "L" }, "Leg": { "A": 50, "R": 50, "I": 55, "sigma": "L" } } }, "p3": { "axes": { "Cfg": { "A": 72, "R": 72, "I": 72, "sigma": "L" }, "Emb": { "A": 70, "R": 70, "I": 70, "sigma": "L" }, "Org": { "A": 74, "R": 74, "I": 74, "sigma": "L" }, "Dir": { "A": 69, "R": 69, "I": 69, "sigma": "L" }, "Leg": { "A": 71, "R": 71, "I": 71, "sigma": "L" } } } } }],
+        "payload_events": [
+          { "timestep_idx": 0, "face": "inner", "scan_index": 1, "order_depth": 3, "leg_scope": "distributed", "trace_persistence": 2, "distributed_span": 3, "alpha_source": "p1.Org", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Leg", "sigma": "L", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "substitute", "magnitude": 0.70 },
+          { "timestep_idx": 0, "face": "outer", "scan_index": 2, "order_depth": 2, "leg_scope": "distributed", "trace_persistence": 2, "distributed_span": 2, "field_scope": "recursive", "field_feedback": 3, "field_depth": 2, "alpha_source": "p1.Org", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Org", "sigma": "L", "axis": "Org", "unfolding": "acute", "register": "retained", "mode": "load", "magnitude": 0.58 },
+          { "timestep_idx": 0, "face": "inner", "scan_index": 3, "order_depth": 2, "leg_scope": "distributed", "trace_persistence": 1, "distributed_span": 2, "alpha_source": "p1.Cfg", "alpha_medium": "p3.Cfg", "alpha_receiving": "p2.Cfg", "sigma": "L", "axis": "Cfg", "unfolding": "acute", "register": "retained", "mode": "substitute", "magnitude": 0.68 },
+          { "timestep_idx": 0, "face": "outer", "scan_index": 4, "order_depth": 1, "leg_scope": "distributed", "trace_persistence": 1, "distributed_span": 1, "alpha_source": "p1.Dir", "alpha_medium": "p3.Dir", "alpha_receiving": "p2.Dir", "sigma": "L", "axis": "Dir", "unfolding": "acute", "register": "retained", "mode": "route", "magnitude": 0.60 }
+        ],
+        "analysis": { "key_finding": "Integrated substitution-facing public-path seed." }
+      }
     }
   ]
 }
