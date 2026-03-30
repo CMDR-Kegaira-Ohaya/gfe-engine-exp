@@ -396,15 +396,37 @@ function getRowLocalSuiteSeedMap() {
   };
 }
 
+function getRowLocalSuiteExpectedInvariantClassMap() {
+  return {
+    'INV-ROW-CORE-01': [
+      'core_local_axis_noncollapse',
+      'core_local_raw_noncollapse',
+      'core_local_axis_contrast',
+      'core_local_raw_contrast',
+    ],
+    'INV-ROW-FAIL-PLA-01': [
+      'plastic_noncollapse_divergence',
+      'plastic_form_noncollapse',
+    ],
+    'INV-ROW-FAIL-COL-01': [
+      'collapse_noncollapse_divergence',
+      'collapse_projection_noncollapse',
+    ],
+  };
+}
+
 function evaluateExecutableRowLocalSuiteChecks(fixtures = [], invariantRegistry = {}) {
   const fixtureMap = new Map(fixtures.map(fixture => [fixture.id || '(unknown-fixture)', fixture]));
   const suites = Array.isArray(invariantRegistry.row_local_suites) ? invariantRegistry.row_local_suites : [];
   const suiteSeedMap = getRowLocalSuiteSeedMap();
+  const suiteExpectedInvariantClassMap = getRowLocalSuiteExpectedInvariantClassMap();
 
   return suites.map(suite => {
     const suiteId = suite.suite_id || '(unnamed-suite)';
     const seed_fixture_ids = suiteSeedMap[suiteId] || [];
+    const expected_invariant_classes = suiteExpectedInvariantClassMap[suiteId] || [];
     const executable_slice = seed_fixture_ids.length > 0;
+    const executable_content_slice = expected_invariant_classes.length > 0;
     const referencedFixtures = seed_fixture_ids
       .map(fixtureId => fixtureMap.get(fixtureId))
       .filter(Boolean);
@@ -418,22 +440,50 @@ function evaluateExecutableRowLocalSuiteChecks(fixtures = [], invariantRegistry 
       .map(fixture => fixture.id || '(unknown-fixture)')
       .sort();
 
-    const pass = !executable_slice
+    const observedInvariantItems = referencedFixtures.flatMap(fixture =>
+      Array.isArray(fixture.divergence_invariants?.items) ? fixture.divergence_invariants.items : []
+    );
+    const observed_invariant_classes = Array.from(
+      new Set(observedInvariantItems.map(item => item.class).filter(Boolean))
+    ).sort();
+    const missing_invariant_classes = expected_invariant_classes
+      .filter(invariantClass => !observed_invariant_classes.includes(invariantClass))
+      .sort();
+    const failing_invariant_classes = expected_invariant_classes
+      .filter(invariantClass =>
+        observedInvariantItems.some(item => item.class === invariantClass && item.pass === false)
+      )
+      .sort();
+
+    const seed_pass = !executable_slice
       ? null
       : missing_fixture_ids.length === 0 &&
         unenforced_fixture_ids.length === 0 &&
         failing_fixture_ids.length === 0;
+    const content_pass = !executable_content_slice
+      ? null
+      : missing_invariant_classes.length === 0 && failing_invariant_classes.length === 0;
+    const pass = !executable_slice
+      ? null
+      : seed_pass && (content_pass !== false);
 
     return {
       suite_id: suiteId,
       row: suite.row || '(unmapped-row)',
       label: suite.label || '',
       executable_slice,
+      executable_content_slice,
       enforced: executable_slice,
       seed_fixture_ids,
+      expected_invariant_classes,
+      observed_invariant_classes,
       missing_fixture_ids,
       unenforced_fixture_ids,
       failing_fixture_ids,
+      missing_invariant_classes,
+      failing_invariant_classes,
+      seed_pass,
+      content_pass,
       pass,
     };
   });
@@ -441,8 +491,13 @@ function evaluateExecutableRowLocalSuiteChecks(fixtures = [], invariantRegistry 
 
 function summarizeExecutableRowLocalSuiteChecks(checks = []) {
   const executableChecks = checks.filter(check => check.executable_slice);
+  const executableContentChecks = executableChecks.filter(check => check.executable_content_slice);
   const failingSuiteIds = executableChecks
     .filter(check => !check.pass)
+    .map(check => check.suite_id)
+    .sort();
+  const failingContentSuiteIds = executableContentChecks
+    .filter(check => check.content_pass === false)
     .map(check => check.suite_id)
     .sort();
   const rowsWithExecutableChecks = Array.from(
@@ -452,10 +507,14 @@ function summarizeExecutableRowLocalSuiteChecks(checks = []) {
   return {
     declared_suites: checks.length,
     executable_checks: executableChecks.length,
+    executable_content_checks: executableContentChecks.length,
     passed_checks: executableChecks.filter(check => check.pass).length,
     failed_checks: executableChecks.filter(check => !check.pass).length,
+    passed_content_checks: executableContentChecks.filter(check => check.content_pass === true).length,
+    failed_content_checks: executableContentChecks.filter(check => check.content_pass === false).length,
     rows_with_executable_checks: rowsWithExecutableChecks.length,
     failing_suite_ids: failingSuiteIds,
+    failing_content_suite_ids: failingContentSuiteIds,
   };
 }
 
