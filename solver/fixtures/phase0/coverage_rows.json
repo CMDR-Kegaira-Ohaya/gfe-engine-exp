@@ -129,10 +129,11 @@
       "target_state": "full",
       "required_fixture_classes": ["golden", "contrast", "anti-collapse", "integration"],
       "runtime_surface": "solver/failure.js plus cascade/envelope projection surfaces",
-      "packs": ["failure_split.json", "failure_projection.json"],
-      "fixture_ids": ["FX-FAIL-03", "FX-FAIL-04", "FX-FAIL-05"],
+      "packs": ["failure_split.json", "failure_projection.json", "failure_collapse_integration.json"],
+      "fixture_ids": ["FX-FAIL-03", "FX-FAIL-04", "FX-FAIL-05", "FX-INT-11"],
       "notes": [
         "Collapse is hard-gated in grammar, cascade, and envelope projection contrasts.",
+        "A row-scoped integration fixture now proves collapse-facing coexistence with relation, face, order, distributed Leg, recursive field, envelope, blocked cascade, and projection outputs.",
         "Still requires fuller corpus and invariant depth before full."
       ]
     },
