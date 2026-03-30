@@ -5,7 +5,7 @@
   "fixture_pack": "anti-collapse",
   "notes": [
     "This pack starts the anti-collapse corpus class required by the v15.7 coverage contract.",
-    "The first targets are relation triad non-collapse and failure suppression remaining distinct from collapse under collapse pressure.",
+    "The current targets are relation triad non-collapse, failure suppression remaining distinct from collapse under pressure, and order depth remaining distinct from scan-led flattening.",
     "These fixtures are still Phase 0 scaffolds; they sharpen corpus shape without claiming full validation completeness."
   ],
   "fixtures": [
@@ -170,6 +170,86 @@
           { "timestep_idx": 0, "alpha_source": "p1.Dir", "alpha_medium": "p3.Dir", "alpha_receiving": "p2.Leg", "sigma": "Dst", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "overflow", "magnitude": 0.84 }
         ],
         "analysis": { "key_finding": "Collapse under pressure seed." }
+      }
+    },
+    {
+      "id": "FX-ORD-02",
+      "row": "ORDER_RECURSION",
+      "kind": "contrast",
+      "fixture_class": "anti-collapse",
+      "enforce_invariants": true,
+      "purpose": "Deep order should remain solver-distinct from scan-led flattening even when total event content is otherwise aligned.",
+      "compare_paths": [
+        "timeline.0.participants.p2.solver_debug.relation_summary.order_notes",
+        "timeline.0.participants.p2.solver_debug.relation_summary.average_order_depth",
+        "timeline.0.participants.p2.solver_debug.relation_summary.average_recursion_signal",
+        "timeline.0.participants.p2.solver_debug.relation_traces",
+        "timeline.0.participants.p2.theta"
+      ],
+      "divergence_invariants": [
+        {
+          "label": "order recursion non-collapse",
+          "class": "order_noncollapse_divergence",
+          "expectation": "all_must_differ",
+          "paths": [
+            "timeline.0.participants.p2.solver_debug.relation_summary.order_notes",
+            "timeline.0.participants.p2.solver_debug.relation_summary.average_order_depth",
+            "timeline.0.participants.p2.solver_debug.relation_summary.average_recursion_signal",
+            "timeline.0.participants.p2.solver_debug.relation_traces"
+          ]
+        },
+        {
+          "label": "order interpretation non-collapse",
+          "class": "order_interpretation_noncollapse",
+          "expectation": "some_must_differ",
+          "paths": [
+            "timeline.0.participants.p2.theta"
+          ]
+        }
+      ],
+      "case_a_data": {
+        "system_name": "fx-ord-02-deep-order-preserved",
+        "participants": [
+          { "id": "p1", "name": "P1" },
+          { "id": "p2", "name": "P2" },
+          { "id": "p3", "name": "P3" }
+        ],
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": { "axes": { "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" }, "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" }, "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" } } },
+              "p2": { "axes": { "Cfg": { "A": 26, "R": 32, "I": 82, "sigma": "L" }, "Emb": { "A": 58, "R": 58, "I": 60, "sigma": "L" }, "Org": { "A": 68, "R": 68, "I": 70, "sigma": "L" }, "Dir": { "A": 38, "R": 42, "I": 78, "sigma": "L" }, "Leg": { "A": 70, "R": 70, "I": 72, "sigma": "L" } } },
+              "p3": { "axes": { "Cfg": { "A": 74, "R": 74, "I": 74, "sigma": "L" }, "Emb": { "A": 72, "R": 72, "I": 72, "sigma": "L" }, "Org": { "A": 76, "R": 76, "I": 76, "sigma": "L" }, "Dir": { "A": 73, "R": 73, "I": 73, "sigma": "L" }, "Leg": { "A": 72, "R": 72, "I": 72, "sigma": "L" } } }
+            }
+          }
+        ],
+        "payload_events": [
+          { "timestep_idx": 0, "scan_index": 2, "order_depth": 4, "alpha_source": "p1.Dir", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Leg", "sigma": "L", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "threshold-transfer", "magnitude": 0.60 }
+        ],
+        "analysis": { "key_finding": "Deep order remains solver-distinct." }
+      },
+      "case_b_data": {
+        "system_name": "fx-ord-02-scan-led-flattening",
+        "participants": [
+          { "id": "p1", "name": "P1" },
+          { "id": "p2", "name": "P2" },
+          { "id": "p3", "name": "P3" }
+        ],
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": { "axes": { "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" }, "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" }, "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" } } },
+              "p2": { "axes": { "Cfg": { "A": 26, "R": 32, "I": 82, "sigma": "L" }, "Emb": { "A": 58, "R": 58, "I": 60, "sigma": "L" }, "Org": { "A": 68, "R": 68, "I": 70, "sigma": "L" }, "Dir": { "A": 38, "R": 42, "I": 78, "sigma": "L" }, "Leg": { "A": 70, "R": 70, "I": 72, "sigma": "L" } } },
+              "p3": { "axes": { "Cfg": { "A": 74, "R": 74, "I": 74, "sigma": "L" }, "Emb": { "A": 72, "R": 72, "I": 72, "sigma": "L" }, "Org": { "A": 76, "R": 76, "I": 76, "sigma": "L" }, "Dir": { "A": 73, "R": 73, "I": 73, "sigma": "L" }, "Leg": { "A": 72, "R": 72, "I": 72, "sigma": "L" } } }
+            }
+          }
+        ],
+        "payload_events": [
+          { "timestep_idx": 0, "scan_index": 5, "order_depth": 0, "alpha_source": "p1.Dir", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Leg", "sigma": "L", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "threshold-transfer", "magnitude": 0.60 }
+        ],
+        "analysis": { "key_finding": "Scan-led flattening pressure seed." }
       }
     }
   ]

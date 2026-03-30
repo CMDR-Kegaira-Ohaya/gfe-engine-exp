@@ -146,10 +146,12 @@
       "target_state": "full",
       "required_fixture_classes": ["golden", "contrast", "anti-collapse", "integration"],
       "runtime_surface": "solver/order.js plus order-aware relation handling and event ordering",
-      "packs": ["order_split.json"],
-      "fixture_ids": ["FX-ORD-01"],
+      "packs": ["order_split.json", "anti_collapse.json", "integration_paths.json"],
+      "fixture_ids": ["FX-ORD-01", "FX-ORD-02", "FX-INT-03"],
       "notes": [
         "Depth order is solver-operative and hard-gated apart from scan order.",
+        "A dedicated anti-collapse order fixture now protects depth against scan-led flattening.",
+        "A broader integration fixture now proves order-facing coexistence with face, distributed Leg, field, envelope, and cascade outputs.",
         "Still requires fuller corpus and invariant depth before full."
       ]
     },

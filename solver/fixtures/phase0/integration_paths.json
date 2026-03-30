@@ -91,6 +91,48 @@
         ],
         "analysis": { "key_finding": "Integrated field/order/Leg-facing public-path seed." }
       }
+    },
+    {
+      "id": "FX-INT-03",
+      "row": "ORDER_RECURSION",
+      "kind": "single",
+      "fixture_class": "integration",
+      "purpose": "Canonical runtime should expose integrated order, face, distributed Leg, field recursion, envelope, and cascade outputs in one order-facing solved case.",
+      "assertions": [
+        "validate_ok",
+        "solve_ok",
+        "path_exists:timeline.0.participants.p2.solver_debug.relation_summary.order_notes",
+        "path_exists:timeline.0.participants.p2.solver_debug.relation_summary.average_order_depth",
+        "path_exists:timeline.0.participants.p2.solver_debug.relation_summary.faces",
+        "path_exists:timeline.0.participants.p2.solver_debug.relation_summary.leg_scopes",
+        "path_exists:timeline.0.participants.p2.solver_debug.relation_summary.field_scopes",
+        "path_exists:timeline.0.participants.p2.failure.primary",
+        "path_exists:timeline.0.participants.p2.envelope.status",
+        "path_exists:timeline.0.participants.p2.cascade.projection_mode"
+      ],
+      "case_data": {
+        "system_name": "fx-int-03-order-facing-integration",
+        "participants": [
+          { "id": "p1", "name": "P1" },
+          { "id": "p2", "name": "P2" },
+          { "id": "p3", "name": "P3" }
+        ],
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": { "axes": { "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" }, "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" }, "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" } } },
+              "p2": { "cascade": { "attempts": [ { "axis": "Leg" }, { "axis": "Org" }, { "axis": "Cfg" } ] }, "axes": { "Cfg": { "A": 24, "R": 30, "I": 82, "sigma": "L" }, "Emb": { "A": 58, "R": 58, "I": 60, "sigma": "L" }, "Org": { "A": 60, "R": 60, "I": 68, "sigma": "L" }, "Dir": { "A": 36, "R": 40, "I": 78, "sigma": "L" }, "Leg": { "A": 62, "R": 62, "I": 68, "sigma": "L" } } },
+              "p3": { "axes": { "Cfg": { "A": 22, "R": 28, "I": 84, "sigma": "M" }, "Emb": { "A": 30, "R": 34, "I": 78, "sigma": "M" }, "Org": { "A": 20, "R": 30, "I": 88, "sigma": "M" }, "Dir": { "A": 26, "R": 32, "I": 84, "sigma": "M" }, "Leg": { "A": 28, "R": 34, "I": 80, "sigma": "M" } } }
+            }
+          }
+        ],
+        "payload_events": [
+          { "timestep_idx": 0, "face": "inner", "scan_index": 1, "order_depth": 4, "leg_scope": "distributed", "trace_persistence": 3, "distributed_span": 3, "alpha_source": "p1.Dir", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Leg", "sigma": "L", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "threshold-transfer", "magnitude": 0.64 },
+          { "timestep_idx": 0, "face": "outer", "scan_index": 3, "order_depth": 2, "leg_scope": "distributed", "trace_persistence": 2, "distributed_span": 2, "field_scope": "recursive", "field_feedback": 3, "field_depth": 2, "alpha_source": "p1.Org", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Org", "sigma": "M", "axis": "Org", "unfolding": "acute", "register": "retained", "mode": "load", "magnitude": 0.56 }
+        ],
+        "analysis": { "key_finding": "Integrated order-facing public-path seed." }
+      }
     }
   ]
 }
