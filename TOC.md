@@ -123,6 +123,7 @@
 │   │       ├── face_split.json
 │   │       ├── failure_projection.json
 │   │       ├── failure_split.json
+│   │       ├── failure_substitution_anti_collapse.json
 │   │       ├── family_truth.json
 │   │       ├── field_recursion.json
 │   │       ├── integration_paths.json
