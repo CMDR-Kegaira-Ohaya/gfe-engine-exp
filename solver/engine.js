@@ -24,7 +24,7 @@ export function solveParticipantStep(previousParticipant = {}, events = [], weig
   const payloadAudit = aggregateParticipantPayload(events, participant.id, weights, options);
   const aggregates = payloadAudit.byAxis;
   const updatedAxes = updateParticipantAxes(participant.axes, aggregates, weights);
-  const prevalence = derivePrevalence(updatedAxes.canonical, weights);
+  const prevalence = derivePrevalence(updatedAxes.canonical, payloadAudit.relation_summary, weights);
   const theta = deriveTheta(updatedAxes.canonical, prevalence, weights);
   const mode_counts = countParticipantModes(events, participant.id);
   const compensation = deriveCompensation(mode_counts, theta);
@@ -61,7 +61,7 @@ export function solveCase(caseData, options = {}) {
   const solved = deepClone(caseData);
 
   solved.solver = {
-    version: '0.3.1',
+    version: '0.3.2',
     mode: 'canon-locked-runtime',
     weights,
   };

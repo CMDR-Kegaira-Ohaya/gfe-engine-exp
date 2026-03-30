@@ -46,6 +46,8 @@ function buildParticipantSnapshots(solvedCase) {
       Object.entries(step?.participants || {}).map(([participantId, participant]) => [
         participantId,
         {
+          prevalence: participant?.prevalence || null,
+          theta: participant?.theta || null,
           relation_summary: participant?.solver_debug?.relation_summary || null,
           relation_traces: participant?.solver_debug?.relation_traces || [],
           canonical_axes: participant?._canonical_axes || null,
