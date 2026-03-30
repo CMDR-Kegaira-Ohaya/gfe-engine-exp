@@ -118,12 +118,14 @@
 ├── solver/
 │   ├── fixtures/
 │   │   └── phase0/
+│   │       ├── anti_collapse.json
 │   │       ├── coverage_rows.json
 │   │       ├── face_split.json
 │   │       ├── failure_projection.json
 │   │       ├── failure_split.json
 │   │       ├── family_truth.json
 │   │       ├── field_recursion.json
+│   │       ├── integration_paths.json
 │   │       ├── leg_distributed.json
 │   │       ├── manifest.json
 │   │       ├── order_split.json
