@@ -182,6 +182,37 @@
         ],
         "analysis": { "key_finding": "Integrated family-facing public-path seed." }
       }
+    },
+    {
+      "id": "FX-INT-07",
+      "row": "FAILURE_OVERFLOW",
+      "kind": "single",
+      "fixture_class": "integration",
+      "purpose": "Canonical runtime should expose integrated overflow failure grammar, relation, face, order, distributed Leg, recursive field, envelope, compensation, and cascade outputs in one overflow-facing solved case.",
+      "assertions": [
+        "validate_ok",
+        "solve_ok",
+        "path_exists:timeline.0.participants.p2.failure.primary",
+        "path_exists:timeline.0.participants.p2.failure.grammars.overflow",
+        "path_exists:timeline.0.participants.p2.solver_debug.relation_summary.faces",
+        "path_exists:timeline.0.participants.p2.solver_debug.relation_summary.order_notes",
+        "path_exists:timeline.0.participants.p2.solver_debug.relation_summary.leg_scopes",
+        "path_exists:timeline.0.participants.p2.solver_debug.relation_summary.field_scopes",
+        "path_exists:timeline.0.participants.p2.envelope.status",
+        "path_exists:timeline.0.participants.p2.compensation",
+        "path_exists:timeline.0.participants.p2.cascade.projection_mode"
+      ],
+      "case_data": {
+        "system_name": "fx-int-07-overflow-facing-integration",
+        "participants": [{ "id": "p1", "name": "P1" }, { "id": "p2", "name": "P2" }, { "id": "p3", "name": "P3" }],
+        "timeline": [{ "timestep_label": "T0", "participants": { "p1": { "axes": { "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Emb": { "A": 79, "R": 79, "I": 79, "sigma": "L" }, "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" }, "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" } } }, "p2": { "cascade": { "attempts": [{ "axis": "Cfg" }, { "axis": "Dir" }, { "axis": "Leg" }, { "axis": "Org" }] }, "axes": { "Cfg": { "A": 24, "R": 34, "I": 76, "sigma": "L" }, "Emb": { "A": 45, "R": 45, "I": 62, "sigma": "L" }, "Org": { "A": 52, "R": 52, "I": 64, "sigma": "L" }, "Dir": { "A": 38, "R": 38, "I": 68, "sigma": "L" }, "Leg": { "A": 36, "R": 36, "I": 64, "sigma": "L" } } }, "p3": { "axes": { "Cfg": { "A": 78, "R": 78, "I": 78, "sigma": "L" }, "Emb": { "A": 77, "R": 77, "I": 77, "sigma": "L" }, "Org": { "A": 80, "R": 80, "I": 80, "sigma": "L" }, "Dir": { "A": 76, "R": 76, "I": 76, "sigma": "L" }, "Leg": { "A": 75, "R": 75, "I": 75, "sigma": "L" } } } } }],
+        "payload_events": [
+          { "timestep_idx": 0, "face": "inner", "scan_index": 1, "order_depth": 3, "leg_scope": "distributed", "trace_persistence": 2, "distributed_span": 3, "alpha_source": "p1.Dir", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Leg", "sigma": "M", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "overflow", "magnitude": 0.90 },
+          { "timestep_idx": 0, "face": "outer", "scan_index": 2, "order_depth": 2, "leg_scope": "distributed", "trace_persistence": 2, "distributed_span": 2, "field_scope": "recursive", "field_feedback": 3, "field_depth": 2, "alpha_source": "p1.Org", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Org", "sigma": "L", "axis": "Org", "unfolding": "acute", "register": "retained", "mode": "overflow", "magnitude": 0.80 },
+          { "timestep_idx": 0, "face": "inner", "scan_index": 3, "order_depth": 2, "leg_scope": "distributed", "trace_persistence": 1, "distributed_span": 2, "alpha_source": "p1.Cfg", "alpha_medium": "p3.Cfg", "alpha_receiving": "p2.Cfg", "sigma": "M", "axis": "Cfg", "unfolding": "acute", "register": "retained", "mode": "overflow", "magnitude": 0.85 }
+        ],
+        "analysis": { "key_finding": "Integrated overflow-facing public-path seed." }
+      }
     }
   ]
 }
