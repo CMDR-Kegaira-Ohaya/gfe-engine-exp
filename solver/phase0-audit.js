@@ -59,6 +59,7 @@ function buildParticipantSnapshots(solvedCase) {
           theta: participant?.theta || null,
           compensation: participant?.compensation || null,
           failure: participant?.failure || null,
+          envelope: participant?.envelope || null,
           cascade: participant?.cascade || null,
           relation_summary: participant?.solver_debug?.relation_summary || null,
           relation_traces: participant?.solver_debug?.relation_traces || [],

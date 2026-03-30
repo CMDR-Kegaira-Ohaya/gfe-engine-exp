@@ -38,7 +38,11 @@ export function solveParticipantStep(previousParticipant = {}, events = [], weig
     payloadAudit.relation_summary,
     weights
   );
-  const envelope = deriveEnvelope(updatedAxes.canonical);
+  const envelope = deriveEnvelope(updatedAxes.canonical, {
+    failure,
+    prevalence,
+    compensation,
+  });
   const cascade = deriveCascade({
     ...participant,
     axes: updatedAxes.display,
@@ -66,6 +70,7 @@ export function solveParticipantStep(previousParticipant = {}, events = [], weig
       relation_traces: payloadAudit.relation_traces,
       relation_summary: payloadAudit.relation_summary,
       failure_summary: failure,
+      envelope_summary: envelope,
     },
   };
 }
@@ -76,7 +81,7 @@ export function solveCase(caseData, options = {}) {
   const solved = deepClone(caseData);
 
   solved.solver = {
-    version: '0.4.1',
+    version: '0.4.2',
     mode: 'canon-locked-runtime',
     weights,
   };

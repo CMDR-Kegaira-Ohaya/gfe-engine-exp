@@ -43,6 +43,18 @@ export function buildDashboardChunks(caseData) {
           theta: item.participant.theta || { active: false, blocked_family: null, note: '' },
           compensation: item.participant.compensation || { active: false, type: null, note: '' },
           failure: item.participant.failure || { active: false, primary: null, note: '' },
+          envelope: item.participant.envelope || {
+            adm: 0,
+            bear: 0,
+            coh: 0,
+            floor: 0,
+            projected_floor: 0,
+            contracted: false,
+            status: 'nominal-envelope',
+            primary_failure: null,
+            stress_signal: 0,
+            note: '',
+          },
           cascade: item.participant.cascade || {
             active: false,
             blocked: false,
