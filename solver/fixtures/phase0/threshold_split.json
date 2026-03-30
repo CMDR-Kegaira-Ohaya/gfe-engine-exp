@@ -1,0 +1,158 @@
+{
+  "version": "0.1.0",
+  "canon": "v15.7",
+  "mode": "phase0-audit",
+  "fixture_pack": "threshold-split",
+  "notes": [
+    "This pack hard-gates the mirrored-threshold requirement as a focused Phase 0 contrast.",
+    "Cfg stress is held in the threshold-active range while prevalence is shifted from aligned to maladaptive conditions.",
+    "The goal is to force visible divergence in prevalence family assignment and mirrored theta blocking behavior."
+  ],
+  "fixtures": [
+    {
+      "id": "FX-THR-01",
+      "row": "THRESHOLD_PREVALENCE",
+      "kind": "contrast",
+      "enforce_invariants": true,
+      "purpose": "Mirrored threshold behavior should diverge when prevalence shifts from aligned to maladaptive while threshold pressure remains active.",
+      "compare_paths": [
+        "timeline.0.participants.p2.prevalence",
+        "timeline.0.participants.p2.theta",
+        "timeline.0.participants.p2.solver_debug.relation_summary"
+      ],
+      "divergence_invariants": [
+        {
+          "label": "prevalence family mirror split",
+          "class": "threshold_prevalence_divergence",
+          "expectation": "all_must_differ",
+          "paths": [
+            "timeline.0.participants.p2.prevalence",
+            "timeline.0.participants.p2.solver_debug.relation_summary"
+          ]
+        },
+        {
+          "label": "theta mirrored block split",
+          "class": "threshold_theta_divergence",
+          "expectation": "all_must_differ",
+          "paths": [
+            "timeline.0.participants.p2.theta"
+          ]
+        }
+      ],
+      "case_a_data": {
+        "system_name": "fx-thr-01-aligned-prevalent",
+        "participants": [
+          { "id": "p1", "name": "P1" },
+          { "id": "p2", "name": "P2" },
+          { "id": "p3", "name": "P3" }
+        ],
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" },
+                  "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" },
+                  "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" },
+                  "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" },
+                  "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" }
+                }
+              },
+              "p2": {
+                "axes": {
+                  "Cfg": { "A": 22, "R": 30, "I": 82, "sigma": "L" },
+                  "Emb": { "A": 58, "R": 58, "I": 60, "sigma": "L" },
+                  "Org": { "A": 70, "R": 70, "I": 72, "sigma": "L" },
+                  "Dir": { "A": 36, "R": 40, "I": 78, "sigma": "L" },
+                  "Leg": { "A": 72, "R": 72, "I": 74, "sigma": "L" }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": { "A": 81, "R": 81, "I": 81, "sigma": "L" },
+                  "Emb": { "A": 79, "R": 79, "I": 79, "sigma": "L" },
+                  "Org": { "A": 82, "R": 82, "I": 82, "sigma": "L" },
+                  "Dir": { "A": 80, "R": 80, "I": 80, "sigma": "L" },
+                  "Leg": { "A": 79, "R": 79, "I": 79, "sigma": "L" }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Dir",
+            "alpha_medium": "p1.Org",
+            "alpha_receiving": "p2.Leg",
+            "sigma": "L",
+            "axis": "Leg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "threshold-transfer",
+            "magnitude": 0.60
+          }
+        ],
+        "analysis": { "key_finding": "Aligned-prevalent mirrored-threshold seed." }
+      },
+      "case_b_data": {
+        "system_name": "fx-thr-01-maladaptive-prevalent",
+        "participants": [
+          { "id": "p1", "name": "P1" },
+          { "id": "p2", "name": "P2" },
+          { "id": "p3", "name": "P3" }
+        ],
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" },
+                  "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" },
+                  "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" },
+                  "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" },
+                  "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" }
+                }
+              },
+              "p2": {
+                "axes": {
+                  "Cfg": { "A": 22, "R": 30, "I": 82, "sigma": "L" },
+                  "Emb": { "A": 58, "R": 58, "I": 60, "sigma": "L" },
+                  "Org": { "A": 70, "R": 70, "I": 72, "sigma": "L" },
+                  "Dir": { "A": 36, "R": 40, "I": 78, "sigma": "L" },
+                  "Leg": { "A": 72, "R": 72, "I": 74, "sigma": "L" }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": { "A": 28, "R": 34, "I": 82, "sigma": "M" },
+                  "Emb": { "A": 32, "R": 35, "I": 78, "sigma": "M" },
+                  "Org": { "A": 22, "R": 30, "I": 88, "sigma": "M" },
+                  "Dir": { "A": 26, "R": 32, "I": 84, "sigma": "M" },
+                  "Leg": { "A": 30, "R": 36, "I": 80, "sigma": "M" }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Dir",
+            "alpha_medium": "p3.Org",
+            "alpha_receiving": "p2.Leg",
+            "sigma": "L",
+            "axis": "Leg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "threshold-transfer",
+            "magnitude": 0.60
+          }
+        ],
+        "analysis": { "key_finding": "Maladaptive-prevalent mirrored-threshold seed." }
+      }
+    }
+  ]
+}

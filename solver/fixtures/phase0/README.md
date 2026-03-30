@@ -18,11 +18,12 @@ Primary entrypoints:
 - `solver/fixtures/phase0/failure_split.json`
 - `solver/fixtures/phase0/failure_projection.json`
 - `solver/fixtures/phase0/relation_split.json`
+- `solver/fixtures/phase0/threshold_split.json`
 
 Audit loading rule:
 - the Phase 0 audit now loads **all** `.json` fixture packs in this directory
 - `manifest.json` remains the base scaffold pack
-- focused packs such as `failure_split.json`, `failure_projection.json`, and `relation_split.json` are supplemental, not competing authority surfaces
+- focused packs such as `failure_split.json`, `failure_projection.json`, `relation_split.json`, and `threshold_split.json` are supplemental, not competing authority surfaces
 
 Divergence-invariant rule:
 - contrast fixtures may declare `divergence_invariants`
