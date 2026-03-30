@@ -246,6 +246,38 @@
         ],
         "analysis": { "key_finding": "Integrated substitution-facing public-path seed." }
       }
+    },
+    {
+      "id": "FX-INT-09",
+      "row": "FAILURE_SUPPRESSION",
+      "kind": "single",
+      "fixture_class": "integration",
+      "purpose": "Canonical runtime should expose integrated suppression failure grammar, relation, face, order, distributed Leg, recursive field, envelope, blocked cascade, and projection outputs in one suppression-facing solved case.",
+      "assertions": [
+        "validate_ok",
+        "solve_ok",
+        "path_exists:timeline.0.participants.p2.failure.primary",
+        "path_exists:timeline.0.participants.p2.failure.grammars.suppression",
+        "path_exists:timeline.0.participants.p2.solver_debug.relation_summary.faces",
+        "path_exists:timeline.0.participants.p2.solver_debug.relation_summary.order_notes",
+        "path_exists:timeline.0.participants.p2.solver_debug.relation_summary.leg_scopes",
+        "path_exists:timeline.0.participants.p2.solver_debug.relation_summary.field_scopes",
+        "path_exists:timeline.0.participants.p2.envelope.status",
+        "path_exists:timeline.0.participants.p2.cascade.projection_mode",
+        "path_exists:timeline.0.participants.p2.cascade.blocked"
+      ],
+      "case_data": {
+        "system_name": "fx-int-09-suppression-facing-integration",
+        "participants": [{ "id": "p1", "name": "P1" }, { "id": "p2", "name": "P2" }, { "id": "p3", "name": "P3" }],
+        "timeline": [{ "timestep_label": "T0", "participants": { "p1": { "axes": { "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" }, "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Dir": { "A": 83, "R": 83, "I": 83, "sigma": "L" }, "Leg": { "A": 79, "R": 79, "I": 79, "sigma": "L" } } }, "p2": { "cascade": { "attempts": [{ "axis": "Cfg" }, { "axis": "Emb" }, { "axis": "Leg" }, { "axis": "Org" }] }, "axes": { "Cfg": { "A": 40, "R": 45, "I": 70, "sigma": "M" }, "Emb": { "A": 35, "R": 40, "I": 65, "sigma": "M" }, "Org": { "A": 44, "R": 46, "I": 62, "sigma": "M" }, "Dir": { "A": 45, "R": 47, "I": 60, "sigma": "M" }, "Leg": { "A": 40, "R": 42, "I": 60, "sigma": "M" } } }, "p3": { "axes": { "Cfg": { "A": 12, "R": 12, "I": 12, "sigma": "L" }, "Emb": { "A": 14, "R": 14, "I": 14, "sigma": "L" }, "Org": { "A": 10, "R": 10, "I": 10, "sigma": "L" }, "Dir": { "A": 11, "R": 11, "I": 11, "sigma": "L" }, "Leg": { "A": 12, "R": 12, "I": 12, "sigma": "L" } } } } }],
+        "payload_events": [
+          { "timestep_idx": 0, "face": "inner", "scan_index": 1, "order_depth": 3, "leg_scope": "distributed", "trace_persistence": 2, "distributed_span": 2, "alpha_source": "p1.Org", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Emb", "sigma": "M", "axis": "Emb", "unfolding": "acute", "register": "retained", "mode": "suppress", "magnitude": 0.78 },
+          { "timestep_idx": 0, "face": "outer", "scan_index": 2, "order_depth": 2, "leg_scope": "distributed", "trace_persistence": 2, "distributed_span": 2, "field_scope": "recursive", "field_feedback": 3, "field_depth": 2, "alpha_source": "p1.Org", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Org", "sigma": "M", "axis": "Org", "unfolding": "acute", "register": "retained", "mode": "suppress", "magnitude": 0.62 },
+          { "timestep_idx": 0, "face": "inner", "scan_index": 3, "order_depth": 2, "leg_scope": "distributed", "trace_persistence": 1, "distributed_span": 2, "alpha_source": "p1.Cfg", "alpha_medium": "p3.Cfg", "alpha_receiving": "p2.Cfg", "sigma": "M", "axis": "Cfg", "unfolding": "acute", "register": "retained", "mode": "suppress", "magnitude": 0.70 },
+          { "timestep_idx": 0, "face": "outer", "scan_index": 4, "order_depth": 1, "leg_scope": "distributed", "trace_persistence": 1, "distributed_span": 1, "alpha_source": "p1.Dir", "alpha_medium": "p3.Dir", "alpha_receiving": "p2.Leg", "sigma": "M", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "overflow", "magnitude": 0.42 }
+        ],
+        "analysis": { "key_finding": "Integrated suppression-facing public-path seed." }
+      }
     }
   ]
 }
