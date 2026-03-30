@@ -118,6 +118,7 @@ function evaluateDivergenceInvariants(fixture = {}, comparisons = []) {
 
   const classes = Array.from(new Set(evaluated.map(item => item.class))).sort();
   return {
+    enforced: !!fixture.enforce_invariants,
     count: evaluated.length,
     passed: evaluated.filter(item => item.pass).length,
     failed: evaluated.filter(item => !item.pass).length,
@@ -187,8 +188,9 @@ for (const manifest of manifests) {
       const comparisons = comparePaths(solvedA, solvedB, fixture.compare_paths || []);
       const differsSomewhere = comparisons.some(item => item.differs);
       const divergence_invariants = evaluateDivergenceInvariants(fixture, comparisons);
+      const hard_gated_failure = !!fixture.enforce_invariants && divergence_invariants.failed > 0;
 
-      if (fixture.enforce_invariants && divergence_invariants.failed > 0) {
+      if (hard_gated_failure) {
         hardFailure = true;
       }
 
@@ -201,6 +203,7 @@ for (const manifest of manifests) {
         validation_a: summarizeValidation(validationA),
         validation_b: summarizeValidation(validationB),
         differs_somewhere: differsSomewhere,
+        hard_gated_failure,
         divergence_invariants,
         comparisons,
         snapshots_a: buildParticipantSnapshots(solvedA),

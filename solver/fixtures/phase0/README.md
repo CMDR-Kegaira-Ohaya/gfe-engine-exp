@@ -31,4 +31,6 @@ Divergence-invariant rule:
   - `expectation` (`all_must_differ` or `some_must_differ`)
   - `paths`
 - the audit reports invariant pass/fail by class so contrasts are tagged, not merely shown
-- invariants are informative by default; they become hard-gated only if a fixture explicitly sets `enforce_invariants: true`
+- invariants are informative by default
+- selected fixtures may now set `enforce_invariants: true`
+- when enabled, failed divergence invariants become an audit hard failure for that fixture
