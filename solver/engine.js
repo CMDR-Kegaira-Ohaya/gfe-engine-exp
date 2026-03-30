@@ -81,7 +81,7 @@ export function solveCase(caseData, options = {}) {
   const solved = deepClone(caseData);
 
   solved.solver = {
-    version: '0.4.4',
+    version: '0.4.5',
     mode: 'canon-locked-runtime',
     weights,
   };

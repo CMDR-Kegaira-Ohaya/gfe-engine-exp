@@ -1,5 +1,6 @@
 import { clip01, stableNumber, toCanonicalScale } from './utils.js';
 import { resolveOrderProfile } from './order.js';
+import { resolveDistributedLegProfile } from './leg_distributed.js';
 
 function mean(values = []) {
   const nums = values.filter(Number.isFinite);
@@ -101,6 +102,7 @@ export function deriveRelationParticipation(
   const receivingHold = mean([receivingState.A, receivingState.R]);
   const faceProfile = resolveFaceProfile(event.face, weights);
   const orderProfile = resolveOrderProfile(event, weights);
+  const legProfile = resolveDistributedLegProfile(event, primitive, axis, weights);
 
   const triadContinuity = clip01(
     1 -
@@ -115,10 +117,10 @@ export function deriveRelationParticipation(
   );
 
   const adjustedTriadContinuity = clip01(
-    triadContinuity + faceProfile.continuityBias + orderProfile.continuityBias
+    triadContinuity + faceProfile.continuityBias + orderProfile.continuityBias + legProfile.continuityBias
   );
   const adjustedRelationTransfer = clip01(
-    relationTransfer * faceProfile.receivingMultiplier * orderProfile.receivingMultiplier
+    relationTransfer * faceProfile.receivingMultiplier * orderProfile.receivingMultiplier * legProfile.receivingMultiplier
   );
   const scaledMagnitude = clip01(stableNumber(primitive.magnitude, 0));
 
@@ -133,12 +135,14 @@ export function deriveRelationParticipation(
     scaledMagnitude *
     stableNumber(weights.relationEmissionCost, 0) *
     faceProfile.emissionMultiplier *
-    orderProfile.emissionMultiplier;
+    orderProfile.emissionMultiplier *
+    legProfile.emissionMultiplier;
 
   const mediumBurden =
     mean([sourceDrive, receivingHold]) *
     scaledMagnitude *
-    stableNumber(weights.relationMediumBurden, 0);
+    stableNumber(weights.relationMediumBurden, 0) *
+    legProfile.mediumBurdenMultiplier;
 
   const contestGain =
     (1 - adjustedTriadContinuity) *
@@ -164,7 +168,7 @@ export function deriveRelationParticipation(
   if (participantId === event.receivingParticipantId && axis === primitive.axis) {
     role = 'receiving';
     aggregate.deltaRIn += receivingShift;
-    aggregate.deltaIEvent += receivingShift * faceProfile.retentionMultiplier * orderProfile.retentionMultiplier;
+    aggregate.deltaIEvent += receivingShift * faceProfile.retentionMultiplier * orderProfile.retentionMultiplier * legProfile.retentionMultiplier;
     if (primitive.sigma === 'M') aggregate.contestM += contestGain;
     if (primitive.sigma === 'Dst') aggregate.contractDst += destructiveGain;
     aggregate.eventCount += 1;
@@ -196,6 +200,11 @@ export function deriveRelationParticipation(
       scan_index: orderProfile.scan_index,
       recursion_signal: orderProfile.recursion_signal,
       order_note: orderProfile.note,
+      leg_scope: legProfile.leg_scope,
+      trace_persistence: legProfile.trace_persistence,
+      distributed_span: legProfile.distributed_span,
+      persistence_signal: legProfile.persistence_signal,
+      leg_note: legProfile.note,
       source: {
         participantId: event.sourceParticipantId,
         axis: sourceAxis,

@@ -76,6 +76,9 @@ export function normalizePayloadEvent(event = {}) {
     face: event.face || null,
     order_depth: Math.max(0, stableNumber(event.order_depth ?? event.orderDepth, 0)),
     scan_index: Math.max(0, stableNumber(event.scan_index ?? event.scanIndex, 0)),
+    leg_scope: event.leg_scope || event.legScope || 'local',
+    trace_persistence: Math.max(0, stableNumber(event.trace_persistence ?? event.tracePersistence, 0)),
+    distributed_span: Math.max(0, stableNumber(event.distributed_span ?? event.distributedSpan, 0)),
     interference: event.interference || '',
     payload_bundle: payloadBundleRaw.map(atom => normalizePrimitive(atom, fallbackAxis))
   };
@@ -138,6 +141,8 @@ export function summarizeRelationTraces(relationTraces = []) {
     roles: {},
     faces: {},
     order_notes: {},
+    leg_scopes: {},
+    leg_notes: {},
     medium_participants: {},
     source_participants: {},
     receiving_participants: {},
@@ -146,6 +151,9 @@ export function summarizeRelationTraces(relationTraces = []) {
     average_order_depth: 0,
     average_scan_index: 0,
     average_recursion_signal: 0,
+    average_trace_persistence: 0,
+    average_distributed_span: 0,
+    average_persistence_signal: 0,
   };
 
   if (!relationTraces.length) return summary;
@@ -155,11 +163,16 @@ export function summarizeRelationTraces(relationTraces = []) {
   let depthSum = 0;
   let scanSum = 0;
   let recursionSignalSum = 0;
+  let tracePersistenceSum = 0;
+  let distributedSpanSum = 0;
+  let persistenceSignalSum = 0;
 
   for (const trace of relationTraces) {
     incrementCounter(summary.roles, trace.role || 'unknown');
     incrementCounter(summary.faces, trace.face || 'neutral');
     incrementCounter(summary.order_notes, trace.order_note || 'scan-led-order');
+    incrementCounter(summary.leg_scopes, trace.leg_scope || 'non-leg');
+    incrementCounter(summary.leg_notes, trace.leg_note || 'non-leg-event');
     incrementCounter(summary.medium_participants, trace.medium?.participantId || 'unknown');
     incrementCounter(summary.source_participants, trace.source?.participantId || 'unknown');
     incrementCounter(summary.receiving_participants, trace.receiving?.participantId || 'unknown');
@@ -168,6 +181,9 @@ export function summarizeRelationTraces(relationTraces = []) {
     depthSum += stableNumber(trace.order_depth, 0);
     scanSum += stableNumber(trace.scan_index, 0);
     recursionSignalSum += stableNumber(trace.recursion_signal, 0);
+    tracePersistenceSum += stableNumber(trace.trace_persistence, 0);
+    distributedSpanSum += stableNumber(trace.distributed_span, 0);
+    persistenceSignalSum += stableNumber(trace.persistence_signal, 0);
   }
 
   summary.average_transfer = transferSum / relationTraces.length;
@@ -175,6 +191,9 @@ export function summarizeRelationTraces(relationTraces = []) {
   summary.average_order_depth = depthSum / relationTraces.length;
   summary.average_scan_index = scanSum / relationTraces.length;
   summary.average_recursion_signal = recursionSignalSum / relationTraces.length;
+  summary.average_trace_persistence = tracePersistenceSum / relationTraces.length;
+  summary.average_distributed_span = distributedSpanSum / relationTraces.length;
+  summary.average_persistence_signal = persistenceSignalSum / relationTraces.length;
   return summary;
 }
 
