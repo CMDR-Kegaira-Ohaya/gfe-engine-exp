@@ -123,6 +123,7 @@
 │   │       ├── face_anti_collapse.json
 │   │       ├── face_integration.json
 │   │       ├── face_split.json
+│   │       ├── failure_collapse_integration.json
 │   │       ├── failure_projection.json
 │   │       ├── failure_split.json
 │   │       ├── failure_substitution_anti_collapse.json
