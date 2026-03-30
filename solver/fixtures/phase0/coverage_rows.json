@@ -56,10 +56,11 @@
       "target_state": "full",
       "required_fixture_classes": ["golden", "contrast", "anti-collapse", "integration"],
       "runtime_surface": "relation-conditioned prevalence / theta with family-truth contrast evidence",
-      "packs": ["family_truth.json"],
-      "fixture_ids": ["FX-FAM-01"],
+      "packs": ["family_truth.json", "integration_paths.json"],
+      "fixture_ids": ["FX-FAM-01", "FX-INT-06"],
       "notes": [
         "Aligned vs misaligned family handling now has its own hard-gated proof surface.",
+        "A broader integration fixture now proves family-facing coexistence with mirrored threshold, relation, face, order, distributed Leg, recursive field, envelope, and cascade outputs.",
         "Still requires fuller executable separation and invariant depth before full."
       ]
     },
@@ -178,10 +179,11 @@
       "target_state": "full",
       "required_fixture_classes": ["golden", "contrast", "anti-collapse", "integration"],
       "runtime_surface": "solver/field_recursion.js plus field-aware relation handling",
-      "packs": ["field_recursion.json", "integration_paths.json"],
-      "fixture_ids": ["FX-FLD-01", "FX-INT-02"],
+      "packs": ["field_recursion.json", "anti_collapse.json", "integration_paths.json"],
+      "fixture_ids": ["FX-FLD-01", "FX-FLD-02", "FX-INT-02"],
       "notes": [
         "Local vs recursive field behavior is solver-operative and hard-gated.",
+        "A dedicated anti-collapse field fixture now protects recursive field behavior against local flattening.",
         "A broader integration fixture now proves field/order/Leg-facing public-path coexistence.",
         "Still requires fuller corpus and invariant depth before full."
       ]
