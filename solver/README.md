@@ -15,6 +15,11 @@ This directory is reserved for executable implementation of the GFE runtime.
 - The assistant may inspect, analyze, compare, and test solver logic, but repository changes require explicit human approval.
 - Findings should be reported in chat first.
 
+## Current validation surfaces
+- `selftest.js` — compact smoke check for the current runtime
+- `phase0-audit.js` — Phase 0 audit runner for the v15.7 solver-coverage program
+- `fixtures/phase0/` — named Phase 0 proof-base scaffold cases and manifest
+
 ## Intended future contents
 - validator
 - normalizer
