@@ -416,9 +416,21 @@ function getRowLocalSuiteExpectedInvariantClassMap() {
       'family_truth_divergence',
       'family_receiving_divergence',
     ],
+    'INV-ROW-FAIL-OVF-01': [
+      'overflow_noncollapse_divergence',
+      'overflow_projection_noncollapse',
+    ],
+    'INV-ROW-FAIL-SUB-01': [
+      'substitution_noncollapse_divergence',
+      'substitution_projection_noncollapse',
+    ],
     'INV-ROW-FAIL-PLA-01': [
       'plastic_noncollapse_divergence',
       'plastic_form_noncollapse',
+    ],
+    'INV-ROW-FAIL-SUP-01': [
+      'failure_noncollapse_divergence',
+      'failure_projection_noncollapse',
     ],
     'INV-ROW-FAIL-COL-01': [
       'collapse_noncollapse_divergence',
@@ -431,6 +443,14 @@ function getRowLocalSuiteExpectedInvariantClassMap() {
     'INV-ROW-ORD-01': [
       'order_trace_divergence',
       'order_receiving_divergence',
+    ],
+    'INV-ROW-LEG-01': [
+      'distributed_leg_noncollapse',
+      'distributed_leg_interpretation_noncollapse',
+    ],
+    'INV-ROW-FLD-01': [
+      'field_noncollapse_divergence',
+      'field_interpretation_noncollapse',
     ],
   };
 }
