@@ -26,6 +26,36 @@ function readAxisState(encounterContext = {}, participantId, axis) {
   };
 }
 
+function resolveFaceProfile(face, weights = {}) {
+  if (face === 'inner') {
+    return {
+      face: 'inner',
+      continuityBias: stableNumber(weights.faceInnerContinuityBias, 0.10),
+      receivingMultiplier: stableNumber(weights.faceInnerReceivingMultiplier, 1.16),
+      emissionMultiplier: stableNumber(weights.faceInnerEmissionMultiplier, 0.92),
+      retentionMultiplier: stableNumber(weights.faceInnerRetentionMultiplier, 0.92),
+    };
+  }
+
+  if (face === 'outer') {
+    return {
+      face: 'outer',
+      continuityBias: -stableNumber(weights.faceOuterContinuityPenalty, 0.12),
+      receivingMultiplier: stableNumber(weights.faceOuterReceivingMultiplier, 0.82),
+      emissionMultiplier: stableNumber(weights.faceOuterEmissionMultiplier, 1.18),
+      retentionMultiplier: stableNumber(weights.faceOuterRetentionMultiplier, 0.48),
+    };
+  }
+
+  return {
+    face: 'neutral',
+    continuityBias: 0,
+    receivingMultiplier: 1,
+    emissionMultiplier: 1,
+    retentionMultiplier: 0.8,
+  };
+}
+
 export function buildEncounterContext(participantsById = {}) {
   const participants = {};
   for (const [participantId, participant] of Object.entries(participantsById || {})) {
@@ -68,6 +98,7 @@ export function deriveRelationParticipation(
   const sourceDrive = mean([sourceState.R, sourceState.I]);
   const mediumConductance = mean([mediumState.A, mediumState.R]);
   const receivingHold = mean([receivingState.A, receivingState.R]);
+  const faceProfile = resolveFaceProfile(event.face, weights);
 
   const triadContinuity = clip01(
     1 -
@@ -81,10 +112,12 @@ export function deriveRelationParticipation(
       (0.20 * receivingHold)
   );
 
+  const adjustedTriadContinuity = clip01(triadContinuity + faceProfile.continuityBias);
+  const adjustedRelationTransfer = clip01(relationTransfer * faceProfile.receivingMultiplier);
   const scaledMagnitude = clip01(stableNumber(primitive.magnitude, 0));
 
   const receivingShift =
-    (relationTransfer - 0.5) *
+    (adjustedRelationTransfer - 0.5) *
     2 *
     scaledMagnitude *
     stableNumber(weights.relationReceivingGain, 0);
@@ -92,7 +125,8 @@ export function deriveRelationParticipation(
   const sourceEmissionCost =
     (1 - mediumConductance) *
     scaledMagnitude *
-    stableNumber(weights.relationEmissionCost, 0);
+    stableNumber(weights.relationEmissionCost, 0) *
+    faceProfile.emissionMultiplier;
 
   const mediumBurden =
     mean([sourceDrive, receivingHold]) *
@@ -100,12 +134,12 @@ export function deriveRelationParticipation(
     stableNumber(weights.relationMediumBurden, 0);
 
   const contestGain =
-    (1 - triadContinuity) *
+    (1 - adjustedTriadContinuity) *
     scaledMagnitude *
     stableNumber(weights.relationContestGain, 0);
 
   const destructiveGain =
-    (1 - relationTransfer) *
+    (1 - adjustedRelationTransfer) *
     scaledMagnitude *
     stableNumber(weights.relationDestructiveGain, 0);
 
@@ -123,7 +157,7 @@ export function deriveRelationParticipation(
   if (participantId === event.receivingParticipantId && axis === primitive.axis) {
     role = 'receiving';
     aggregate.deltaRIn += receivingShift;
-    aggregate.deltaIEvent += receivingShift * 0.8;
+    aggregate.deltaIEvent += receivingShift * faceProfile.retentionMultiplier;
     if (primitive.sigma === 'M') aggregate.contestM += contestGain;
     if (primitive.sigma === 'Dst') aggregate.contractDst += destructiveGain;
     aggregate.eventCount += 1;
@@ -150,6 +184,7 @@ export function deriveRelationParticipation(
       participantId,
       axis,
       primitiveAxis: primitive.axis,
+      face: faceProfile.face,
       source: {
         participantId: event.sourceParticipantId,
         axis: sourceAxis,
@@ -167,6 +202,8 @@ export function deriveRelationParticipation(
       },
       relation_transfer: relationTransfer,
       triad_continuity: triadContinuity,
+      adjusted_relation_transfer: adjustedRelationTransfer,
+      adjusted_triad_continuity: adjustedTriadContinuity,
       role,
     },
   };

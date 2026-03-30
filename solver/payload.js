@@ -121,6 +121,7 @@ export function summarizeRelationTraces(relationTraces = []) {
   const summary = {
     trace_count: relationTraces.length,
     roles: {},
+    faces: {},
     medium_participants: {},
     source_participants: {},
     receiving_participants: {},
@@ -135,11 +136,12 @@ export function summarizeRelationTraces(relationTraces = []) {
 
   for (const trace of relationTraces) {
     incrementCounter(summary.roles, trace.role || 'unknown');
+    incrementCounter(summary.faces, trace.face || 'neutral');
     incrementCounter(summary.medium_participants, trace.medium?.participantId || 'unknown');
     incrementCounter(summary.source_participants, trace.source?.participantId || 'unknown');
     incrementCounter(summary.receiving_participants, trace.receiving?.participantId || 'unknown');
-    transferSum += stableNumber(trace.relation_transfer, 0);
-    continuitySum += stableNumber(trace.triad_continuity, 0);
+    transferSum += stableNumber(trace.adjusted_relation_transfer ?? trace.relation_transfer, 0);
+    continuitySum += stableNumber(trace.adjusted_triad_continuity ?? trace.triad_continuity, 0);
   }
 
   summary.average_transfer = transferSum / relationTraces.length;
