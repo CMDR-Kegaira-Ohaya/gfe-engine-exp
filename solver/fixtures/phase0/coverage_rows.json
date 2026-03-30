@@ -14,11 +14,12 @@
       "target_state": "full",
       "required_fixture_classes": ["golden", "contrast", "anti-collapse", "integration"],
       "runtime_surface": "canonical local-axis ARI math in solver/state.js and solver/engine.js",
-      "packs": ["manifest.json"],
-      "fixture_ids": ["FX-CORE-01"],
+      "packs": ["manifest.json", "core_anti_collapse.json"],
+      "fixture_ids": ["FX-CORE-01", "FX-CORE-02"],
       "notes": [
         "Public-path executable surface exists.",
-        "Still missing the fuller invariant / anti-collapse / integration bundle required for full."
+        "A dedicated anti-collapse core fixture now protects local-axis ARI math against cross-axis local-shell flattening under a stable runtime frame.",
+        "Still missing the fuller invariant and integration bundle required for full."
       ]
     },
     {
