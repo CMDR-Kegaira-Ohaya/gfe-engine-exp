@@ -404,6 +404,18 @@ function getRowLocalSuiteExpectedInvariantClassMap() {
       'core_local_axis_contrast',
       'core_local_raw_contrast',
     ],
+    'INV-ROW-REL-01': [
+      'relation_trace_divergence',
+      'relation_receiving_divergence',
+    ],
+    'INV-ROW-THR-01': [
+      'threshold_prevalence_divergence',
+      'threshold_theta_divergence',
+    ],
+    'INV-ROW-FAM-01': [
+      'family_truth_divergence',
+      'family_receiving_divergence',
+    ],
     'INV-ROW-FAIL-PLA-01': [
       'plastic_noncollapse_divergence',
       'plastic_form_noncollapse',
@@ -411,6 +423,14 @@ function getRowLocalSuiteExpectedInvariantClassMap() {
     'INV-ROW-FAIL-COL-01': [
       'collapse_noncollapse_divergence',
       'collapse_projection_noncollapse',
+    ],
+    'INV-ROW-FACE-01': [
+      'face_trace_divergence',
+      'face_footprint_divergence',
+    ],
+    'INV-ROW-ORD-01': [
+      'order_trace_divergence',
+      'order_receiving_divergence',
     ],
   };
 }
