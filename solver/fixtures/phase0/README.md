@@ -22,3 +22,13 @@ Audit loading rule:
 - the Phase 0 audit now loads **all** `.json` fixture packs in this directory
 - `manifest.json` remains the base scaffold pack
 - focused packs such as `failure_split.json` and `failure_projection.json` are supplemental, not competing authority surfaces
+
+Divergence-invariant rule:
+- contrast fixtures may declare `divergence_invariants`
+- each invariant carries:
+  - `label`
+  - `class`
+  - `expectation` (`all_must_differ` or `some_must_differ`)
+  - `paths`
+- the audit reports invariant pass/fail by class so contrasts are tagged, not merely shown
+- invariants are informative by default; they become hard-gated only if a fixture explicitly sets `enforce_invariants: true`

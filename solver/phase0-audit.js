@@ -76,6 +76,56 @@ function buildParticipantSnapshots(solvedCase) {
   });
 }
 
+function evaluateDivergenceInvariant(invariant = {}, comparisons = []) {
+  const expectation = invariant.expectation || 'all_must_differ';
+  const requestedPaths = Array.isArray(invariant.paths) ? invariant.paths : [];
+  const comparisonMap = new Map(comparisons.map(item => [item.path, item]));
+  const matched = requestedPaths
+    .map(pathKey => comparisonMap.get(pathKey))
+    .filter(Boolean);
+
+  const missing_paths = requestedPaths.filter(pathKey => !comparisonMap.has(pathKey));
+  const differing_paths = matched.filter(item => item.differs).map(item => item.path);
+  const same_paths = matched.filter(item => !item.differs).map(item => item.path);
+
+  let pass = false;
+  if (expectation === 'some_must_differ') {
+    pass = differing_paths.length > 0;
+  } else {
+    pass = matched.length > 0 && same_paths.length === 0;
+  }
+
+  return {
+    label: invariant.label || '(unnamed-invariant)',
+    class: invariant.class || 'uncategorized-divergence',
+    expectation,
+    pass,
+    requested_paths: requestedPaths,
+    differing_paths,
+    same_paths,
+    missing_paths,
+  };
+}
+
+function evaluateDivergenceInvariants(fixture = {}, comparisons = []) {
+  const invariants = Array.isArray(fixture.divergence_invariants)
+    ? fixture.divergence_invariants
+    : [];
+
+  const evaluated = invariants.map(invariant =>
+    evaluateDivergenceInvariant(invariant, comparisons)
+  );
+
+  const classes = Array.from(new Set(evaluated.map(item => item.class))).sort();
+  return {
+    count: evaluated.length,
+    passed: evaluated.filter(item => item.pass).length,
+    failed: evaluated.filter(item => !item.pass).length,
+    classes,
+    items: evaluated,
+  };
+}
+
 const report = {
   manifests: manifests.map(item => ({
     file: item.file,
@@ -136,6 +186,11 @@ for (const manifest of manifests) {
 
       const comparisons = comparePaths(solvedA, solvedB, fixture.compare_paths || []);
       const differsSomewhere = comparisons.some(item => item.differs);
+      const divergence_invariants = evaluateDivergenceInvariants(fixture, comparisons);
+
+      if (fixture.enforce_invariants && divergence_invariants.failed > 0) {
+        hardFailure = true;
+      }
 
       report.fixtures.push({
         fixture_pack: fixturePack,
@@ -146,6 +201,7 @@ for (const manifest of manifests) {
         validation_a: summarizeValidation(validationA),
         validation_b: summarizeValidation(validationB),
         differs_somewhere: differsSomewhere,
+        divergence_invariants,
         comparisons,
         snapshots_a: buildParticipantSnapshots(solvedA),
         snapshots_b: buildParticipantSnapshots(solvedB),
