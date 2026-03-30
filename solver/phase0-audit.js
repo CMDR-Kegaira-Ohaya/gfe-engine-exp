@@ -298,7 +298,60 @@ function evaluateExecutableCrossPhaseInvariants(fixtures = [], invariantRegistry
 
   return {
     determinism: determinismCheck,
+    seed_checks: evaluateExecutableCrossPhaseSeedChecks(fixtures, invariantRegistry),
   };
+}
+
+function getCrossPhaseInvariantSeedMap() {
+  return {
+    'INV-XPH-04': ['FX-REL-02'],
+    'INV-XPH-06': ['FX-ORD-02'],
+    'INV-XPH-07': ['FX-FACE-02'],
+    'INV-XPH-08': ['FX-THR-02'],
+    'INV-XPH-09': ['FX-FAM-02'],
+    'INV-XPH-10': ['FX-FAIL-07', 'FX-FAIL-08', 'FX-FAIL-10', 'FX-FAIL-06', 'FX-FAIL-09'],
+    'INV-XPH-11': ['FX-LEG-02'],
+  };
+}
+
+function evaluateExecutableCrossPhaseSeedChecks(fixtures = [], invariantRegistry = {}) {
+  const fixtureMap = new Map(fixtures.map(fixture => [fixture.id || '(unknown-fixture)', fixture]));
+  const registered = Array.isArray(invariantRegistry.cross_phase_invariants)
+    ? invariantRegistry.cross_phase_invariants
+    : [];
+  const registeredMap = new Map(registered.map(invariant => [invariant.id || '(unnamed-invariant)', invariant]));
+  const seedMap = getCrossPhaseInvariantSeedMap();
+
+  return Object.entries(seedMap).map(([invariantId, seed_fixture_ids]) => {
+    const invariant = registeredMap.get(invariantId) || null;
+    const referencedFixtures = seed_fixture_ids
+      .map(fixtureId => fixtureMap.get(fixtureId))
+      .filter(Boolean);
+    const missing_fixture_ids = seed_fixture_ids.filter(fixtureId => !fixtureMap.has(fixtureId)).sort();
+    const unenforced_fixture_ids = referencedFixtures
+      .filter(fixture => !fixture.divergence_invariants?.enforced)
+      .map(fixture => fixture.id || '(unknown-fixture)')
+      .sort();
+    const failing_fixture_ids = referencedFixtures
+      .filter(fixture => !!fixture.hard_gated_failure)
+      .map(fixture => fixture.id || '(unknown-fixture)')
+      .sort();
+
+    return {
+      id: invariantId,
+      label: invariant?.label || '(unnamed-invariant)',
+      executable_slice: true,
+      enforced: true,
+      seed_fixture_ids,
+      missing_fixture_ids,
+      unenforced_fixture_ids,
+      failing_fixture_ids,
+      pass:
+        missing_fixture_ids.length === 0 &&
+        unenforced_fixture_ids.length === 0 &&
+        failing_fixture_ids.length === 0,
+    };
+  });
 }
 
 function summarizeExecutableCrossPhaseInvariantChecks(checks = {}) {
@@ -308,13 +361,20 @@ function summarizeExecutableCrossPhaseInvariantChecks(checks = {}) {
     failed_fixtures: 0,
     pass: false,
   };
+  const seedChecks = Array.isArray(checks.seed_checks) ? checks.seed_checks : [];
+  const failingSeedCheckIds = seedChecks
+    .filter(check => !check.pass)
+    .map(check => check.id || '(unnamed-invariant)')
+    .sort();
 
   return {
-    enforced_checks: 1,
-    passed_checks: determinism.pass ? 1 : 0,
-    failed_checks: determinism.pass ? 0 : 1,
+    enforced_checks: 1 + seedChecks.length,
+    passed_checks: (determinism.pass ? 1 : 0) + seedChecks.filter(check => check.pass).length,
+    failed_checks: (determinism.pass ? 0 : 1) + seedChecks.filter(check => !check.pass).length,
     determinism_checked_fixtures: determinism.checked_fixtures,
     determinism_failed_fixtures: determinism.failed_fixtures,
+    seed_check_count: seedChecks.length,
+    failed_seed_check_ids: failingSeedCheckIds,
   };
 }
 
@@ -698,6 +758,9 @@ report.cross_phase_invariant_check_summary = summarizeExecutableCrossPhaseInvari
 );
 
 if (report.cross_phase_invariant_checks.determinism?.failed_fixtures > 0) {
+  hardFailure = true;
+}
+if ((report.cross_phase_invariant_checks.seed_checks || []).some(check => !check.pass)) {
   hardFailure = true;
 }
 
