@@ -127,6 +127,129 @@ function evaluateDivergenceInvariants(fixture = {}, comparisons = []) {
   };
 }
 
+function buildRowAggregation(fixtures = []) {
+  const rowMap = new Map();
+
+  for (const fixture of fixtures) {
+    const row = fixture.row || '(unmapped-row)';
+    if (!rowMap.has(row)) {
+      rowMap.set(row, {
+        fixture_ids: new Set(),
+        packs: new Set(),
+        files: new Set(),
+        single_fixture_ids: new Set(),
+        contrast_fixture_ids: new Set(),
+        enforced_fixture_ids: new Set(),
+        failing_enforced_fixture_ids: new Set(),
+      });
+    }
+
+    const entry = rowMap.get(row);
+    entry.fixture_ids.add(fixture.id || '(unknown-fixture)');
+    if (fixture.fixture_pack) entry.packs.add(fixture.fixture_pack);
+    if (fixture.file) entry.files.add(fixture.file);
+    if (fixture.kind === 'single') entry.single_fixture_ids.add(fixture.id || '(unknown-fixture)');
+    if (fixture.kind === 'contrast') entry.contrast_fixture_ids.add(fixture.id || '(unknown-fixture)');
+    if (fixture.divergence_invariants?.enforced) entry.enforced_fixture_ids.add(fixture.id || '(unknown-fixture)');
+    if (fixture.hard_gated_failure) entry.failing_enforced_fixture_ids.add(fixture.id || '(unknown-fixture)');
+  }
+
+  return rowMap;
+}
+
+function inferCoverageState(rowDeclaration = {}, aggregation = null) {
+  if (rowDeclaration.current_state) return rowDeclaration.current_state;
+  if (aggregation && aggregation.fixture_ids.size > 0) return 'partial';
+  return 'parsed-only';
+}
+
+function buildCoverageRows(rowDeclarations = [], fixtures = []) {
+  const declaredRows = Array.isArray(rowDeclarations) ? rowDeclarations : [];
+  const aggregation = buildRowAggregation(fixtures);
+  const rows = [];
+  const seen = new Set();
+
+  for (const declaration of declaredRows) {
+    const row = declaration.row;
+    const observed = aggregation.get(row) || {
+      fixture_ids: new Set(),
+      packs: new Set(),
+      files: new Set(),
+      single_fixture_ids: new Set(),
+      contrast_fixture_ids: new Set(),
+      enforced_fixture_ids: new Set(),
+      failing_enforced_fixture_ids: new Set(),
+    };
+
+    seen.add(row);
+    rows.push({
+      row,
+      current_state: inferCoverageState(declaration, observed),
+      target_state: declaration.target_state || 'full',
+      authority_note: declaration.authority_note || '',
+      runtime_surface: declaration.runtime_surface || '',
+      notes: declaration.notes || [],
+      declared_packs: declaration.packs || [],
+      declared_fixture_ids: declaration.fixture_ids || [],
+      observed_packs: Array.from(observed.packs).sort(),
+      observed_files: Array.from(observed.files).sort(),
+      observed_fixture_ids: Array.from(observed.fixture_ids).sort(),
+      single_fixture_ids: Array.from(observed.single_fixture_ids).sort(),
+      contrast_fixture_ids: Array.from(observed.contrast_fixture_ids).sort(),
+      enforced_fixture_ids: Array.from(observed.enforced_fixture_ids).sort(),
+      failing_enforced_fixture_ids: Array.from(observed.failing_enforced_fixture_ids).sort(),
+      hard_gated_phase0: Array.from(observed.enforced_fixture_ids).length > 0,
+      hard_gated_failures: Array.from(observed.failing_enforced_fixture_ids).length,
+    });
+  }
+
+  for (const [row, observed] of aggregation.entries()) {
+    if (seen.has(row)) continue;
+    rows.push({
+      row,
+      current_state: inferCoverageState({}, observed),
+      target_state: 'full',
+      authority_note: 'undeclared-row-observation',
+      runtime_surface: '',
+      notes: [],
+      declared_packs: [],
+      declared_fixture_ids: [],
+      observed_packs: Array.from(observed.packs).sort(),
+      observed_files: Array.from(observed.files).sort(),
+      observed_fixture_ids: Array.from(observed.fixture_ids).sort(),
+      single_fixture_ids: Array.from(observed.single_fixture_ids).sort(),
+      contrast_fixture_ids: Array.from(observed.contrast_fixture_ids).sort(),
+      enforced_fixture_ids: Array.from(observed.enforced_fixture_ids).sort(),
+      failing_enforced_fixture_ids: Array.from(observed.failing_enforced_fixture_ids).sort(),
+      hard_gated_phase0: Array.from(observed.enforced_fixture_ids).length > 0,
+      hard_gated_failures: Array.from(observed.failing_enforced_fixture_ids).length,
+    });
+  }
+
+  return rows.sort((left, right) => String(left.row).localeCompare(String(right.row)));
+}
+
+function summarizeCoverageRows(coverageRows = []) {
+  const summary = {
+    total_rows: coverageRows.length,
+    by_state: {},
+    hard_gated_rows: 0,
+    rows_with_failing_gates: 0,
+  };
+
+  for (const row of coverageRows) {
+    summary.by_state[row.current_state] = (summary.by_state[row.current_state] || 0) + 1;
+    if (row.hard_gated_phase0) summary.hard_gated_rows += 1;
+    if (row.hard_gated_failures > 0) summary.rows_with_failing_gates += 1;
+  }
+
+  return summary;
+}
+
+const coverageRowDeclarations = manifests.flatMap(item =>
+  Array.isArray(item.data.rows) ? item.data.rows : []
+);
+
 const report = {
   manifests: manifests.map(item => ({
     file: item.file,
@@ -136,6 +259,8 @@ const report = {
     fixture_pack: item.data.fixture_pack || null,
   })),
   fixtures: [],
+  coverage_rows: [],
+  coverage_summary: {},
 };
 
 let hardFailure = false;
@@ -222,6 +347,9 @@ for (const manifest of manifests) {
     });
   }
 }
+
+report.coverage_rows = buildCoverageRows(coverageRowDeclarations, report.fixtures);
+report.coverage_summary = summarizeCoverageRows(report.coverage_rows);
 
 console.log(JSON.stringify(report, null, 2));
 
