@@ -698,6 +698,89 @@ function buildRowFixtureMap(fixtures = []) {
   return rowMap;
 }
 
+function buildBehavioralContrastSurface(rowFixtures = []) {
+  const contrastFixtures = rowFixtures.filter(fixture => fixture.kind === 'contrast');
+  const enforcedContrastFixtures = contrastFixtures.filter(fixture => fixture.divergence_invariants?.enforced);
+  const passingContrastFixtures = enforcedContrastFixtures.filter(
+    fixture => !fixture.hard_gated_failure && (fixture.divergence_invariants?.failed || 0) === 0
+  );
+  const observedInvariantClasses = Array.from(
+    new Set(
+      enforcedContrastFixtures.flatMap(fixture =>
+        Array.isArray(fixture.divergence_invariants?.classes) ? fixture.divergence_invariants.classes : []
+      )
+    )
+  ).sort();
+  const comparedPaths = Array.from(
+    new Set(
+      contrastFixtures.flatMap(fixture =>
+        Array.isArray(fixture.comparisons) ? fixture.comparisons.map(item => item.path).filter(Boolean) : []
+      )
+    )
+  ).sort();
+
+  return {
+    contrast_fixture_ids: contrastFixtures.map(fixture => fixture.id || '(unknown-fixture)'),
+    enforced_contrast_fixture_ids: enforcedContrastFixtures.map(fixture => fixture.id || '(unknown-fixture)'),
+    passing_contrast_fixture_ids: passingContrastFixtures.map(fixture => fixture.id || '(unknown-fixture)'),
+    observed_invariant_classes: observedInvariantClasses,
+    compared_paths: comparedPaths,
+    total_contrast_fixtures: contrastFixtures.length,
+    enforced_contrast_fixtures: enforcedContrastFixtures.length,
+    passing_contrast_fixtures: passingContrastFixtures.length,
+    compared_path_count: comparedPaths.length,
+    pass:
+      contrastFixtures.length > 0 &&
+      enforcedContrastFixtures.length > 0 &&
+      passingContrastFixtures.length > 0 &&
+      observedInvariantClasses.length > 0 &&
+      comparedPaths.length > 0,
+  };
+}
+
+function buildOutputContractSurface(rowFixtures = []) {
+  const integrationFixtures = rowFixtures.filter(fixture => fixture.fixture_class === 'integration');
+  const integrationFixturesWithPaths = integrationFixtures.filter(
+    fixture => Array.isArray(fixture.path_checks) && fixture.path_checks.length > 0
+  );
+  const passingIntegrationFixtures = integrationFixturesWithPaths.filter(
+    fixture => fixture.path_checks.every(check => check.exists)
+  );
+  const assertedPaths = Array.from(
+    new Set(
+      integrationFixturesWithPaths.flatMap(fixture =>
+        fixture.path_checks.map(check => check.path).filter(Boolean)
+      )
+    )
+  ).sort();
+  const failedPaths = Array.from(
+    new Set(
+      integrationFixturesWithPaths.flatMap(fixture =>
+        fixture.path_checks.filter(check => !check.exists).map(check => check.path).filter(Boolean)
+      )
+    )
+  ).sort();
+
+  return {
+    integration_fixture_ids: integrationFixtures.map(fixture => fixture.id || '(unknown-fixture)'),
+    integration_fixture_ids_with_paths: integrationFixturesWithPaths.map(fixture => fixture.id || '(unknown-fixture)'),
+    passing_integration_fixture_ids: passingIntegrationFixtures.map(fixture => fixture.id || '(unknown-fixture)'),
+    asserted_paths: assertedPaths,
+    failed_paths: failedPaths,
+    integration_fixture_count: integrationFixtures.length,
+    integration_fixture_count_with_paths: integrationFixturesWithPaths.length,
+    passing_integration_fixture_count: passingIntegrationFixtures.length,
+    asserted_path_count: assertedPaths.length,
+    failed_path_count: failedPaths.length,
+    pass:
+      integrationFixtures.length > 0 &&
+      integrationFixturesWithPaths.length > 0 &&
+      passingIntegrationFixtures.length > 0 &&
+      assertedPaths.length > 0 &&
+      failedPaths.length === 0,
+  };
+}
+
 function evaluateRowPromotionGates(coverageRows = [], fixtures = [], crossPhaseChecks = {}, canonicalRuntimeSummary = {}) {
   const rowFixtureMap = buildRowFixtureMap(fixtures);
   const globalCrossPhasePass =
@@ -712,16 +795,8 @@ function evaluateRowPromotionGates(coverageRows = [], fixtures = [], crossPhaseC
 
   const rows = coverageRows.map(row => {
     const rowFixtures = rowFixtureMap.get(row.row) || [];
-    const contrastFixtures = rowFixtures.filter(fixture => fixture.kind === 'contrast');
-    const passingContrastFixtures = contrastFixtures.filter(
-      fixture => !fixture.hard_gated_failure && (fixture.divergence_invariants?.failed || 0) === 0
-    );
-    const outputAssertionFixtures = rowFixtures.filter(
-      fixture => Array.isArray(fixture.path_checks) && fixture.path_checks.length > 0
-    );
-    const passingOutputAssertionFixtures = outputAssertionFixtures.filter(
-      fixture => fixture.path_checks.every(check => check.exists)
-    );
+    const behavioral_contrast_surface = buildBehavioralContrastSurface(rowFixtures);
+    const output_contract_surface = buildOutputContractSurface(rowFixtures);
     const rowPublicEntrypointOnly = rowFixtures.length > 0 && rowFixtures.every(
       fixture => fixture.public_entrypoint === CANONICAL_PUBLIC_ENTRYPOINT
     );
@@ -737,8 +812,12 @@ function evaluateRowPromotionGates(coverageRows = [], fixtures = [], crossPhaseC
         hard_gated_phase0: row.hard_gated_phase0,
       },
       behavioral_contrast_proof: {
-        pass: passingContrastFixtures.length > 0,
-        fixture_ids: passingContrastFixtures.map(fixture => fixture.id || '(unknown-fixture)'),
+        pass: behavioral_contrast_surface.pass,
+        contrast_fixture_ids: behavioral_contrast_surface.contrast_fixture_ids,
+        enforced_contrast_fixture_ids: behavioral_contrast_surface.enforced_contrast_fixture_ids,
+        passing_contrast_fixture_ids: behavioral_contrast_surface.passing_contrast_fixture_ids,
+        observed_invariant_classes: behavioral_contrast_surface.observed_invariant_classes,
+        compared_path_count: behavioral_contrast_surface.compared_path_count,
       },
       invariant_pass: {
         pass: row.has_executable_row_local_suite_checks && row.failed_row_local_suite_check_count === 0 && globalCrossPhasePass,
@@ -746,13 +825,15 @@ function evaluateRowPromotionGates(coverageRows = [], fixtures = [], crossPhaseC
         cross_phase_pass: globalCrossPhasePass,
       },
       public_path_proof: {
-        pass: row.observed_fixture_classes.includes('integration') && rowPublicEntrypointOnly,
-        observed_fixture_classes: row.observed_fixture_classes,
+        pass: output_contract_surface.integration_fixture_count > 0 && rowPublicEntrypointOnly,
+        integration_fixture_ids: output_contract_surface.integration_fixture_ids,
         public_entrypoint_only: rowPublicEntrypointOnly,
       },
       exposed_output_contract: {
-        pass: passingOutputAssertionFixtures.length > 0,
-        fixture_ids: passingOutputAssertionFixtures.map(fixture => fixture.id || '(unknown-fixture)'),
+        pass: output_contract_surface.pass,
+        passing_integration_fixture_ids: output_contract_surface.passing_integration_fixture_ids,
+        asserted_path_count: output_contract_surface.asserted_path_count,
+        failed_path_count: output_contract_surface.failed_path_count,
       },
       non_collapse_proof: {
         pass: row.observed_fixture_classes.includes('anti-collapse') && row.hard_gated_failures === 0,
@@ -770,13 +851,13 @@ function evaluateRowPromotionGates(coverageRows = [], fixtures = [], crossPhaseC
       evidence_bundle_present: {
         pass:
           row.single_fixture_ids.length > 0 &&
-          row.contrast_fixture_ids.length > 0 &&
+          behavioral_contrast_surface.passing_contrast_fixtures > 0 &&
           row.row_local_suite_count > 0 &&
-          outputAssertionFixtures.length > 0,
+          output_contract_surface.passing_integration_fixture_count > 0,
         single_fixture_ids: row.single_fixture_ids,
-        contrast_fixture_ids: row.contrast_fixture_ids,
+        passing_contrast_fixture_ids: behavioral_contrast_surface.passing_contrast_fixture_ids,
         row_local_suite_ids: row.row_local_suite_ids,
-        output_assertion_fixture_ids: outputAssertionFixtures.map(fixture => fixture.id || '(unknown-fixture)'),
+        passing_integration_fixture_ids: output_contract_surface.passing_integration_fixture_ids,
       },
     };
 
@@ -791,6 +872,8 @@ function evaluateRowPromotionGates(coverageRows = [], fixtures = [], crossPhaseC
 
     return {
       ...row,
+      behavioral_contrast_surface,
+      output_contract_surface,
       promotion_checks,
       full_contract_eligible: promotion_blockers.length === 0,
       promotion_blockers,
@@ -811,6 +894,8 @@ function evaluateRowPromotionGates(coverageRows = [], fixtures = [], crossPhaseC
       not_yet_eligible_rows: rows.length - full_contract_eligible_row_ids.length,
       full_contract_eligible_row_ids,
       blocker_counts: blockerCounts,
+      rows_with_behavioral_contrast_surface: rows.filter(row => row.behavioral_contrast_surface.pass).length,
+      rows_with_output_contract_surface: rows.filter(row => row.output_contract_surface.pass).length,
     },
   };
 }
@@ -828,6 +913,8 @@ function summarizeCoverageRows(coverageRows = []) {
     rows_with_failed_row_local_suite_checks: 0,
     rows_full_contract_eligible: 0,
     rows_old_runtime_independence_proven: 0,
+    rows_with_behavioral_contrast_surface: 0,
+    rows_with_output_contract_surface: 0,
   };
 
   for (const row of coverageRows) {
@@ -841,6 +928,8 @@ function summarizeCoverageRows(coverageRows = []) {
     if (row.failed_row_local_suite_check_count > 0) summary.rows_with_failed_row_local_suite_checks += 1;
     if (row.full_contract_eligible) summary.rows_full_contract_eligible += 1;
     if (row.promotion_checks?.old_runtime_independence?.pass) summary.rows_old_runtime_independence_proven += 1;
+    if (row.behavioral_contrast_surface?.pass) summary.rows_with_behavioral_contrast_surface += 1;
+    if (row.output_contract_surface?.pass) summary.rows_with_output_contract_surface += 1;
   }
 
   return summary;
