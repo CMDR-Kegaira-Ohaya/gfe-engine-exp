@@ -1,0 +1,117 @@
+{
+  "version": "0.1.0",
+  "canon": "v15.7",
+  "mode": "phase0-audit",
+  "fixture_pack": "failure-substitution-golden",
+  "notes": [
+    "This pack starts the row-scoped golden corpus for FAILURE_SUBSTITUTION.",
+    "It provides a stable single-case witness that can be declared alongside the contrast, anti-collapse, and integration surfaces already present in Phase 0.",
+    "The current seed reuses the preserved substitution frame so declaration blockers can be cleared without inventing a divergent runtime surface."
+  ],
+  "fixtures": [
+    {
+      "id": "FX-FAIL-SUB-G01",
+      "row": "FAILURE_SUBSTITUTION",
+      "kind": "single",
+      "fixture_class": "golden",
+      "purpose": "Stable substitution witness for FAILURE_SUBSTITUTION golden coverage.",
+      "assertions": [
+        "path_exists:timeline.0.participants.p2.failure.primary",
+        "path_exists:timeline.0.participants.p2.failure.grammars.substitution",
+        "path_exists:timeline.0.participants.p2.compensation",
+        "path_exists:timeline.0.participants.p2.cascade.projection_mode",
+        "path_exists:timeline.0.participants.p2.solver_debug.relation_summary"
+      ],
+      "case_data": {
+        "system_name": "fx-fail-sub-g01-substitution-golden",
+        "participants": [
+          { "id": "p1", "name": "P1" },
+          { "id": "p2", "name": "P2" },
+          { "id": "p3", "name": "P3" }
+        ],
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" },
+                  "Emb": { "A": 79, "R": 79, "I": 79, "sigma": "L" },
+                  "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" },
+                  "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" },
+                  "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" }
+                }
+              },
+              "p2": {
+                "cascade": {
+                  "attempts": [
+                    { "axis": "Cfg" },
+                    { "axis": "Dir" },
+                    { "axis": "Leg" }
+                  ]
+                },
+                "axes": {
+                  "Cfg": { "A": 46, "R": 50, "I": 56, "sigma": "L" },
+                  "Emb": { "A": 54, "R": 54, "I": 58, "sigma": "L" },
+                  "Org": { "A": 52, "R": 52, "I": 57, "sigma": "L" },
+                  "Dir": { "A": 49, "R": 49, "I": 55, "sigma": "L" },
+                  "Leg": { "A": 50, "R": 50, "I": 55, "sigma": "L" }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": { "A": 72, "R": 72, "I": 72, "sigma": "L" },
+                  "Emb": { "A": 70, "R": 70, "I": 70, "sigma": "L" },
+                  "Org": { "A": 74, "R": 74, "I": 74, "sigma": "L" },
+                  "Dir": { "A": 69, "R": 69, "I": 69, "sigma": "L" },
+                  "Leg": { "A": 71, "R": 71, "I": 71, "sigma": "L" }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Org",
+            "alpha_medium": "p3.Org",
+            "alpha_receiving": "p2.Leg",
+            "sigma": "L",
+            "axis": "Leg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "substitute",
+            "magnitude": 0.70
+          },
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Cfg",
+            "alpha_medium": "p3.Cfg",
+            "alpha_receiving": "p2.Cfg",
+            "sigma": "L",
+            "axis": "Cfg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "substitute",
+            "magnitude": 0.68
+          },
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Dir",
+            "alpha_medium": "p3.Dir",
+            "alpha_receiving": "p2.Dir",
+            "sigma": "L",
+            "axis": "Dir",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "route",
+            "magnitude": 0.60
+          }
+        ],
+        "analysis": {
+          "key_finding": "Golden substitution-preserved witness for failure-grammar handling."
+        }
+      }
+    }
+  ]
+}

@@ -140,11 +140,11 @@
       "target_state": "full",
       "required_fixture_classes": ["golden", "contrast", "anti-collapse", "integration"],
       "runtime_surface": "solver/failure.js distinct grammar candidate and projection surfaces",
-      "packs": ["failure_split.json", "failure_projection.json", "failure_substitution_anti_collapse.json", "integration_paths.json"],
-      "fixture_ids": ["FX-FAIL-01", "FX-FAIL-04", "FX-FAIL-08", "FX-INT-08"],
+      "packs": ["failure_substitution_golden.json", "failure_split.json", "failure_projection.json", "failure_substitution_anti_collapse.json", "integration_paths.json"],
+      "fixture_ids": ["FX-FAIL-SUB-G01", "FX-FAIL-01", "FX-FAIL-04", "FX-FAIL-08", "FX-INT-08"],
       "notes": [
         "Substitution is contrast-tested against overflow and rerouted cascade projection.",
-        "Dedicated anti-collapse and integration surfaces are present.",
+        "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
         "Still requires fuller corpus and invariant depth before full."
       ],
       "proof_expectations": {
