@@ -148,18 +148,20 @@
       ],
       "runtime_surface": "relation-conditioned prevalence / theta with family-truth contrast evidence",
       "packs": [
+        "family_golden.json",
         "family_truth.json",
         "anti_collapse.json",
         "integration_paths.json"
       ],
       "fixture_ids": [
+        "FX-FAM-G01",
         "FX-FAM-01",
         "FX-FAM-02",
         "FX-INT-06"
       ],
       "notes": [
         "Aligned vs misaligned family handling has its own hard-gated proof surface.",
-        "Dedicated anti-collapse and integration surfaces are present.",
+        "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
         "Still requires fuller executable separation and invariant depth before full."
       ],
       "proof_expectations": {
