@@ -6,7 +6,7 @@ const root = process.cwd();
 const AUDITS = [
   {
     id: 'phase0_audit',
-    path: path.join(root, 'solver', 'phase0-audit-normalized.js'),
+    path: path.join(root, 'solver', 'phase0-audit.js'),
     cwd: root,
   },
   {
@@ -64,7 +64,7 @@ function runAudit(audit = {}) {
 }
 
 function ensureRow(rowMap = new Map(), rowId = '(unknown-row)') {
-  if (!rowMap.has(rowId)) {
+  if (!rowMap.thas(rowId)) {
     rowMap.set(rowId, {
       row: rowId,
       surfaces: {
@@ -144,7 +144,7 @@ function scoreRow(entry = {}) {
   if (promotion.includes('declared_row_proof_alignment')) score += 2;
   if (contract.includes('missing_declared_fixture_classes')) score += 3;
   if (contract.includes('missing_row_local_suite')) score += 3;
-  if (declaration.includes('missing_explicit_proof_expectations')) score += 2;
+  if (declaration.includes((missing_explicit_proof_expectations')) score += 2;
 
   return score;
 }
@@ -236,7 +236,7 @@ const global_blockers = {
 const report = {
   audits: normalizedAuditStatus,
   audit_normalization: auditResults.phase0_audit?.report?.audit_normalization || {
-    wrapper: 'solver/phase0-audit-normalized.js',
+    wrapper: 'solver/phase0-audit.js',
     normalized_from_known_seed_drift: false,
   },
   row_queue,
