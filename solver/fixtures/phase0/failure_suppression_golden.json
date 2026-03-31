@@ -1,0 +1,98 @@
+{
+  "version": "0.1.0",
+  "canon": "v15.7",
+  "mode": "phase0-audit",
+  "fixture_pack": "failure-suppression-golden",
+  "notes": [
+    "This pack starts the row-scoped golden corpus for FAILURE_SUPPRESSION.",
+    "It provides a stable single-case witness that can be declared alongside the contrast, anti-collapse, and integration surfaces already present in Phase 0.",
+    "The current seed reuses the suppressed-envelope frame so declaration blockers can be cleared without inventing a divergent runtime surface."
+  ],
+  "fixtures": [
+    {
+      "id": "FX-FAIL-SUP-G01",
+      "row": "FAILURE_SUPPRESSION",
+      "kind": "single",
+      "fixture_class": "golden",
+      "purpose": "Stable suppression witness for FAILURE_SUPPRESSION golden coverage.",
+      "assertions": [
+        "path_exists:timeline.0.participants.p2.failure.primary",
+        "path_exists:timeline.0.participants.p2.envelope.status",
+        "path_exists:timeline.0.participants.p2.envelope.projected_floor",
+        "path_exists:timeline.0.participants.p2.prevalence",
+        "path_exists:timeline.0.participants.p2.solver_debug.relation_summary"
+      ],
+      "case_data": {
+        "system_name": "fx-fail-sup-g01-suppressed-envelope-golden",
+        "participants": [
+          { "id": "p1", "name": "P1" },
+          { "id": "p2", "name": "P2" },
+          { "id": "p3", "name": "P3" }
+        ],
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" },
+                  "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" },
+                  "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" },
+                  "Dir": { "A": 83, "R": 83, "I": 83, "sigma": "L" },
+                  "Leg": { "A": 79, "R": 79, "I": 79, "sigma": "L" }
+                }
+              },
+              "p2": {
+                "axes": {
+                  "Cfg": { "A": 40, "R": 45, "I": 70, "sigma": "M" },
+                  "Emb": { "A": 35, "R": 40, "I": 65, "sigma": "M" },
+                  "Org": { "A": 44, "R": 46, "I": 62, "sigma": "M" },
+                  "Dir": { "A": 45, "R": 47, "I": 60, "sigma": "M" },
+                  "Leg": { "A": 40, "R": 42, "I": 60, "sigma": "M" }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": { "A": 12, "R": 12, "I": 12, "sigma": "L" },
+                  "Emb": { "A": 14, "R": 14, "I": 14, "sigma": "L" },
+                  "Org": { "A": 10, "R": 10, "I": 10, "sigma": "L" },
+                  "Dir": { "A": 11, "R": 11, "I": 11, "sigma": "L" },
+                  "Leg": { "A": 12, "R": 12, "I": 12, "sigma": "L" }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Org",
+            "alpha_medium": "p3.Org",
+            "alpha_receiving": "p2.Emb",
+            "sigma": "M",
+            "axis": "Emb",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "suppress",
+            "magnitude": 0.78
+          },
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Cfg",
+            "alpha_medium": "p3.Cfg",
+            "alpha_receiving": "p2.Cfg",
+            "sigma": "M",
+            "axis": "Cfg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "suppress",
+            "magnitude": 0.70
+          }
+        ],
+        "analysis": {
+          "key_finding": "Golden suppressed-envelope witness for failure-grammar handling."
+        }
+      }
+    }
+  ]
+}

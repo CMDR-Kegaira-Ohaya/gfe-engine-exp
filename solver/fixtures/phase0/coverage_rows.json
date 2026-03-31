@@ -190,11 +190,11 @@
       "target_state": "full",
       "required_fixture_classes": ["golden", "contrast", "anti-collapse", "integration"],
       "runtime_surface": "solver/failure.js plus envelope/cascade projection surfaces",
-      "packs": ["failure_split.json", "failure_projection.json", "anti_collapse.json", "integration_paths.json"],
-      "fixture_ids": ["FX-FAIL-03", "FX-FAIL-05", "FX-FAIL-06", "FX-INT-09"],
+      "packs": ["failure_suppression_golden.json", "failure_split.json", "failure_projection.json", "anti_collapse.json", "integration_paths.json"],
+      "fixture_ids": ["FX-FAIL-SUP-G01", "FX-FAIL-03", "FX-FAIL-05", "FX-FAIL-06", "FX-INT-09"],
       "notes": [
         "Suppression is contrast-tested against collapse and hard-gated in grammar and envelope space.",
-        "Dedicated anti-collapse and integration surfaces are present.",
+        "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
         "Still requires fuller corpus and invariant depth before full."
       ],
       "proof_expectations": {
@@ -296,8 +296,8 @@
         "Local vs distributed Leg persistence is solver-operative and hard-gated.",
         "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
         "Still requires fuller corpus and invariant depth before full."
-      }
-      ,"proof_expectations": {
+      ],
+      "proof_expectations": {
         "mode": "explicit-row-proof-v1",
         "behavioral_contrast_surface_required": true,
         "output_contract_surface_required": true,
