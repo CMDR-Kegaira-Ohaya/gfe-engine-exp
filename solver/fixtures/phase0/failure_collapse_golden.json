@@ -1,0 +1,105 @@
+{
+  "version": "0.1.0",
+  "canon": "v15.7",
+  "mode": "phase0-audit",
+  "fixture_pack": "failure-collapse-golden",
+  "notes": [
+    "This pack starts the row-scoped golden corpus for FAILURE_COLLAPSE.",
+    "It provides a stable single-case witness that can be declared alongside the contrast, anti-collapse, and integration surfaces already present in Phase 0.",
+    "The current seed reuses the collapse-preserved frame so declaration blockers can be cleared without inventing a divergent runtime surface."
+  ],
+  "fixtures": [
+    {
+      "id": "FX-FAIL-COL-G01",
+      "row": "FAILURE_COLLAPSE",
+      "kind": "single",
+      "fixture_class": "golden",
+      "purpose": "Stable collapse witness for FAILURE_COLLAPSE golden coverage.",
+      "assertions": [
+        "path_exists:timeline.0.participants.p2.failure.primary",
+        "path_exists:timeline.0.participants.p2.failure.grammars.collapse",
+        "path_exists:timeline.0.participants.p2.envelope.status",
+        "path_exists:timeline.0.participants.p2.cascade.projection_mode",
+        "path_exists:timeline.0.participants.p2.cascade.blocked"
+      ],
+      "case_data": {
+        "system_name": "fx-fail-col-g01-collapse-golden",
+        "participants": [
+          { "id": "p1", "name": "P1" },
+          { "id": "p2", "name": "P2" },
+          { "id": "p3", "name": "P3" }
+        ],
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" },
+                  "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" },
+                  "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" },
+                  "Dir": { "A": 83, "R": 83, "I": 83, "sigma": "L" },
+                  "Leg": { "A": 79, "R": 79, "I": 79, "sigma": "L" }
+                }
+              },
+              "p2": {
+                "cascade": {
+                  "attempts": [
+                    { "axis": "Cfg" },
+                    { "axis": "Dir" },
+                    { "axis": "Leg" }
+                  ]
+                },
+                "axes": {
+                  "Cfg": { "A": 10, "R": 18, "I": 85, "sigma": "Dst" },
+                  "Emb": { "A": 20, "R": 24, "I": 80, "sigma": "Dst" },
+                  "Org": { "A": 18, "R": 22, "I": 76, "sigma": "Dst" },
+                  "Dir": { "A": 15, "R": 20, "I": 80, "sigma": "Dst" },
+                  "Leg": { "A": 10, "R": 18, "I": 75, "sigma": "Dst" }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": { "A": 8, "R": 8, "I": 8, "sigma": "L" },
+                  "Emb": { "A": 10, "R": 10, "I": 10, "sigma": "L" },
+                  "Org": { "A": 8, "R": 8, "I": 8, "sigma": "L" },
+                  "Dir": { "A": 9, "R": 9, "I": 9, "sigma": "L" },
+                  "Leg": { "A": 8, "R": 8, "I": 8, "sigma": "L" }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Cfg",
+            "alpha_medium": "p3.Cfg",
+            "alpha_receiving": "p2.Cfg",
+            "sigma": "Dst",
+            "axis": "Cfg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "collapse",
+            "magnitude": 0.88
+          },
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Dir",
+            "alpha_medium": "p3.Dir",
+            "alpha_receiving": "p2.Leg",
+            "sigma": "Dst",
+            "axis": "Leg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "collapse",
+            "magnitude": 0.84
+          }
+        ],
+        "analysis": {
+          "key_finding": "Golden collapse-preserved witness for failure-grammar handling."
+        }
+      }
+    }
+  ]
+}
