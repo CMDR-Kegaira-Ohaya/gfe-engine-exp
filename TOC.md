@@ -136,6 +136,7 @@
 │   │       ├── failure_split.json
 │   │       ├── failure_substitution_anti_collapse.json
 │   │       ├── failure_substitution_golden.json
+│   │       ├── failure_suppression_golden.json
 │   │       ├── family_golden.json
 │   │       ├── family_truth.json
 │   │       ├── field_golden.json
