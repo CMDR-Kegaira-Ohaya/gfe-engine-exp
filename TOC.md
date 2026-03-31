@@ -127,6 +127,7 @@
 │   │       ├── face_integration.json
 │   │       ├── face_split.json
 │   │       ├── failure_collapse_anti_collapse.json
+│   │       ├── failure_collapse_golden.json
 │   │       ├── failure_collapse_integration.json
 │   │       ├── failure_overflow_golden.json
 │   │       ├── failure_plastic_deformation_anti_collapse.json
