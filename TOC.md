@@ -160,6 +160,7 @@
 │   ├── phase0-audit.js
 │   ├── phase0-contract-preflight.js
 │   ├── phase0-proof-expectations-audit.js
+│   ├── phase0-readiness.js
 │   ├── prevalence.js
 │   ├── README.md
 │   ├── relation.js
