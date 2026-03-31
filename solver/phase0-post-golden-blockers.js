@@ -6,7 +6,7 @@ const root = process.cwd();
 const AUDITS = [
   {
     id: 'phase0_audit',
-    path: path.join(root, 'solver', 'phase0-audit-normalized.js'),
+    path: path.join(root, 'solver', 'phase0-audit.js'),
     cwd: root,
   },
   {
@@ -239,7 +239,7 @@ const nonGoldenBlockerCounts = countBy(
 const report = {
   audits: normalizedAuditStatus,
   audit_normalization: auditResults.phase0_audit?.report?.audit_normalization || {
-    wrapper: 'solver/phase0-audit-normalized.js',
+    wrapper: 'solver/phase0-audit.js',
     normalized_from_known_seed_drift: false,
   },
   golden_sweep_status: {
