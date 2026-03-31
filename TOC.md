@@ -140,6 +140,7 @@
 │   │       ├── invariant_registry.json
 │   │       ├── leg_distributed.json
 │   │       ├── manifest.json
+│   │       ├── order_golden.json
 │   │       ├── order_split.json
 │   │       ├── README.md
 │   │       ├── relation_golden.json
