@@ -34,9 +34,7 @@
       ],
       "notes": [
         "Public-path executable surface exists.",
-        "A row-scoped core contrast fixture now proves maintained local-axis profile changes produce different canonical outputs under a fixed event frame.",
-        "A dedicated anti-collapse core fixture now protects local-axis ARI math against cross-axis local-shell flattening under a stable runtime frame.",
-        "A row-scoped integration fixture now proves core-facing coexistence of canonical local-axis outputs with relation, envelope, and cascade outputs.",
+        "Core contrast, anti-collapse, and integration surfaces are present.",
         "Still missing the fuller invariant bundle required for full."
       ],
       "proof_expectations": {
@@ -66,18 +64,20 @@
       "runtime_surface": "solver/relation.js triadic participation via source / medium / receiving",
       "packs": [
         "manifest.json",
+        "relation_golden.json",
         "relation_split.json",
         "anti_collapse.json",
         "integration_paths.json"
       ],
       "fixture_ids": [
+        "FX-REL-G01",
         "FX-REL-01",
         "FX-REL-02",
         "FX-INT-01"
       ],
       "notes": [
         "Medium-sensitive relation handling is executable and hard-gated in Phase 0.",
-        "Anti-collapse and integration surfaces are now started for the relation row.",
+        "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
         "Still lacks the fuller modern corpus and invariant suite required for full."
       ],
       "proof_expectations": {
@@ -117,8 +117,7 @@
       ],
       "notes": [
         "Mirrored threshold contrast is hard-gated in Phase 0.",
-        "A dedicated anti-collapse threshold fixture now protects mirrored threshold behavior against threshold flattening.",
-        "A broader integration fixture now proves threshold-facing coexistence with relation, face, order, distributed Leg, field, envelope, and cascade outputs.",
+        "Dedicated anti-collapse and integration surfaces are present.",
         "Still not full because row-local and cross-phase invariant suites remain incomplete."
       ],
       "proof_expectations": {
@@ -157,9 +156,8 @@
         "FX-INT-06"
       ],
       "notes": [
-        "Aligned vs misaligned family handling now has its own hard-gated proof surface.",
-        "A dedicated anti-collapse family fixture now protects family-truth handling against same-family shorthand collapse at the source-medium boundary.",
-        "A broader integration fixture now proves family-facing coexistence with mirrored threshold, relation, face, order, distributed Leg, recursive field, envelope, and cascade outputs.",
+        "Aligned vs misaligned family handling has its own hard-gated proof surface.",
+        "Dedicated anti-collapse and integration surfaces are present.",
         "Still requires fuller executable separation and invariant depth before full."
       ],
       "proof_expectations": {
@@ -199,8 +197,7 @@
       ],
       "notes": [
         "Overflow is contrast-tested against substitution and hard-gated in Phase 0.",
-        "A dedicated anti-collapse overflow fixture now protects overflow against substitution shorthand under a broadly similar relation frame.",
-        "A broader integration fixture now proves overflow-facing coexistence with relation, face, order, distributed Leg, recursive field, envelope, compensation, and cascade outputs.",
+        "Dedicated anti-collapse and integration surfaces are present.",
         "Still requires fuller corpus and invariant depth before full."
       ],
       "proof_expectations": {
@@ -242,8 +239,7 @@
       ],
       "notes": [
         "Substitution is contrast-tested against overflow and rerouted cascade projection.",
-        "A dedicated anti-collapse substitution fixture now protects substitution against overflow shorthand and projection collapse under a broadly similar relation frame.",
-        "A broader integration fixture now proves substitution-facing coexistence with relation, face, order, distributed Leg, recursive field, envelope, compensation, reroute, and cascade outputs.",
+        "Dedicated anti-collapse and integration surfaces are present.",
         "Still requires fuller corpus and invariant depth before full."
       ],
       "proof_expectations": {
@@ -283,8 +279,7 @@
       ],
       "notes": [
         "Plastic deformation is executable and contrast-tested against transient stress.",
-        "A dedicated anti-collapse plastic-deformation fixture now protects maintained-form deformation against collapse shorthand under a broadly similar accumulated-pressure frame.",
-        "A row-scoped integration fixture now proves plastic-facing coexistence of maintained-form deformation with relation, face, order, distributed Leg, recursive field, envelope, prevalence, and cascade outputs.",
+        "Dedicated anti-collapse and integration surfaces are present.",
         "It remains partial because the fuller corpus and invariant depth required for full are still missing."
       ],
       "proof_expectations": {
@@ -326,8 +321,7 @@
       ],
       "notes": [
         "Suppression is contrast-tested against collapse and hard-gated in grammar and envelope space.",
-        "A dedicated anti-collapse suppression fixture now exists in Phase 0.",
-        "A broader integration fixture now proves suppression-facing coexistence with relation, face, order, distributed Leg, recursive field, envelope, blocked cascade, and projection outputs.",
+        "Dedicated anti-collapse and integration surfaces are present.",
         "Still requires fuller corpus and invariant depth before full."
       ],
       "proof_expectations": {
@@ -370,8 +364,7 @@
       ],
       "notes": [
         "Collapse is hard-gated in grammar, cascade, and envelope projection contrasts.",
-        "A dedicated anti-collapse collapse fixture now protects collapse against suppression-shell flattening under a broadly similar relation frame.",
-        "A row-scoped integration fixture now proves collapse-facing coexistence with relation, face, order, distributed Leg, recursive field, envelope, blocked cascade, and projection outputs.",
+        "Dedicated anti-collapse and integration surfaces are present.",
         "Still requires fuller corpus and invariant depth before full."
       ],
       "proof_expectations": {
@@ -411,8 +404,7 @@
       ],
       "notes": [
         "Inner vs outer face is solver-operative and hard-gated.",
-        "A dedicated anti-collapse face fixture now protects inner landing against outer-emission flattening under a broadly similar relation frame.",
-        "A row-scoped integration fixture now proves face-facing coexistence with relation, order, distributed Leg, recursive field, envelope, and cascade outputs.",
+        "Dedicated anti-collapse and integration surfaces are present.",
         "Still requires fuller corpus and invariant depth before full."
       ],
       "proof_expectations": {
@@ -452,8 +444,7 @@
       ],
       "notes": [
         "Depth order is solver-operative and hard-gated apart from scan order.",
-        "A dedicated anti-collapse order fixture now protects depth against scan-led flattening.",
-        "A broader integration fixture now proves order-facing coexistence with face, distributed Leg, field, envelope, and cascade outputs.",
+        "Dedicated anti-collapse and integration surfaces are present.",
         "Still requires fuller corpus and invariant depth before full."
       ],
       "proof_expectations": {
@@ -493,8 +484,7 @@
       ],
       "notes": [
         "Local vs distributed Leg persistence is solver-operative and hard-gated.",
-        "A dedicated anti-collapse Leg fixture now protects distributed persistence against local flattening.",
-        "A broader integration fixture now proves Leg-facing coexistence with face, order, field, envelope, and cascade outputs.",
+        "Dedicated anti-collapse and integration surfaces are present.",
         "Still requires fuller corpus and invariant depth before full."
       ],
       "proof_expectations": {
@@ -534,8 +524,7 @@
       ],
       "notes": [
         "Local vs recursive field behavior is solver-operative and hard-gated.",
-        "A dedicated anti-collapse field fixture now protects recursive field behavior against local flattening.",
-        "A broader integration fixture now proves field/order/Leg-facing public-path coexistence.",
+        "Dedicated anti-collapse and integration surfaces are present.",
         "Still requires fuller corpus and invariant depth before full."
       ],
       "proof_expectations": {
