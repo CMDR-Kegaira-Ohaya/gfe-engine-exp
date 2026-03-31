@@ -1,0 +1,110 @@
+{
+  "version": "0.1.0",
+  "canon": "v15.7",
+  "mode": "phase0-audit",
+  "fixture_pack": "failure-overflow-golden",
+  "notes": [
+    "This pack starts the row-scoped golden corpus for FAILURE_OVERFLOW.",
+    "It provides a stable single-case witness that can be declared alongside the contrast, anti-collapse, and integration surfaces already present in Phase 0.",
+    "The current seed reuses the overflow-oriented frame so declaration blockers can be cleared without inventing a divergent runtime surface."
+  ],
+  "fixtures": [
+    {
+      "id": "FX-FAIL-OVF-G01",
+      "row": "FAILURE_OVERFLOW",
+      "kind": "single",
+      "fixture_class": "golden",
+      "purpose": "Stable overflow witness for FAILURE_OVERFLOW golden coverage.",
+      "assertions": [
+        "path_exists:timeline.0.participants.p2.failure.primary",
+        "path_exists:timeline.0.participants.p2.failure.grammars.overflow",
+        "path_exists:timeline.0.participants.p2.compensation",
+        "path_exists:timeline.0.participants.p2.solver_debug.relation_summary",
+        "path_exists:timeline.0.participants.p2.prevalence"
+      ],
+      "case_data": {
+        "system_name": "fx-fail-ovf-g01-overflow-golden",
+        "participants": [
+          { "id": "p1", "name": "P1" },
+          { "id": "p2", "name": "P2" },
+          { "id": "p3", "name": "P3" }
+        ],
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" },
+                  "Emb": { "A": 79, "R": 79, "I": 79, "sigma": "L" },
+                  "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" },
+                  "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" },
+                  "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" }
+                }
+              },
+              "p2": {
+                "axes": {
+                  "Cfg": { "A": 25, "R": 35, "I": 75, "sigma": "L" },
+                  "Emb": { "A": 45, "R": 45, "I": 62, "sigma": "L" },
+                  "Org": { "A": 48, "R": 48, "I": 60, "sigma": "L" },
+                  "Dir": { "A": 40, "R": 40, "I": 68, "sigma": "L" },
+                  "Leg": { "A": 38, "R": 38, "I": 64, "sigma": "L" }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": { "A": 78, "R": 78, "I": 78, "sigma": "L" },
+                  "Emb": { "A": 77, "R": 77, "I": 77, "sigma": "L" },
+                  "Org": { "A": 80, "R": 80, "I": 80, "sigma": "L" },
+                  "Dir": { "A": 76, "R": 76, "I": 76, "sigma": "L" },
+                  "Leg": { "A": 75, "R": 75, "I": 75, "sigma": "L" }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Dir",
+            "alpha_medium": "p3.Org",
+            "alpha_receiving": "p2.Leg",
+            "sigma": "M",
+            "axis": "Leg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "overflow",
+            "magnitude": 0.90
+          },
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Cfg",
+            "alpha_medium": "p3.Cfg",
+            "alpha_receiving": "p2.Cfg",
+            "sigma": "M",
+            "axis": "Cfg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "overflow",
+            "magnitude": 0.85
+          },
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Dir",
+            "alpha_medium": "p3.Org",
+            "alpha_receiving": "p2.Dir",
+            "sigma": "L",
+            "axis": "Dir",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "overflow",
+            "magnitude": 0.80
+          }
+        ],
+        "analysis": {
+          "key_finding": "Golden overflow-oriented witness for failure-grammar handling."
+        }
+      }
+    }
+  ]
+}
