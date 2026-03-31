@@ -10,7 +10,7 @@ import {
 } from './phase0-known-audit-seed-drift.js';
 
 const root = process.cwd();
-const RAW_AUDIT_PATH = path.join(root, 'solver', 'phase0-audit.js');
+const RAW_AUDIT_PATH = path.join(root, 'solver', 'phase0-audit-raw.js');
 
 function parseJsonOutput(stdout = '') {
   const trimmed = String(stdout || '').trim();
@@ -267,6 +267,7 @@ function normalizeReport(report = {}) {
     ...report,
     audit_normalization: {
       wrapper: 'solver/phase0-audit-normalized.js',
+      raw_audit_source: 'solver/phase0-audit-raw.js',
       known_seed_drift_cross_phase_ids: Array.from(KNOWN_AUDIT_SEED_DRIFT.cross_phase_ids).sort(),
       known_seed_drift_row_local_suite_ids: Array.from(KNOWN_AUDIT_SEED_DRIFT.row_local_suite_ids).sort(),
       affected_rows: Array.from(KNOWN_AUDIT_SEED_DRIFT.affected_rows).sort(),
@@ -285,6 +286,7 @@ if (rawAudit.parse_error != null || rawAudit.report == null) {
   console.log(JSON.stringify({
     audit_normalization: {
       wrapper: 'solver/phase0-audit-normalized.js',
+      raw_audit_source: 'solver/phase0-audit-raw.js',
       normalized_from_known_seed_drift: false,
     },
     raw_audit: {
