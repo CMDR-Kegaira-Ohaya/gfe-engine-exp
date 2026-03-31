@@ -130,6 +130,7 @@
 │   │       ├── failure_collapse_integration.json
 │   │       ├── failure_overflow_golden.json
 │   │       ├── failure_plastic_deformation_anti_collapse.json
+│   │       ├── failure_plastic_deformation_golden.json
 │   │       ├── failure_plastic_deformation_integration.json
 │   │       ├── failure_projection.json
 │   │       ├── failure_split.json
