@@ -1,5 +1,6 @@
+import fs from 'node:fs';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { solveCase, validateCase } from './index.js';
 import {
   hasKnownAuditSeedDrift,
   filterPromotionBlockers,
@@ -9,309 +10,417 @@ import {
   KNOWN_AUDIT_SEED_DRIFT,
 } from './phase0-known-audit-seed-drift.js';
 
+
 const root = process.cwd();
-const RAW_AUDIT_PATH = path.join(root, 'solver', 'phase0-audit-core.js');
+const fixturesDir = path.join(root, 'solver', 'fixtures', 'phase0');
+const CANONICAL_PUBLIC_ENTRYPOINT = 'solver/index.js#solveCase';
+const CANONICAL_RUNTIME_MODE = 'canon-locked-runtime';
 
-function parseJsonOutput(stdout = '') {
-  const trimmed = String(stdout || '').trim();
-  if (!trimmed) return null;
-  return JSON.parse(trimmed);
+const manifestPaths = fs
+  .readdirSync(fixturesDir)
+  .filter(name => name.endsWith('.json'))
+  .sort()
+  .map(name => path.join(fixturesDir, name));
+
+const manifests = manifestPaths.map(filePath => ({
+  file: path.basename(filePath),
+  data: JSON.parse(fs.readFileSync(filePath, 'utf8')),
+}));
+
+function getAtPath(value, dottedPath) {
+  return String(dottedPath || '')
+    .split('.')
+    .filter(Boolean)
+    .reduce((current, key) => {
+      if (current === undefined || current === null) return undefined;
+      if (/^\d+$/.test(key)) return current[Number(key)];
+      return current[key];
+    }, value);
 }
 
-function runRawAudit() {
-  const result = spawnSync(process.execPath, [RAW_AUDIT_PATH], {
-    cwd: root,
-    encoding: 'utf8',
-    maxBuffer: 1024 * 1024 * 20,
+function comparePaths(solvedA, solvedB, paths) {
+  return (paths || []).map(comparePath => {
+    const left = getAtPath(solvedA, comparePath);
+    const right = getAtPath(solvedB, comparePath);
+    const differs = JSON.stringify(left) !== JSON.stringify(right);
+    return { path: comparePath, differs, left, right };
   });
+}
 
-  const stdout = result.stdout || '';
-  let report = null;
-  let parse_error = null;
-
-  try {
-    report = parseJsonOutput(stdout);
-  } catch (error) {
-    parse_error = error instanceof Error ? error.message : String(error);
-  }
-
+function summarizeValidation(validation) {
   return {
-    ok:
-      result.error == null &&
-      result.signal == null &&
-      result.status === 0 &&
-      parse_error == null &&
-      report != null,
-    exit_code: typeof result.status === 'number' ? result.status : null,
-    signal: result.signal || null,
-    invocation_error: result.error ? String(result.error.message || result.error) : null,
-    parse_error,
-    report,
+    ok: validation.ok,
+    errors: validation.issues.filter(issue => issue.level === 'error').length,
+    warnings: validation.issues.filter(issue => issue.level === 'warning').length,
   };
 }
 
-function buildFixtureMap(fixtures = []) {
-  return new Map((fixtures || []).map(fixture => [fixture.id || '(unknown-fixture)', fixture]));
-}
-
-function buildCrossPhaseRegistryMap(report = {}) {
-  const items = Array.isArray(report.invariant_registry?.cross_phase_invariants)
-    ? report.invariant_registry.cross_phase_invariants
-    : [];
-  return new Map(items.map(item => [item.id || '(unnamed-invariant)', item]));
-}
-
-function buildRowLocalRegistryMap(report = {}) {
-  const items = Array.isArray(report.invariant_registry?.row_local_suites)
-    ? report.invariant_registry.row_local_suites
-    : [];
-  return new Map(items.map(item => [item.suite_id || '(unnamed-suite)', item]));
-}
-
-function recomputeExecutableCheck(check = {}, registryEntry = {}, fixtureMap = new Map(), idKey = 'id') {
-  const entryId = registryEntry?.[idKey] || check?.[idKey] || '(unnamed-entry)';
-  const seed_fixture_ids = Array.isArray(registryEntry?.seed_fixture_ids)
-    ? registryEntry.seed_fixture_ids.slice()
-    : Array.isArray(check?.seed_fixture_ids)
-      ? check.seed_fixture_ids.slice()
-      : [];
-  const expected_invariant_classes = Array.isArray(registryEntry?.expected_invariant_classes)
-    ? registryEntry.expected_invariant_classes.slice()
-    : Array.isArray(check?.expected_invariant_classes)
-      ? check.expected_invariant_classes.slice()
-      : [];
-
-  const executable_content_slice = expected_invariant_classes.length > 0;
-  const referencedFixtures = seed_fixture_ids.map(fixtureId => fixtureMap.get(fixtureId)).filter(Boolean);
-  const missing_fixture_ids = seed_fixture_ids.filter(fixtureId => !fixtureMap.has(fixtureId)).sort();
-  const unenforced_fixture_ids = referencedFixtures
-    .filter(fixture => !fixture.divergence_invariants?.enforced)
-    .map(fixture => fixture.id || '(unknown-fixture)')
-    .sort();
-  const failing_fixture_ids = referencedFixtures
-    .filter(fixture => !!fixture.hard_gated_failure)
-    .map(fixture => fixture.id || '(unknown-fixture)')
-    .sort();
-  const observedInvariantItems = referencedFixtures.flatMap(fixture =>
-    Array.isArray(fixture.divergence_invariants?.items) ? fixture.divergence_invariants.items : []
-  );
-  const observed_invariant_classes = Array.from(
-    new Set(observedInvariantItems.map(item => item.class).filter(Boolean))
-  ).sort();
-  const missing_invariant_classes = expected_invariant_classes
-    .filter(invariantClass => !observed_invariant_classes.includes(invariantClass))
-    .sort();
-  const failing_invariant_classes = expected_invariant_classes
-    .filter(invariantClass => observedInvariantItems.some(item => item.class === invariantClass && item.pass === false))
-    .sort();
-  const seed_pass =
-    missing_fixture_ids.length === 0 &&
-    unenforced_fixture_ids.length === 0 &&
-    failing_fixture_ids.length === 0;
-  const content_pass = !executable_content_slice
-    ? null
-    : missing_invariant_classes.length === 0 && failing_invariant_classes.length === 0;
-
-  return {
-    ...check,
-    [idKey]: entryId,
-    executable_slice: true,
-    executable_content_slice,
-    enforced: true,
-    seed_fixture_ids,
-    expected_invariant_classes,
-    observed_invariant_classes,
-    missing_fixture_ids,
-    unenforced_fixture_ids,
-    failing_fixture_ids,
-    missing_invariant_classes,
-    failing_invariant_classes,
-    seed_pass,
-    content_pass,
-    pass: seed_pass && (content_pass !== false),
-  };
-}
-
-function summarizeCrossPhaseChecks(checks = {}) {
-  const determinism = checks.determinism || {
-    checked_fixtures: 0,
-    passed_fixtures: 0,
-    failed_fixtures: 0,
-    pass: false,
-  };
-  const seedChecks = Array.isArray(checks.seed_checks) ? checks.seed_checks : [];
-  const executableContentChecks = seedChecks.filter(check => check.executable_content_slice);
-  return {
-    enforced_checks: 1 + seedChecks.length,
-    executable_content_checks: executableContentChecks.length,
-    passed_checks: (determinism.pass ? 1 : 0) + seedChecks.filter(check => check.pass).length,
-    failed_checks: (determinism.pass ? 0 : 1) + seedChecks.filter(check => !check.pass).length,
-    passed_content_checks: executableContentChecks.filter(check => check.content_pass === true).length,
-    failed_content_checks: executableContentChecks.filter(check => check.content_pass === false).length,
-    determinism_checked_fixtures: determinism.checked_fixtures,
-    determinism_failed_fixtures: determinism.failed_fixtures,
-    seed_check_count: seedChecks.length,
-    failed_seed_check_ids: seedChecks.filter(check => !check.pass).map(check => check.id || '(unnamed-invariant)').sort(),
-    failing_content_check_ids: executableContentChecks
-      .filter(check => check.content_pass === false)
-      .map(check => check.id || '(unnamed-invariant)')
-      .sort(),
-  };
-}
-
-function summarizeRowLocalChecks(checks = []) {
-  const executableChecks = checks.filter(check => check.executable_slice);
-  const executableContentChecks = executableChecks.filter(check => check.executable_content_slice);
-  return {
-    declared_suites: checks.length,
-    executable_checks: executableChecks.length,
-    executable_content_checks: executableContentChecks.length,
-    passed_checks: executableChecks.filter(check => check.pass).length,
-    failed_checks: executableChecks.filter(check => !check.pass).length,
-    passed_content_checks: executableContentChecks.filter(check => check.content_pass === true).length,
-    failed_content_checks: executableContentChecks.filter(check => check.content_pass === false).length,
-    rows_with_executable_checks: Array.from(new Set(executableChecks.map(check => check.row).filter(Boolean))).length,
-    failing_suite_ids: executableChecks.filter(check => !check.pass).map(check => check.suite_id).sort(),
-    failing_content_suite_ids: executableContentChecks
-      .filter(check => check.content_pass === false)
-      .map(check => check.suite_id)
-      .sort(),
-  };
-}
-
-function normalizeCoverageRows(report = {}, normalizedCrossPhaseChecks = {}, normalizedRowLocalSuiteChecks = []) {
-  const rows = Array.isArray(report.coverage_rows) ? report.coverage_rows : [];
-  const suiteMap = new Map();
-  for (const check of normalizedRowLocalSuiteChecks.filter(item => item.executable_slice)) {
-    const row = check.row || '(unmapped-row)';
-    if (!suiteMap.has(row)) suiteMap.set(row, []);
-    suiteMap.get(row).push(check);
-  }
-
-  const globalCrossPhasePass =
-    !!normalizedCrossPhaseChecks?.determinism?.pass &&
-    (normalizedCrossPhaseChecks.seed_checks || []).every(check => check.pass);
-
-  return rows.map(row => {
-    const suiteChecks = suiteMap.get(row.row || '(unmapped-row)') || [];
-    const failingSuiteChecks = suiteChecks.filter(check => !check.pass);
-    const promotion_checks = row.promotion_checks ? { ...row.promotion_checks } : {};
-    if (promotion_checks.invariant_pass) {
-      promotion_checks.invariant_pass = {
-        ...promotion_checks.invariant_pass,
-        pass: suiteChecks.length > 0 && failingSuiteChecks.length === 0 && globalCrossPhasePass,
-        row_local_suite_pass: suiteChecks.length > 0 && failingSuiteChecks.length === 0,
-        cross_phase_pass: globalCrossPhasePass,
-      };
-    }
-
-    const promotion_blockers = filterPromotionBlockers(
-      row,
-      row.promotion_blockers || [],
-      { ignoreKnownAuditSeedDrift: hasKnownAuditSeedDrift(report) && isKnownAffectedRow(row.row || '') }
+function buildParticipantSnapshots(solvedCase) {
+  const timeline = Array.isArray(solvedCase?.timeline) ? solvedCase.timeline : [];
+  return timeline.map((step, stepIndex) => {
+    const participants = Object.fromEntries(
+      Object.entries(step?.participants || {}).map(([participantId, participant]) => [
+        participantId,
+        {
+          prevalence: participant?.prevalence || null,
+          theta: participant?.theta || null,
+          compensation: participant?.compensation || null,
+          failure: participant?.failure || null,
+          envelope: participant?.envelope || null,
+          cascade: participant?.cascade || null,
+          relation_summary: participant?.solver_debug?.relation_summary || null,
+          relation_traces: participant?.solver_debug?.relation_traces || [],
+          canonical_axes: participant?._canonical_axes || null,
+          display_axes: participant?.axes || null,
+        },
+      ])
     );
 
+    return { step_index: stepIndex, participants };
+  });
+}
+
+function inferFixtureClass(fixture = {}) {
+  if (fixture.fixture_class) return fixture.fixture_class;
+  if (fixture.kind === 'single') return 'golden';
+  if (fixture.kind === 'contrast') return 'contrast';
+  return 'unclassified';
+}
+
+function evaluateDivergenceInvariant(invariant = {}, comparisons = []) {
+  const expectation = invariant.expectation || 'all_must_differ';
+  const requestedPaths = Array.isArray(invariant.paths) ? invariant.paths : [];
+  const comparisonMap = new Map(comparisons.map(item => [item.path, item]));
+  const matched = requestedPaths.map(pathKey => comparisonMap.get(pathKey)).filter(Boolean);
+
+  const missing_paths = requestedPaths.filter(pathKey => !comparisonMap.has(pathKey));
+  const differing_paths = matched.filter(item => item.differs).map(item => item.path);
+  const same_paths = matched.filter(item => !item.differs).map(item => item.path);
+
+  let pass = false;
+  if (expectation === 'some_must_differ') {
+    pass = differing_paths.length > 0;
+  } else {
+    pass = matched.length > 0 && same_paths.length === 0;
+  }
+
+  return {
+    label: invariant.label || '(unnamed-invariant)',
+    class: invariant.class || 'uncategorized-divergence',
+    expectation,
+    pass,
+    requested_paths: requestedPaths,
+    differing_paths,
+    same_paths,
+    missing_paths,
+  };
+}
+
+function evaluateDivergenceInvariants(fixture = {}, comparisons = []) {
+  const invariants = Array.isArray(fixture.divergence_invariants) ? fixture.divergence_invariants : [];
+  const items = invariants.map(invariant => evaluateDivergenceInvariant(invariant, comparisons));
+  return {
+    enforced: !!fixture.enforce_invariants,
+    count: items.length,
+    passed: items.filter(item => item.pass).length,
+    failed: items.filter(item => !item.pass).length,
+    classes: Array.from(new Set(items.map(item => item.class))).sort(),
+    items,
+  };
+}
+
+function evaluateDeterminism(caseData) {
+  const solved_first = solveCase(caseData);
+  const solved_second = solveCase(caseData);
+  return {
+    pass: JSON.stringify(solved_first) === JSON.stringify(solved_second),
+    solved_first_ok: !!solved_first,
+    solved_second_ok: !!solved_second,
+  };
+}
+
+function getRuntimeIdentity(solvedCase) {
+  const solver = solvedCase?.solver || {};
+  const version = solver.version || null;
+  const mode = solver.mode || null;
+  const signature = version || mode
+    ? `${version || '(unknown-version)'}::${mode || '(unknown-mode)'}`
+    : null;
+  return { version, mode, signature };
+}
+
+function summarizeCanonicalRuntime(fixtures = []) {
+  const runtimeInstances = [];
+  const fixtureIds = [];
+
+  for (const fixture of fixtures) {
+    if (fixture.kind === 'single' && fixture.runtime_identity?.signature) {
+      runtimeInstances.push(fixture.runtime_identity);
+      fixtureIds.push(fixture.id || '(unknown-fixture)');
+    }
+    if (fixture.kind === 'contrast') {
+      if (fixture.runtime_identity_a?.signature) {
+        runtimeInstances.push(fixture.runtime_identity_a);
+        fixtureIds.push(`${fixture.id || '(unknown-fixture)'}:a`);
+      }
+      if (fixture.runtime_identity_b?.signature) {
+        runtimeInstances.push(fixture.runtime_identity_b);
+        fixtureIds.push(`${fixture.id || '(unknown-fixture)'}:b`);
+      }
+    }
+  }
+
+  const unique_runtime_signatures = Array.from(
+    new Set(runtimeInstances.map(item => item.signature).filter(Boolean))
+  ).sort();
+  const unique_versions = Array.from(
+    new Set(runtimeInstances.map(item => item.version).filter(Boolean))
+  ).sort();
+  const unique_modes = Array.from(
+    new Set(runtimeInstances.map(item => item.mode).filter(Boolean))
+  ).sort();
+  const public_entrypoint_only = fixtures.every(
+    fixture => fixture.public_entrypoint === CANONICAL_PUBLIC_ENTRYPOINT
+  );
+  const canonical_mode_only = runtimeInstances.length > 0 && runtimeInstances.every(
+    item => item.mode === CANONICAL_RUNTIME_MODE
+  );
+  const runtime_consistent_across_fixtures = unique_runtime_signatures.length === 1;
+
+  return {
+    fixture_count: fixtures.length,
+    solved_runtime_instances: runtimeInstances.length,
+    fixture_ids: fixtureIds,
+    public_entrypoint_only,
+    canonical_mode_only,
+    unique_runtime_signatures,
+    unique_versions,
+    unique_modes,
+    runtime_consistent_across_fixtures,
+    single_runtime_signature: runtime_consistent_across_fixtures
+      ? unique_runtime_signatures[0] || null
+      : null,
+  };
+}
+
+function buildRowAggregation(fixtures = []) {
+  const rowMap = new Map();
+
+  for (const fixture of fixtures) {
+    const row = fixture.row || '(unmapped-row)';
+    if (!rowMap.has(row)) {
+      rowMap.set(row, {
+        fixture_ids: new Set(),
+        fixture_classes: new Set(),
+        packs: new Set(),
+        files: new Set(),
+        single_fixture_ids: new Set(),
+        contrast_fixture_ids: new Set(),
+        enforced_fixture_ids: new Set(),
+        failing_enforced_fixture_ids: new Set(),
+      });
+    }
+
+    const entry = rowMap.get(row);
+    entry.fixture_ids.add(fixture.id || '(unknown-fixture)');
+    if (fixture.fixture_class) entry.fixture_classes.add(fixture.fixture_class);
+    if (fixture.fixture_pack) entry.packs.add(fixture.fixture_pack);
+    if (fixture.file) entry.files.add(fixture.file);
+    if (fixture.kind === 'single') entry.single_fixture_ids.add(fixture.id || '(unknown-fixture)');
+    if (fixture.kind === 'contrast') entry.contrast_fixture_ids.add(fixture.id || '(unknown-fixture)');
+    if (fixture.divergence_invariants?.enforced) entry.enforced_fixture_ids.add(fixture.id || '(unknown-fixture)');
+    if (fixture.hard_gated_failure) entry.failing_enforced_fixture_ids.add(fixture.id || '(unknown-fixture)');
+  }
+
+  return rowMap;
+}
+
+function inferCoverageState(rowDeclaration = {}, aggregation = null) {
+  if (rowDeclaration.current_state) return rowDeclaration.current_state;
+  if (aggregation && aggregation.fixture_ids.size > 0) return 'partial';
+  return 'parsed-only';
+}
+
+function extractInvariantRegistry(manifests = []) {
+  const cross_phase_invariants = manifests.flatMap(manifest =>
+    (manifest.data.cross_phase_invariants || []).map(invariant => ({
+      file: manifest.file,
+      fixture_pack: manifest.data.fixture_pack || manifest.file,
+      ...invariant,
+    }))
+  );
+
+  const row_local_suites = manifests.flatMap(manifest =>
+    (manifest.data.row_local_suites || []).map(suite => ({
+      file: manifest.file,
+      fixture_pack: manifest.data.fixture_pack || manifest.file,
+      ...suite,
+    }))
+  );
+
+  return { cross_phase_invariants, row_local_suites };
+}
+
+function buildRowLocalSuiteMap(rowLocalSuites = []) {
+  const rowMap = new Map();
+  for (const suite of rowLocalSuites) {
+    const row = suite.row || '(unmapped-row)';
+    if (!rowMap.has(row)) rowMap.set(row, []);
+    rowMap.get(row).push(suite);
+  }
+  for (const suites of rowMap.values()) {
+    suites.sort((left, right) => String(left.suite_id || '').localeCompare(String(right.suite_id || '')));
+  }
+  return rowMap;
+}
+
+function summarizeInvariantRegistry(invariantRegistry = {}) {
+  const crossPhaseInvariants = Array.isArray(invariantRegistry.cross_phase_invariants)
+    ? invariantRegistry.cross_phase_invariants
+    : [];
+  const rowLocalSuites = Array.isArray(invariantRegistry.row_local_suites)
+    ? invariantRegistry.row_local_suites
+    : [];
+  const rowsWithSuites = Array.from(new Set(rowLocalSuites.map(suite => suite.row).filter(Boolean))).sort();
+
+  return {
+    cross_phase_invariants: {
+      count: crossPhaseInvariants.length,
+      ids: crossPhaseInvariants.map(invariant => invariant.id || '(unnamed-invariant)'),
+    },
+    row_local_suites: {
+      count: rowLocalSuites.length,
+      rows_covered: rowsWithSuites.length,
+      rows: rowsWithSuites,
+      suite_ids: rowLocalSuites.map(suite => suite.suite_id || '(unnamed-suite)'),
+    },
+  };
+}
+
+function getCrossPhaseInvariantSeedMap() {
+  return {
+    'INV-XPH-04': ['FX-REL-02'],
+    'INV-XPH-06': ['FX-ORD-02'],
+    'INV-XPH-07': ['FX-FACE-02'],
+    'INV-XPH-08': ['FX-THR-02'],
+    'INV-XPH-09': ['FX-FAM-02'],
+    'INV-XPH-10': ['FX-FAIL-07', 'FX-FAIL-08', 'FX-FAIL-10', 'FX-FAIL-06', 'FX-FAIL-09'],
+    'INV-XPH-11': ['FX-LEG-02'],
+  };
+}
+
+function getCrossPhaseInvariantExpectedInvariantClassMap() {
+  return {
+    'INV-XPH-04': ['relation_medium_noncollapse', 'relation_interpretation_noncollapse'],
+    'INV-XPH-06': ['order_noncollapse_divergence', 'order_interpretation_noncollapse'],
+    'INV-XPH-07': ['face_trace_divergence', 'face_footprint_divergence'],
+    'INV-XPH-08': ['threshold_noncollapse_divergence', 'threshold_cfg_noncollapse'],
+    'INV-XPH-09': ['family_truth_noncollapse', 'family_receiving_noncollapse'],
+    'INV-XPH-10': [
+      'overflow_noncollapse_divergence',
+      'overflow_projection_noncollapse',
+      'substitution_noncollapse_divergence',
+      'substitution_projection_noncollapse',
+      'plastic_noncollapse_divergence',
+      'plastic_form_noncollapse',
+      'failure_noncollapse_divergence',
+      'failure_projection_noncollapse',
+      'collapse_noncollapse_divergence',
+      'collapse_projection_noncollapse',
+    ],
+    'INV-XPH-11': ['distributed_leg_noncollapse', 'distributed_leg_interpretation_noncollapse'],
+  };
+}
+
+function evaluateExecutableCrossPhaseSeedChecks(fixtures = [], invariantRegistry = {}) {
+  const fixtureMap = new Map(fixtures.map(fixture => [fixture.id || '(unknown-fixture)', fixture]));
+  const registered = Array.isArray(invariantRegistry.cross_phase_invariants)
+    ? invariantRegistry.cross_phase_invariants
+    : [];
+  const registeredMap = new Map(registered.map(invariant => [invariant.id || '(unnamed-invariant)', invariant]));
+  const seedMap = getCrossPhaseInvariantSeedMap();
+  const expectedClassMap = getCrossPhaseInvariantExpectedInvariantClassMap();
+
+  return Object.entries(seedMap).map(([invariantId, seed_fixture_ids]) => {
+    const invariant = registeredMap.get(invariantId) || null;
+    const expected_invariant_classes = expectedClassMap[invariantId] || [];
+    const executable_content_slice = expected_invariant_classes.length > 0;
+    const referencedFixtures = seed_fixture_ids.map(fixtureId => fixtureMap.get(fixtureId)).filter(Boolean);
+    const missing_fixture_ids = seed_fixture_ids.filter(fixtureId => !fixtureMap.has(fixtureId)).sort();
+    const unenforced_fixture_ids = referencedFixtures
+      .filter(fixture => !fixture.divergence_invariants?.enforced)
+      .map(fixture => fixture.id || '(unknown-fixture)')
+      .sort();
+    const failing_fixture_ids = referencedFixtures
+      .filter(fixture => !!fixture.hard_gated_failure)
+      .map(fixture => fixture.id || '(unknown-fixture)')
+      .sort();
+
+    const observedInvariantItems = referencedFixtures.flatMap(fixture =>
+      Array.isArray(fixture.divergence_invariants?.items) ? fixture.divergence_invariants.items : []
+    );
+    const observed_invariant_classes = Array.from(
+      new Set(observedInvariantItems.map(item => item.class).filter(Boolean))
+    ).sort();
+    const missing_invariant_classes = expected_invariant_classes
+      .filter(invariantClass => !observed_invariant_classes.includes(invariantClass))
+      .sort();
+    const failing_invariant_classes = expected_invariant_classes
+      .filter(invariantClass => observedInvariantItems.some(item => item.class === invariantClass && item.pass === false))
+      .sort();
+
+    const seed_pass =
+      missing_fixture_ids.length === 0 &&
+      unenforced_fixture_ids.length === 0 &&
+      failing_fixture_ids.length === 0;
+    const content_pass = !executable_content_slice
+      ? null
+      : missing_invariant_classes.length === 0 && failing_invariant_classes.length === 0;
+
     return {
-      ...row,
-      executable_row_local_suite_check_ids: suiteChecks.map(check => check.suite_id),
-      executable_row_local_suite_check_count: suiteChecks.length,
-      passed_row_local_suite_check_count: suiteChecks.filter(check => check.pass).length,
-      failed_row_local_suite_check_ids: failingSuiteChecks.map(check => check.suite_id),
-      failed_row_local_suite_check_count: failingSuiteChecks.length,
-      has_executable_row_local_suite_checks: suiteChecks.length > 0,
-      promotion_checks,
-      promotion_blockers,
-      full_contract_eligible: promotion_blockers.length === 0,
-      promotion_state: promotion_blockers.length === 0 ? 'full-contract-eligible' : 'not-yet-full',
+      id: invariantId,
+      label: invariant?.label || '(unnamed-invariant)',
+      executable_slice: true,
+      executable_content_slice,
+      enforced: true,
+      seed_fixture_ids,
+      expected_invariant_classes,
+      observed_invariant_classes,
+      missing_fixture_ids,
+      unenforced_fixture_ids,
+      failing_fixture_ids,
+      missing_invariant_classes,
+      failing_invariant_classes,
+      seed_pass,
+      content_pass,
+      pass: seed_pass && (content_pass !== false),
     };
   });
 }
 
-function normalizeReport(report = {}) {
-  const fixtureMap = buildFixtureMap(report.fixtures || []);
-  const crossPhaseRegistryMap = buildCrossPhaseRegistryMap(report);
-  const rowLocalRegistryMap = buildRowLocalRegistryMap(report);
+function evaluateExecutableCrossPhaseInvariants(fixtures = [], invariantRegistry = {}) {
+  const registered = Array.isArray(invariantRegistry.cross_phase_invariants)
+    ? invariantRegistry.cross_phase_invariants
+    : [];
+  const determinismInvariant = registered.find(invariant => invariant.id === 'INV-XPH-12') || null;
 
-  const crossPhaseChecks = report.cross_phase_invariant_checks || {};
-  const normalizedSeedChecks = (crossPhaseChecks.seed_checks || []).map(check => {
-    const id = check.id || '(unnamed-invariant)';
-    if (!isKnownCrossPhaseDriftId(id)) return check;
-    return recomputeExecutableCheck(check, crossPhaseRegistryMap.get(id) || {}, fixtureMap, 'id');
-  });
-  const normalizedCrossPhaseChecks = {
-    ...crossPhaseChecks,
-    seed_checks: normalizedSeedChecks,
-  };
-  const normalizedCrossPhaseSummary = summarizeCrossPhaseChecks(normalizedCrossPhaseChecks);
+  const deterministicFixtureChecks = fixtures
+    .filter(fixture => fixture.kind === 'single' || fixture.kind === 'contrast')
+    .map(fixture => {
+      if (fixture.kind === 'single') {
+        return {
+          fixture_id: fixture.id || '(unknown-fixture)',
+          row: fixture.row || '(unmapped-row)',
+          kind: fixture.kind,
+          pass: !!fixture.determinism?.pass,
+        };
+      }
+      return {
+        fixture_id: fixture.id || '(unknown-fixture)',
+        row: fixture.row || '(unmapped-row)',
+        kind: fixture.kind,
+        pass: !!fixture.determinism_a?.pass && !!fixture.determinism_b?.pass,
+      };
+    });
 
-  const normalizedRowLocalSuiteChecks = (report.row_local_suite_checks || []).map(check => {
-    const suiteId = check.suite_id || '(unnamed-suite)';
-    if (!isKnownRowLocalSuiteDriftId(suiteId)) return check;
-    return recomputeExecutableCheck(check, rowLocalRegistryMap.get(suiteId) || {}, fixtureMap, 'suite_id');
-  });
-  const normalizedRowLocalSummary = summarizeRowLocalChecks(normalizedRowLocalSuiteChecks);
-
-  const normalizedCoverageRows = normalizeCoverageRows(
-    {
-      ...report,
-      cross_phase_invariant_checks: normalizedCrossPhaseChecks,
-      cross_phase_invariant_check_summary: normalizedCrossPhaseSummary,
-      row_local_suite_checks: normalizedRowLocalSuiteChecks,
-      row_local_suite_check_summary: normalizedRowLocalSummary,
-    },
-    normalizedCrossPhaseChecks,
-    normalizedRowLocalSuiteChecks
-  );
-
-  return {
-    ...report,
-    audit_normalization: {
-      wrapper: 'solver/phase0-audit.js',
-      raw_audit_source: 'solver/phase0-audit-core.js',
-      known_seed_drift_cross_phase_ids: Array.from(KNOWN_AUDIT_SEED_DRIFT.cross_phase_ids).sort(),
-      known_seed_drift_row_local_suite_ids: Array.from(KNOWN_AUDIT_SEED_DRIFT.row_local_suite_ids).sort(),
-      affected_rows: Array.from(KNOWN_AUDIT_SEED_DRIFT.affected_rows).sort(),
-      normalized_from_known_seed_drift: hasKnownAuditSeedDrift(report),
-    },
-    cross_phase_invariant_checks: normalizedCrossPhaseChecks,
-    cross_phase_invariant_check_summary: normalizedCrossPhaseSummary,
-    row_local_suite_checks: normalizedRowLocalSuiteChecks,
-    row_local_suite_check_summary: normalizedRowLocalSummary,
-    coverage_rows: normalizedCoverageRows,
-  };
-}
-
-const rawAudit = runRawAudit();
-if (rawAudit.parse_error != null || rawAudit.report == null) {
-  console.log(JSON.stringify({
-    audit_normalization: {
-      wrapper: 'solver/phase0-audit.js',
-      raw_audit_source: 'solver/phase0-audit-core.js',
-      normalized_from_known_seed_drift: false,
-    },
-    raw_audit: {
-      ok: rawAudit.ok,
-      exit_code: rawAudit.exit_code,
-      signal: rawAudit.signal,
-      invocation_error: rawAudit.invocation_error,
-      parse_error: rawAudit.parse_error,
-    },
-  }, null, 2));
-  process.exitCode = 1;
-} else {
-  const normalizedReport = normalizeReport(rawAudit.report);
-  console.log(JSON.stringify(normalizedReport, null, 2));
-
-  const normalizedOnlyKnownSeedDrift = hasKnownAuditSeedDrift(rawAudit.report);
-  const normalizedCrossPhaseSummary = normalizedReport.cross_phase_invariant_check_summary || {};
-  const normalizedRowLocalSummary = normalizedReport.row_local_suite_check_summary || {};
-  const normalizationClearedAuditFailure =
-    normalizedOnlyKnownSeedDrift &&
-    Number(normalizedCrossPhaseSummary.determinism_failed_fixtures || 0) === 0 &&
-    Number(normalizedCrossPhaseSummary.failed_checks || 0) === 0 &&
-    Number(normalizedRowLocalSummary.failed_checks || 0) === 0;
-
-  if (!(rawAudit.ok === true || normalizationClearedAuditFailure)) {
-    process.exitCode = 1;
-  }
-}
+    ... [TRUNCATED] ...
