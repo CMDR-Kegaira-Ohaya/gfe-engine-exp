@@ -315,11 +315,11 @@
       "target_state": "full",
       "required_fixture_classes": ["golden", "contrast", "anti-collapse", "integration"],
       "runtime_surface": "solver/field_recursion.js plus field-aware relation handling",
-      "packs": ["field_recursion.json", "anti_collapse.json", "integration_paths.json"],
-      "fixture_ids": ["FX-FLD-01", "FX-FLD-02", "FX-INT-02"],
+      "packs": ["field_golden.json", "field_recursion.json", "anti_collapse.json", "integration_paths.json"],
+      "fixture_ids": ["FX-FLD-G01", "FX-FLD-01", "FX-FLD-02", "FX-INT-02"],
       "notes": [
         "Local vs recursive field behavior is solver-operative and hard-gated.",
-        "Dedicated anti-collapse and integration surfaces are present.",
+        "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
         "Still requires fuller corpus and invariant depth before full."
       ],
       "proof_expectations": {

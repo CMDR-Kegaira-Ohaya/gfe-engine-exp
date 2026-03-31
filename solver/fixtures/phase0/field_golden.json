@@ -1,0 +1,94 @@
+{
+  "version": "0.1.0",
+  "canon": "v15.7",
+  "mode": "phase0-audit",
+  "fixture_pack": "field-golden",
+  "notes": [
+    "This pack starts the row-scoped golden corpus for FIELD_RECURSION.",
+    "It provides a stable single-case witness that can be declared alongside the contrast, anti-collapse, and integration surfaces already present in Phase 0.",
+    "The current seed reuses the local-field frame so declaration blockers can be cleared without inventing a divergent runtime surface."
+  ],
+  "fixtures": [
+    {
+      "id": "FX-FLD-G01",
+      "row": "FIELD_RECURSION",
+      "kind": "single",
+      "fixture_class": "golden",
+      "purpose": "Stable field-recursion witness for FIELD_RECURSION golden coverage.",
+      "assertions": [
+        "path_exists:timeline.0.participants.p2.solver_debug.relation_summary",
+        "path_exists:timeline.0.participants.p2.solver_debug.relation_traces",
+        "path_exists:timeline.0.participants.p2._canonical_axes.Org",
+        "path_exists:timeline.0.participants.p2.prevalence",
+        "path_exists:timeline.0.participants.p2.envelope"
+      ],
+      "case_data": {
+        "system_name": "fx-fld-g01-local-field-golden",
+        "participants": [
+          { "id": "p1", "name": "P1" },
+          { "id": "p2", "name": "P2" },
+          { "id": "p3", "name": "P3" }
+        ],
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" },
+                  "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" },
+                  "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" },
+                  "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" },
+                  "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" }
+                }
+              },
+              "p2": {
+                "axes": {
+                  "Cfg": { "A": 28, "R": 34, "I": 82, "sigma": "L" },
+                  "Emb": { "A": 58, "R": 58, "I": 60, "sigma": "L" },
+                  "Org": { "A": 62, "R": 62, "I": 66, "sigma": "L" },
+                  "Dir": { "A": 38, "R": 42, "I": 78, "sigma": "L" },
+                  "Leg": { "A": 64, "R": 64, "I": 66, "sigma": "L" }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": { "A": 74, "R": 74, "I": 74, "sigma": "L" },
+                  "Emb": { "A": 72, "R": 72, "I": 72, "sigma": "L" },
+                  "Org": { "A": 76, "R": 76, "I": 76, "sigma": "L" },
+                  "Dir": { "A": 73, "R": 73, "I": 73, "sigma": "L" },
+                  "Leg": { "A": 72, "R": 72, "I": 72, "sigma": "L" }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "scan_index": 2,
+            "order_depth": 2,
+            "leg_scope": "distributed",
+            "trace_persistence": 2,
+            "distributed_span": 2,
+            "field_scope": "local",
+            "field_feedback": 0,
+            "field_depth": 0,
+            "alpha_source": "p1.Org",
+            "alpha_medium": "p3.Org",
+            "alpha_receiving": "p2.Org",
+            "sigma": "L",
+            "axis": "Org",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "load",
+            "magnitude": 0.58
+          }
+        ],
+        "analysis": {
+          "key_finding": "Golden local-field witness for field-recursion handling."
+        }
+      }
+    }
+  ]
+}
