@@ -139,6 +139,7 @@
 │   │       ├── integration_paths.json
 │   │       ├── invariant_registry.json
 │   │       ├── leg_distributed.json
+│   │       ├── leg_golden.json
 │   │       ├── manifest.json
 │   │       ├── order_golden.json
 │   │       ├── order_split.json
