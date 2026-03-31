@@ -2,7 +2,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 const root = process.cwd();
-const AUDIT_PATH = path.join(root, 'solver', 'phase0-audit-normalized.js');
+const AUDIT_PATH = path.join(root, 'solver', 'phase0-audit.js');
 const GOLDEN_SWEEP_BLOCKERS = new Set(['missing_declared_fixture_classes']);
 
 function parseJsonOutput(stdout = '') {
@@ -161,7 +161,7 @@ const reportOut = {
     parse_error: audit.parse_error,
   },
   audit_normalization: report.audit_normalization || {
-    wrapper: 'solver/phase0-audit-normalized.js',
+    wrapper: 'solver/phase0-audit.js',
     normalized_from_known_seed_drift: false,
   },
   summaries: {
