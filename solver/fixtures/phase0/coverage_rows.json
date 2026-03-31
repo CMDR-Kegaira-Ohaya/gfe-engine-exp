@@ -106,18 +106,20 @@
       ],
       "runtime_surface": "solver/prevalence.js mirrored threshold behavior via prevalence / theta",
       "packs": [
+        "threshold_golden.json",
         "threshold_split.json",
         "anti_collapse.json",
         "integration_paths.json"
       ],
       "fixture_ids": [
+        "FX-THR-G01",
         "FX-THR-01",
         "FX-THR-02",
         "FX-INT-05"
       ],
       "notes": [
         "Mirrored threshold contrast is hard-gated in Phase 0.",
-        "Dedicated anti-collapse and integration surfaces are present.",
+        "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
         "Still not full because row-local and cross-phase invariant suites remain incomplete."
       ],
       "proof_expectations": {
