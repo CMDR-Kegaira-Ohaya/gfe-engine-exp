@@ -135,6 +135,7 @@
 │   │       ├── failure_substitution_anti_collapse.json
 │   │       ├── family_golden.json
 │   │       ├── family_truth.json
+│   │       ├── field_golden.json
 │   │       ├── field_recursion.json
 │   │       ├── integration_paths.json
 │   │       ├── invariant_registry.json
