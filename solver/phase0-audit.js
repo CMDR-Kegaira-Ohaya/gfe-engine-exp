@@ -780,6 +780,137 @@ function buildCoverageRows(
   return rows.sort((left, right) => String(left.row).localeCompare(String(right.row)));
 }
 
+function buildRowFixtureMap(fixtures = []) {
+  const rowMap = new Map();
+
+  for (const fixture of fixtures) {
+    const row = fixture.row || '(unmapped-row)';
+    if (!rowMap.has(row)) rowMap.set(row, []);
+    rowMap.get(row).push(fixture);
+  }
+
+  for (const rowFixtures of rowMap.values()) {
+    rowFixtures.sort((left, right) =>
+      String(left.id || '').localeCompare(String(right.id || ''))
+    );
+  }
+
+  return rowMap;
+}
+
+function evaluateRowPromotionGates(coverageRows = [], fixtures = [], crossPhaseChecks = {}) {
+  const rowFixtureMap = buildRowFixtureMap(fixtures);
+  const globalCrossPhasePass =
+    !!crossPhaseChecks?.determinism?.pass &&
+    (crossPhaseChecks?.seed_checks || []).every(check => check.pass);
+  const oldRuntimeIndependencePass = false;
+  const blockerCounts = {};
+
+  const rows = coverageRows.map(row => {
+    const rowFixtures = rowFixtureMap.get(row.row) || [];
+    const contrastFixtures = rowFixtures.filter(fixture => fixture.kind === 'contrast');
+    const passingContrastFixtures = contrastFixtures.filter(
+      fixture => !fixture.hard_gated_failure && (fixture.divergence_invariants?.failed || 0) === 0
+    );
+    const outputAssertionFixtures = rowFixtures.filter(
+      fixture => Array.isArray(fixture.path_checks) && fixture.path_checks.length > 0
+    );
+    const passingOutputAssertionFixtures = outputAssertionFixtures.filter(fixture =>
+      fixture.path_checks.every(check => check.exists)
+    );
+
+    const checks = {
+      canon_anchor: {
+        pass: Boolean(row.runtime_surface),
+        runtime_surface: row.runtime_surface || '',
+      },
+      executable_independence: {
+        pass: row.has_complete_fixture_class_set && row.hard_gated_phase0,
+        has_complete_fixture_class_set: row.has_complete_fixture_class_set,
+        hard_gated_phase0: row.hard_gated_phase0,
+      },
+      behavioral_contrast_proof: {
+        pass: passingContrastFixtures.length > 0,
+        fixture_ids: passingContrastFixtures.map(fixture => fixture.id || '(unknown-fixture)'),
+      },
+      invariant_pass: {
+        pass:
+          row.has_executable_row_local_suite_checks &&
+          row.failed_row_local_suite_check_count === 0 &&
+          globalCrossPhasePass,
+        row_local_suite_pass:
+          row.has_executable_row_local_suite_checks &&
+          row.failed_row_local_suite_check_count === 0,
+        cross_phase_pass: globalCrossPhasePass,
+      },
+      public_path_proof: {
+        pass: row.observed_fixture_classes.includes('integration'),
+        observed_fixture_classes: row.observed_fixture_classes,
+      },
+      exposed_output_contract: {
+        pass: passingOutputAssertionFixtures.length > 0,
+        fixture_ids: passingOutputAssertionFixtures.map(fixture => fixture.id || '(unknown-fixture)'),
+      },
+      non_collapse_proof: {
+        pass:
+          row.observed_fixture_classes.includes('anti-collapse') && row.hard_gated_failures === 0,
+        observed_fixture_classes: row.observed_fixture_classes,
+        hard_gated_failures: row.hard_gated_failures,
+      },
+      old_runtime_independence: {
+        pass: oldRuntimeIndependencePass,
+        status: 'unproven-in-phase0-audit',
+      },
+      evidence_bundle_present: {
+        pass:
+          row.single_fixture_ids.length > 0 &&
+          row.contrast_fixture_ids.length > 0 &&
+          row.row_local_suite_count > 0 &&
+          outputAssertionFixtures.length > 0,
+        single_fixture_ids: row.single_fixture_ids,
+        contrast_fixture_ids: row.contrast_fixture_ids,
+        row_local_suite_ids: row.row_local_suite_ids,
+        output_assertion_fixture_ids: outputAssertionFixtures.map(
+          fixture => fixture.id || '(unknown-fixture)'
+        ),
+      },
+    };
+
+    const blockers = Object.entries(checks)
+      .filter(([, value]) => value.pass !== true)
+      .map(([key]) => key)
+      .sort();
+
+    for (const blocker of blockers) {
+      blockerCounts[blocker] = (blockerCounts[blocker] || 0) + 1;
+    }
+
+    return {
+      ...row,
+      promotion_checks: checks,
+      full_contract_eligible: blockers.length === 0,
+      promotion_blockers: blockers,
+      promotion_state: blockers.length === 0 ? 'full-contract-eligible' : 'not-yet-full',
+    };
+  });
+
+  const fullContractEligibleRows = rows
+    .filter(row => row.full_contract_eligible)
+    .map(row => row.row)
+    .sort();
+
+  return {
+    rows,
+    summary: {
+      total_rows: rows.length,
+      full_contract_eligible_rows: fullContractEligibleRows.length,
+      not_yet_eligible_rows: rows.length - fullContractEligibleRows.length,
+      full_contract_eligible_row_ids: fullContractEligibleRows,
+      blocker_counts: blockerCounts,
+    },
+  };
+}
+
 function summarizeCoverageRows(coverageRows = []) {
   const summary = {
     total_rows: coverageRows.length,
@@ -791,6 +922,7 @@ function summarizeCoverageRows(coverageRows = []) {
     rows_missing_row_local_suites: 0,
     rows_with_executable_row_local_suite_checks: 0,
     rows_with_failed_row_local_suite_checks: 0,
+    rows_full_contract_eligible: 0,
   };
 
   for (const row of coverageRows) {
@@ -802,6 +934,7 @@ function summarizeCoverageRows(coverageRows = []) {
     if (row.missing_row_local_suite) summary.rows_missing_row_local_suites += 1;
     if (row.has_executable_row_local_suite_checks) summary.rows_with_executable_row_local_suite_checks += 1;
     if (row.failed_row_local_suite_check_count > 0) summary.rows_with_failed_row_local_suite_checks += 1;
+    if (row.full_contract_eligible) summary.rows_full_contract_eligible += 1;
   }
 
   return summary;
@@ -826,6 +959,7 @@ const report = {
   cross_phase_invariant_check_summary: {},
   row_local_suite_checks: [],
   row_local_suite_check_summary: {},
+  promotion_gate_summary: {},
   fixtures: [],
   coverage_rows: [],
   coverage_summary: {},
@@ -956,6 +1090,14 @@ report.coverage_rows = buildCoverageRows(
   invariantRegistry,
   report.row_local_suite_checks
 );
+
+const promotionEvaluation = evaluateRowPromotionGates(
+  report.coverage_rows,
+  report.fixtures,
+  report.cross_phase_invariant_checks
+);
+report.coverage_rows = promotionEvaluation.rows;
+report.promotion_gate_summary = promotionEvaluation.summary;
 report.coverage_summary = summarizeCoverageRows(report.coverage_rows);
 
 console.log(JSON.stringify(report, null, 2));
