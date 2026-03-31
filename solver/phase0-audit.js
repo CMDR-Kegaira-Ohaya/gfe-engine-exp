@@ -1,4 +1,3 @@
-
 import fs from 'node:fs';
 import path from 'node:path';
 import { solveCase, validateCase } from './index.js';
@@ -646,6 +645,7 @@ function buildCoverageRows(rowDeclarations = [], fixtures = [], invariantRegistr
       required_fixture_classes,
       declared_packs: declaration.packs || [],
       declared_fixture_ids: declaration.fixture_ids || [],
+      proof_expectations: declaration.proof_expectations || null,
       row_local_suite_ids: rowLocalSuites.map(suite => suite.suite_id || '(unnamed-suite)'),
       row_local_suite_labels: rowLocalSuites.map(suite => suite.label || ''),
       row_local_suite_count: rowLocalSuites.length,
@@ -786,7 +786,42 @@ function buildOutputContractSurface(rowFixtures = []) {
   };
 }
 
+function normalizeExplicitProofExpectations(row = {}) {
+  const raw = row?.proof_expectations && typeof row.proof_expectations === 'object'
+    ? row.proof_expectations
+    : null;
+  if (!raw) return null;
+  return {
+    mode: raw.mode || 'explicit-row-proof-v1',
+    behavioral_contrast_surface_required: raw.behavioral_contrast_surface_required,
+    output_contract_surface_required: raw.output_contract_surface_required,
+    non_collapse_proof_required: raw.non_collapse_proof_required,
+    complete_fixture_class_set_required: raw.complete_fixture_class_set_required,
+    row_local_suite_required: raw.row_local_suite_required,
+    public_entrypoint: raw.public_entrypoint || null,
+    runtime_mode: raw.runtime_mode || null,
+    integration_fixture_ids: Array.isArray(raw.integration_fixture_ids)
+      ? raw.integration_fixture_ids.slice().sort()
+      : [],
+  };
+}
+
+function getRowRuntimeModes(rowFixtures = []) {
+  const modes = [];
+  for (const fixture of rowFixtures) {
+    if (fixture.kind === 'single' && fixture.runtime_identity?.mode) {
+      modes.push(fixture.runtime_identity.mode);
+    }
+    if (fixture.kind === 'contrast') {
+      if (fixture.runtime_identity_a?.mode) modes.push(fixture.runtime_identity_a.mode);
+      if (fixture.runtime_identity_b?.mode) modes.push(fixture.runtime_identity_b.mode);
+    }
+  }
+  return Array.from(new Set(modes.filter(Boolean))).sort();
+}
+
 function buildDeclaredRowProofExpectation(row = {}, fixtureIdMap = new Map()) {
+  const explicitProofExpectations = normalizeExplicitProofExpectations(row);
   const declared_fixture_ids = Array.isArray(row.declared_fixture_ids) ? row.declared_fixture_ids : [];
   const declared_files = Array.isArray(row.declared_packs) ? row.declared_packs : [];
   const required_fixture_classes = Array.isArray(row.required_fixture_classes)
@@ -802,7 +837,17 @@ function buildDeclaredRowProofExpectation(row = {}, fixtureIdMap = new Map()) {
     };
   });
 
+  const inferred_declared_integration_fixture_ids = declaredFixtureRecords
+    .filter(record => record.fixture_class === 'integration')
+    .map(record => record.id)
+    .sort();
+
   return {
+    declaration_source: explicitProofExpectations
+      ? 'explicit-proof-expectations'
+      : 'inferred-row-proof-fallback',
+    declaration_mode: explicitProofExpectations?.mode || 'inferred-row-proof-v0',
+    explicit_proof_expectations: explicitProofExpectations,
     declared_fixture_ids,
     declared_files,
     required_fixture_classes,
@@ -810,19 +855,33 @@ function buildDeclaredRowProofExpectation(row = {}, fixtureIdMap = new Map()) {
       .filter(record => record.kind === 'contrast')
       .map(record => record.id)
       .sort(),
-    declared_integration_fixture_ids: declaredFixtureRecords
-      .filter(record => record.fixture_class === 'integration')
-      .map(record => record.id)
-      .sort(),
+    declared_integration_fixture_ids:
+      explicitProofExpectations?.integration_fixture_ids?.length > 0
+        ? explicitProofExpectations.integration_fixture_ids
+        : inferred_declared_integration_fixture_ids,
     unresolved_declared_fixture_ids: declaredFixtureRecords
       .filter(record => !record.observed)
       .map(record => record.id)
       .sort(),
-    expects_behavioral_contrast_surface: required_fixture_classes.includes('contrast'),
-    expects_output_contract_surface: required_fixture_classes.includes('integration'),
-    expects_non_collapse_proof: required_fixture_classes.includes('anti-collapse'),
-    expects_complete_fixture_class_set: (row.target_state || '') === 'full',
-    expects_row_local_suite: (row.target_state || '') === 'full',
+    expects_behavioral_contrast_surface:
+      explicitProofExpectations?.behavioral_contrast_surface_required
+        ?? required_fixture_classes.includes('contrast'),
+    expects_output_contract_surface:
+      explicitProofExpectations?.output_contract_surface_required
+        ?? required_fixture_classes.includes('integration'),
+    expects_non_collapse_proof:
+      explicitProofExpectations?.non_collapse_proof_required
+        ?? required_fixture_classes.includes('anti-collapse'),
+    expects_complete_fixture_class_set:
+      explicitProofExpectations?.complete_fixture_class_set_required
+        ?? ((row.target_state || '') === 'full'),
+    expects_row_local_suite:
+      explicitProofExpectations?.row_local_suite_required
+        ?? ((row.target_state || '') === 'full'),
+    expected_public_entrypoint:
+      explicitProofExpectations?.public_entrypoint || CANONICAL_PUBLIC_ENTRYPOINT,
+    expected_runtime_mode:
+      explicitProofExpectations?.runtime_mode || CANONICAL_RUNTIME_MODE,
   };
 }
 
@@ -831,7 +890,8 @@ function evaluateDeclaredRowProofExpectation(
   declaredProofExpectation = {},
   behavioralContrastSurface = {},
   outputContractSurface = {},
-  nonCollapsePass = false
+  nonCollapsePass = false,
+  rowFixtures = []
 ) {
   const missing_declared_fixture_ids = (declaredProofExpectation.declared_fixture_ids || [])
     .filter(fixtureId => !row.observed_fixture_ids.includes(fixtureId))
@@ -846,6 +906,7 @@ function evaluateDeclaredRowProofExpectation(
     .filter(fixtureId => !(outputContractSurface.integration_fixture_ids || []).includes(fixtureId))
     .sort();
 
+  const row_runtime_modes = getRowRuntimeModes(rowFixtures);
   const fixture_presence_pass =
     missing_declared_fixture_ids.length === 0 &&
     missing_declared_files.length === 0 &&
@@ -865,14 +926,31 @@ function evaluateDeclaredRowProofExpectation(
   const row_local_suite_pass = !declaredProofExpectation.expects_row_local_suite
     ? true
     : row.has_row_local_suite === true;
+  const public_entrypoint_pass = !declaredProofExpectation.expected_public_entrypoint
+    ? true
+    : rowFixtures.length > 0 && rowFixtures.every(
+      fixture => fixture.public_entrypoint === declaredProofExpectation.expected_public_entrypoint
+    );
+  const runtime_mode_pass = !declaredProofExpectation.expected_runtime_mode
+    ? true
+    : row_runtime_modes.length > 0 && row_runtime_modes.every(
+      mode => mode === declaredProofExpectation.expected_runtime_mode
+    );
 
   return {
+    declaration_source: declaredProofExpectation.declaration_source || 'unknown',
+    declaration_mode: declaredProofExpectation.declaration_mode || '',
     fixture_presence_pass,
     required_fixture_classes_pass,
     behavioral_contrast_pass,
     output_contract_pass,
     non_collapse_pass,
     row_local_suite_pass,
+    public_entrypoint_pass,
+    runtime_mode_pass,
+    expected_public_entrypoint: declaredProofExpectation.expected_public_entrypoint || null,
+    expected_runtime_mode: declaredProofExpectation.expected_runtime_mode || null,
+    observed_runtime_modes: row_runtime_modes,
     missing_declared_fixture_ids,
     missing_declared_files,
     missing_declared_contrast_fixture_ids,
@@ -884,7 +962,9 @@ function evaluateDeclaredRowProofExpectation(
       behavioral_contrast_pass &&
       output_contract_pass &&
       non_collapse_pass &&
-      row_local_suite_pass,
+      row_local_suite_pass &&
+      public_entrypoint_pass &&
+      runtime_mode_pass,
   };
 }
 
@@ -916,7 +996,8 @@ function evaluateRowPromotionGates(coverageRows = [], fixtures = [], crossPhaseC
       declared_proof_expectation,
       behavioral_contrast_surface,
       output_contract_surface,
-      nonCollapsePass
+      nonCollapsePass,
+      rowFixtures
     );
 
     const promotion_checks = {
@@ -979,6 +1060,13 @@ function evaluateRowPromotionGates(coverageRows = [], fixtures = [], crossPhaseC
       },
       declared_row_proof_alignment: {
         pass: declared_proof_expectation_check.pass,
+        declaration_source: declared_proof_expectation_check.declaration_source,
+        declaration_mode: declared_proof_expectation_check.declaration_mode,
+        public_entrypoint_pass: declared_proof_expectation_check.public_entrypoint_pass,
+        runtime_mode_pass: declared_proof_expectation_check.runtime_mode_pass,
+        expected_public_entrypoint: declared_proof_expectation_check.expected_public_entrypoint,
+        expected_runtime_mode: declared_proof_expectation_check.expected_runtime_mode,
+        observed_runtime_modes: declared_proof_expectation_check.observed_runtime_modes,
         missing_declared_fixture_ids: declared_proof_expectation_check.missing_declared_fixture_ids,
         missing_declared_files: declared_proof_expectation_check.missing_declared_files,
         missing_declared_contrast_fixture_ids: declared_proof_expectation_check.missing_declared_contrast_fixture_ids,
@@ -1025,6 +1113,9 @@ function evaluateRowPromotionGates(coverageRows = [], fixtures = [], crossPhaseC
       rows_with_behavioral_contrast_surface: rows.filter(row => row.behavioral_contrast_surface.pass).length,
       rows_with_output_contract_surface: rows.filter(row => row.output_contract_surface.pass).length,
       rows_with_declared_row_proof_alignment: rows.filter(row => row.declared_proof_expectation_check.pass).length,
+      rows_with_explicit_proof_expectations: rows.filter(
+        row => row.declared_proof_expectation.declaration_source === 'explicit-proof-expectations'
+      ).length,
     },
   };
 }
@@ -1045,6 +1136,7 @@ function summarizeCoverageRows(coverageRows = []) {
     rows_with_behavioral_contrast_surface: 0,
     rows_with_output_contract_surface: 0,
     rows_with_declared_row_proof_alignment: 0,
+    rows_with_explicit_proof_expectations: 0,
   };
 
   for (const row of coverageRows) {
@@ -1061,6 +1153,9 @@ function summarizeCoverageRows(coverageRows = []) {
     if (row.behavioral_contrast_surface?.pass) summary.rows_with_behavioral_contrast_surface += 1;
     if (row.output_contract_surface?.pass) summary.rows_with_output_contract_surface += 1;
     if (row.declared_proof_expectation_check?.pass) summary.rows_with_declared_row_proof_alignment += 1;
+    if (row.declared_proof_expectation?.declaration_source === 'explicit-proof-expectations') {
+      summary.rows_with_explicit_proof_expectations += 1;
+    }
   }
 
   return summary;
