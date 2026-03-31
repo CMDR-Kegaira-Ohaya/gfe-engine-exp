@@ -165,11 +165,11 @@
       "target_state": "full",
       "required_fixture_classes": ["golden", "contrast", "anti-collapse", "integration"],
       "runtime_surface": "solver/failure.js plastic-deformation grammar candidate",
-      "packs": ["failure_split.json", "failure_plastic_deformation_anti_collapse.json", "failure_plastic_deformation_integration.json"],
-      "fixture_ids": ["FX-FAIL-02", "FX-FAIL-10", "FX-INT-13"],
+      "packs": ["failure_plastic_deformation_golden.json", "failure_split.json", "failure_plastic_deformation_anti_collapse.json", "failure_plastic_deformation_integration.json"],
+      "fixture_ids": ["FX-FAIL-PLA-G01", "FX-FAIL-02", "FX-FAIL-10", "FX-INT-13"],
       "notes": [
         "Plastic deformation is executable and contrast-tested against transient stress.",
-        "Dedicated anti-collapse and integration surfaces are present.",
+        "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
         "It remains partial because the fuller corpus and invariant depth required for full are still missing."
       ],
       "proof_expectations": {
@@ -296,8 +296,8 @@
         "Local vs distributed Leg persistence is solver-operative and hard-gated.",
         "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
         "Still requires fuller corpus and invariant depth before full."
-      ],
-      "proof_expectations": {
+      }
+      ,"proof_expectations": {
         "mode": "explicit-row-proof-v1",
         "behavioral_contrast_surface_required": true,
         "output_contract_surface_required": true,

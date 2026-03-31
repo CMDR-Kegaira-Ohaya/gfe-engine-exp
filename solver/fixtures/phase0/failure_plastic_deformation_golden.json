@@ -1,0 +1,110 @@
+{
+  "version": "0.1.0",
+  "canon": "v15.7",
+  "mode": "phase0-audit",
+  "fixture_pack": "failure-plastic-deformation-golden",
+  "notes": [
+    "This pack starts the row-scoped golden corpus for FAILURE_PLASTIC_DEFORMATION.",
+    "It provides a stable single-case witness that can be declared alongside the contrast, anti-collapse, and integration surfaces already present in Phase 0.",
+    "The current seed reuses the preserved plastic-deformation frame so declaration blockers can be cleared without inventing a divergent runtime surface."
+  ],
+  "fixtures": [
+    {
+      "id": "FX-FAIL-PLA-G01",
+      "row": "FAILURE_PLASTIC_DEFORMATION",
+      "kind": "single",
+      "fixture_class": "golden",
+      "purpose": "Stable plastic-deformation witness for FAILURE_PLASTIC_DEFORMATION golden coverage.",
+      "assertions": [
+        "path_exists:timeline.0.participants.p2.failure.primary",
+        "path_exists:timeline.0.participants.p2.failure.grammars.plastic-deformation",
+        "path_exists:timeline.0.participants.p2._canonical_axes.Cfg",
+        "path_exists:timeline.0.participants.p2.prevalence",
+        "path_exists:timeline.0.participants.p2.envelope.status"
+      ],
+      "case_data": {
+        "system_name": "fx-fail-pla-g01-plastic-golden",
+        "participants": [
+          { "id": "p1", "name": "P1" },
+          { "id": "p2", "name": "P2" },
+          { "id": "p3", "name": "P3" }
+        ],
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" },
+                  "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" },
+                  "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" },
+                  "Dir": { "A": 83, "R": 83, "I": 83, "sigma": "L" },
+                  "Leg": { "A": 79, "R": 79, "I": 79, "sigma": "L" }
+                }
+              },
+              "p2": {
+                "axes": {
+                  "Cfg": { "A": 20, "R": 28, "I": 90, "sigma": "M" },
+                  "Emb": { "A": 36, "R": 36, "I": 72, "sigma": "M" },
+                  "Org": { "A": 32, "R": 32, "I": 70, "sigma": "M" },
+                  "Dir": { "A": 20, "R": 24, "I": 85, "sigma": "M" },
+                  "Leg": { "A": 30, "R": 34, "I": 74, "sigma": "M" }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": { "A": 18, "R": 18, "I": 18, "sigma": "L" },
+                  "Emb": { "A": 22, "R": 22, "I": 22, "sigma": "L" },
+                  "Org": { "A": 20, "R": 20, "I": 20, "sigma": "L" },
+                  "Dir": { "A": 19, "R": 19, "I": 19, "sigma": "L" },
+                  "Leg": { "A": 21, "R": 21, "I": 21, "sigma": "L" }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Org",
+            "alpha_medium": "p3.Org",
+            "alpha_receiving": "p2.Cfg",
+            "sigma": "M",
+            "axis": "Cfg",
+            "unfolding": "accumulated",
+            "register": "retained",
+            "mode": "load",
+            "magnitude": 0.78
+          },
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Dir",
+            "alpha_medium": "p3.Dir",
+            "alpha_receiving": "p2.Dir",
+            "sigma": "M",
+            "axis": "Dir",
+            "unfolding": "accumulated",
+            "register": "retained",
+            "mode": "load",
+            "magnitude": 0.76
+          },
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Leg",
+            "alpha_medium": "p3.Leg",
+            "alpha_receiving": "p2.Leg",
+            "sigma": "M",
+            "axis": "Leg",
+            "unfolding": "accumulated",
+            "register": "retained",
+            "mode": "load",
+            "magnitude": 0.72
+          }
+        ],
+        "analysis": {
+          "key_finding": "Golden plastic-deformation-preserved witness for failure-grammar handling."
+        }
+      }
+    }
+  ]
+}
