@@ -170,6 +170,7 @@
 │   ├── payload.js
 │   ├── phase0-audit.js
 │   ├── phase0-contract-preflight.js
+│   ├── phase0-executable-gap-report.js
 │   ├── phase0-post-golden-blockers.js
 │   ├── phase0-proof-expectations-audit.js
 │   ├── phase0-readiness.js
