@@ -124,6 +124,7 @@
 │   │       ├── core_integration.json
 │   │       ├── coverage_rows.json
 │   │       ├── face_anti_collapse.json
+│   │       ├── face_golden.json
 │   │       ├── face_integration.json
 │   │       ├── face_split.json
 │   │       ├── failure_collapse_anti_collapse.json
