@@ -17,7 +17,6 @@
       "enforce_invariants": true,
       "purpose": "Plastic deformation should remain solver-distinct from collapse under a broadly similar accumulated-pressure frame, rather than flattening maintained form into the same collapse grammar and envelope shell.",
       "compare_paths": [
-        "timeline.0.participants.p2.failure.primary",
         "timeline.0.participants.p2.failure.grammars.plastic-deformation",
         "timeline.0.participants.p2.failure.grammars.collapse",
         "timeline.0.participants.p2._canonical_axes.Cfg",

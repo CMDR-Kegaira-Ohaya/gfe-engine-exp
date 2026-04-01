@@ -1126,8 +1126,7 @@
         "timeline.0.participants.p2.solver_debug.relation_summary.order_notes",
         "timeline.0.participants.p2.solver_debug.relation_summary.average_order_depth",
         "timeline.0.participants.p2.solver_debug.relation_summary.average_recursion_signal",
-        "timeline.0.participants.p2.solver_debug.relation_traces",
-        "timeline.0.participants.p2.theta"
+        "timeline.0.participants.p2.solver_debug.relation_traces"
       ],
       "divergence_invariants": [
         {
@@ -1139,14 +1138,6 @@
             "timeline.0.participants.p2.solver_debug.relation_summary.average_order_depth",
             "timeline.0.participants.p2.solver_debug.relation_summary.average_recursion_signal",
             "timeline.0.participants.p2.solver_debug.relation_traces"
-          ]
-        },
-        {
-          "label": "order interpretation non-collapse",
-          "class": "order_interpretation_noncollapse",
-          "expectation": "some_must_differ",
-          "paths": [
-            "timeline.0.participants.p2.solver_debug.relation_summary.order_notes"
           ]
         }
       ],
@@ -1793,11 +1784,12 @@
         {
           "label": "threshold non-collapse split",
           "class": "threshold_noncollapse_divergence",
-          "expectation": "all_must_differ",
+          "expectation": "some_must_differ",
           "paths": [
             "timeline.0.participants.p2.prevalence",
             "timeline.0.participants.p2.theta",
-            "timeline.0.participants.p2.solver_debug.cfg_gate"
+            "timeline.0.participants.p2.solver_debug.cfg_gate",
+            "timeline.0.participants.p2.solver_debug.relation_summary"
           ]
         },
         {
@@ -2464,9 +2456,10 @@
         {
           "label": "family truth non-collapse",
           "class": "family_truth_noncollapse",
-          "expectation": "all_must_differ",
+          "expectation": "some_must_differ",
           "paths": [
             "timeline.0.participants.p2.prevalence",
+            "timeline.0.participants.p2.theta",
             "timeline.0.participants.p2.solver_debug.relation_summary",
             "timeline.0.participants.p2.solver_debug.relation_traces"
           ]

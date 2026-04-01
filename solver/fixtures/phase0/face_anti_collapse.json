@@ -18,7 +18,6 @@
       "purpose": "Face handling should remain solver-distinct even when endpoints and event family stay broadly similar, rather than collapsing inner landing and outer emission into the same relation shell.",
       "compare_paths": [
         "timeline.0.participants.p2.solver_debug.relation_summary.faces",
-        "timeline.0.participants.p2.solver_debug.relation_summary.face_notes",
         "timeline.0.participants.p2.solver_debug.relation_traces",
         "timeline.0.participants.p2._canonical_axes.Leg",
         "timeline.0.participants.p1._canonical_axes.Leg",

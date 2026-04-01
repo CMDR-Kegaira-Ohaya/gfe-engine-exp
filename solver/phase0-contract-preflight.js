@@ -133,7 +133,14 @@ function evaluateContractRow(rowId, coverageRowMap = new Map(), fixtureIdMap = n
     .map(fixtureId => fixtureIdMap.get(fixtureId) || null)
     .filter(Boolean);
   const declared_fixture_classes_present = Array.from(
-    new Set(declared_fixture_records.map(record => record.fixture_class).filter(Boolean))
+    new Set(
+      declared_fixture_records.flatMap(record => {
+        const classes = [];
+        if (record.kind === 'contrast') classes.push('contrast');
+        if (record.fixture_class) classes.push(record.fixture_class);
+        return classes;
+      }).filter(Boolean)
+    )
   ).sort();
   const missing_fixture_classes = REQUIRED_FIXTURE_CLASSES.filter(
     fixtureClass => !declared_fixture_classes_present.includes(fixtureClass)

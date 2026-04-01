@@ -218,6 +218,7 @@ function buildRowAggregation(fixtures = []) {
 
     const entry = rowMap.get(row);
     entry.fixture_ids.add(fixture.id || '(unknown-fixture)');
+    if (fixture.kind === 'contrast') entry.fixture_classes.add('contrast');
     if (fixture.fixture_class) entry.fixture_classes.add(fixture.fixture_class);
     if (fixture.fixture_pack) entry.packs.add(fixture.fixture_pack);
     if (fixture.file) entry.files.add(fixture.file);
@@ -880,9 +881,11 @@ function evaluateRowPromotionGates(coverageRows = [], fixtures = [], crossPhaseC
     const antiCollapseFixtures = rowFixtures.filter(
       fixture => fixture.fixture_class === 'anti-collapse'
     );
+    const antiCollapseHardGatedFailures = antiCollapseFixtures.filter(
+      fixture => fixture.hard_gated_failure
+    ).length;
     const nonCollapsePass =
-      antiCollapseFixtures.length > 0 &&
-      antiCollapseFixtures.every(fixture => fixture.hard_gated_failure !== true);
+      antiCollapseFixtures.length > 0 && antiCollapseHardGatedFailures === 0;
     const declared_proof_expectation = buildDeclaredRowProofExpectation(row, fixtureIdMap);
     const declared_proof_expectation_check = evaluateDeclaredRowProofExpectation(
       row,
@@ -935,7 +938,10 @@ function evaluateRowPromotionGates(coverageRows = [], fixtures = [], crossPhaseC
       non_collapse_proof: {
         pass: nonCollapsePass,
         observed_fixture_classes: row.observed_fixture_classes,
-        hard_gated_failures: row.hard_gated_failures,
+        anti_collapse_fixture_ids: antiCollapseFixtures.map(
+          fixture => fixture.id || '(unknown-fixture)'
+        ),
+        hard_gated_failures: antiCollapseHardGatedFailures,
       },
       old_runtime_independence: {
         pass: oldRuntimeIndependencePass,

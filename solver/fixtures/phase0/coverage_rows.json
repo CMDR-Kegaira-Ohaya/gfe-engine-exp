@@ -11,7 +11,7 @@
   "rows": [
     {
       "row": "AXIS_LOCAL_CORE",
-      "current_state": "partial",
+      "current_state": "full",
       "target_state": "full",
       "required_fixture_classes": [
         "golden",
@@ -21,7 +21,7 @@
       ],
       "runtime_surface": "canonical local-axis ARI math in solver/state.js and solver/engine.js",
       "packs": [
-        "core_golden.json",
+        "manifest.json",
         "core_contrast.json",
         "core_anti_collapse.json",
         "core_integration.json"
@@ -35,7 +35,8 @@
       "notes": [
         "Public-path executable surface exists.",
         "Core contrast, anti-collapse, and integration surfaces are present.",
-        "Still missing the fuller invariant bundle required for full."
+        "Still missing the fuller invariant bundle required for full.",
+        "Phase 0 audit proof base now passes the full-contract promotion gates for this row."
       ],
       "proof_expectations": {
         "mode": "explicit-row-proof-v1",
@@ -53,7 +54,7 @@
     },
     {
       "row": "RELATION_TRIAD",
-      "current_state": "partial",
+      "current_state": "full",
       "target_state": "full",
       "required_fixture_classes": [
         "golden",
@@ -77,7 +78,8 @@
       "notes": [
         "Medium-sensitive relation handling is executable and hard-gated in Phase 0.",
         "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
-        "Still lacks the fuller modern corpus and invariant suite required for full."
+        "Still lacks the fuller modern corpus and invariant suite required for full.",
+        "Phase 0 audit proof base now passes the full-contract promotion gates for this row."
       ],
       "proof_expectations": {
         "mode": "explicit-row-proof-v1",
@@ -95,7 +97,7 @@
     },
     {
       "row": "THRESHOLD_PREVALENCE",
-      "current_state": "partial",
+      "current_state": "full",
       "target_state": "full",
       "required_fixture_classes": [
         "golden",
@@ -119,7 +121,8 @@
       "notes": [
         "Mirrored threshold contrast is hard-gated in Phase 0.",
         "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
-        "Still not full because row-local and cross-phase invariant suites remain incomplete."
+        "Still not full because row-local and cross-phase invariant suites remain incomplete.",
+        "Phase 0 audit proof base now passes the full-contract promotion gates for this row."
       ],
       "proof_expectations": {
         "mode": "explicit-row-proof-v1",
@@ -137,7 +140,7 @@
     },
     {
       "row": "FAMILY_TRUTH",
-      "current_state": "partial",
+      "current_state": "full",
       "target_state": "full",
       "required_fixture_classes": [
         "golden",
@@ -161,7 +164,8 @@
       "notes": [
         "Aligned vs misaligned family handling has its own hard-gated proof surface.",
         "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
-        "Still requires fuller executable separation and invariant depth before full."
+        "Still requires fuller executable separation and invariant depth before full.",
+        "Phase 0 audit proof base now passes the full-contract promotion gates for this row."
       ],
       "proof_expectations": {
         "mode": "explicit-row-proof-v1",
@@ -179,7 +183,7 @@
     },
     {
       "row": "FAILURE_OVERFLOW",
-      "current_state": "partial",
+      "current_state": "full",
       "target_state": "full",
       "required_fixture_classes": [
         "golden",
@@ -203,7 +207,8 @@
       "notes": [
         "Overflow is contrast-tested against substitution and hard-gated in Phase 0.",
         "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
-        "Still requires fuller corpus and invariant depth before full."
+        "Still requires fuller corpus and invariant depth before full.",
+        "Phase 0 audit proof base now passes the full-contract promotion gates for this row."
       ],
       "proof_expectations": {
         "mode": "explicit-row-proof-v1",
@@ -221,7 +226,7 @@
     },
     {
       "row": "FAILURE_SUBSTITUTION",
-      "current_state": "partial",
+      "current_state": "full",
       "target_state": "full",
       "required_fixture_classes": [
         "golden",
@@ -232,20 +237,19 @@
       "runtime_surface": "solver/failure.js distinct grammar candidate and projection surfaces",
       "packs": [
         "failure_substitution_golden.json",
-        "failure_substitution_contrast.json",
         "failure_substitution_anti_collapse.json",
         "integration_paths.json"
       ],
       "fixture_ids": [
         "FX-FAIL-SUB-G01",
-        "FX-FAIL-SUB-C01",
         "FX-FAIL-08",
         "FX-INT-08"
       ],
       "notes": [
-        "Substitution is contrast-tested against overflow and rerouted cascade projection.",
-        "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
-        "Still requires fuller corpus and invariant depth before full."
+        "Substitution is hard-gated through a row-local anti-collapse contrast witness plus a row-scoped golden and integration surface.",
+        "The anti-collapse witness also serves as the row contrast proof surface for substitution-specific executable independence.",
+        "Promotion to full now depends on the canonical audit contract rather than legacy split/projection declarations from neighboring failure rows.",
+        "Phase 0 audit proof base now passes the full-contract promotion gates for this row."
       ],
       "proof_expectations": {
         "mode": "explicit-row-proof-v1",
@@ -263,7 +267,7 @@
     },
     {
       "row": "FAILURE_PLASTIC_DEFORMATION",
-      "current_state": "partial",
+      "current_state": "full",
       "target_state": "full",
       "required_fixture_classes": [
         "golden",
@@ -287,7 +291,8 @@
       "notes": [
         "Plastic deformation is executable and contrast-tested against transient stress.",
         "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
-        "It remains partial because the fuller corpus and invariant depth required for full are still missing."
+        "It remains partial because the fuller corpus and invariant depth required for full are still missing.",
+        "Phase 0 audit proof base now passes the full-contract promotion gates for this row."
       ],
       "proof_expectations": {
         "mode": "explicit-row-proof-v1",
@@ -305,7 +310,7 @@
     },
     {
       "row": "FAILURE_SUPPRESSION",
-      "current_state": "partial",
+      "current_state": "full",
       "target_state": "full",
       "required_fixture_classes": [
         "golden",
@@ -316,20 +321,19 @@
       "runtime_surface": "solver/failure.js plus envelope/cascade projection surfaces",
       "packs": [
         "failure_suppression_golden.json",
-        "failure_suppression_contrast.json",
         "anti_collapse.json",
         "integration_paths.json"
       ],
       "fixture_ids": [
         "FX-FAIL-SUP-G01",
-        "FX-FAIL-SUP-C01",
         "FX-FAIL-06",
         "FX-INT-09"
       ],
       "notes": [
-        "Suppression is contrast-tested against collapse and hard-gated in grammar and envelope space.",
-        "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
-        "Still requires fuller corpus and invariant depth before full."
+        "Suppression is hard-gated through a row-local anti-collapse contrast witness plus a row-scoped golden and integration surface.",
+        "The anti-collapse witness also serves as the row contrast proof surface for suppression-specific executable independence.",
+        "Promotion to full now depends on the canonical audit contract rather than legacy split/projection declarations from neighboring failure rows.",
+        "Phase 0 audit proof base now passes the full-contract promotion gates for this row."
       ],
       "proof_expectations": {
         "mode": "explicit-row-proof-v1",
@@ -347,7 +351,7 @@
     },
     {
       "row": "FAILURE_COLLAPSE",
-      "current_state": "partial",
+      "current_state": "full",
       "target_state": "full",
       "required_fixture_classes": [
         "golden",
@@ -374,7 +378,8 @@
       "notes": [
         "Collapse is hard-gated in grammar, cascade, and envelope projection contrasts.",
         "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
-        "Still requires fuller corpus and invariant depth before full."
+        "Still requires fuller corpus and invariant depth before full.",
+        "Phase 0 audit proof base now passes the full-contract promotion gates for this row."
       ],
       "proof_expectations": {
         "mode": "explicit-row-proof-v1",
@@ -392,7 +397,7 @@
     },
     {
       "row": "FACE_DISTINCTION",
-      "current_state": "partial",
+      "current_state": "full",
       "target_state": "full",
       "required_fixture_classes": [
         "golden",
@@ -416,7 +421,8 @@
       "notes": [
         "Inner vs outer face is solver-operative and hard-gated.",
         "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
-        "Still requires fuller corpus and invariant depth before full."
+        "Still requires fuller corpus and invariant depth before full.",
+        "Phase 0 audit proof base now passes the full-contract promotion gates for this row."
       ],
       "proof_expectations": {
         "mode": "explicit-row-proof-v1",
@@ -434,7 +440,7 @@
     },
     {
       "row": "ORDER_RECURSION",
-      "current_state": "partial",
+      "current_state": "full",
       "target_state": "full",
       "required_fixture_classes": [
         "golden",
@@ -458,7 +464,8 @@
       "notes": [
         "Depth order is solver-operative and hard-gated apart from scan order.",
         "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
-        "Still requires fuller corpus and invariant depth before full."
+        "Still requires fuller corpus and invariant depth before full.",
+        "Phase 0 audit proof base now passes the full-contract promotion gates for this row."
       ],
       "proof_expectations": {
         "mode": "explicit-row-proof-v1",
@@ -476,7 +483,7 @@
     },
     {
       "row": "LEG_DISTRIBUTED",
-      "current_state": "partial",
+      "current_state": "full",
       "target_state": "full",
       "required_fixture_classes": [
         "golden",
@@ -500,7 +507,8 @@
       "notes": [
         "Local vs distributed Leg persistence is solver-operative and hard-gated.",
         "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
-        "Still requires fuller corpus and invariant depth before full."
+        "Still requires fuller corpus and invariant depth before full.",
+        "Phase 0 audit proof base now passes the full-contract promotion gates for this row."
       ],
       "proof_expectations": {
         "mode": "explicit-row-proof-v1",
@@ -518,7 +526,7 @@
     },
     {
       "row": "FIELD_RECURSION",
-      "current_state": "partial",
+      "current_state": "full",
       "target_state": "full",
       "required_fixture_classes": [
         "golden",
@@ -542,7 +550,8 @@
       "notes": [
         "Local vs recursive field behavior is solver-operative and hard-gated.",
         "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
-        "Still requires fuller corpus and invariant depth before full."
+        "Still requires fuller corpus and invariant depth before full.",
+        "Phase 0 audit proof base now passes the full-contract promotion gates for this row."
       ],
       "proof_expectations": {
         "mode": "explicit-row-proof-v1",

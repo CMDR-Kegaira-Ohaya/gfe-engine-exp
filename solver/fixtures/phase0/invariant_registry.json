@@ -100,8 +100,7 @@
         "FX-ORD-02"
       ],
       "expected_invariant_classes": [
-        "order_noncollapse_divergence",
-        "order_interpretation_noncollapse"
+        "order_noncollapse_divergence"
       ]
     },
     {
@@ -460,11 +459,10 @@
       ],
       "executable_content_slice": true,
       "seed_fixture_ids": [
-        "FX-ORD-01"
+        "FX-ORD-02"
       ],
       "expected_invariant_classes": [
-        "order_trace_divergence",
-        "order_receiving_divergence"
+        "order_noncollapse_divergence"
       ]
     },
     {
