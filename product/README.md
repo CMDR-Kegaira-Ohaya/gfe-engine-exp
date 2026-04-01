@@ -1,6 +1,12 @@
 # Product area
 
-This is  the quarantined product zone for new GUI/app work in this repo.
+This is the quarantined product zone for new GUI/app work in this repo.
+
+## Canonical product shell
+
+- `/product/` is the canonical product app shell.
+- the repo root (``/``) is the canonical public entry and redirects here
+- legacy `pworkbench-v3.html` paths should be treated as redirect/compatibility surfaces, not as a second live product
 
 Working rules:
 - keep core material outside this area
