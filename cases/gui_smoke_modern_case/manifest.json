@@ -4,5 +4,12 @@
   "slug": "gui_smoke_modern_case",
   "current_case_source": "./source/case.md",
   "current_encoding": "./revisions/rev_smoke_v1/encoding.json",
-  "current_narrative": "./readings/current_model_reading.md"
+  "current_narrative": "./readings/current_model_reading.md",
+  "provenance": {
+    "class": "demo/smoke",
+    "solver_certified": false,
+    "solve_output_path": null,
+    "solve_run_ref": null,
+    "note": "GUI smoke case for interface/runtime verification. Not a solver-certified case output."
+  }
 }

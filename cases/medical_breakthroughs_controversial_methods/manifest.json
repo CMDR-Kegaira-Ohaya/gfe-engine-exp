@@ -3,5 +3,12 @@
   "title": "Medical breakthroughs and controversial methods",
   "slug": "medical_breakthroughs_controversial_methods",
   "current_case_source": "./source/case.md",
-  "current_encoding": "./revisions/rev_migrated_root/encoding.json"
+  "current_encoding": "./revisions/rev_migrated_root/encoding.json",
+  "provenance": {
+    "class": "unknown/unspecified",
+    "solver_certified": false,
+    "solve_output_path": null,
+    "solve_run_ref": null,
+    "note": "Migrated package present in repo. Explicit solver provenance is not declared in this manifest."
+  }
 }

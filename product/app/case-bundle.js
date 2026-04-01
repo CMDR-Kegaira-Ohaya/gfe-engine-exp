@@ -6,6 +6,7 @@ export async function loadCasesIndex() {
       const manifest = await fetchJson(entry.manifestPath);
       const caseBaseUrl = new URL('./', new URL(entry.manifestPath, window.location.href));
       const manifestRepoPath = repoPathFromCatalogPath(entry.manifestPath);
+      const provenance = normalizeProvenance(manifest, manifestRepoPath);
 
       return {
         slug: manifest.slug || manifest.case_id,
@@ -13,6 +14,7 @@ export async function loadCasesIndex() {
         summary: manifest.summary || 'Case bundle',
         manifest,
         manifestPath: entry.manifestPath,
+        provenance,
         repoPaths: {
           manifest: manifestRepoPath,
           source: manifest.current_case_source
@@ -20,6 +22,9 @@ export async function loadCasesIndex() {
             : null,
           encoding: manifest.current_encoding
             ? resolveRepoRelativePath(manifestRepoPath, manifest.current_encoding)
+            : null,
+          solve: provenance.solveOutputPath
+            ? resolveRepoRelativePath(manifestRepoPath, provenance.solveOutputPath)
             : null,
           narrative: manifest.current_narrative
             ? resolveRepoRelativePath(manifestRepoPath, manifest.current_narrative)
@@ -31,6 +36,9 @@ export async function loadCasesIndex() {
             : null,
           encoding: manifest.current_encoding
             ? new URL(manifest.current_encoding, caseBaseUrl).href
+            : null,
+          solve: provenance.solveOutputPath
+            ? new URL(provenance.solveOutputPath, caseBaseUrl).href
             : null,
           narrative: manifest.current_narrative
             ? new URL(manifest.current_narrative, caseBaseUrl).href
@@ -59,6 +67,11 @@ export async function loadCaseBundle(slug, entries) {
     entry.paths.narrative ? fetchText(entry.paths.narrative) : Promise.resolve(''),
   ]);
 
+  const provenance = entry.provenance || normalizeProvenance(entry.manifest, entry.repoPaths?.manifest);
+  const structuralStatus = encoding
+    ? (provenance.solverCertified ? 'solver-certified' : 'provisional')
+    : 'absent';
+
   return {
     identity: {
       slug: entry.slug,
@@ -66,13 +79,14 @@ export async function loadCaseBundle(slug, entries) {
       synopsis: entry.summary,
     },
     status: {
-      structural: encoding ? 'provisional' : 'absent',
+      structural: structuralStatus,
       artifacts: {
         source: Boolean(entry.paths.source),
         encoding: Boolean(entry.paths.encoding),
-        solve: false,
+        solve: Boolean(entry.paths.solve || provenance.solveOutputPath),
         narrative: Boolean(entry.paths.narrative),
       },
+      provenance,
     },
     manifest: entry.manifest,
     repoPaths: entry.repoPaths,
@@ -94,6 +108,29 @@ export async function loadCaseBundle(slug, entries) {
       structureToNarrative: [],
       sourceToNarrative: [],
     },
+  };
+}
+
+function normalizeProvenance(manifest, manifestRepoPath = '') {
+  const block = manifest?.provenance || {};
+  const provenanceClass = String(
+    block.class || (block.solver_certified ? 'solver-certified' : 'unknown/unspecified'),
+  );
+  const solverCertified = Boolean(block.solver_certified);
+  const solveOutputPath = block.solve_output_path || manifest?.current_solve_output || null;
+  const solveRunRef = block.solve_run_ref || null;
+  const note = block.note
+    || (solverCertified
+      ? 'Solver-certified provenance declared in manifest.'
+      : 'Solver provenance not declared or not certified in manifest.');
+
+  return {
+    class: provenanceClass,
+    solverCertified,
+    solveOutputPath,
+    solveRunRef,
+    note,
+    manifestRepoPath,
   };
 }
 

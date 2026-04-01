@@ -5,5 +5,12 @@
   "summary": "Legacy v12.7 demo case rebuilt with a fresh citations base and a 15.7 comparison reading.",
   "current_case_source": "./source/case.md",
   "current_encoding": "./revisions/rev_2026_04_01_v15_7_demo/encoding.json",
-  "current_narrative": "./readings/current_model_reading.md"
+  "current_narrative": "./readings/current_model_reading.md",
+  "provenance": {
+    "class": "solver-compatible",
+    "solver_certified": false,
+    "solve_output_path": null,
+    "solve_run_ref": null,
+    "note": "Hand-authored demo encoding for product/UI testing. Solver-compatible, but not a solver-certified case output."
+  }
 }
