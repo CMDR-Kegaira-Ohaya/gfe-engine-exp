@@ -1,4 +1,4 @@
-# GFE Engine Exp — Core Repo
+# GFE Engine Exp — Core Repo.
 
 This repo is now a core-first repo for GFE material, with a quarantined product area for new GUI/app work under `/product/`.
 
