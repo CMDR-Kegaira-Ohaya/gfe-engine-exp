@@ -118,7 +118,8 @@
 │   │   ├── repo-panel.js
 │   │   ├── specified-view-enhanced.js
 │   │   ├── specified-view.js
-│   │   └── styles.css
+│   │   ├── styles.css
+│   │   └── ux-overrides.css
 │   ├── workflows/
 │   │   ├── README.md
 │   │   └── REPO_INTEGRATION.md
