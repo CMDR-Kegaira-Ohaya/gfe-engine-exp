@@ -4,6 +4,12 @@ This repo is now a core-first repo for GFE material, with a quarantined product 
 
 See `TOC.md` for the current auto-generated repository map
 
+## Canonical public entry
+
+- The canonical public/live product entry is the repo root (`/`), which redirects to `/product/`.
+- `/product/` is the canonical product app shell.
+- `workbench-v3.html` is a legacy path and now redirects to the canonical product app to avoid split public surfaces.
+
 ## What is kept here
 
 - `/engine/` — canonical GFE source texts
