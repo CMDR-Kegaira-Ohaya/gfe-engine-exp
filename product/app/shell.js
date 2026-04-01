@@ -15,12 +15,16 @@ export function createShell(root) {
       </header>
 
       <main class="layout">
-        <aside class="panel sidebar">
-          <div class="panel-head">
-            <h2>Overall View</h2>
-            <p>Choose a case, then inspect the whole transformed case map.</p>
-          </div>
-          <div id="case-list" class="case-list"></div>
+        <aside class="left-column">
+          <section class="panel sidebar">
+            <div class="panel-head">
+              <h2>Overall View</h2>
+              <p>Choose a case, then inspect the whole transformed case map.</p>
+            </div>
+            <div id="case-list" class="case-list"></div>
+          </section>
+
+          <section id="documents-panel" class="panel documents-panel sidebar-documents"></section>
         </aside>
 
         <section class="center-column">
@@ -41,8 +45,17 @@ export function createShell(root) {
 
         <aside class="right-column">
           <section id="context-panel" class="panel context-panel"></section>
-          <section id="documents-panel" class="panel documents-panel"></section>
-          <section id="repo-panel" class="panel repo-panel"></section>
+
+          <details class="panel repo-panel-shell">
+            <summary class="repo-shell-summary">
+              <div>
+                <div class="eyebrow">Utility</div>
+                <strong>Repo tools</strong>
+              </div>
+              <span class="muted">Collapsed by default</span>
+            </summary>
+            <div id="repo-panel" class="repo-panel"></div>
+          </details>
         </aside>
       </main>
     </div>
