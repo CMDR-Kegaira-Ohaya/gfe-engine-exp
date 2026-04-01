@@ -47,7 +47,8 @@
 │   │   └── manifest.json
 │   ├── honeybee_colony_collapse_demo/
 │   │   ├── source/
-│   │   │   └── case.md
+│   │   │   ├── case.md
+│   │   │   └── sources.md
 │   │   └── manifest.json
 │   ├── medical_breakthroughs_controversial_methods/
 │   │   ├── revisions/
