@@ -228,6 +228,7 @@
 │       │   │   ├── 23_SLICE_VALIDATION_STATUS_2026-03-29.md
 │       │   │   ├── 24_SOLVER_COVERAGE_PROGRAM_v15_7.md
 │       │   │   ├── 25_SOLVER_COVERAGE_CONTRACT_v15_7.md
+│       │   │   ├── 26_CASE_PROVENANCE_POLICY_v15_7.md
 │       │   │   ├── GFE_VisualCodex.md
 │       │   │   └── gui_confirmed_findings_2026-03-26.md
 │       │   └── 00_INDEX.md
