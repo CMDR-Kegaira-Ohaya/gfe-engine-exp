@@ -1,0 +1,9 @@
+{
+  "case_id": "honeybee_colony_collapse_demo",
+  "title": "Honeybee colony collapse disorder (demo case)",
+  "slug": "honeybee_colony_collapse_demo",
+  "summary": "Legacy v12.7 demo case rebuilt with a fresh citations base and a 15.7 comparison reading.",
+  "current_case_source": "./source/case.md",
+  "current_encoding": "./revisions/rev_2026_04_01_v15_7_demo/encoding.json",
+  "current_narrative": "./readings/current_model_reading.md"
+}
