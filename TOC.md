@@ -46,6 +46,8 @@
 │   │   │   └── case.md
 │   │   └── manifest.json
 │   ├── honeybee_colony_collapse_demo/
+│   │   ├── readings/
+│   │   │   └── current_model_reading.md
 │   │   ├── source/
 │   │   │   ├── case.md
 │   │   │   └── sources.md
