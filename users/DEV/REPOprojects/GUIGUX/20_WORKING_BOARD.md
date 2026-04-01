@@ -6,15 +6,17 @@ Purpose: keep the DEV GUI/UX lane aligned, implementable, and drift-resistant.
 
 If anything in this file conflicts with `10_SCOPE_LOCK_PIPELINE.md`, the scope lock wins.
 
-Last updated: 2026-03-28
+Last updated: 2026-04-01
 
 ---
 
 ## Lane posture (locked)
 
-- Current lane: **user-visible polish + projection correctness**
+- Current lane: **user-visible product closure + projection correctness**
 - Solver authority on structure remains **absolute** (GUI is projection).
-- No architecture churn: stay UI-surface and workflow-level unless a repo map explicitly requires deeper changes.
+- No architecture churn: stay UI-surface and workflow-level unless the repo map explicitly requires deeper changes.
+- Solver coverage and the Phase 0 proof base are now treated as **closed inputs on current main**, not as the active work lane.
+- Do not reopen solver-rescue work unless a concrete repo-visible contradiction appears.
 
 See: `10_SCOPE_LOCK_PIPELINE.md` → [GUIGUX_PIPELINE_CONTRACT] and [GUIGUX_GUI_PROJECTION_CONTRACT]
 
@@ -22,108 +24,89 @@ See: `10_SCOPE_LOCK_PIPELINE.md` → [GUIGUX_PIPELINE_CONTRACT] and [GUIGUX_GUI_
 
 ## North star UX (locked)
 
-### One viewport, step-zoom navigation
+### One viewport, stable orientation, whole before commentary
 
-Replace “100 panels and drawers” with **one primary viewport** the user navigates by **discrete zoom steps**:
+The user should be able to:
+1) open the studied case as a whole transformed map
+2) keep orientation while changing reading mode
+3) inspect a target without losing the whole
+4) keep source and narrative as companion surfaces, not replacements for the map
 
-1) **Galaxy** (cases as stars)
-2) **System** (within-case map / Case Space)
-3) **Moment** (timestep neighborhood)
-4) **Target** (one node/link focus)
-5) **Deep** (encoding + tables, on demand only)
-
-The user always knows:
-- where they are (breadcrumb / zoom stack)
-- what is selected (focus card)
-- what actions apply (pin / trace / layers)
+The user should always know:
+- where they are
+- what is selected
+- what actions apply
+- which surface is primary
 
 ### Stable documents contract (do not break)
 
-Documents panel remains stable and does **not** follow map clicks:
+Documents remain stable and do **not** hijack the main view:
 - Full case (source)
-- Full result (synthesized)
+- Full result (synthesized reading)
 
-Map clicks feed **Focus Inspector** (and visual highlights), not documents replacement.
+Map clicks feed focus/inspection behavior, not document replacement.
 
 ---
 
-## Interaction contracts (copy from Elite-style maps)
+## Interaction contracts (keep)
 
 ### Inspect vs Pin (two states)
 
-- Inspect (temporary): click/hover previews, no global commitment.
-- Pin (target): locks focus; atlas/timeline/inspector follow until cleared.
+- Inspect: temporary local focus
+- Pin: retained target focus until cleared
 
-### Layers (reduce clutter without removing detail)
+### Layers (reduce clutter without changing truth)
 
-Viewport shows only enabled layers (toggle set):
-- nodes (actors / entities)
+Viewport shows only enabled layers:
+- nodes / entities
 - encounters / links
-- payload primitives (optional)
-- “has sources” / “no sources” coverage (optional)
+- payload-bearing structures when appropriate
+- optional source/evidence overlays
 
-### Trace mode (route planning analogue)
+### Trace mode
 
-Explicit mode that highlights paths:
-- trace actor across timeline
-- trace encounter chain
-- trace interference propagation
+Explicit mode that follows continuity/pathing without replacing the main map.
 
 ---
 
-## Implementation plan (current)
+## Current implementation plan
 
-### Phase 0 — prep / guardrails (done)
+### Phase 0 — foundation / solver closure (done)
 
-- Workbench v3 layout sanity: fit 1920×1080 at 100% zoom (no forced page zoom)
-- Layout Debug HUD exists for precise remote diagnosis
-- Case Map overlay exists (system-level table-map) with selection highlighting
+- solver coverage board now reports full on the current v15.7 contract
+- Phase 0 blocker/audit rescue is no longer the active lane
+- repo-aware bridge and verified write path exist
+- treat this as settled input unless a concrete contradiction appears
 
-### Phase 1 — Galaxy MVP (start now)
+### Phase 1 — public product closure (active now)
 
-Goal: add a **Galaxy** tab that renders **cases as stars** from `catalog/index.json`.
+Goal: make the public product surface clearly and credibly present solved structure.
 
-Minimum behaviors:
-- Render stable star positions (deterministic by slug; no reshuffle).
-- Click star → inspect (focus card in-viewport).
-- Double-click star → open case and transition to **System** (Case map tab).
-- Breadcrumb: `Galaxy > Case` (at least).
+Minimum outcomes:
+- confirm the canonical public/live entry surface
+- run a real browser-level closure pass on that surface
+- make the whole solved map visibly primary
+- keep documents stable and secondary
+- make inspect / pin / trace behavior feel clear
+- keep repo mutation surfaces useful but secondary to the product center
 
-Non-goals (later):
-- filters/modes
-- clustering/regions
-- search
-- trace
+### Phase 2 — expansion after public closure
 
-### Phase 2 — System map upgrade (after Galaxy MVP is stable)
-
-- Replace “chip grid + link list” with a true node-link viewport (still step-zoom, not free-fly).
-- Add pin/clear controls (targeting).
-- Add layers toggle.
-- Keep docs stable; use Focus Inspector for click results.
-
-### Phase 3 — Moment + Trace + Modes
-
-- Moment zoom: click timestep badge / timeline selection narrows viewport neighborhood.
-- Trace mode: explicit, reversible, visually clear.
-- Cross-case modes (Galaxy): mutually exclusive “lenses” for complexity management.
+Only after the public product surface is clearly good:
+- refine evidence-lens behavior
+- add filters only as clutter control
+- strengthen source → structure → narrative correspondence hints
+- expand richer edit / mutation flows only if they do not displace the viewing-first product
 
 ---
 
-## Files to touch first (for Phase 1)
+## Working rules for the current lane
 
-Entry / wiring:
-- `/workbench-v3.html` (add Galaxy tab + includes)
-
-Galaxy surface:
-- `/ui-v3/galaxy-map.css` (new)
-- `/ui-v3/galaxy-map-overlay.js` (new)
-
-System surface glue:
-- `/ui-v3/case-map-overlay.js` (allow auto-transition from Galaxy → System after opening a case)
-
-Data:
-- `/catalog/index.json` (read-only input)
+- Do not spend the lane on more solver theory unless repo truth forces it.
+- Do not let repo-control success masquerade as product completion.
+- Do not let documents become the main screen.
+- Do not let the repo panel become the center of gravity.
+- Prefer changes that improve immediate user comprehension of solved structure.
 
 ---
 
@@ -131,6 +114,7 @@ Data:
 
 - `gui_confirmed_findings_2026-03-26.md` — confirmed UI overload + smoketest fixture needs
 - `GFE_VisualCodex.md` — palette + projection rules
+- `21_REBUILD_PLAN.md` — current rebuild plan
+- `22_PRODUCT_OPERATING_MAP.md` — whole-product operating map
 
-Legacy examples (pattern inspiration only; not “truth”):
-- `/legacy/GUIv2/` — earlier UI shell + constellation/zoom patterns
+Last updated: 2026-04-01
