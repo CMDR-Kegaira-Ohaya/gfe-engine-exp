@@ -114,6 +114,7 @@
 │   ├── gui/
 │   │   ├── context-panel.js
 │   │   ├── documents-panel.js
+│   │   ├── payload-visualizer.js
 │   │   ├── README.md
 │   │   ├── repo-panel.js
 │   │   ├── specified-view-enhanced.js
