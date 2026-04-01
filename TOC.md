@@ -116,6 +116,7 @@
 │   │   ├── documents-panel.js
 │   │   ├── README.md
 │   │   ├── repo-panel.js
+│   │   ├── specified-view-enhanced.js
 │   │   ├── specified-view.js
 │   │   └── styles.css
 │   ├── workflows/
