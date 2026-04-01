@@ -2,7 +2,7 @@
 
 This repo is now a core-first repo for GFE material, with a quarantined product area for new GUI/app work under `/product/`.
 
-See `TOC.md` for the current auto-generated repository map.
+See `TOC.md` for the current auto-generated repository map
 
 ## What is kept here
 
