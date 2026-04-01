@@ -48,6 +48,9 @@
 │   ├── honeybee_colony_collapse_demo/
 │   │   ├── readings/
 │   │   │   └── current_model_reading.md
+│   │   ├── revisions/
+│   │   │   └── rev_2026_04_01_v15_7_demo/
+│   │   │       └── encoding.json
 │   │   ├── source/
 │   │   │   ├── case.md
 │   │   │   └── sources.md
