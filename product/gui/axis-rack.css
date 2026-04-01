@@ -1,0 +1,265 @@
+/* Canon 5-axis participant rack: Cfg, Emb, Org, Dir, Leg */
+.selectable-row {
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.participant-axis-rack {
+  flex-basis: 100%;
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(124, 196, 255, 0.12);
+  background:
+    linear-gradient(180deg, rgba(124, 196, 255, 0.06), rgba(124, 196, 255, 0.015)),
+    rgba(255, 255, 255, 0.02);
+}
+
+.participant-axis-rack-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.participant-axis-rack-title {
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.participant-axis-rack-note {
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+
+.participant-axis-list {
+  display: grid;
+  gap: 8px;
+}
+
+.axis-rail {
+  --axis-rgb: 124, 196, 255;
+  display: grid;
+  gap: 6px;
+  padding: 9px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(var(--axis-rgb), 0.16);
+  border-left: 3px solid rgba(var(--axis-rgb), 0.46);
+  background:
+    linear-gradient(90deg, rgba(var(--axis-rgb), 0.08), rgba(255, 255, 255, 0.02) 22%, rgba(255, 255, 255, 0.03)),
+    rgba(255, 255, 255, 0.02);
+}
+
+.axis-rail.dominant {
+  box-shadow: inset 0 0 0 1px rgba(var(--axis-rgb), 0.14);
+}
+
+.axis-rail.axis-cfg,
+.registry-chip.axis-cfg,
+.moment-mini-chip.axis-cfg,
+.payload-meta-pill.axis-cfg,
+.payload-lane.axis-cfg {
+  --axis-rgb: 124, 196, 255;
+}
+
+.axis-rail.axis-emb,
+.registry-chip.axis-emb,
+.moment-mini-chip.axis-emb,
+.payload-meta-pill.axis-emb,
+.payload-lane.axis-emb {
+  --axis-rgb: 193, 159, 255;
+}
+
+.axis-rail.axis-org,
+.registry-chip.axis-org,
+.moment-mini-chip.axis-org,
+.payload-meta-pill.axis-org,
+.payload-lane.axis-org {
+  --axis-rgb: 122, 211, 155;
+}
+
+.axis-rail.axis-dir,
+.registry-chip.axis-dir,
+.moment-mini-chip.axis-dir,
+.payload-meta-pill.axis-dir,
+.payload-lane.axis-dir {
+  --axis-rgb: 255, 210, 122;
+}
+
+.axis-rail.axis-leg,
+.registry-chip.axis-leg,
+.moment-mini-chip.axis-leg,
+.payload-meta-pill.axis-leg,
+.payload-lane.axis-leg {
+  --axis-rgb: 255, 150, 122;
+}
+
+.registry-chip.axis-cfg,
+.registry-chip.axis-emb,
+.registry-chip.axis-org,
+.registry-chip.axis-dir,
+.registry-chip.axis-leg,
+.moment-mini-chip.axis-cfg,
+.moment-mini-chip.axis-emb,
+.moment-mini-chip.axis-org,
+.moment-mini-chip.axis-dir,
+.moment-mini-chip.axis-leg,
+.payload-meta-pill.axis-cfg,
+.payload-meta-pill.axis-emb,
+.payload-meta-pill.axis-org,
+.payload-meta-pill.axis-dir,
+.payload-meta-pill.axis-leg {
+  border-color: rgba(var(--axis-rgb), 0.28);
+  background: rgba(var(--axis-rgb), 0.08);
+  color: var(--text);
+}
+
+.payload-lane.axis-cfg,
+.payload-lane.axis-emb,
+.payload-lane.axis-org,
+.payload-lane.axis-dir,
+.payload-lane.axis-leg {
+  border-left-color: rgba(var(--axis-rgb), 0.46);
+}
+
+.axis-rail-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.axis-rail-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.axis-rail-values {
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+
+.axis-rail-track {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0;
+  min-height: 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.04);
+  overflow: hidden;
+}
+
+.axis-half {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.axis-half.left {
+  justify-content: flex-end;
+  padding-right: 8px;
+}
+
+.axis-half.right {
+  justify-content: flex-start;
+  padding-left: 8px;
+}
+
+.axis-fill {
+  display: block;
+  height: 6px;
+  border-radius: 999px;
+  min-width: 0;
+}
+
+.axis-fill.sigma-l {
+  background: var(--good);
+}
+
+.axis-fill.sigma-m {
+  background: #ffd27a;
+}
+
+.axis-clip {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  z-index: 1;
+  background: rgba(212, 156, 156, 0.18);
+}
+
+.axis-clip.left {
+  left: 2px;
+  border-radius: 999px 0 0 999px;
+}
+
+.axis-clip.right {
+  right: 2px;
+  border-radius: 0 999px 999px 0;
+}
+
+.axis-theta {
+  position: relative;
+  z-index: 2;
+  width: 22px;
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--text);
+}
+
+.axis-rail-band {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.axis-band-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.72rem;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.axis-band-pill.band-engaged,
+.axis-rail.band-engaged .axis-band-pill {
+  border-color: rgba(255, 210, 122, 0.26);
+  background: rgba(255, 210, 122, 0.08);
+  color: var(--text);
+}
+
+.axis-band-pill.band-saturated,
+.axis-rail.band-saturated .axis-band-pill {
+  border-color: rgba(212, 156, 156, 0.32);
+  background: rgba(212, 156, 156, 0.10);
+  color: var(--text);
+}
+
+.axis-band-pill.band-latent,
+.axis-rail.band-latent .axis-band-pill {
+  border-style: dashed;
+}
+
+@media (max-width: 1200px) {
+  .axis-rail-head {
+    align-items: flex-start;
+  }
+
+  .participant-axis-rack-note,
+  .axis-rail-values {
+    width: 100%;
+  }
+}

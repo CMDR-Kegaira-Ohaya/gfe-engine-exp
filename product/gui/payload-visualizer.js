@@ -2,6 +2,11 @@ import { loadCasesIndex, loadCaseBundle } from '../app/case-bundle.js';
 import { escapeHtml, eventsForStep, label, participantFromAlpha } from '../app/helpers.js';
 
 const root = document.getElementById('app');
+const CANON_AXES = Object.freeze(['Cfg', 'Emb', 'Org', 'Dir', 'Leg']);
+const CANON_AXIS_ORDER = new Map(CANON_AXES.map((axis, index) => [axis.toLowerCase(), index]));
+const FAMILY_ORDER = new Map([['l', 0], ['m', 1], ['dst', 2]]);
+const FACE_ORDER = new Map([['inner', 0], ['outer', 1], ['unspecified', 2]]);
+const BAND_ORDER = new Map([['latent', 0], ['low', 1], ['engaged', 2], ['saturated', 3]]);
 
 let casesIndexPromise = null;
 const bundleCache = new Map();
@@ -59,7 +64,12 @@ async function enhancePayloadView() {
     if (Number.isNaN(stepIndex)) return;
 
     const stepEvents = eventsForStep(events, stepIndex);
-    if (!stepEvents.length) return;
+    if (!stepEvents.length) {
+      clearParticipantAxisRacks(card);
+      return;
+    }
+
+    renderParticipantAxisRacks(card, stepEvents);
 
     const head = card.querySelector('.moment-head');
     const firstBlock = card.querySelector('.moment-block');
@@ -80,6 +90,126 @@ async function enhancePayloadView() {
   });
 }
 
+function clearParticipantAxisRacks(card) {
+  card.querySelectorAll('.participant-axis-rack').forEach((node) => node.remove());
+}
+
+function renderParticipantAxisRacks(card, stepEvents) {
+  const rows = Array.from(card.querySelectorAll('.selectable-row'));
+  rows.forEach((row) => {
+    row.querySelector('.participant-axis-rack')?.remove();
+
+    const entityButton = row.querySelector('[data-select-type="entity"]');
+    if (!entityButton) return;
+
+    const participantId = entityButton.dataset.selectId;
+    if (!participantId) return;
+
+    const summary = summarizeParticipantAxes(stepEvents, participantId);
+    row.insertAdjacentHTML('beforeend', renderParticipantAxisRack(summary));
+  });
+}
+
+function summarizeParticipantAxes(stepEvents, participantId) {
+  const stats = Object.fromEntries(
+    CANON_AXES.map((axis) => [axis, { L: 0, M: 0, Dst: 0, total: 0 }]),
+  );
+
+  stepEvents.forEach((event) => {
+    if (!participantInEvent(event, participantId)) return;
+
+    const axis = canonicalAxis(event?.axis);
+    if (!axis) return;
+
+    const bundle = Array.isArray(event?.payload_bundle) ? event.payload_bundle : [];
+    if (!bundle.length) {
+      stats[axis].total += 1;
+      return;
+    }
+
+    bundle.forEach((item) => {
+      const sigma = canonicalSigma(item?.sigma);
+      const magnitude = normalizedMagnitude(item?.magnitude);
+      if (!['L', 'M', 'Dst'].includes(sigma)) return;
+      stats[axis][sigma] += magnitude;
+      stats[axis].total += magnitude;
+    });
+  });
+
+  const maxTotal = Math.max(...CANON_AXES.map((axis) => stats[axis].total), 0);
+  const dominantAxis = CANON_AXES.reduce((best, axis) => (
+    stats[axis].total > (stats[best]?.total ?? 0) ? axis : best
+  ), CANON_AXES[0]);
+
+  return { stats, maxTotal, dominantAxis };
+}
+
+function participantInEvent(event, participantId) {
+  const target = String(participantId ?? '').trim();
+  if (!target) return false;
+
+  const candidates = [
+    event?.sourceParticipantId,
+    event?.receivingParticipantId,
+    event?.mediumParticipantId,
+    participantFromAlpha(event?.alpha_source),
+    participantFromAlpha(event?.alpha_receiving),
+    participantFromAlpha(event?.alpha_medium),
+  ].map((value) => String(value ?? '').trim()).filter(Boolean);
+
+  return candidates.includes(target);
+}
+
+function renderParticipantAxisRack(summary) {
+  const { stats, maxTotal, dominantAxis } = summary;
+  const overview = maxTotal > 0
+    ? `${label(dominantAxis)} dominant · ${displayBand(stats[dominantAxis].total)} state`
+    : 'No canon-axis payload state in this moment';
+
+  return `
+    <div class="participant-axis-rack">
+      <div class="participant-axis-rack-head">
+        <span class="participant-axis-rack-title">5-axis rack</span>
+        <span class="participant-axis-rack-note">${escapeHtml(overview)}</span>
+      </div>
+      <div class="participant-axis-list">
+        ${CANON_AXES.map((axis) => renderAxisRail(axis, stats[axis], maxTotal, axis === dominantAxis)).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function renderAxisRail(axis, state, maxTotal, isDominant) {
+  const scale = maxTotal > 0 ? maxTotal : 1;
+  const leftWidth = railWidth(state.L, scale);
+  const rightWidth = railWidth(state.M, scale);
+  const clipWidth = clipWidthPercent(state.Dst, scale);
+  const band = displayBand(state.total);
+
+  return `
+    <div class="axis-rail ${isDominant ? 'dominant' : ''} band-${token(band)} axis-${token(axis)}">
+      <div class="axis-rail-head">
+        <span class="axis-rail-label">${escapeHtml(label(axis))}</span>
+        <span class="axis-rail-values">L ${escapeHtml(formatMagnitude(state.L))} · M ${escapeHtml(formatMagnitude(state.M))} · Dst ${escapeHtml(formatMagnitude(state.Dst))}</span>
+      </div>
+      <div class="axis-rail-track">
+        <span class="axis-clip left" style="width:${clipWidth}%"></span>
+        <span class="axis-clip right" style="width:${clipWidth}%"></span>
+        <span class="axis-half left">
+          <span class="axis-fill sigma-l" style="width:${leftWidth}%"></span>
+        </span>
+        <span class="axis-theta">θ</span>
+        <span class="axis-half right">
+          <span class="axis-fill sigma-m" style="width:${rightWidth}%"></span>
+        </span>
+      </div>
+      <div class="axis-rail-band">
+        <span class="axis-band-pill band-${token(band)}">${escapeHtml(band)}</span>
+      </div>
+    </div>
+  `;
+}
+
 function renderMapPrecisionNote(container) {
   const summaryNode = container.querySelector('.map-summary');
   if (!summaryNode) return;
@@ -90,7 +220,7 @@ function renderMapPrecisionNote(container) {
     `
       <div class="payload-map-note">
         <div class="eyebrow">Structural readout</div>
-        <p>Axes, faces, interference classes, and family signatures are shown as encoded classes. Signal bands are visual readouts from payload magnitude.</p>
+        <p>Participant focus uses the canon 5-axis rack: Cfg, Emb, Org, Dir, Leg. Each rail is split by θ into L and M, with Dst shown as end-clipping on both sides.</p>
       </div>
     `,
   );
@@ -100,15 +230,16 @@ function renderStructuralRegistry(container, events) {
   const existing = container.querySelector('.structural-registry');
   existing?.remove();
 
-  const axes = aggregateCounts(events.map((event) => label(event?.axis || '') || 'unspecified'));
+  const axes = aggregateCounts(events.map((event) => canonicalAxis(event?.axis) || 'unspecified'), CANON_AXES);
   const faces = aggregateCounts(events.map((event) => label(event?.face || '') || 'unspecified'));
   const interferences = aggregateCounts(events.map((event) => label(event?.interference || '') || 'unspecified'));
   const families = aggregateCounts(
     events.flatMap((event) =>
       Array.isArray(event?.payload_bundle)
-        ? event.payload_bundle.map((item) => String(item?.sigma ?? 'Σ?'))
+        ? event.payload_bundle.map((item) => canonicalSigma(item?.sigma))
         : [],
     ),
+    ['L', 'M', 'Dst'],
   );
 
   const payloadMoments = new Set(
@@ -155,7 +286,7 @@ function renderStructuralRegistry(container, events) {
 }
 
 function renderRegistryGroup(title, counts, variant) {
-  const entries = Object.entries(counts).sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]));
+  const entries = sortCountEntries(counts, variant);
   return `
     <section class="registry-group">
       <div class="registry-group-title">${escapeHtml(title)}</div>
@@ -180,17 +311,18 @@ function renderRegistryChip(name, count, variant) {
 }
 
 function renderMomentStructuralReadout(stepEvents) {
-  const axes = aggregateCounts(stepEvents.map((event) => label(event?.axis || '') || 'unspecified'));
+  const axes = aggregateCounts(stepEvents.map((event) => canonicalAxis(event?.axis) || 'unspecified'), CANON_AXES);
   const faces = aggregateCounts(stepEvents.map((event) => label(event?.face || '') || 'unspecified'));
   const interferences = aggregateCounts(stepEvents.map((event) => label(event?.interference || '') || 'unspecified'));
   const families = aggregateCounts(
     stepEvents.flatMap((event) =>
       Array.isArray(event?.payload_bundle)
-        ? event.payload_bundle.map((item) => String(item?.sigma ?? 'Σ?'))
+        ? event.payload_bundle.map((item) => canonicalSigma(item?.sigma))
         : [],
     ),
+    ['L', 'M', 'Dst'],
   );
-  const bands = aggregateCounts(stepEvents.map((event) => displayBand(maxMagnitude(event))));
+  const bands = aggregateCounts(stepEvents.map((event) => displayBand(maxMagnitude(event))), ['latent', 'low', 'engaged', 'saturated']);
 
   return `
     <section class="moment-structural-readout">
@@ -210,7 +342,7 @@ function renderMomentStructuralReadout(stepEvents) {
 }
 
 function renderMiniGroup(title, counts, variant) {
-  const entries = Object.entries(counts).sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]));
+  const entries = sortCountEntries(counts, variant);
   return `
     <div class="moment-mini-group">
       <div class="moment-mini-title">${escapeHtml(title)}</div>
@@ -270,13 +402,13 @@ function renderPayloadLane(event) {
   const receiving = label(event?.receivingParticipantId ?? participantFromAlpha(event?.alpha_receiving)) || 'receiver';
   const medium = label(event?.mediumParticipantId ?? participantFromAlpha(event?.alpha_medium));
   const interference = label(event?.interference || '');
-  const axis = label(event?.axis || '');
+  const axis = canonicalAxis(event?.axis) || '';
   const face = label(event?.face || '');
   const bundle = Array.isArray(event?.payload_bundle) ? event.payload_bundle : [];
   const band = displayBand(maxMagnitude(event));
 
   return `
-    <article class="payload-lane axis-${token(event?.axis)} face-${token(event?.face)} band-${token(band)}">
+    <article class="payload-lane axis-${token(axis)} face-${token(face)} band-${token(band)}">
       <div class="payload-lane-head">
         <div class="payload-route">
           <span class="payload-node source">${escapeHtml(source)}</span>
@@ -301,10 +433,10 @@ function renderPayloadLane(event) {
 }
 
 function renderFamilyChip(item) {
-  const sigma = String(item?.sigma ?? 'Σ?');
+  const sigma = canonicalSigma(item?.sigma);
   const mode = label(item?.mode || 'mode');
   const register = label(item?.register || 'register');
-  const magnitude = Number(item?.magnitude ?? 0);
+  const magnitude = normalizedMagnitude(item?.magnitude);
   const width = Number.isFinite(magnitude)
     ? Math.max(10, Math.min(100, Math.round(magnitude * 100)))
     : 24;
@@ -324,19 +456,56 @@ function renderFamilyChip(item) {
   `;
 }
 
-function aggregateCounts(values) {
-  return values.reduce((accumulator, value) => {
+function aggregateCounts(values, seed = []) {
+  const accumulator = Object.fromEntries(seed.map((value) => [String(value), 0]));
+  values.forEach((value) => {
     const key = String(value || 'unspecified');
     accumulator[key] = (accumulator[key] || 0) + 1;
-    return accumulator;
-  }, {});
+  });
+  return accumulator;
+}
+
+function sortCountEntries(counts, variant) {
+  const entries = Object.entries(counts);
+  return entries.sort((left, right) => {
+    if (right[1] !== left[1]) return right[1] - left[1];
+    return rankForVariant(variant, left[0]) - rankForVariant(variant, right[0]) || left[0].localeCompare(right[0]);
+  });
+}
+
+function rankForVariant(variant, value) {
+  const key = String(value || '').toLowerCase();
+  if (variant === 'axis') return CANON_AXIS_ORDER.get(key) ?? 99;
+  if (variant === 'family') return FAMILY_ORDER.get(key) ?? 99;
+  if (variant === 'face') return FACE_ORDER.get(key) ?? 99;
+  if (variant === 'band') return BAND_ORDER.get(key) ?? 99;
+  return 99;
+}
+
+function canonicalAxis(value) {
+  const raw = String(value ?? '').trim().toLowerCase();
+  return CANON_AXES.find((axis) => axis.toLowerCase() === raw) || '';
+}
+
+function canonicalSigma(value) {
+  const raw = String(value ?? '').trim().toLowerCase();
+  if (raw === 'l') return 'L';
+  if (raw === 'm') return 'M';
+  if (raw === 'dst') return 'Dst';
+  return 'Σ?';
+}
+
+function normalizedMagnitude(value) {
+  const number = Number(value ?? 0);
+  return Number.isFinite(number) ? Math.max(0, number) : 0;
 }
 
 function maxMagnitude(event) {
   const bundle = Array.isArray(event?.payload_bundle) ? event.payload_bundle : [];
   const magnitudes = bundle
-    .map((item) => Number(item?.magnitude ?? 0))
+    .map((item) => normalizedMagnitude(item?.magnitude))
     .filter((value) => Number.isFinite(value));
+
   return magnitudes.length ? Math.max(...magnitudes) : 0;
 }
 
@@ -345,6 +514,16 @@ function displayBand(value) {
   if (value < 0.33) return 'low';
   if (value < 0.66) return 'engaged';
   return 'saturated';
+}
+
+function railWidth(value, scale) {
+  if (!Number.isFinite(value) || !Number.isFinite(scale) || scale <= 0) return 0;
+  return Math.max(0, Math.min(44, (value / scale) * 44));
+}
+
+function clipWidthPercent(value, scale) {
+  if (!Number.isFinite(value) || !Number.isFinite(scale) || scale <= 0) return 0;
+  return Math.max(0, Math.min(18, (value / scale) * 18));
 }
 
 function formatMagnitude(value) {
