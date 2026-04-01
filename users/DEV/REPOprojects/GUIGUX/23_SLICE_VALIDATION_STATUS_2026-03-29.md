@@ -1,80 +1,80 @@
-# Product slice validation status (2026-03-29)
+# Product status checkpoint (2026-04-01)
 
-[PRODUCT_SLICE_VALIDATION_STATUS_2026_03_29]
+[PRODUCT_STATUS_CHECKPOINT_2026_04_01]
 
-Purpose: capture where the current product slice actually stands against the rebuild plan, so next work can stay aligned with the locked lane instead of drifting into isolated infrastructure or polish.
+Purpose: capture where the current product actually stands after solver-coverage closure, so next work stays aligned with the active lane instead of drifting back into already-closed rescue work.
 
 ---
 
 ## 1) Current plan position
 
-Relative to `21_REBUILD_PLAN.md`.
+Relative to `21_REBUILD_PLAN.md`:
 
 We are:
- - past the repo-bridge block
- - inside the first working slice
- - not yet at `first slice closed` or at  `formal next layer` status
+- past the solver-coverage program
+- past the Phase 0 blocker-clearing lane
+- inside the product/UI closure lane
 
 This means:
-- the repo/connector/mutation foundation is no longer the primary blocker
-- the next crucial work is projection correctness and live slice closure, not more repo plumbing by default
+- frozen `/engine/` canon is no longer the moving problem
+- solver coverage on the current v15.7 contract is now treated as closed input
+- the next meaningful work is public product closure and projection correctness
 
 ---
 
-## 2) What is solid
+## 2) What is now closed
 
-- `product/` is the actual build zone
-- modular shape exists across `product/app/`, `product/gui/`, and `./app/repo/`
-- repo-aware bridge exists and is now credible
-- normal writes use verified `saveFile`
-- hard deletes no longer rely on broken `deleteFile` behavior
-- the first guarded product-local delete UP path exists (app helper + repo panel)
+- `/engine/` canon remains frozen
+- solver coverage board on current main reports **full**
+- the Phase 0 proof base/blocker lane is no longer the active blocker
+- repo-aware bridge and verified write path exist
+- product work no longer needs to be framed as solver rescue by default
 
 ---
 
-## 3) What is still open before calling the first slice closed
+## 3) What is still open before calling the product ready
 
-- the current public/live surface is still root -> `workbench-v3.html`, not clearly the new `product/` index as canonical entry
-- the first-slice checklist needs a live browser-level closure pass
-- projection correctness still needs explicit judgment acrosk:
-  - whole-map first signal
+- the canonical public/live entry surface still needs to be made explicit and confirmed
+- the public surface still needs a browser-level closure pass
+- projection correctness still needs explicit judgment across:
+  - whole-map-first signal
   - documents stay stable and secondary
-  - inspect/pin/trace behavior feels clear
-  - repo panel mutation does not steal the product center of gravity
-- we have implementation for richer mutation than the plan needed at this stage, so the risk is starting to let the mutation layer outrun the viewing layer
+  - inspect / pin / trace feels clear
+  - repo mutation surfaces do not steal the product center of gravity
 
 ---
 
 ## 4) Current priority order
-Do these next, in this order:
 
-### 4.1 Live slice closure
-- validate the actual public entry surface
-- decide whether the new `product/` index should be the canonical live surface
-- close the first slice checklist with a real browser-feel decision, not code-structure alone
+### 4.1 Public surface closure
+- decide the canonical public entry surface
+- make that decision visible in the repo/product
+- validate it as the real live product surface
 
 ### 4.2 Projection refinement
-- tighten specified view so the whole-before-parts contract is immediately obvious
+- tighten specified view so whole-before-parts is immediately obvious
 - tighten context and documents so they support the map without becoming the main screen
-- check inspect/pin/trace hierarchy against the visual rules in `22_PRODUCT_OPERATING_MAP.md`
+- check inspect / pin / trace hierarchy against `22_PRODUCT_OPERATING_MAP.md`
 
 ### 4.3 Only after the above
 - refine Evidence lens
 - add filters as clutter control only
-- strengthen source -> structure -> narrative correspondence hints carefully
-- only then expand richer mutation/edit flows
+- strengthen source → structure → narrative correspondence hints carefully
+- expand richer mutation/edit flows only if they do not displace the viewing-first product
 
 ---
 
-## 5) Open risk to watch
+## 5) Open risks to watch
 
-- the repo panel is useful but must not become the new center of the product
-- delete and save successes can create a false sense that we are "further along" than the viewing/orientation layer actually is
-- don't let more mutation surface area arrive before the first slice is clearly good to use
+- stale status docs can make it look like solver rescue is still the active lane when it is not
+- repo panel success can create a false sense of product completion
+- ambiguity between public entry surfaces can hide whether the product is actually ready
+- more mutation surface area can outrun projection quality if left unchecked
 
 ---
 
 ## 6) Simple status line
 
-Current status:
-**foundation strong, first slice present, live closure still needed, next major work = projection correctness before more feature expansion.**
+**Solver coverage closed on the current contract; active remaining work = canonical public entry + product/UI projection closure.**
+
+Last updated: 2026-04-01
