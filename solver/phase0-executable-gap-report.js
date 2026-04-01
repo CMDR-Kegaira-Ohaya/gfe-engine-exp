@@ -132,7 +132,7 @@ const rowLocalSuiteChecks = Array.isArray(report.row_local_suite_checks) ? repor
 const promotionRows = Array.isArray(report.coverage_rows) ? report.coverage_rows : [];
 
 const failingCrossPhaseSeedChecks = crossPhaseChecks
-  .filter(check => check.pass !== true)
+  .filter(check => check.executable_slice === true && check.pass !== true)
   .map(summarizeSeedCheck)
   .sort((left, right) => String(left.id).localeCompare(String(right.id)));
 

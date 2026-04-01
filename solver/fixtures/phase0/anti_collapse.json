@@ -44,17 +44,289 @@
       ],
       "case_a_data": {
         "system_name": "fx-rel-02-distinct-medium",
-        "participants": [{ "id": "p1", "name": "P1" }, { "id": "p2", "name": "P2" }, { "id": "p3", "name": "P3" }],
-        "timeline": [{ "timestep_label": "T0", "participants": { "p1": { "axes": { "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" }, "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" }, "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" } } }, "p2": { "axes": { "Cfg": { "A": 26, "R": 32, "I": 82, "sigma": "L" }, "Emb": { "A": 58, "R": 58, "I": 60, "sigma": "L" }, "Org": { "A": 68, "R": 68, "I": 70, "sigma": "L" }, "Dir": { "A": 38, "R": 42, "I": 78, "sigma": "L" }, "Leg": { "A": 70, "R": 70, "I": 72, "sigma": "L" } } }, "p3": { "axes": { "Cfg": { "A": 24, "R": 30, "I": 82, "sigma": "M" }, "Emb": { "A": 30, "R": 34, "I": 78, "sigma": "M" }, "Org": { "A": 22, "R": 30, "I": 88, "sigma": "M" }, "Dir": { "A": 26, "R": 32, "I": 84, "sigma": "M" }, "Leg": { "A": 28, "R": 34, "I": 80, "sigma": "M" } } } } }],
-        "payload_events": [{ "timestep_idx": 0, "alpha_source": "p1.Dir", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Leg", "sigma": "M", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "load", "magnitude": 0.55 }],
-        "analysis": { "key_finding": "Distinct medium participation seed." }
+        "participants": [
+          {
+            "id": "p1",
+            "name": "P1"
+          },
+          {
+            "id": "p2",
+            "name": "P2"
+          },
+          {
+            "id": "p3",
+            "name": "P3"
+          }
+        ],
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": {
+                    "A": 82,
+                    "R": 82,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 81,
+                    "R": 81,
+                    "I": 81,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 84,
+                    "R": 84,
+                    "I": 84,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p2": {
+                "axes": {
+                  "Cfg": {
+                    "A": 26,
+                    "R": 32,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 58,
+                    "R": 58,
+                    "I": 60,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 68,
+                    "R": 68,
+                    "I": 70,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 38,
+                    "R": 42,
+                    "I": 78,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 70,
+                    "R": 70,
+                    "I": 72,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": {
+                    "A": 24,
+                    "R": 30,
+                    "I": 82,
+                    "sigma": "M"
+                  },
+                  "Emb": {
+                    "A": 30,
+                    "R": 34,
+                    "I": 78,
+                    "sigma": "M"
+                  },
+                  "Org": {
+                    "A": 22,
+                    "R": 30,
+                    "I": 88,
+                    "sigma": "M"
+                  },
+                  "Dir": {
+                    "A": 26,
+                    "R": 32,
+                    "I": 84,
+                    "sigma": "M"
+                  },
+                  "Leg": {
+                    "A": 28,
+                    "R": 34,
+                    "I": 80,
+                    "sigma": "M"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Dir",
+            "alpha_medium": "p3.Org",
+            "alpha_receiving": "p2.Leg",
+            "sigma": "M",
+            "axis": "Leg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "load",
+            "magnitude": 0.55
+          }
+        ],
+        "analysis": {
+          "key_finding": "Distinct medium participation seed."
+        }
       },
       "case_b_data": {
         "system_name": "fx-rel-02-source-medium-collapse-pressure",
-        "participants": [{ "id": "p1", "name": "P1" }, { "id": "p2", "name": "P2" }, { "id": "p3", "name": "P3" }],
-        "timeline": [{ "timestep_label": "T0", "participants": { "p1": { "axes": { "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" }, "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" }, "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" } } }, "p2": { "axes": { "Cfg": { "A": 26, "R": 32, "I": 82, "sigma": "L" }, "Emb": { "A": 58, "R": 58, "I": 60, "sigma": "L" }, "Org": { "A": 68, "R": 68, "I": 70, "sigma": "L" }, "Dir": { "A": 38, "R": 42, "I": 78, "sigma": "L" }, "Leg": { "A": 70, "R": 70, "I": 72, "sigma": "L" } } }, "p3": { "axes": { "Cfg": { "A": 24, "R": 30, "I": 82, "sigma": "M" }, "Emb": { "A": 30, "R": 34, "I": 78, "sigma": "M" }, "Org": { "A": 22, "R": 30, "I": 88, "sigma": "M" }, "Dir": { "A": 26, "R": 32, "I": 84, "sigma": "M" }, "Leg": { "A": 28, "R": 34, "I": 80, "sigma": "M" } } } } }],
-        "payload_events": [{ "timestep_idx": 0, "alpha_source": "p1.Dir", "alpha_medium": "p1.Org", "alpha_receiving": "p2.Leg", "sigma": "M", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "load", "magnitude": 0.55 }],
-        "analysis": { "key_finding": "Source-medium collapse-pressure seed." }
+        "participants": [
+          {
+            "id": "p1",
+            "name": "P1"
+          },
+          {
+            "id": "p2",
+            "name": "P2"
+          },
+          {
+            "id": "p3",
+            "name": "P3"
+          }
+        ],
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": {
+                    "A": 82,
+                    "R": 82,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 81,
+                    "R": 81,
+                    "I": 81,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 84,
+                    "R": 84,
+                    "I": 84,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p2": {
+                "axes": {
+                  "Cfg": {
+                    "A": 26,
+                    "R": 32,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 58,
+                    "R": 58,
+                    "I": 60,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 68,
+                    "R": 68,
+                    "I": 70,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 38,
+                    "R": 42,
+                    "I": 78,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 70,
+                    "R": 70,
+                    "I": 72,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": {
+                    "A": 24,
+                    "R": 30,
+                    "I": 82,
+                    "sigma": "M"
+                  },
+                  "Emb": {
+                    "A": 30,
+                    "R": 34,
+                    "I": 78,
+                    "sigma": "M"
+                  },
+                  "Org": {
+                    "A": 22,
+                    "R": 30,
+                    "I": 88,
+                    "sigma": "M"
+                  },
+                  "Dir": {
+                    "A": 26,
+                    "R": 32,
+                    "I": 84,
+                    "sigma": "M"
+                  },
+                  "Leg": {
+                    "A": 28,
+                    "R": 34,
+                    "I": 80,
+                    "sigma": "M"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Dir",
+            "alpha_medium": "p1.Org",
+            "alpha_receiving": "p2.Leg",
+            "sigma": "M",
+            "axis": "Leg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "load",
+            "magnitude": 0.55
+          }
+        ],
+        "analysis": {
+          "key_finding": "Source-medium collapse-pressure seed."
+        }
       }
     },
     {
@@ -96,24 +368,351 @@
       ],
       "case_a_data": {
         "system_name": "fx-fail-06-suppression-under-pressure",
-        "participants": [{ "id": "p1", "name": "P1" }, { "id": "p2", "name": "P2" }, { "id": "p3", "name": "P3" }],
-        "timeline": [{ "timestep_label": "T0", "participants": { "p1": { "axes": { "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" }, "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Dir": { "A": 83, "R": 83, "I": 83, "sigma": "L" }, "Leg": { "A": 79, "R": 79, "I": 79, "sigma": "L" } } }, "p2": { "cascade": { "attempts": [{ "axis": "Cfg" }, { "axis": "Emb" }, { "axis": "Leg" }] }, "axes": { "Cfg": { "A": 40, "R": 45, "I": 70, "sigma": "M" }, "Emb": { "A": 35, "R": 40, "I": 65, "sigma": "M" }, "Org": { "A": 44, "R": 46, "I": 62, "sigma": "M" }, "Dir": { "A": 45, "R": 47, "I": 60, "sigma": "M" }, "Leg": { "A": 40, "R": 42, "I": 60, "sigma": "M" } } }, "p3": { "axes": { "Cfg": { "A": 12, "R": 12, "I": 12, "sigma": "L" }, "Emb": { "A": 14, "R": 14, "I": 14, "sigma": "L" }, "Org": { "A": 10, "R": 10, "I": 10, "sigma": "L" }, "Dir": { "A": 11, "R": 11, "I": 11, "sigma": "L" }, "Leg": { "A": 12, "R": 12, "I": 12, "sigma": "L" } } } } }],
-        "payload_events": [
-          { "timestep_idx": 0, "alpha_source": "p1.Org", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Emb", "sigma": "M", "axis": "Emb", "unfolding": "acute", "register": "retained", "mode": "suppress", "magnitude": 0.78 },
-          { "timestep_idx": 0, "alpha_source": "p1.Cfg", "alpha_medium": "p3.Cfg", "alpha_receiving": "p2.Cfg", "sigma": "M", "axis": "Cfg", "unfolding": "acute", "register": "retained", "mode": "suppress", "magnitude": 0.70 },
-          { "timestep_idx": 0, "alpha_source": "p1.Dir", "alpha_medium": "p3.Dir", "alpha_receiving": "p2.Leg", "sigma": "M", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "overflow", "magnitude": 0.42 }
+        "participants": [
+          {
+            "id": "p1",
+            "name": "P1"
+          },
+          {
+            "id": "p2",
+            "name": "P2"
+          },
+          {
+            "id": "p3",
+            "name": "P3"
+          }
         ],
-        "analysis": { "key_finding": "Suppression persists under pressure without full collapse." }
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": {
+                    "A": 82,
+                    "R": 82,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 81,
+                    "R": 81,
+                    "I": 81,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 83,
+                    "R": 83,
+                    "I": 83,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 79,
+                    "R": 79,
+                    "I": 79,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p2": {
+                "cascade": {
+                  "attempts": [
+                    {
+                      "axis": "Cfg"
+                    },
+                    {
+                      "axis": "Emb"
+                    },
+                    {
+                      "axis": "Leg"
+                    }
+                  ]
+                },
+                "axes": {
+                  "Cfg": {
+                    "A": 40,
+                    "R": 45,
+                    "I": 70,
+                    "sigma": "M"
+                  },
+                  "Emb": {
+                    "A": 35,
+                    "R": 40,
+                    "I": 65,
+                    "sigma": "M"
+                  },
+                  "Org": {
+                    "A": 44,
+                    "R": 46,
+                    "I": 62,
+                    "sigma": "M"
+                  },
+                  "Dir": {
+                    "A": 45,
+                    "R": 47,
+                    "I": 60,
+                    "sigma": "M"
+                  },
+                  "Leg": {
+                    "A": 40,
+                    "R": 42,
+                    "I": 60,
+                    "sigma": "M"
+                  }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": {
+                    "A": 12,
+                    "R": 12,
+                    "I": 12,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 14,
+                    "R": 14,
+                    "I": 14,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 10,
+                    "R": 10,
+                    "I": 10,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 11,
+                    "R": 11,
+                    "I": 11,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 12,
+                    "R": 12,
+                    "I": 12,
+                    "sigma": "L"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Org",
+            "alpha_medium": "p3.Org",
+            "alpha_receiving": "p2.Emb",
+            "sigma": "M",
+            "axis": "Emb",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "suppress",
+            "magnitude": 0.78
+          },
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Cfg",
+            "alpha_medium": "p3.Cfg",
+            "alpha_receiving": "p2.Cfg",
+            "sigma": "M",
+            "axis": "Cfg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "suppress",
+            "magnitude": 0.7
+          },
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Dir",
+            "alpha_medium": "p3.Dir",
+            "alpha_receiving": "p2.Leg",
+            "sigma": "M",
+            "axis": "Leg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "overflow",
+            "magnitude": 0.42
+          }
+        ],
+        "analysis": {
+          "key_finding": "Suppression persists under pressure without full collapse."
+        }
       },
       "case_b_data": {
         "system_name": "fx-fail-06-collapse-under-pressure",
-        "participants": [{ "id": "p1", "name": "P1" }, { "id": "p2", "name": "P2" }, { "id": "p3", "name": "P3" }],
-        "timeline": [{ "timestep_label": "T0", "participants": { "p1": { "axes": { "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" }, "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Dir": { "A": 83, "R": 83, "I": 83, "sigma": "L" }, "Leg": { "A": 79, "R": 79, "I": 79, "sigma": "L" } } }, "p2": { "cascade": { "attempts": [{ "axis": "Cfg" }, { "axis": "Emb" }, { "axis": "Leg" }] }, "axes": { "Cfg": { "A": 10, "R": 18, "I": 85, "sigma": "Dst" }, "Emb": { "A": 20, "R": 24, "I": 80, "sigma": "Dst" }, "Org": { "A": 18, "R": 22, "I": 76, "sigma": "Dst" }, "Dir": { "A": 15, "R": 20, "I": 80, "sigma": "Dst" }, "Leg": { "A": 10, "R": 18, "I": 75, "sigma": "Dst" } } }, "p3": { "axes": { "Cfg": { "A": 8, "R": 8, "I": 8, "sigma": "L" }, "Emb": { "A": 10, "R": 10, "I": 10, "sigma": "L" }, "Org": { "A": 8, "R": 8, "I": 8, "sigma": "L" }, "Dir": { "A": 9, "R": 9, "I": 9, "sigma": "L" }, "Leg": { "A": 8, "R": 8, "I": 8, "sigma": "L" } } } } }],
-        "payload_events": [
-          { "timestep_idx": 0, "alpha_source": "p1.Cfg", "alpha_medium": "p3.Cfg", "alpha_receiving": "p2.Cfg", "sigma": "Dst", "axis": "Cfg", "unfolding": "acute", "register": "retained", "mode": "overflow", "magnitude": 0.88 },
-          { "timestep_idx": 0, "alpha_source": "p1.Dir", "alpha_medium": "p3.Dir", "alpha_receiving": "p2.Leg", "sigma": "Dst", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "overflow", "magnitude": 0.84 }
+        "participants": [
+          {
+            "id": "p1",
+            "name": "P1"
+          },
+          {
+            "id": "p2",
+            "name": "P2"
+          },
+          {
+            "id": "p3",
+            "name": "P3"
+          }
         ],
-        "analysis": { "key_finding": "Collapse under pressure seed." }
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": {
+                    "A": 82,
+                    "R": 82,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 81,
+                    "R": 81,
+                    "I": 81,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 83,
+                    "R": 83,
+                    "I": 83,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 79,
+                    "R": 79,
+                    "I": 79,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p2": {
+                "cascade": {
+                  "attempts": [
+                    {
+                      "axis": "Cfg"
+                    },
+                    {
+                      "axis": "Emb"
+                    },
+                    {
+                      "axis": "Leg"
+                    }
+                  ]
+                },
+                "axes": {
+                  "Cfg": {
+                    "A": 10,
+                    "R": 18,
+                    "I": 85,
+                    "sigma": "Dst"
+                  },
+                  "Emb": {
+                    "A": 20,
+                    "R": 24,
+                    "I": 80,
+                    "sigma": "Dst"
+                  },
+                  "Org": {
+                    "A": 18,
+                    "R": 22,
+                    "I": 76,
+                    "sigma": "Dst"
+                  },
+                  "Dir": {
+                    "A": 15,
+                    "R": 20,
+                    "I": 80,
+                    "sigma": "Dst"
+                  },
+                  "Leg": {
+                    "A": 10,
+                    "R": 18,
+                    "I": 75,
+                    "sigma": "Dst"
+                  }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": {
+                    "A": 8,
+                    "R": 8,
+                    "I": 8,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 10,
+                    "R": 10,
+                    "I": 10,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 8,
+                    "R": 8,
+                    "I": 8,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 9,
+                    "R": 9,
+                    "I": 9,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 8,
+                    "R": 8,
+                    "I": 8,
+                    "sigma": "L"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Cfg",
+            "alpha_medium": "p3.Cfg",
+            "alpha_receiving": "p2.Cfg",
+            "sigma": "Dst",
+            "axis": "Cfg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "overflow",
+            "magnitude": 0.88
+          },
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Dir",
+            "alpha_medium": "p3.Dir",
+            "alpha_receiving": "p2.Leg",
+            "sigma": "Dst",
+            "axis": "Leg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "overflow",
+            "magnitude": 0.84
+          }
+        ],
+        "analysis": {
+          "key_finding": "Collapse under pressure seed."
+        }
       }
     },
     {
@@ -157,25 +756,363 @@
       ],
       "case_a_data": {
         "system_name": "fx-fail-07-overflow-preserved",
-        "participants": [{ "id": "p1", "name": "P1" }, { "id": "p2", "name": "P2" }, { "id": "p3", "name": "P3" }],
-        "timeline": [{ "timestep_label": "T0", "participants": { "p1": { "axes": { "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Emb": { "A": 79, "R": 79, "I": 79, "sigma": "L" }, "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" }, "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" } } }, "p2": { "cascade": { "attempts": [{ "axis": "Cfg" }, { "axis": "Dir" }, { "axis": "Leg" }] }, "axes": { "Cfg": { "A": 24, "R": 34, "I": 76, "sigma": "L" }, "Emb": { "A": 45, "R": 45, "I": 62, "sigma": "L" }, "Org": { "A": 48, "R": 48, "I": 60, "sigma": "L" }, "Dir": { "A": 38, "R": 38, "I": 68, "sigma": "L" }, "Leg": { "A": 36, "R": 36, "I": 64, "sigma": "L" } } }, "p3": { "axes": { "Cfg": { "A": 78, "R": 78, "I": 78, "sigma": "L" }, "Emb": { "A": 77, "R": 77, "I": 77, "sigma": "L" }, "Org": { "A": 80, "R": 80, "I": 80, "sigma": "L" }, "Dir": { "A": 76, "R": 76, "I": 76, "sigma": "L" }, "Leg": { "A": 75, "R": 75, "I": 75, "sigma": "L" } } } } }],
-        "payload_events": [
-          { "timestep_idx": 0, "alpha_source": "p1.Dir", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Leg", "sigma": "M", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "overflow", "magnitude": 0.90 },
-          { "timestep_idx": 0, "alpha_source": "p1.Cfg", "alpha_medium": "p3.Cfg", "alpha_receiving": "p2.Cfg", "sigma": "M", "axis": "Cfg", "unfolding": "acute", "register": "retained", "mode": "overflow", "magnitude": 0.85 },
-          { "timestep_idx": 0, "alpha_source": "p1.Dir", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Dir", "sigma": "L", "axis": "Dir", "unfolding": "acute", "register": "retained", "mode": "overflow", "magnitude": 0.80 }
+        "participants": [
+          {
+            "id": "p1",
+            "name": "P1"
+          },
+          {
+            "id": "p2",
+            "name": "P2"
+          },
+          {
+            "id": "p3",
+            "name": "P3"
+          }
         ],
-        "analysis": { "key_finding": "Overflow-preserved non-collapse seed." }
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": {
+                    "A": 82,
+                    "R": 82,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 79,
+                    "R": 79,
+                    "I": 79,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 81,
+                    "R": 81,
+                    "I": 81,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 84,
+                    "R": 84,
+                    "I": 84,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p2": {
+                "cascade": {
+                  "attempts": [
+                    {
+                      "axis": "Cfg"
+                    },
+                    {
+                      "axis": "Dir"
+                    },
+                    {
+                      "axis": "Leg"
+                    }
+                  ]
+                },
+                "axes": {
+                  "Cfg": {
+                    "A": 24,
+                    "R": 34,
+                    "I": 76,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 45,
+                    "R": 45,
+                    "I": 62,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 48,
+                    "R": 48,
+                    "I": 60,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 38,
+                    "R": 38,
+                    "I": 68,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 36,
+                    "R": 36,
+                    "I": 64,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": {
+                    "A": 78,
+                    "R": 78,
+                    "I": 78,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 77,
+                    "R": 77,
+                    "I": 77,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 76,
+                    "R": 76,
+                    "I": 76,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 75,
+                    "R": 75,
+                    "I": 75,
+                    "sigma": "L"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Dir",
+            "alpha_medium": "p3.Org",
+            "alpha_receiving": "p2.Leg",
+            "sigma": "M",
+            "axis": "Leg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "overflow",
+            "magnitude": 0.9
+          },
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Cfg",
+            "alpha_medium": "p3.Cfg",
+            "alpha_receiving": "p2.Cfg",
+            "sigma": "M",
+            "axis": "Cfg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "overflow",
+            "magnitude": 0.85
+          },
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Dir",
+            "alpha_medium": "p3.Org",
+            "alpha_receiving": "p2.Dir",
+            "sigma": "L",
+            "axis": "Dir",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "overflow",
+            "magnitude": 0.8
+          }
+        ],
+        "analysis": {
+          "key_finding": "Overflow-preserved non-collapse seed."
+        }
       },
       "case_b_data": {
         "system_name": "fx-fail-07-substitution-shorthand-pressure",
-        "participants": [{ "id": "p1", "name": "P1" }, { "id": "p2", "name": "P2" }, { "id": "p3", "name": "P3" }],
-        "timeline": [{ "timestep_label": "T0", "participants": { "p1": { "axes": { "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Emb": { "A": 79, "R": 79, "I": 79, "sigma": "L" }, "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" }, "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" } } }, "p2": { "cascade": { "attempts": [{ "axis": "Cfg" }, { "axis": "Dir" }, { "axis": "Leg" }] }, "axes": { "Cfg": { "A": 46, "R": 50, "I": 56, "sigma": "L" }, "Emb": { "A": 54, "R": 54, "I": 58, "sigma": "L" }, "Org": { "A": 52, "R": 52, "I": 57, "sigma": "L" }, "Dir": { "A": 49, "R": 49, "I": 55, "sigma": "L" }, "Leg": { "A": 50, "R": 50, "I": 55, "sigma": "L" } } }, "p3": { "axes": { "Cfg": { "A": 72, "R": 72, "I": 72, "sigma": "L" }, "Emb": { "A": 70, "R": 70, "I": 70, "sigma": "L" }, "Org": { "A": 74, "R": 74, "I": 74, "sigma": "L" }, "Dir": { "A": 69, "R": 69, "I": 69, "sigma": "L" }, "Leg": { "A": 71, "R": 71, "I": 71, "sigma": "L" } } } } }],
-        "payload_events": [
-          { "timestep_idx": 0, "alpha_source": "p1.Org", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Leg", "sigma": "L", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "substitute", "magnitude": 0.70 },
-          { "timestep_idx": 0, "alpha_source": "p1.Cfg", "alpha_medium": "p3.Cfg", "alpha_receiving": "p2.Cfg", "sigma": "L", "axis": "Cfg", "unfolding": "acute", "register": "retained", "mode": "substitute", "magnitude": 0.68 },
-          { "timestep_idx": 0, "alpha_source": "p1.Dir", "alpha_medium": "p3.Dir", "alpha_receiving": "p2.Dir", "sigma": "L", "axis": "Dir", "unfolding": "acute", "register": "retained", "mode": "route", "magnitude": 0.60 }
+        "participants": [
+          {
+            "id": "p1",
+            "name": "P1"
+          },
+          {
+            "id": "p2",
+            "name": "P2"
+          },
+          {
+            "id": "p3",
+            "name": "P3"
+          }
         ],
-        "analysis": { "key_finding": "Substitution-shorthand pressure seed." }
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": {
+                    "A": 82,
+                    "R": 82,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 79,
+                    "R": 79,
+                    "I": 79,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 81,
+                    "R": 81,
+                    "I": 81,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 84,
+                    "R": 84,
+                    "I": 84,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p2": {
+                "cascade": {
+                  "attempts": [
+                    {
+                      "axis": "Cfg"
+                    },
+                    {
+                      "axis": "Dir"
+                    },
+                    {
+                      "axis": "Leg"
+                    }
+                  ]
+                },
+                "axes": {
+                  "Cfg": {
+                    "A": 46,
+                    "R": 50,
+                    "I": 56,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 54,
+                    "R": 54,
+                    "I": 58,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 52,
+                    "R": 52,
+                    "I": 57,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 49,
+                    "R": 49,
+                    "I": 55,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 50,
+                    "R": 50,
+                    "I": 55,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": {
+                    "A": 72,
+                    "R": 72,
+                    "I": 72,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 70,
+                    "R": 70,
+                    "I": 70,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 74,
+                    "R": 74,
+                    "I": 74,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 69,
+                    "R": 69,
+                    "I": 69,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 71,
+                    "R": 71,
+                    "I": 71,
+                    "sigma": "L"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Org",
+            "alpha_medium": "p3.Org",
+            "alpha_receiving": "p2.Leg",
+            "sigma": "L",
+            "axis": "Leg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "substitute",
+            "magnitude": 0.7
+          },
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Cfg",
+            "alpha_medium": "p3.Cfg",
+            "alpha_receiving": "p2.Cfg",
+            "sigma": "L",
+            "axis": "Cfg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "substitute",
+            "magnitude": 0.68
+          },
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Dir",
+            "alpha_medium": "p3.Dir",
+            "alpha_receiving": "p2.Dir",
+            "sigma": "L",
+            "axis": "Dir",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "route",
+            "magnitude": 0.6
+          }
+        ],
+        "analysis": {
+          "key_finding": "Substitution-shorthand pressure seed."
+        }
       }
     },
     {
@@ -209,23 +1146,299 @@
           "class": "order_interpretation_noncollapse",
           "expectation": "some_must_differ",
           "paths": [
-            "timeline.0.participants.p2.theta"
+            "timeline.0.participants.p2.solver_debug.relation_summary.order_notes"
           ]
         }
       ],
       "case_a_data": {
         "system_name": "fx-ord-02-deep-order-preserved",
-        "participants": [{ "id": "p1", "name": "P1" }, { "id": "p2", "name": "P2" }, { "id": "p3", "name": "P3" }],
-        "timeline": [{ "timestep_label": "T0", "participants": { "p1": { "axes": { "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" }, "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" }, "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" } } }, "p2": { "axes": { "Cfg": { "A": 26, "R": 32, "I": 82, "sigma": "L" }, "Emb": { "A": 58, "R": 58, "I": 60, "sigma": "L" }, "Org": { "A": 68, "R": 68, "I": 70, "sigma": "L" }, "Dir": { "A": 38, "R": 42, "I": 78, "sigma": "L" }, "Leg": { "A": 70, "R": 70, "I": 72, "sigma": "L" } } }, "p3": { "axes": { "Cfg": { "A": 74, "R": 74, "I": 74, "sigma": "L" }, "Emb": { "A": 72, "R": 72, "I": 72, "sigma": "L" }, "Org": { "A": 76, "R": 76, "I": 76, "sigma": "L" }, "Dir": { "A": 73, "R": 73, "I": 73, "sigma": "L" }, "Leg": { "A": 72, "R": 72, "I": 72, "sigma": "L" } } } } }],
-        "payload_events": [{ "timestep_idx": 0, "scan_index": 2, "order_depth": 4, "alpha_source": "p1.Dir", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Leg", "sigma": "L", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "threshold-transfer", "magnitude": 0.60 }],
-        "analysis": { "key_finding": "Deep order remains solver-distinct." }
+        "participants": [
+          {
+            "id": "p1",
+            "name": "P1"
+          },
+          {
+            "id": "p2",
+            "name": "P2"
+          },
+          {
+            "id": "p3",
+            "name": "P3"
+          }
+        ],
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": {
+                    "A": 82,
+                    "R": 82,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 81,
+                    "R": 81,
+                    "I": 81,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 84,
+                    "R": 84,
+                    "I": 84,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p2": {
+                "axes": {
+                  "Cfg": {
+                    "A": 26,
+                    "R": 32,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 58,
+                    "R": 58,
+                    "I": 60,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 68,
+                    "R": 68,
+                    "I": 70,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 38,
+                    "R": 42,
+                    "I": 78,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 70,
+                    "R": 70,
+                    "I": 72,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": {
+                    "A": 74,
+                    "R": 74,
+                    "I": 74,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 72,
+                    "R": 72,
+                    "I": 72,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 76,
+                    "R": 76,
+                    "I": 76,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 73,
+                    "R": 73,
+                    "I": 73,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 72,
+                    "R": 72,
+                    "I": 72,
+                    "sigma": "L"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "scan_index": 2,
+            "order_depth": 4,
+            "alpha_source": "p1.Dir",
+            "alpha_medium": "p3.Org",
+            "alpha_receiving": "p2.Leg",
+            "sigma": "L",
+            "axis": "Leg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "threshold-transfer",
+            "magnitude": 0.6
+          }
+        ],
+        "analysis": {
+          "key_finding": "Deep order remains solver-distinct."
+        }
       },
       "case_b_data": {
         "system_name": "fx-ord-02-scan-led-flattening",
-        "participants": [{ "id": "p1", "name": "P1" }, { "id": "p2", "name": "P2" }, { "id": "p3", "name": "P3" }],
-        "timeline": [{ "timestep_label": "T0", "participants": { "p1": { "axes": { "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" }, "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" }, "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" } } }, "p2": { "axes": { "Cfg": { "A": 26, "R": 32, "I": 82, "sigma": "L" }, "Emb": { "A": 58, "R": 58, "I": 60, "sigma": "L" }, "Org": { "A": 68, "R": 68, "I": 70, "sigma": "L" }, "Dir": { "A": 38, "R": 42, "I": 78, "sigma": "L" }, "Leg": { "A": 70, "R": 70, "I": 72, "sigma": "L" } } }, "p3": { "axes": { "Cfg": { "A": 74, "R": 74, "I": 74, "sigma": "L" }, "Emb": { "A": 72, "R": 72, "I": 72, "sigma": "L" }, "Org": { "A": 76, "R": 76, "I": 76, "sigma": "L" }, "Dir": { "A": 73, "R": 73, "I": 73, "sigma": "L" }, "Leg": { "A": 72, "R": 72, "I": 72, "sigma": "L" } } } } }],
-        "payload_events": [{ "timestep_idx": 0, "scan_index": 5, "order_depth": 0, "alpha_source": "p1.Dir", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Leg", "sigma": "L", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "threshold-transfer", "magnitude": 0.60 }],
-        "analysis": { "key_finding": "Scan-led flattening pressure seed." }
+        "participants": [
+          {
+            "id": "p1",
+            "name": "P1"
+          },
+          {
+            "id": "p2",
+            "name": "P2"
+          },
+          {
+            "id": "p3",
+            "name": "P3"
+          }
+        ],
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": {
+                    "A": 82,
+                    "R": 82,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 81,
+                    "R": 81,
+                    "I": 81,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 84,
+                    "R": 84,
+                    "I": 84,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p2": {
+                "axes": {
+                  "Cfg": {
+                    "A": 26,
+                    "R": 32,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 58,
+                    "R": 58,
+                    "I": 60,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 68,
+                    "R": 68,
+                    "I": 70,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 38,
+                    "R": 42,
+                    "I": 78,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 70,
+                    "R": 70,
+                    "I": 72,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": {
+                    "A": 74,
+                    "R": 74,
+                    "I": 74,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 72,
+                    "R": 72,
+                    "I": 72,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 76,
+                    "R": 76,
+                    "I": 76,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 73,
+                    "R": 73,
+                    "I": 73,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 72,
+                    "R": 72,
+                    "I": 72,
+                    "sigma": "L"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "scan_index": 5,
+            "order_depth": 0,
+            "alpha_source": "p1.Dir",
+            "alpha_medium": "p3.Org",
+            "alpha_receiving": "p2.Leg",
+            "sigma": "L",
+            "axis": "Leg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "threshold-transfer",
+            "magnitude": 0.6
+          }
+        ],
+        "analysis": {
+          "key_finding": "Scan-led flattening pressure seed."
+        }
       }
     },
     {
@@ -267,17 +1480,299 @@
       ],
       "case_a_data": {
         "system_name": "fx-leg-02-distributed-preserved",
-        "participants": [{ "id": "p1", "name": "P1" }, { "id": "p2", "name": "P2" }, { "id": "p3", "name": "P3" }],
-        "timeline": [{ "timestep_label": "T0", "participants": { "p1": { "axes": { "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" }, "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" }, "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" } } }, "p2": { "axes": { "Cfg": { "A": 28, "R": 34, "I": 82, "sigma": "L" }, "Emb": { "A": 58, "R": 58, "I": 60, "sigma": "L" }, "Org": { "A": 68, "R": 68, "I": 70, "sigma": "L" }, "Dir": { "A": 38, "R": 42, "I": 78, "sigma": "L" }, "Leg": { "A": 64, "R": 64, "I": 66, "sigma": "L" } } }, "p3": { "axes": { "Cfg": { "A": 74, "R": 74, "I": 74, "sigma": "L" }, "Emb": { "A": 72, "R": 72, "I": 72, "sigma": "L" }, "Org": { "A": 76, "R": 76, "I": 76, "sigma": "L" }, "Dir": { "A": 73, "R": 73, "I": 73, "sigma": "L" }, "Leg": { "A": 72, "R": 72, "I": 72, "sigma": "L" } } } } }],
-        "payload_events": [{ "timestep_idx": 0, "scan_index": 2, "order_depth": 2, "leg_scope": "distributed", "trace_persistence": 3, "distributed_span": 3, "alpha_source": "p1.Dir", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Leg", "sigma": "L", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "threshold-transfer", "magnitude": 0.62 }],
-        "analysis": { "key_finding": "Distributed Leg persistence remains solver-distinct." }
+        "participants": [
+          {
+            "id": "p1",
+            "name": "P1"
+          },
+          {
+            "id": "p2",
+            "name": "P2"
+          },
+          {
+            "id": "p3",
+            "name": "P3"
+          }
+        ],
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": {
+                    "A": 82,
+                    "R": 82,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 81,
+                    "R": 81,
+                    "I": 81,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 84,
+                    "R": 84,
+                    "I": 84,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p2": {
+                "axes": {
+                  "Cfg": {
+                    "A": 28,
+                    "R": 34,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 58,
+                    "R": 58,
+                    "I": 60,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 68,
+                    "R": 68,
+                    "I": 70,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 38,
+                    "R": 42,
+                    "I": 78,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 64,
+                    "R": 64,
+                    "I": 66,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": {
+                    "A": 74,
+                    "R": 74,
+                    "I": 74,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 72,
+                    "R": 72,
+                    "I": 72,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 76,
+                    "R": 76,
+                    "I": 76,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 73,
+                    "R": 73,
+                    "I": 73,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 72,
+                    "R": 72,
+                    "I": 72,
+                    "sigma": "L"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "scan_index": 2,
+            "order_depth": 2,
+            "leg_scope": "distributed",
+            "trace_persistence": 3,
+            "distributed_span": 3,
+            "alpha_source": "p1.Dir",
+            "alpha_medium": "p3.Org",
+            "alpha_receiving": "p2.Leg",
+            "sigma": "L",
+            "axis": "Leg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "threshold-transfer",
+            "magnitude": 0.62
+          }
+        ],
+        "analysis": {
+          "key_finding": "Distributed Leg persistence remains solver-distinct."
+        }
       },
       "case_b_data": {
         "system_name": "fx-leg-02-local-flattening-pressure",
-        "participants": [{ "id": "p1", "name": "P1" }, { "id": "p2", "name": "P2" }, { "id": "p3", "name": "P3" }],
-        "timeline": [{ "timestep_label": "T0", "participants": { "p1": { "axes": { "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" }, "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" }, "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" } } }, "p2": { "axes": { "Cfg": { "A": 28, "R": 34, "I": 82, "sigma": "L" }, "Emb": { "A": 58, "R": 58, "I": 60, "sigma": "L" }, "Org": { "A": 68, "R": 68, "I": 70, "sigma": "L" }, "Dir": { "A": 38, "R": 42, "I": 78, "sigma": "L" }, "Leg": { "A": 64, "R": 64, "I": 66, "sigma": "L" } } }, "p3": { "axes": { "Cfg": { "A": 74, "R": 74, "I": 74, "sigma": "L" }, "Emb": { "A": 72, "R": 72, "I": 72, "sigma": "L" }, "Org": { "A": 76, "R": 76, "I": 76, "sigma": "L" }, "Dir": { "A": 73, "R": 73, "I": 73, "sigma": "L" }, "Leg": { "A": 72, "R": 72, "I": 72, "sigma": "L" } } } } }],
-        "payload_events": [{ "timestep_idx": 0, "scan_index": 2, "order_depth": 2, "leg_scope": "local", "trace_persistence": 0, "distributed_span": 0, "alpha_source": "p1.Dir", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Leg", "sigma": "L", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "threshold-transfer", "magnitude": 0.62 }],
-        "analysis": { "key_finding": "Local flattening pressure seed." }
+        "participants": [
+          {
+            "id": "p1",
+            "name": "P1"
+          },
+          {
+            "id": "p2",
+            "name": "P2"
+          },
+          {
+            "id": "p3",
+            "name": "P3"
+          }
+        ],
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": {
+                    "A": 82,
+                    "R": 82,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 81,
+                    "R": 81,
+                    "I": 81,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 84,
+                    "R": 84,
+                    "I": 84,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p2": {
+                "axes": {
+                  "Cfg": {
+                    "A": 28,
+                    "R": 34,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 58,
+                    "R": 58,
+                    "I": 60,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 68,
+                    "R": 68,
+                    "I": 70,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 38,
+                    "R": 42,
+                    "I": 78,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 64,
+                    "R": 64,
+                    "I": 66,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": {
+                    "A": 74,
+                    "R": 74,
+                    "I": 74,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 72,
+                    "R": 72,
+                    "I": 72,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 76,
+                    "R": 76,
+                    "I": 76,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 73,
+                    "R": 73,
+                    "I": 73,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 72,
+                    "R": 72,
+                    "I": 72,
+                    "sigma": "L"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "scan_index": 2,
+            "order_depth": 2,
+            "leg_scope": "local",
+            "trace_persistence": 0,
+            "distributed_span": 0,
+            "alpha_source": "p1.Dir",
+            "alpha_medium": "p3.Org",
+            "alpha_receiving": "p2.Leg",
+            "sigma": "L",
+            "axis": "Leg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "threshold-transfer",
+            "magnitude": 0.62
+          }
+        ],
+        "analysis": {
+          "key_finding": "Local flattening pressure seed."
+        }
       }
     },
     {
@@ -302,8 +1797,7 @@
           "paths": [
             "timeline.0.participants.p2.prevalence",
             "timeline.0.participants.p2.theta",
-            "timeline.0.participants.p2.solver_debug.cfg_gate",
-            "timeline.0.participants.p2.solver_debug.relation_summary"
+            "timeline.0.participants.p2.solver_debug.cfg_gate"
           ]
         },
         {
@@ -317,17 +1811,289 @@
       ],
       "case_a_data": {
         "system_name": "fx-thr-02-threshold-preserved",
-        "participants": [{ "id": "p1", "name": "P1" }, { "id": "p2", "name": "P2" }, { "id": "p3", "name": "P3" }],
-        "timeline": [{ "timestep_label": "T0", "participants": { "p1": { "axes": { "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" }, "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" }, "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" } } }, "p2": { "axes": { "Cfg": { "A": 22, "R": 30, "I": 82, "sigma": "L" }, "Emb": { "A": 58, "R": 58, "I": 60, "sigma": "L" }, "Org": { "A": 70, "R": 70, "I": 72, "sigma": "L" }, "Dir": { "A": 36, "R": 40, "I": 78, "sigma": "L" }, "Leg": { "A": 72, "R": 72, "I": 74, "sigma": "L" } } }, "p3": { "axes": { "Cfg": { "A": 28, "R": 34, "I": 82, "sigma": "M" }, "Emb": { "A": 32, "R": 35, "I": 78, "sigma": "M" }, "Org": { "A": 22, "R": 30, "I": 88, "sigma": "M" }, "Dir": { "A": 26, "R": 32, "I": 84, "sigma": "M" }, "Leg": { "A": 30, "R": 36, "I": 80, "sigma": "M" } } } } }],
-        "payload_events": [{ "timestep_idx": 0, "alpha_source": "p1.Dir", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Leg", "sigma": "L", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "threshold-transfer", "magnitude": 0.60 }],
-        "analysis": { "key_finding": "Threshold-active mirrored behavior is preserved." }
+        "participants": [
+          {
+            "id": "p1",
+            "name": "P1"
+          },
+          {
+            "id": "p2",
+            "name": "P2"
+          },
+          {
+            "id": "p3",
+            "name": "P3"
+          }
+        ],
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": {
+                    "A": 82,
+                    "R": 82,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 81,
+                    "R": 81,
+                    "I": 81,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 84,
+                    "R": 84,
+                    "I": 84,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p2": {
+                "axes": {
+                  "Cfg": {
+                    "A": 22,
+                    "R": 30,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 58,
+                    "R": 58,
+                    "I": 60,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 70,
+                    "R": 70,
+                    "I": 72,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 36,
+                    "R": 40,
+                    "I": 78,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 72,
+                    "R": 72,
+                    "I": 74,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": {
+                    "A": 28,
+                    "R": 34,
+                    "I": 82,
+                    "sigma": "M"
+                  },
+                  "Emb": {
+                    "A": 32,
+                    "R": 35,
+                    "I": 78,
+                    "sigma": "M"
+                  },
+                  "Org": {
+                    "A": 22,
+                    "R": 30,
+                    "I": 88,
+                    "sigma": "M"
+                  },
+                  "Dir": {
+                    "A": 26,
+                    "R": 32,
+                    "I": 84,
+                    "sigma": "M"
+                  },
+                  "Leg": {
+                    "A": 30,
+                    "R": 36,
+                    "I": 80,
+                    "sigma": "M"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Dir",
+            "alpha_medium": "p3.Org",
+            "alpha_receiving": "p2.Leg",
+            "sigma": "L",
+            "axis": "Leg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "threshold-transfer",
+            "magnitude": 0.6
+          }
+        ],
+        "analysis": {
+          "key_finding": "Threshold-active mirrored behavior is preserved."
+        }
       },
       "case_b_data": {
         "system_name": "fx-thr-02-threshold-flattening-pressure",
-        "participants": [{ "id": "p1", "name": "P1" }, { "id": "p2", "name": "P2" }, { "id": "p3", "name": "P3" }],
-        "timeline": [{ "timestep_label": "T0", "participants": { "p1": { "axes": { "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" }, "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" }, "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" } } }, "p2": { "axes": { "Cfg": { "A": 56, "R": 58, "I": 60, "sigma": "L" }, "Emb": { "A": 58, "R": 58, "I": 60, "sigma": "L" }, "Org": { "A": 70, "R": 70, "I": 72, "sigma": "L" }, "Dir": { "A": 36, "R": 40, "I": 78, "sigma": "L" }, "Leg": { "A": 72, "R": 72, "I": 74, "sigma": "L" } } }, "p3": { "axes": { "Cfg": { "A": 28, "R": 34, "I": 82, "sigma": "M" }, "Emb": { "A": 32, "R": 35, "I": 78, "sigma": "M" }, "Org": { "A": 22, "R": 30, "I": 88, "sigma": "M" }, "Dir": { "A": 26, "R": 32, "I": 84, "sigma": "M" }, "Leg": { "A": 30, "R": 36, "I": 80, "sigma": "M" } } } } }],
-        "payload_events": [{ "timestep_idx": 0, "alpha_source": "p1.Dir", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Leg", "sigma": "L", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "threshold-transfer", "magnitude": 0.60 }],
-        "analysis": { "key_finding": "Threshold flattening pressure seed." }
+        "participants": [
+          {
+            "id": "p1",
+            "name": "P1"
+          },
+          {
+            "id": "p2",
+            "name": "P2"
+          },
+          {
+            "id": "p3",
+            "name": "P3"
+          }
+        ],
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": {
+                    "A": 82,
+                    "R": 82,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 81,
+                    "R": 81,
+                    "I": 81,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 84,
+                    "R": 84,
+                    "I": 84,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p2": {
+                "axes": {
+                  "Cfg": {
+                    "A": 56,
+                    "R": 58,
+                    "I": 60,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 58,
+                    "R": 58,
+                    "I": 60,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 70,
+                    "R": 70,
+                    "I": 72,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 36,
+                    "R": 40,
+                    "I": 78,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 72,
+                    "R": 72,
+                    "I": 74,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": {
+                    "A": 28,
+                    "R": 34,
+                    "I": 82,
+                    "sigma": "M"
+                  },
+                  "Emb": {
+                    "A": 32,
+                    "R": 35,
+                    "I": 78,
+                    "sigma": "M"
+                  },
+                  "Org": {
+                    "A": 22,
+                    "R": 30,
+                    "I": 88,
+                    "sigma": "M"
+                  },
+                  "Dir": {
+                    "A": 26,
+                    "R": 32,
+                    "I": 84,
+                    "sigma": "M"
+                  },
+                  "Leg": {
+                    "A": 30,
+                    "R": 36,
+                    "I": 80,
+                    "sigma": "M"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Dir",
+            "alpha_medium": "p3.Org",
+            "alpha_receiving": "p2.Leg",
+            "sigma": "L",
+            "axis": "Leg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "threshold-transfer",
+            "magnitude": 0.6
+          }
+        ],
+        "analysis": {
+          "key_finding": "Threshold flattening pressure seed."
+        }
       }
     },
     {
@@ -375,17 +2141,307 @@
       ],
       "case_a_data": {
         "system_name": "fx-fld-02-recursive-preserved",
-        "participants": [{ "id": "p1", "name": "P1" }, { "id": "p2", "name": "P2" }, { "id": "p3", "name": "P3" }],
-        "timeline": [{ "timestep_label": "T0", "participants": { "p1": { "axes": { "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" }, "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" }, "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" } } }, "p2": { "axes": { "Cfg": { "A": 28, "R": 34, "I": 82, "sigma": "L" }, "Emb": { "A": 58, "R": 58, "I": 60, "sigma": "L" }, "Org": { "A": 62, "R": 62, "I": 66, "sigma": "L" }, "Dir": { "A": 38, "R": 42, "I": 78, "sigma": "L" }, "Leg": { "A": 64, "R": 64, "I": 66, "sigma": "L" } } }, "p3": { "axes": { "Cfg": { "A": 74, "R": 74, "I": 74, "sigma": "L" }, "Emb": { "A": 72, "R": 72, "I": 72, "sigma": "L" }, "Org": { "A": 76, "R": 76, "I": 76, "sigma": "L" }, "Dir": { "A": 73, "R": 73, "I": 73, "sigma": "L" }, "Leg": { "A": 72, "R": 72, "I": 72, "sigma": "L" } } } } }],
-        "payload_events": [{ "timestep_idx": 0, "face": "inner", "scan_index": 2, "order_depth": 2, "leg_scope": "distributed", "trace_persistence": 2, "distributed_span": 2, "field_scope": "recursive", "field_feedback": 3, "field_depth": 3, "alpha_source": "p1.Org", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Org", "sigma": "L", "axis": "Org", "unfolding": "acute", "register": "retained", "mode": "load", "magnitude": 0.58 }],
-        "analysis": { "key_finding": "Recursive field remains solver-distinct." }
+        "participants": [
+          {
+            "id": "p1",
+            "name": "P1"
+          },
+          {
+            "id": "p2",
+            "name": "P2"
+          },
+          {
+            "id": "p3",
+            "name": "P3"
+          }
+        ],
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": {
+                    "A": 82,
+                    "R": 82,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 81,
+                    "R": 81,
+                    "I": 81,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 84,
+                    "R": 84,
+                    "I": 84,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p2": {
+                "axes": {
+                  "Cfg": {
+                    "A": 28,
+                    "R": 34,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 58,
+                    "R": 58,
+                    "I": 60,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 62,
+                    "R": 62,
+                    "I": 66,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 38,
+                    "R": 42,
+                    "I": 78,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 64,
+                    "R": 64,
+                    "I": 66,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": {
+                    "A": 74,
+                    "R": 74,
+                    "I": 74,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 72,
+                    "R": 72,
+                    "I": 72,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 76,
+                    "R": 76,
+                    "I": 76,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 73,
+                    "R": 73,
+                    "I": 73,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 72,
+                    "R": 72,
+                    "I": 72,
+                    "sigma": "L"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "face": "inner",
+            "scan_index": 2,
+            "order_depth": 2,
+            "leg_scope": "distributed",
+            "trace_persistence": 2,
+            "distributed_span": 2,
+            "field_scope": "recursive",
+            "field_feedback": 3,
+            "field_depth": 3,
+            "alpha_source": "p1.Org",
+            "alpha_medium": "p3.Org",
+            "alpha_receiving": "p2.Org",
+            "sigma": "L",
+            "axis": "Org",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "load",
+            "magnitude": 0.58
+          }
+        ],
+        "analysis": {
+          "key_finding": "Recursive field remains solver-distinct."
+        }
       },
       "case_b_data": {
         "system_name": "fx-fld-02-local-flattening-pressure",
-        "participants": [{ "id": "p1", "name": "P1" }, { "id": "p2", "name": "P2" }, { "id": "p3", "name": "P3" }],
-        "timeline": [{ "timestep_label": "T0", "participants": { "p1": { "axes": { "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" }, "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" }, "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" } } }, "p2": { "axes": { "Cfg": { "A": 28, "R": 34, "I": 82, "sigma": "L" }, "Emb": { "A": 58, "R": 58, "I": 60, "sigma": "L" }, "Org": { "A": 62, "R": 62, "I": 66, "sigma": "L" }, "Dir": { "A": 38, "R": 42, "I": 78, "sigma": "L" }, "Leg": { "A": 64, "R": 64, "I": 66, "sigma": "L" } } }, "p3": { "axes": { "Cfg": { "A": 74, "R": 74, "I": 74, "sigma": "L" }, "Emb": { "A": 72, "R": 72, "I": 72, "sigma": "L" }, "Org": { "A": 76, "R": 76, "I": 76, "sigma": "L" }, "Dir": { "A": 73, "R": 73, "I": 73, "sigma": "L" }, "Leg": { "A": 72, "R": 72, "I": 72, "sigma": "L" } } } } }],
-        "payload_events": [{ "timestep_idx": 0, "face": "inner", "scan_index": 2, "order_depth": 2, "leg_scope": "distributed", "trace_persistence": 2, "distributed_span": 2, "field_scope": "local", "field_feedback": 0, "field_depth": 0, "alpha_source": "p1.Org", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Org", "sigma": "L", "axis": "Org", "unfolding": "acute", "register": "retained", "mode": "load", "magnitude": 0.58 }],
-        "analysis": { "key_finding": "Local field flattening pressure seed." }
+        "participants": [
+          {
+            "id": "p1",
+            "name": "P1"
+          },
+          {
+            "id": "p2",
+            "name": "P2"
+          },
+          {
+            "id": "p3",
+            "name": "P3"
+          }
+        ],
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": {
+                    "A": 82,
+                    "R": 82,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 81,
+                    "R": 81,
+                    "I": 81,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 84,
+                    "R": 84,
+                    "I": 84,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p2": {
+                "axes": {
+                  "Cfg": {
+                    "A": 28,
+                    "R": 34,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 58,
+                    "R": 58,
+                    "I": 60,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 62,
+                    "R": 62,
+                    "I": 66,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 38,
+                    "R": 42,
+                    "I": 78,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 64,
+                    "R": 64,
+                    "I": 66,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": {
+                    "A": 74,
+                    "R": 74,
+                    "I": 74,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 72,
+                    "R": 72,
+                    "I": 72,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 76,
+                    "R": 76,
+                    "I": 76,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 73,
+                    "R": 73,
+                    "I": 73,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 72,
+                    "R": 72,
+                    "I": 72,
+                    "sigma": "L"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "face": "inner",
+            "scan_index": 2,
+            "order_depth": 2,
+            "leg_scope": "distributed",
+            "trace_persistence": 2,
+            "distributed_span": 2,
+            "field_scope": "local",
+            "field_feedback": 0,
+            "field_depth": 0,
+            "alpha_source": "p1.Org",
+            "alpha_medium": "p3.Org",
+            "alpha_receiving": "p2.Org",
+            "sigma": "L",
+            "axis": "Org",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "load",
+            "magnitude": 0.58
+          }
+        ],
+        "analysis": {
+          "key_finding": "Local field flattening pressure seed."
+        }
       }
     },
     {
@@ -411,7 +2467,6 @@
           "expectation": "all_must_differ",
           "paths": [
             "timeline.0.participants.p2.prevalence",
-            "timeline.0.participants.p2.theta",
             "timeline.0.participants.p2.solver_debug.relation_summary",
             "timeline.0.participants.p2.solver_debug.relation_traces"
           ]
@@ -429,23 +2484,313 @@
       ],
       "case_a_data": {
         "system_name": "fx-fam-02-distinct-family-support",
-        "participants": [{ "id": "p1", "name": "P1" }, { "id": "p2", "name": "P2" }, { "id": "p3", "name": "P3" }],
-        "timeline": [{ "timestep_label": "T0", "participants": { "p1": { "axes": { "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" }, "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" }, "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" } } }, "p2": { "axes": { "Cfg": { "A": 22, "R": 30, "I": 82, "sigma": "L" }, "Emb": { "A": 58, "R": 58, "I": 60, "sigma": "L" }, "Org": { "A": 70, "R": 70, "I": 72, "sigma": "L" }, "Dir": { "A": 36, "R": 40, "I": 78, "sigma": "L" }, "Leg": { "A": 72, "R": 72, "I": 74, "sigma": "L" } } }, "p3": { "axes": { "Cfg": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Emb": { "A": 79, "R": 79, "I": 79, "sigma": "L" }, "Org": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Dir": { "A": 80, "R": 80, "I": 80, "sigma": "L" }, "Leg": { "A": 79, "R": 79, "I": 79, "sigma": "L" } } } } }],
-        "payload_events": [
-          { "timestep_idx": 0, "alpha_source": "p1.Dir", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Leg", "sigma": "L", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "threshold-transfer", "magnitude": 0.58 },
-          { "timestep_idx": 0, "alpha_source": "p1.Org", "alpha_medium": "p3.Org", "alpha_receiving": "p2.Org", "sigma": "L", "axis": "Org", "unfolding": "acute", "register": "retained", "mode": "load", "magnitude": 0.54 }
+        "participants": [
+          {
+            "id": "p1",
+            "name": "P1"
+          },
+          {
+            "id": "p2",
+            "name": "P2"
+          },
+          {
+            "id": "p3",
+            "name": "P3"
+          }
         ],
-        "analysis": { "key_finding": "Distinct aligned-family support seed." }
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": {
+                    "A": 82,
+                    "R": 82,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 81,
+                    "R": 81,
+                    "I": 81,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 84,
+                    "R": 84,
+                    "I": 84,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p2": {
+                "axes": {
+                  "Cfg": {
+                    "A": 22,
+                    "R": 30,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 58,
+                    "R": 58,
+                    "I": 60,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 70,
+                    "R": 70,
+                    "I": 72,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 36,
+                    "R": 40,
+                    "I": 78,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 72,
+                    "R": 72,
+                    "I": 74,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": {
+                    "A": 81,
+                    "R": 81,
+                    "I": 81,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 79,
+                    "R": 79,
+                    "I": 79,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 82,
+                    "R": 82,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 79,
+                    "R": 79,
+                    "I": 79,
+                    "sigma": "L"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Dir",
+            "alpha_medium": "p3.Org",
+            "alpha_receiving": "p2.Leg",
+            "sigma": "L",
+            "axis": "Leg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "threshold-transfer",
+            "magnitude": 0.58
+          },
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Org",
+            "alpha_medium": "p3.Org",
+            "alpha_receiving": "p2.Org",
+            "sigma": "L",
+            "axis": "Org",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "load",
+            "magnitude": 0.54
+          }
+        ],
+        "analysis": {
+          "key_finding": "Distinct aligned-family support seed."
+        }
       },
       "case_b_data": {
         "system_name": "fx-fam-02-same-family-shorthand-pressure",
-        "participants": [{ "id": "p1", "name": "P1" }, { "id": "p2", "name": "P2" }, { "id": "p3", "name": "P3" }],
-        "timeline": [{ "timestep_label": "T0", "participants": { "p1": { "axes": { "Cfg": { "A": 82, "R": 82, "I": 82, "sigma": "L" }, "Emb": { "A": 80, "R": 80, "I": 80, "sigma": "L" }, "Org": { "A": 81, "R": 81, "I": 81, "sigma": "L" }, "Dir": { "A": 84, "R": 84, "I": 84, "sigma": "L" }, "Leg": { "A": 80, "R": 80, "I": 80, "sigma": "L" } } }, "p2": { "axes": { "Cfg": { "A": 22, "R": 30, "I": 82, "sigma": "L" }, "Emb": { "A": 58, "R": 58, "I": 60, "sigma": "L" }, "Org": { "A": 70, "R": 70, "I": 72, "sigma": "L" }, "Dir": { "A": 36, "R": 40, "I": 78, "sigma": "L" }, "Leg": { "A": 72, "R": 72, "I": 74, "sigma": "L" } } }, "p3": { "axes": { "Cfg": { "A": 28, "R": 34, "I": 82, "sigma": "M" }, "Emb": { "A": 32, "R": 35, "I": 78, "sigma": "M" }, "Org": { "A": 22, "R": 30, "I": 88, "sigma": "M" }, "Dir": { "A": 26, "R": 32, "I": 84, "sigma": "M" }, "Leg": { "A": 30, "R": 36, "I": 80, "sigma": "M" } } } } }],
-        "payload_events": [
-          { "timestep_idx": 0, "alpha_source": "p1.Dir", "alpha_medium": "p1.Org", "alpha_receiving": "p2.Leg", "sigma": "L", "axis": "Leg", "unfolding": "acute", "register": "retained", "mode": "threshold-transfer", "magnitude": 0.58 },
-          { "timestep_idx": 0, "alpha_source": "p1.Org", "alpha_medium": "p1.Org", "alpha_receiving": "p2.Org", "sigma": "L", "axis": "Org", "unfolding": "acute", "register": "retained", "mode": "load", "magnitude": 0.54 }
+        "participants": [
+          {
+            "id": "p1",
+            "name": "P1"
+          },
+          {
+            "id": "p2",
+            "name": "P2"
+          },
+          {
+            "id": "p3",
+            "name": "P3"
+          }
         ],
-        "analysis": { "key_finding": "Same-family shorthand pressure seed." }
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": {
+                    "A": 82,
+                    "R": 82,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 81,
+                    "R": 81,
+                    "I": 81,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 84,
+                    "R": 84,
+                    "I": 84,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p2": {
+                "axes": {
+                  "Cfg": {
+                    "A": 22,
+                    "R": 30,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 58,
+                    "R": 58,
+                    "I": 60,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 70,
+                    "R": 70,
+                    "I": 72,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 36,
+                    "R": 40,
+                    "I": 78,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 72,
+                    "R": 72,
+                    "I": 74,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": {
+                    "A": 28,
+                    "R": 34,
+                    "I": 82,
+                    "sigma": "M"
+                  },
+                  "Emb": {
+                    "A": 32,
+                    "R": 35,
+                    "I": 78,
+                    "sigma": "M"
+                  },
+                  "Org": {
+                    "A": 22,
+                    "R": 30,
+                    "I": 88,
+                    "sigma": "M"
+                  },
+                  "Dir": {
+                    "A": 26,
+                    "R": 32,
+                    "I": 84,
+                    "sigma": "M"
+                  },
+                  "Leg": {
+                    "A": 30,
+                    "R": 36,
+                    "I": 80,
+                    "sigma": "M"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Dir",
+            "alpha_medium": "p1.Org",
+            "alpha_receiving": "p2.Leg",
+            "sigma": "L",
+            "axis": "Leg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "threshold-transfer",
+            "magnitude": 0.58
+          },
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Org",
+            "alpha_medium": "p1.Org",
+            "alpha_receiving": "p2.Org",
+            "sigma": "L",
+            "axis": "Org",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "load",
+            "magnitude": 0.54
+          }
+        ],
+        "analysis": {
+          "key_finding": "Same-family shorthand pressure seed."
+        }
       }
     }
   ]

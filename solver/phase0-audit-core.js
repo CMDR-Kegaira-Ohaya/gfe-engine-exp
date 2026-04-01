@@ -877,8 +877,12 @@ function evaluateRowPromotionGates(coverageRows = [], fixtures = [], crossPhaseC
     const rowPublicEntrypointOnly = rowFixtures.length > 0 && rowFixtures.every(
       fixture => fixture.public_entrypoint === CANONICAL_PUBLIC_ENTRYPOINT
     );
+    const antiCollapseFixtures = rowFixtures.filter(
+      fixture => fixture.fixture_class === 'anti-collapse'
+    );
     const nonCollapsePass =
-      row.observed_fixture_classes.includes('anti-collapse') && row.hard_gated_failures === 0;
+      antiCollapseFixtures.length > 0 &&
+      antiCollapseFixtures.every(fixture => fixture.hard_gated_failure !== true);
     const declared_proof_expectation = buildDeclaredRowProofExpectation(row, fixtureIdMap);
     const declared_proof_expectation_check = evaluateDeclaredRowProofExpectation(
       row,

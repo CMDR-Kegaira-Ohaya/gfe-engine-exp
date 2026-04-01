@@ -1,0 +1,184 @@
+{
+  "version": "0.1.0",
+  "canon": "v15.7",
+  "mode": "phase0-audit",
+  "fixture_pack": "core-golden",
+  "notes": [
+    "Row-scoped golden witness for AXIS_LOCAL_CORE.",
+    "This pack exists to satisfy the declared full-contract fixture class set without reopening the corrupted shared manifest scaffold."
+  ],
+  "fixtures": [
+    {
+      "id": "FX-CORE-01",
+      "row": "AXIS_LOCAL_CORE",
+      "kind": "single",
+      "fixture_class": "golden",
+      "purpose": "Stable golden witness for canonical local-axis outputs on AXIS_LOCAL_CORE.",
+      "assertions": [
+        "validate_ok",
+        "solve_ok",
+        "path_exists:timeline.0.participants.p2._canonical_axes.Cfg",
+        "path_exists:timeline.0.participants.p2._canonical_axes.Emb",
+        "path_exists:timeline.0.participants.p2._canonical_axes.Org",
+        "path_exists:timeline.0.participants.p2._canonical_axes.Dir",
+        "path_exists:timeline.0.participants.p2._canonical_axes.Leg"
+      ],
+      "case_data": {
+        "system_name": "fx-int-12-core-facing-integration",
+        "participants": [
+          {
+            "id": "p1",
+            "name": "P1"
+          },
+          {
+            "id": "p2",
+            "name": "P2"
+          },
+          {
+            "id": "p3",
+            "name": "P3"
+          }
+        ],
+        "timeline": [
+          {
+            "timestep_label": "T0",
+            "participants": {
+              "p1": {
+                "axes": {
+                  "Cfg": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 78,
+                    "R": 78,
+                    "I": 78,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 79,
+                    "R": 79,
+                    "I": 79,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 76,
+                    "R": 76,
+                    "I": 76,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 77,
+                    "R": 77,
+                    "I": 77,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p2": {
+                "cascade": {
+                  "attempts": [
+                    {
+                      "axis": "Cfg"
+                    },
+                    {
+                      "axis": "Leg"
+                    },
+                    {
+                      "axis": "Org"
+                    }
+                  ]
+                },
+                "axes": {
+                  "Cfg": {
+                    "A": 22,
+                    "R": 28,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 60,
+                    "R": 60,
+                    "I": 62,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 70,
+                    "R": 70,
+                    "I": 74,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 38,
+                    "R": 44,
+                    "I": 78,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 72,
+                    "R": 72,
+                    "I": 76,
+                    "sigma": "L"
+                  }
+                }
+              },
+              "p3": {
+                "axes": {
+                  "Cfg": {
+                    "A": 82,
+                    "R": 82,
+                    "I": 82,
+                    "sigma": "L"
+                  },
+                  "Emb": {
+                    "A": 80,
+                    "R": 80,
+                    "I": 80,
+                    "sigma": "L"
+                  },
+                  "Org": {
+                    "A": 81,
+                    "R": 81,
+                    "I": 81,
+                    "sigma": "L"
+                  },
+                  "Dir": {
+                    "A": 78,
+                    "R": 78,
+                    "I": 78,
+                    "sigma": "L"
+                  },
+                  "Leg": {
+                    "A": 79,
+                    "R": 79,
+                    "I": 79,
+                    "sigma": "L"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "payload_events": [
+          {
+            "timestep_idx": 0,
+            "alpha_source": "p1.Dir",
+            "alpha_medium": "p1.Org",
+            "alpha_receiving": "p2.Leg",
+            "sigma": "L",
+            "axis": "Leg",
+            "unfolding": "acute",
+            "register": "retained",
+            "mode": "load",
+            "magnitude": 0.4
+          }
+        ],
+        "analysis": {
+          "key_finding": "Integrated core-facing public-path seed."
+        }
+      }
+    }
+  ]
+}

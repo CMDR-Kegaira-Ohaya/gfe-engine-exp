@@ -1,1 +1,562 @@
-{"version":"0.1.0","canon":"v15.7","mode":"coverage-status","notes":["This file is a working status/memory board for the solver coverage rows against the v15.7 contract.","It does not redefine the formal meaning of parsed-only, partial, full, fixture classes, or final validation target.","Its purpose is to keep the current repo-visible row state convergent with the Phase 0 audit surface.","Row declarations may now carry explicit proof_expectations metadata for Phase 0 audit alignment; when absent, older inference remains the fallback."],"rows":[{"row":"AXIS_LOCAL_CORE","current_state":"partial","target_state":"full","required_fixture_classes":["golden","contrast","anti-collapse","integration"],"runtime_surface":"canonical local-axis ARI math in solver/state.js and solver/engine.js","packs":["manifest.json","core_contrast.json","core_anti_collapse.json","core_integration.json"],"fixture_ids":["FX-CORE-01","FX-CORE-02","FX-CORE-03","FX-INT-12"],"notes":["Public-path executable surface exists.","Core contrast, anti-collapse, and integration surfaces are present.","Still missing the fuller invariant bundle required for full."],"proof_expectations":{"mode":"explicit-row-proof-v1","behavioral_contrast_surface_required":true,"output_contract_surface_required":true,"non_collapse_proof_required":true,"complete_fixture_class_set_required":true,"row_local_suite_required":true,"public_entrypoint":"solver/index.js#solveCase","runtime_mode":"canon-locked-runtime","integration_fixture_ids":["FX-INT-12"]}},{"row":"RELATION_TRIAD","current_state":"partial","target_state":"full","required_fixture_classes":["golden","contrast","anti-collapse","integration"],"runtime_surface":"solver/relation.js triadic participation via source / medium / receiving","packs":["manifest.json","relation_golden.json","relation_split.json","anti_collapse.json","integration_paths.json"],"fixture_ids":["FX-REL-G01","FX-REL-01","FX-REL-02","FX-INT-01"],"notes":["Medium-sensitive relation handling is executable and hard-gated in Phase 0.","A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.","Still lacks the fuller modern corpus and invariant suite required for full."],"proof_expectations":{"mode":"explicit-row-proof-v1","behavioral_contrast_surface_required":true,"output_contract_surface_required":true,"non_collapse_proof_required":true,"complete_fixture_class_set_required":true,"row_local_suite_required":true,"public_entrypoint":"solver/index.js#solveCase","runtime_mode":"canon-locked-runtime","integration_fixture_ids":["FX-INT-01"]}},{"row":"THRESHOLD_PREVALENCE","current_state":"partial","target_state":"full","required_fixture_classes":["golden","contrast","anti-collapse","integration"],"runtime_surface":"solver/prevalence.js mirrored threshold behavior via prevalence / theta","packs":["threshold_golden.json","threshold_split.json","anti_collapse.json","integration_paths.json"],"fixture_ids":["FX-THR-G01","FX-THR-01","FX-THR-02","FX-INT-05"],"notes":["Mirrored threshold contrast is hard-gated in Phase 0.","A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.","Still not full because row-local and cross-phase invariant suites remain incomplete."],"proof_expectations":{"mode":"explicit-row-proof-v1","behavioral_contrast_surface_required":true,"output_contract_surface_required":true,"non_collapse_proof_required":true,"complete_fixture_class_set_required":true,"row_local_suite_required":true,"public_entrypoint":"solver/index.js#solveCase","runtime_mode":"canon-locked-runtime","integration_fixture_ids":["FX-INT-05"]}},{"row":"FAMILY_TRUTH","current_state":"partial","target_state":"full","required_fixture_classes":["golden","contrast","anti-collapse","integration"],"runtime_surface":"relation-conditioned prevalence / theta with family-truth contrast evidence","packs":["family_golden.json","family_truth.json","anti_collapse.json","integration_paths.json"],"fixture_ids":["FX-FAM-G01","FX-FAM-01","FX-FAM-02","FX-INT-06"],"notes":["Aligned vs misaligned family handling has its own hard-gated proof surface.","A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.","Still requires fuller executable separation and invariant depth before full."],"proof_expectations":{"mode":"explicit-row-proof-v1","behavioral_contrast_surface_required":true,"output_contract_surface_required":true,"non_collapse_proof_required":true,"complete_fixture_class_set_required":true,"row_local_suite_required":true,"public_entrypoint":"solver/index.js#solveCase","runtime_mode":"canon-locked-runtime","integration_fixture_ids":["FX-INT-06"]}},{"row":"FAILURE_OVERFLOW","current_state":"partial","target_state":"full","required_fixture_classes":["golden","contrast","anti-collapse","integration"],"runtime_surface":"solver/failure.js distinct grammar candidate and projection surfaces","packs":["failure_overflow_golden.json","failure_split.json","anti_collapse.json","integration_paths.json"],"fixture_ids":["FX-FAIL-OVF-G01","FX-FAIL-01","FX-FAIL-07","FX-INT-07"],"notes":["Overflow is contrast-tested against substitution and hard-gated in Phase 0.","A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.","Still requires fuller corpus and invariant depth before full."],"proof_expectations":{"mode":"explicit-row-proof-v1","behavioral_contrast_surface_required":true,"output_contract_surface_required":true,"non_collapse_proof_required":true,"complete_fixture_class_set_required":true,"row_local_suite_required":true,"public_entrypoint":"solver/index.js#solveCase","runtime_mode":"canon-locked-runtime","integration_fixture_ids":["FX-INT-07"]}},{"row":"FAILURE_SUBSTITUTION","current_state":"partial","target_state":"full","required_fixture_classes":["golden","contrast","anti-collapse","integration"],"runtime_surface":"solver/failure.js distinct grammar candidate and projection surfaces","packs":["failure_substitution_golden.json","failure_split.json","failure_projection.json","failure_substitution_anti_collapse.json","integration_paths.json"],"fixture_ids":["FX-FAIL-SUB-G01","FX-FAIL-01","FX-FAIL-04","FX-FAIL-08","FX-INT-08"],"notes":["Substitution is contrast-tested against overflow and rerouted cascade projection.","A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.","Still requires fuller corpus and invariant depth before full."],"proof_expectations":{"mode":"explicit-row-proof-v1","behavioral_contrast_surface_required":true,"output_contract_surface_required":true,"non_collapse_proof_required":true,"complete_fixture_class_set_required":true,"row_local_suite_required":true,"public_entrypoint":"solver/index.js#solveCase","runtime_mode":"canon-locked-runtime","integration_fixture_ids":["FX-INT-08"]}},{"row":"FAILURE_PLASTIC_DEFORMATION","current_state":"partial","target_state":"full","required_fixture_classes":["golden","contrast","anti-collapse","integration"],"runtime_surface":"solver/failure.js plastic-deformation grammar candidate","packs":["failure_plastic_deformation_golden.json","failure_split.json","failure_plastic_deformation_anti_collapse.json","failure_plastic_deformation_integration.json"],"fixture_ids":["FX-FAIL-PLA-G01","FX-FAIL-02","FX-FAIL-10","FX-INT-13"],"notes":["Plastic deformation is executable and contrast-tested against transient stress.","A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.","It remains partial because the fuller corpus and invariant depth required for full are still missing."],"proof_expectations":{"mode":"explicit-row-proof-v1","behavioral_contrast_surface_required":true,"output_contract_surface_required":true,"non_collapse_proof_required":true,"complete_fixture_class_set_required":true,"row_local_suite_required":true,"public_entrypoint":"solver/index.js#solveCase","runtime_mode":"canon-locked-runtime","integration_fixture_ids":["FX-INT-13"]}},{"row":"FAILURE_SUPPRESSION","current_state":"partial","target_state":"full","required_fixture_classes":["golden","contrast","anti-collapse","integration"],"runtime_surface":"solver/failure.js plus envelope/cascade projection surfaces","packs":["failure_suppression_golden.json","failure_split.json","failure_projection.json","anti_collapse.json","integration_paths.json"],"fixture_ids":["FX-FAIL-SUP-G01","FX-FAIL-03","FX-FAIL-05","FX-FAIL-06","FX-INT-09"],"notes":["Suppression is contrast-tested against collapse and hard-gated in grammar and envelope space.","A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.","Still requires fuller corpus and invariant depth before full."],"proof_expectations":{"mode":"explicit-row-proof-v1","behavioral_contrast_surface_required":true,"output_contract_surface_required":true,"non_collapse_proof_required":true,"complete_fixture_class_set_required":true,"row_local_suite_required":true,"public_entrypoint":"solver/index.js#solveCase","runtime_mode":"canon-locked-runtime","integration_fixture_ids":["FX-INT-09"]}},{"row":"FAILURE_COLLAPSE","current_state":"partial","target_state":"full","required_fixture_classes":["golden","contrast","anti-collapse","integration"],"runtime_surface":"solver/failure.js plus cascade/envelope projection surfaces","packs":["failure_collapse_golden.json","failure_split.json","failure_projection.json","failure_collapse_anti_collapse.json","failure_collapse_integration.json"],"fixture_ids":["FX-FAIL-COL-G01","FX-FAIL-03","FX-FAIL-04","FX-FAIL-05","FX-FAIL-09","FX-INT-11"],"notes":["Collapse is hard-gated in grammar, cascade, and envelope projection contrasts.","A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.","Still requires fuller corpus and invariant depth before full."],"proof_expectations":{"mode":"explicit-row-proof-v1","behavioral_contrast_surface_required":true,"output_contract_surface_required":true,"non_collapse_proof_required":true,"complete_fixture_class_set_required":true,"row_local_suite_required":true,"public_entrypoint":"solver/index.js#solveCase","runtime_mode":"canon-locked-runtime","integration_fixture_ids":["FX-INT-11"]}},{"row":"FACE_DISTINCTION","current_state":"partial","target_state":"full","required_fixture_classes":["golden","contrast","anti-collapse","integration"],"runtime_surface":"solver/relation.js face-aware continuity/transfer/emission handling","packs":["face_golden.json","face_split.json","face_anti_collapse.json","face_integration.json"],"fixture_ids":["FX-FACE-G01","FX-FACE-01","FX-FACE-02","FX-INT-10"],"notes":["Inner vs outer face is solver-operative and hard-gated.","A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.","Still requires fuller corpus and invariant depth before full."],"proof_expectations":{"mode":"explicit-row-proof-v1","behavioral_contrast_surface_required":true,"output_contract_surface_required":true,"non_collapse_proof_required":true,"complete_fixture_class_set_required":true,"row_local_suite_required":true,"public_entrypoint":"solver/index.js#solveCase","runtime_mode":"canon-locked-runtime","integration_fixture_ids":["FX-INT-10"]}},{"row":"ORDER_RECURSION","current_state":"partial","target_state":"full","required_fixture_classes":["golden","contrast","anti-collapse","integration"],"runtime_surface":"solver/order.js plus order-aware relation handling and event ordering","packs":["order_golden.json","order_split.json","anti_collapse.json","integration_paths.json"],"fixture_ids":["FX-ORD-G01","FX-ORD-01","FX-ORD-02","FX-INT-03"],"notes":["Depth order is solver-operative and hard-gated apart from scan order.","A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.","Still requires fuller corpus and invariant depth before full."],"proof_expectations":{"mode":"explicit-row-proof-v1","behavioral_contrast_surface_required":true,"output_contract_surface_required":true,"non_collapse_proof_required":true,"complete_fixture_class_set_required":true,"row_local_suite_required":true,"public_entrypoint":"solver/index.js#solveCase","runtime_mode":"canon-locked-runtime","integration_fixture_ids":["FX-INT-03"]}},{"row":"LEG_DISTRIBUTED","current_state":"partial","target_state":"full","required_fixture_classes":["golden","contrast","anti-collapse","integration"],"runtime_surface":"solver/leg_distributed.js plus distributed Leg-aware relation handling","packs":["leg_golden.json","leg_distributed.json","anti_collapse.json","integration_paths.json"],"fixture_ids":["FX-LEG-G01","FX-LEG-01","FX-LEG-02","FX-INT-04"],"notes":["Local vs distributed Leg persistence is solver-operative and hard-gated.","A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.","Still requires fuller corpus and invariant depth before full."],"proof_expectations":{"mode":"explicit-row-proof-v1","behavioral_contrast_surface_required":true,"output_contract_surface_required":true,"non_collapse_proof_required":true,"complete_fixture_class_set_required":true,"row_local_suite_required":true,"public_entrypoint":"solver/index.js#solveCase","runtime_mode":"canon-locked-runtime","integration_fixture_ids":["FX-INT-04"]}},{"row":"FIELD_RECURSION","current_state":"partial","target_state":"full","required_fixture_classes":["golden","contrast","anti-collapse","integration"],"runtime_surface":"solver/field_recursion.js plus field-aware relation handling","packs":["field_golden.json","field_recursion.json","anti_collapse.json","integration_paths.json"],"fixture_ids":["FX-FLD-G01","FX-FLD-01","FX-FLD-02","FX-INT-02"],"notes":["Local vs recursive field behavior is solver-operative and hard-gated.","A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.","Still requires fuller corpus and invariant depth before full."],"proof_expectations":{"mode":"explicit-row-proof-v1","behavioral_contrast_surface_required":true,"output_contract_surface_required":true,"non_collapse_proof_required":true,"complete_fixture_class_set_required":true,"row_local_suite_required":true,"public_entrypoint":"solver/index.js#solveCase","runtime_mode":"canon-locked-runtime","integration_fixture_ids":["FX-INT-02"]}}]}
+{
+  "version": "0.1.0",
+  "canon": "v15.7",
+  "mode": "coverage-status",
+  "notes": [
+    "This file is a working status/memory board for the solver coverage rows against the v15.7 contract.",
+    "It does not redefine the formal meaning of parsed-only, partial, full, fixture classes, or final validation target.",
+    "Its purpose is to keep the current repo-visible row state convergent with the Phase 0 audit surface.",
+    "Row declarations may now carry explicit proof_expectations metadata for Phase 0 audit alignment; when absent, older inference remains the fallback."
+  ],
+  "rows": [
+    {
+      "row": "AXIS_LOCAL_CORE",
+      "current_state": "partial",
+      "target_state": "full",
+      "required_fixture_classes": [
+        "golden",
+        "contrast",
+        "anti-collapse",
+        "integration"
+      ],
+      "runtime_surface": "canonical local-axis ARI math in solver/state.js and solver/engine.js",
+      "packs": [
+        "core_golden.json",
+        "core_contrast.json",
+        "core_anti_collapse.json",
+        "core_integration.json"
+      ],
+      "fixture_ids": [
+        "FX-CORE-01",
+        "FX-CORE-02",
+        "FX-CORE-03",
+        "FX-INT-12"
+      ],
+      "notes": [
+        "Public-path executable surface exists.",
+        "Core contrast, anti-collapse, and integration surfaces are present.",
+        "Still missing the fuller invariant bundle required for full."
+      ],
+      "proof_expectations": {
+        "mode": "explicit-row-proof-v1",
+        "behavioral_contrast_surface_required": true,
+        "output_contract_surface_required": true,
+        "non_collapse_proof_required": true,
+        "complete_fixture_class_set_required": true,
+        "row_local_suite_required": true,
+        "public_entrypoint": "solver/index.js#solveCase",
+        "runtime_mode": "canon-locked-runtime",
+        "integration_fixture_ids": [
+          "FX-INT-12"
+        ]
+      }
+    },
+    {
+      "row": "RELATION_TRIAD",
+      "current_state": "partial",
+      "target_state": "full",
+      "required_fixture_classes": [
+        "golden",
+        "contrast",
+        "anti-collapse",
+        "integration"
+      ],
+      "runtime_surface": "solver/relation.js triadic participation via source / medium / receiving",
+      "packs": [
+        "relation_golden.json",
+        "relation_split.json",
+        "anti_collapse.json",
+        "integration_paths.json"
+      ],
+      "fixture_ids": [
+        "FX-REL-G01",
+        "FX-REL-01",
+        "FX-REL-02",
+        "FX-INT-01"
+      ],
+      "notes": [
+        "Medium-sensitive relation handling is executable and hard-gated in Phase 0.",
+        "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
+        "Still lacks the fuller modern corpus and invariant suite required for full."
+      ],
+      "proof_expectations": {
+        "mode": "explicit-row-proof-v1",
+        "behavioral_contrast_surface_required": true,
+        "output_contract_surface_required": true,
+        "non_collapse_proof_required": true,
+        "complete_fixture_class_set_required": true,
+        "row_local_suite_required": true,
+        "public_entrypoint": "solver/index.js#solveCase",
+        "runtime_mode": "canon-locked-runtime",
+        "integration_fixture_ids": [
+          "FX-INT-01"
+        ]
+      }
+    },
+    {
+      "row": "THRESHOLD_PREVALENCE",
+      "current_state": "partial",
+      "target_state": "full",
+      "required_fixture_classes": [
+        "golden",
+        "contrast",
+        "anti-collapse",
+        "integration"
+      ],
+      "runtime_surface": "solver/prevalence.js mirrored threshold behavior via prevalence / theta",
+      "packs": [
+        "threshold_golden.json",
+        "threshold_split.json",
+        "anti_collapse.json",
+        "integration_paths.json"
+      ],
+      "fixture_ids": [
+        "FX-THR-G01",
+        "FX-THR-01",
+        "FX-THR-02",
+        "FX-INT-05"
+      ],
+      "notes": [
+        "Mirrored threshold contrast is hard-gated in Phase 0.",
+        "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
+        "Still not full because row-local and cross-phase invariant suites remain incomplete."
+      ],
+      "proof_expectations": {
+        "mode": "explicit-row-proof-v1",
+        "behavioral_contrast_surface_required": true,
+        "output_contract_surface_required": true,
+        "non_collapse_proof_required": true,
+        "complete_fixture_class_set_required": true,
+        "row_local_suite_required": true,
+        "public_entrypoint": "solver/index.js#solveCase",
+        "runtime_mode": "canon-locked-runtime",
+        "integration_fixture_ids": [
+          "FX-INT-05"
+        ]
+      }
+    },
+    {
+      "row": "FAMILY_TRUTH",
+      "current_state": "partial",
+      "target_state": "full",
+      "required_fixture_classes": [
+        "golden",
+        "contrast",
+        "anti-collapse",
+        "integration"
+      ],
+      "runtime_surface": "relation-conditioned prevalence / theta with family-truth contrast evidence",
+      "packs": [
+        "family_golden.json",
+        "family_truth.json",
+        "anti_collapse.json",
+        "integration_paths.json"
+      ],
+      "fixture_ids": [
+        "FX-FAM-G01",
+        "FX-FAM-01",
+        "FX-FAM-02",
+        "FX-INT-06"
+      ],
+      "notes": [
+        "Aligned vs misaligned family handling has its own hard-gated proof surface.",
+        "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
+        "Still requires fuller executable separation and invariant depth before full."
+      ],
+      "proof_expectations": {
+        "mode": "explicit-row-proof-v1",
+        "behavioral_contrast_surface_required": true,
+        "output_contract_surface_required": true,
+        "non_collapse_proof_required": true,
+        "complete_fixture_class_set_required": true,
+        "row_local_suite_required": true,
+        "public_entrypoint": "solver/index.js#solveCase",
+        "runtime_mode": "canon-locked-runtime",
+        "integration_fixture_ids": [
+          "FX-INT-06"
+        ]
+      }
+    },
+    {
+      "row": "FAILURE_OVERFLOW",
+      "current_state": "partial",
+      "target_state": "full",
+      "required_fixture_classes": [
+        "golden",
+        "contrast",
+        "anti-collapse",
+        "integration"
+      ],
+      "runtime_surface": "solver/failure.js distinct grammar candidate and projection surfaces",
+      "packs": [
+        "failure_overflow_golden.json",
+        "failure_split.json",
+        "anti_collapse.json",
+        "integration_paths.json"
+      ],
+      "fixture_ids": [
+        "FX-FAIL-OVF-G01",
+        "FX-FAIL-01",
+        "FX-FAIL-07",
+        "FX-INT-07"
+      ],
+      "notes": [
+        "Overflow is contrast-tested against substitution and hard-gated in Phase 0.",
+        "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
+        "Still requires fuller corpus and invariant depth before full."
+      ],
+      "proof_expectations": {
+        "mode": "explicit-row-proof-v1",
+        "behavioral_contrast_surface_required": true,
+        "output_contract_surface_required": true,
+        "non_collapse_proof_required": true,
+        "complete_fixture_class_set_required": true,
+        "row_local_suite_required": true,
+        "public_entrypoint": "solver/index.js#solveCase",
+        "runtime_mode": "canon-locked-runtime",
+        "integration_fixture_ids": [
+          "FX-INT-07"
+        ]
+      }
+    },
+    {
+      "row": "FAILURE_SUBSTITUTION",
+      "current_state": "partial",
+      "target_state": "full",
+      "required_fixture_classes": [
+        "golden",
+        "contrast",
+        "anti-collapse",
+        "integration"
+      ],
+      "runtime_surface": "solver/failure.js distinct grammar candidate and projection surfaces",
+      "packs": [
+        "failure_substitution_golden.json",
+        "failure_substitution_contrast.json",
+        "failure_substitution_anti_collapse.json",
+        "integration_paths.json"
+      ],
+      "fixture_ids": [
+        "FX-FAIL-SUB-G01",
+        "FX-FAIL-SUB-C01",
+        "FX-FAIL-08",
+        "FX-INT-08"
+      ],
+      "notes": [
+        "Substitution is contrast-tested against overflow and rerouted cascade projection.",
+        "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
+        "Still requires fuller corpus and invariant depth before full."
+      ],
+      "proof_expectations": {
+        "mode": "explicit-row-proof-v1",
+        "behavioral_contrast_surface_required": true,
+        "output_contract_surface_required": true,
+        "non_collapse_proof_required": true,
+        "complete_fixture_class_set_required": true,
+        "row_local_suite_required": true,
+        "public_entrypoint": "solver/index.js#solveCase",
+        "runtime_mode": "canon-locked-runtime",
+        "integration_fixture_ids": [
+          "FX-INT-08"
+        ]
+      }
+    },
+    {
+      "row": "FAILURE_PLASTIC_DEFORMATION",
+      "current_state": "partial",
+      "target_state": "full",
+      "required_fixture_classes": [
+        "golden",
+        "contrast",
+        "anti-collapse",
+        "integration"
+      ],
+      "runtime_surface": "solver/failure.js plastic-deformation grammar candidate",
+      "packs": [
+        "failure_plastic_deformation_golden.json",
+        "failure_split.json",
+        "failure_plastic_deformation_anti_collapse.json",
+        "failure_plastic_deformation_integration.json"
+      ],
+      "fixture_ids": [
+        "FX-FAIL-PLA-G01",
+        "FX-FAIL-02",
+        "FX-FAIL-10",
+        "FX-INT-13"
+      ],
+      "notes": [
+        "Plastic deformation is executable and contrast-tested against transient stress.",
+        "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
+        "It remains partial because the fuller corpus and invariant depth required for full are still missing."
+      ],
+      "proof_expectations": {
+        "mode": "explicit-row-proof-v1",
+        "behavioral_contrast_surface_required": true,
+        "output_contract_surface_required": true,
+        "non_collapse_proof_required": true,
+        "complete_fixture_class_set_required": true,
+        "row_local_suite_required": true,
+        "public_entrypoint": "solver/index.js#solveCase",
+        "runtime_mode": "canon-locked-runtime",
+        "integration_fixture_ids": [
+          "FX-INT-13"
+        ]
+      }
+    },
+    {
+      "row": "FAILURE_SUPPRESSION",
+      "current_state": "partial",
+      "target_state": "full",
+      "required_fixture_classes": [
+        "golden",
+        "contrast",
+        "anti-collapse",
+        "integration"
+      ],
+      "runtime_surface": "solver/failure.js plus envelope/cascade projection surfaces",
+      "packs": [
+        "failure_suppression_golden.json",
+        "failure_suppression_contrast.json",
+        "anti_collapse.json",
+        "integration_paths.json"
+      ],
+      "fixture_ids": [
+        "FX-FAIL-SUP-G01",
+        "FX-FAIL-SUP-C01",
+        "FX-FAIL-06",
+        "FX-INT-09"
+      ],
+      "notes": [
+        "Suppression is contrast-tested against collapse and hard-gated in grammar and envelope space.",
+        "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
+        "Still requires fuller corpus and invariant depth before full."
+      ],
+      "proof_expectations": {
+        "mode": "explicit-row-proof-v1",
+        "behavioral_contrast_surface_required": true,
+        "output_contract_surface_required": true,
+        "non_collapse_proof_required": true,
+        "complete_fixture_class_set_required": true,
+        "row_local_suite_required": true,
+        "public_entrypoint": "solver/index.js#solveCase",
+        "runtime_mode": "canon-locked-runtime",
+        "integration_fixture_ids": [
+          "FX-INT-09"
+        ]
+      }
+    },
+    {
+      "row": "FAILURE_COLLAPSE",
+      "current_state": "partial",
+      "target_state": "full",
+      "required_fixture_classes": [
+        "golden",
+        "contrast",
+        "anti-collapse",
+        "integration"
+      ],
+      "runtime_surface": "solver/failure.js plus cascade/envelope projection surfaces",
+      "packs": [
+        "failure_collapse_golden.json",
+        "failure_split.json",
+        "failure_projection.json",
+        "failure_collapse_anti_collapse.json",
+        "failure_collapse_integration.json"
+      ],
+      "fixture_ids": [
+        "FX-FAIL-COL-G01",
+        "FX-FAIL-03",
+        "FX-FAIL-04",
+        "FX-FAIL-05",
+        "FX-FAIL-09",
+        "FX-INT-11"
+      ],
+      "notes": [
+        "Collapse is hard-gated in grammar, cascade, and envelope projection contrasts.",
+        "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
+        "Still requires fuller corpus and invariant depth before full."
+      ],
+      "proof_expectations": {
+        "mode": "explicit-row-proof-v1",
+        "behavioral_contrast_surface_required": true,
+        "output_contract_surface_required": true,
+        "non_collapse_proof_required": true,
+        "complete_fixture_class_set_required": true,
+        "row_local_suite_required": true,
+        "public_entrypoint": "solver/index.js#solveCase",
+        "runtime_mode": "canon-locked-runtime",
+        "integration_fixture_ids": [
+          "FX-INT-11"
+        ]
+      }
+    },
+    {
+      "row": "FACE_DISTINCTION",
+      "current_state": "partial",
+      "target_state": "full",
+      "required_fixture_classes": [
+        "golden",
+        "contrast",
+        "anti-collapse",
+        "integration"
+      ],
+      "runtime_surface": "solver/relation.js face-aware continuity/transfer/emission handling",
+      "packs": [
+        "face_golden.json",
+        "face_split.json",
+        "face_anti_collapse.json",
+        "face_integration.json"
+      ],
+      "fixture_ids": [
+        "FX-FACE-G01",
+        "FX-FACE-01",
+        "FX-FACE-02",
+        "FX-INT-10"
+      ],
+      "notes": [
+        "Inner vs outer face is solver-operative and hard-gated.",
+        "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
+        "Still requires fuller corpus and invariant depth before full."
+      ],
+      "proof_expectations": {
+        "mode": "explicit-row-proof-v1",
+        "behavioral_contrast_surface_required": true,
+        "output_contract_surface_required": true,
+        "non_collapse_proof_required": true,
+        "complete_fixture_class_set_required": true,
+        "row_local_suite_required": true,
+        "public_entrypoint": "solver/index.js#solveCase",
+        "runtime_mode": "canon-locked-runtime",
+        "integration_fixture_ids": [
+          "FX-INT-10"
+        ]
+      }
+    },
+    {
+      "row": "ORDER_RECURSION",
+      "current_state": "partial",
+      "target_state": "full",
+      "required_fixture_classes": [
+        "golden",
+        "contrast",
+        "anti-collapse",
+        "integration"
+      ],
+      "runtime_surface": "solver/order.js plus order-aware relation handling and event ordering",
+      "packs": [
+        "order_golden.json",
+        "order_split.json",
+        "anti_collapse.json",
+        "integration_paths.json"
+      ],
+      "fixture_ids": [
+        "FX-ORD-G01",
+        "FX-ORD-01",
+        "FX-ORD-02",
+        "FX-INT-03"
+      ],
+      "notes": [
+        "Depth order is solver-operative and hard-gated apart from scan order.",
+        "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
+        "Still requires fuller corpus and invariant depth before full."
+      ],
+      "proof_expectations": {
+        "mode": "explicit-row-proof-v1",
+        "behavioral_contrast_surface_required": true,
+        "output_contract_surface_required": true,
+        "non_collapse_proof_required": true,
+        "complete_fixture_class_set_required": true,
+        "row_local_suite_required": true,
+        "public_entrypoint": "solver/index.js#solveCase",
+        "runtime_mode": "canon-locked-runtime",
+        "integration_fixture_ids": [
+          "FX-INT-03"
+        ]
+      }
+    },
+    {
+      "row": "LEG_DISTRIBUTED",
+      "current_state": "partial",
+      "target_state": "full",
+      "required_fixture_classes": [
+        "golden",
+        "contrast",
+        "anti-collapse",
+        "integration"
+      ],
+      "runtime_surface": "solver/leg_distributed.js plus distributed Leg-aware relation handling",
+      "packs": [
+        "leg_golden.json",
+        "leg_distributed.json",
+        "anti_collapse.json",
+        "integration_paths.json"
+      ],
+      "fixture_ids": [
+        "FX-LEG-G01",
+        "FX-LEG-01",
+        "FX-LEG-02",
+        "FX-INT-04"
+      ],
+      "notes": [
+        "Local vs distributed Leg persistence is solver-operative and hard-gated.",
+        "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
+        "Still requires fuller corpus and invariant depth before full."
+      ],
+      "proof_expectations": {
+        "mode": "explicit-row-proof-v1",
+        "behavioral_contrast_surface_required": true,
+        "output_contract_surface_required": true,
+        "non_collapse_proof_required": true,
+        "complete_fixture_class_set_required": true,
+        "row_local_suite_required": true,
+        "public_entrypoint": "solver/index.js#solveCase",
+        "runtime_mode": "canon-locked-runtime",
+        "integration_fixture_ids": [
+          "FX-INT-04"
+        ]
+      }
+    },
+    {
+      "row": "FIELD_RECURSION",
+      "current_state": "partial",
+      "target_state": "full",
+      "required_fixture_classes": [
+        "golden",
+        "contrast",
+        "anti-collapse",
+        "integration"
+      ],
+      "runtime_surface": "solver/field_recursion.js plus field-aware relation handling",
+      "packs": [
+        "field_golden.json",
+        "field_recursion.json",
+        "anti_collapse.json",
+        "integration_paths.json"
+      ],
+      "fixture_ids": [
+        "FX-FLD-G01",
+        "FX-FLD-01",
+        "FX-FLD-02",
+        "FX-INT-02"
+      ],
+      "notes": [
+        "Local vs recursive field behavior is solver-operative and hard-gated.",
+        "A row-scoped golden witness now exists alongside contrast, anti-collapse, and integration surfaces.",
+        "Still requires fuller corpus and invariant depth before full."
+      ],
+      "proof_expectations": {
+        "mode": "explicit-row-proof-v1",
+        "behavioral_contrast_surface_required": true,
+        "output_contract_surface_required": true,
+        "non_collapse_proof_required": true,
+        "complete_fixture_class_set_required": true,
+        "row_local_suite_required": true,
+        "public_entrypoint": "solver/index.js#solveCase",
+        "runtime_mode": "canon-locked-runtime",
+        "integration_fixture_ids": [
+          "FX-INT-02"
+        ]
+      }
+    }
+  ]
+}

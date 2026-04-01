@@ -63,7 +63,7 @@
       ],
       "executable_content_slice": true,
       "seed_fixture_ids": [
-        "FX-REL-01"
+        "FX-REL-02"
       ],
       "expected_invariant_classes": [
         "relation_medium_noncollapse",
@@ -97,7 +97,7 @@
       ],
       "executable_content_slice": true,
       "seed_fixture_ids": [
-        "FX-ORD-01"
+        "FX-ORD-02"
       ],
       "expected_invariant_classes": [
         "order_noncollapse_divergence",
@@ -139,7 +139,7 @@
       ],
       "executable_content_slice": true,
       "seed_fixture_ids": [
-        "FX-THR-01"
+        "FX-THR-02"
       ],
       "expected_invariant_classes": [
         "threshold_noncollapse_divergence",
@@ -160,7 +160,7 @@
       ],
       "executable_content_slice": true,
       "seed_fixture_ids": [
-        "FX-FAM-01"
+        "FX-FAM-02"
       ],
       "expected_invariant_classes": [
         "family_truth_noncollapse",
@@ -271,7 +271,7 @@
       ],
       "executable_content_slice": true,
       "seed_fixture_ids": [
-        "FX-REL-01"
+        "FX-REL-02"
       ],
       "expected_invariant_classes": [
         "relation_medium_noncollapse",
@@ -292,7 +292,7 @@
       ],
       "executable_content_slice": true,
       "seed_fixture_ids": [
-        "FX-THR-01"
+        "FX-THR-02"
       ],
       "expected_invariant_classes": [
         "threshold_noncollapse_divergence",
@@ -313,7 +313,7 @@
       ],
       "executable_content_slice": true,
       "seed_fixture_ids": [
-        "FX-FAM-01"
+        "FX-FAM-02"
       ],
       "expected_invariant_classes": [
         "family_truth_noncollapse",

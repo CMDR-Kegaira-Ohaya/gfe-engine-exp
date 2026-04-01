@@ -64,7 +64,7 @@ function runAudit(audit = {}) {
 }
 
 function ensureRow(rowMap = new Map(), rowId = '(unknown-row)') {
-  if (!rowMap.thas(rowId)) {
+  if (!rowMap.has(rowId)) {
     rowMap.set(rowId, {
       row: rowId,
       surfaces: {
@@ -144,7 +144,7 @@ function scoreRow(entry = {}) {
   if (promotion.includes('declared_row_proof_alignment')) score += 2;
   if (contract.includes('missing_declared_fixture_classes')) score += 3;
   if (contract.includes('missing_row_local_suite')) score += 3;
-  if (declaration.includes((missing_explicit_proof_expectations')) score += 2;
+  if (declaration.includes('missing_explicit_proof_expectations')) score += 2;
 
   return score;
 }
