@@ -3,6 +3,9 @@
     "manifestPath": "../cases/gui_smoke_modern_case/manifest.json"
   },
   {
+    "manifestPath": "../cases/honeybee_colony_collapse_demo/manifest.json"
+  },
+  {
     "manifestPath": "../cases/medical_breakthroughs_controversial_methods/manifest.json"
   },
   {
