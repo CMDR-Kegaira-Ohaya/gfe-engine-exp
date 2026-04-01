@@ -1,0 +1,692 @@
+{
+  "case_id": "honeybee_colony_collapse_demo",
+  "system_name": "Honeybee colony collapse disorder (demo case)",
+  "locus_of_analysis": "colony",
+  "description": "A rebuilt legacy demo case for testing whether v15.7 surfaces more structure than an older v12.7-style framing when worker disappearance, brood persistence, stored food, and field stress are kept distinct.",
+  "participants": [
+    "worker_force",
+    "queen_and_brood",
+    "stored_reserves",
+    "field_stressors",
+    "beekeeper_readout"
+  ],
+  "timeline": [
+    {
+      "timestep_label": "The colony appears seasonally workable before the final pattern is visible",
+      "participants": {
+        "worker_force": {
+          "axes": {
+            "body": {
+              "A": 72,
+              "R": 66,
+              "I": 58
+            },
+            "mind": {
+              "A": 62,
+              "R": 60,
+              "I": 54
+            },
+            "social": {
+              "A": 78,
+              "R": 72,
+              "I": 68
+            },
+            "ethics": {
+              "A": 55,
+              "R": 55,
+              "I": 52
+            },
+            "time": {
+              "A": 70,
+              "R": 64,
+              "I": 58
+            }
+          }
+        },
+        "queen_and_brood": {
+          "axes": {
+            "body": {
+              "A": 80,
+              "R": 74,
+              "I": 70
+            },
+            "mind": {
+              "A": 58,
+              "R": 56,
+              "I": 52
+            },
+            "social": {
+              "A": 74,
+              "R": 68,
+              "I": 66
+            },
+            "ethics": {
+              "A": 50,
+              "R": 50,
+              "I": 48
+            },
+            "time": {
+              "A": 76,
+              "R": 70,
+              "I": 68
+            }
+          }
+        },
+        "stored_reserves": {
+          "axes": {
+            "body": {
+              "A": 82,
+              "R": 78,
+              "I": 74
+            },
+            "mind": {
+              "A": 36,
+              "R": 34,
+              "I": 30
+            },
+            "social": {
+              "A": 48,
+              "R": 44,
+              "I": 40
+            },
+            "ethics": {
+              "A": 38,
+              "R": 38,
+              "I": 36
+            },
+            "time": {
+              "A": 80,
+              "R": 76,
+              "I": 72
+            }
+          }
+        },
+        "field_stressors": {
+          "axes": {
+            "body": {
+              "A": 44,
+              "R": 58,
+              "I": 62
+            },
+            "mind": {
+              "A": 46,
+              "R": 56,
+              "I": 60
+            },
+            "social": {
+              "A": 52,
+              "R": 60,
+              "I": 64
+            },
+            "ethics": {
+              "A": 42,
+              "R": 50,
+              "I": 54
+            },
+            "time": {
+              "A": 68,
+              "R": 72,
+              "I": 76
+            }
+          }
+        },
+        "beekeeper_readout": {
+          "axes": {
+            "body": {
+              "A": 40,
+              "R": 52,
+              "I": 42
+            },
+            "mind": {
+              "A": 55,
+              "R": 58,
+              "I": 46
+            },
+            "social": {
+              "A": 50,
+              "R": 54,
+              "I": 44
+            },
+            "ethics": {
+              "A": 52,
+              "R": 54,
+              "I": 50
+            },
+            "time": {
+              "A": 48,
+              "R": 56,
+              "I": 46
+            }
+          }
+        }
+      }
+    },
+    {
+      "timestep_label": "Multiple field pressures accumulate before the colony presents a final crash signature",
+      "participants": {
+        "worker_force": {
+          "axes": {
+            "body": {
+              "A": 58,
+              "R": 48,
+              "I": 60
+            },
+            "mind": {
+              "A": 54,
+              "R": 44,
+              "I": 58
+            },
+            "social": {
+              "A": 68,
+              "R": 46,
+              "I": 72
+            },
+            "ethics": {
+              "A": 50,
+              "R": 42,
+              "I": 54
+            },
+            "time": {
+              "A": 60,
+              "R": 44,
+              "I": 68
+            }
+          }
+        },
+        "queen_and_brood": {
+          "axes": {
+            "body": {
+              "A": 76,
+              "R": 68,
+              "I": 70
+            },
+            "mind": {
+              "A": 56,
+              "R": 52,
+              "I": 54
+            },
+            "social": {
+              "A": 70,
+              "R": 62,
+              "I": 66
+            },
+            "ethics": {
+              "A": 50,
+              "R": 48,
+              "I": 48
+            },
+            "time": {
+              "A": 72,
+              "R": 64,
+              "I": 66
+            }
+          }
+        },
+        "stored_reserves": {
+          "axes": {
+            "body": {
+              "A": 80,
+              "R": 76,
+              "I": 72
+            },
+            "mind": {
+              "A": 34,
+              "R": 32,
+              "I": 30
+            },
+            "social": {
+              "A": 46,
+              "R": 42,
+              "I": 40
+            },
+            "ethics": {
+              "A": 36,
+              "R": 36,
+              "I": 34
+            },
+            "time": {
+              "A": 78,
+              "R": 74,
+              "I": 70
+            }
+          }
+        },
+        "field_stressors": {
+          "axes": {
+            "body": {
+              "A": 54,
+              "R": 68,
+              "I": 72
+            },
+            "mind": {
+              "A": 56,
+              "R": 66,
+              "I": 70
+            },
+            "social": {
+              "A": 62,
+              "R": 70,
+              "I": 74
+            },
+            "ethics": {
+              "A": 50,
+              "R": 58,
+              "I": 62
+            },
+            "time": {
+              "A": 78,
+              "R": 82,
+              "I": 86
+            }
+          }
+        },
+        "beekeeper_readout": {
+          "axes": {
+            "body": {
+              "A": 42,
+              "R": 54,
+              "I": 44
+            },
+            "mind": {
+              "A": 56,
+              "R": 60,
+              "I": 48
+            },
+            "social": {
+              "A": 52,
+              "R": 56,
+              "I": 46
+            },
+            "ethics": {
+              "A": 52,
+              "R": 56,
+              "I": 50
+            },
+            "time": {
+              "A": 50,
+              "R": 58,
+              "I": 48
+            }
+          }
+        }
+      }
+    },
+    {
+      "timestep_label": "Adult workers fail to return while the queen, brood, and food stores still remain",
+      "participants": {
+        "worker_force": {
+          "axes": {
+            "body": {
+              "A": 28,
+              "R": 18,
+              "I": 62
+            },
+            "mind": {
+              "A": 32,
+              "R": 20,
+              "I": 60
+            },
+            "social": {
+              "A": 36,
+              "R": 18,
+              "I": 70
+            },
+            "ethics": {
+              "A": 34,
+              "R": 24,
+              "I": 48
+            },
+            "time": {
+              "A": 30,
+              "R": 18,
+              "I": 74
+            }
+          }
+        },
+        "queen_and_brood": {
+          "axes": {
+            "body": {
+              "A": 70,
+              "R": 58,
+              "I": 66
+            },
+            "mind": {
+              "A": 54,
+              "R": 48,
+              "I": 50
+            },
+            "social": {
+              "A": 66,
+              "R": 54,
+              "I": 60
+            },
+            "ethics": {
+              "A": 48,
+              "R": 46,
+              "I": 46
+            },
+            "time": {
+              "A": 68,
+              "R": 56,
+              "I": 62
+            }
+          }
+        },
+        "stored_reserves": {
+          "axes": {
+            "body": {
+              "A": 78,
+              "R": 74,
+              "I": 70
+            },
+            "mind": {
+              "A": 34,
+              "R": 30,
+              "I": 28
+            },
+            "social": {
+              "A": 44,
+              "R": 40,
+              "I": 38
+            },
+            "ethics": {
+              "A": 36,
+              "R": 34,
+              "I": 32
+            },
+            "time": {
+              "A": 76,
+              "R": 72,
+              "I": 68
+            }
+          }
+        },
+        "field_stressors": {
+          "axes": {
+            "body": {
+              "A": 60,
+              "R": 74,
+              "I": 78
+            },
+            "mind": {
+              "A": 60,
+              "R": 72,
+              "I": 76
+            },
+            "social": {
+              "A": 66,
+              "R": 74,
+              "I": 78
+            },
+            "ethics": {
+              "A": 54,
+              "R": 62,
+              "I": 64
+            },
+            "time": {
+              "A": 82,
+              "R": 86,
+              "I": 90
+            }
+          }
+        },
+        "beekeeper_readout": {
+          "axes": {
+            "body": {
+              "A": 46,
+              "R": 42,
+              "I": 56
+            },
+            "mind": {
+              "A": 58,
+              "R": 44,
+              "I": 60
+            },
+            "social": {
+              "A": 54,
+              "R": 42,
+              "I": 58
+            },
+            "ethics": {
+              "A": 52,
+              "R": 46,
+              "I": 54
+            },
+            "time": {
+              "A": 50,
+              "R": 40,
+              "I": 62
+            }
+          }
+        }
+      }
+    },
+    {
+      "timestep_label": "The collapse becomes legible as a patterned syndrome rather than an ordinary die-off",
+      "participants": {
+        "worker_force": {
+          "axes": {
+            "body": {
+              "A": 12,
+              "R": 10,
+              "I": 34
+            },
+            "mind": {
+              "A": 18,
+              "R": 14,
+              "I": 30
+            },
+            "social": {
+              "A": 16,
+              "R": 10,
+              "I": 40
+            },
+            "ethics": {
+              "A": 22,
+              "R": 18,
+              "I": 26
+            },
+            "time": {
+              "A": 14,
+              "R": 10,
+              "I": 46
+            }
+          }
+        },
+        "queen_and_brood": {
+          "axes": {
+            "body": {
+              "A": 60,
+              "R": 44,
+              "I": 54
+            },
+            "mind": {
+              "A": 46,
+              "R": 40,
+              "I": 42
+            },
+            "social": {
+              "A": 54,
+              "R": 40,
+              "I": 48
+            },
+            "ethics": {
+              "A": 42,
+              "R": 40,
+              "I": 40
+            },
+            "time": {
+              "A": 56,
+              "R": 42,
+              "I": 50
+            }
+          }
+        },
+        "stored_reserves": {
+          "axes": {
+            "body": {
+              "A": 74,
+              "R": 70,
+              "I": 62
+            },
+            "mind": {
+              "A": 30,
+              "R": 28,
+              "I": 24
+            },
+            "social": {
+              "A": 40,
+              "R": 36,
+              "I": 32
+            },
+            "ethics": {
+              "A": 32,
+              "R": 30,
+              "I": 28
+            },
+            "time": {
+              "A": 70,
+              "R": 66,
+              "I": 58
+            }
+          }
+        },
+        "field_stressors": {
+          "axes": {
+            "body": {
+              "A": 58,
+              "R": 70,
+              "I": 74
+            },
+            "mind": {
+              "A": 58,
+              "R": 68,
+              "I": 72
+            },
+            "social": {
+              "A": 62,
+              "R": 72,
+              "I": 76
+            },
+            "ethics": {
+              "A": 52,
+              "R": 60,
+              "I": 62
+            },
+            "time": {
+              "A": 80,
+              "R": 84,
+              "I": 88
+            }
+          }
+        },
+        "beekeeper_readout": {
+          "axes": {
+            "body": {
+              "A": 58,
+              "R": 34,
+              "I": 68
+            },
+            "mind": {
+              "A": 68,
+              "R": 38,
+              "I": 72
+            },
+            "social": {
+              "A": 62,
+              "R": 36,
+              "I": 70
+            },
+            "ethics": {
+              "A": 60,
+              "R": 40,
+              "I": 66
+            },
+            "time": {
+              "A": 58,
+              "R": 34,
+              "I": 74
+            }
+          }
+        }
+      }
+    }
+  ],
+  "payload_events": [
+    {
+      "timestep_idx": 1,
+      "alpha_source": "field_stressors.Org",
+      "alpha_receiving": "worker_force.Org",
+      "alpha_medium": "field_stressors.Org",
+      "axis": "Org",
+      "face": "outer",
+      "interference": "accumulated_multi_stressor_load",
+      "payload_bundle": [
+        {
+          "sigma": "L",
+          "mode": "route",
+          "register": "emitted",
+          "axis": "Org",
+          "magnitude": 0.5
+        },
+        {
+          "sigma": "Dst",
+          "mode": "load",
+          "register": "retained",
+          "axis": "Org",
+          "magnitude": 0.7
+        }
+      ]
+    },
+    {
+      "timestep_idx": 2,
+      "alpha_source": "worker_force.Dir",
+      "alpha_receiving": "queen_and_brood.Emb",
+      "alpha_medium": "worker_force.Dir",
+      "axis": "Dir",
+      "face": "outer",
+      "interference": "missing_return",
+      "payload_bundle": [
+        {
+          "sigma": "M",
+          "mode": "suppress",
+          "register": "retained",
+          "axis": "Dir",
+          "magnitude": 0.8
+        },
+        {
+          "sigma": "Dst",
+          "mode": "load",
+          "register": "retained",
+          "axis": "Emb",
+          "magnitude": 0.6
+        }
+      ]
+    },
+    {
+      "timestep_idx": 3,
+      "alpha_source": "beekeeper_readout.Leg",
+      "alpha_receiving": "worker_force.Cfg",
+      "alpha_medium": "beekeeper_readout.Leg",
+      "axis": "Leg",
+      "face": "outer",
+      "interference": "pattern_recognition",
+      "payload_bundle": [
+        {
+          "sigma": "L",
+          "mode": "threshold-transfer",
+          "register": "emitted",
+          "axis": "Leg",
+          "magnitude": 0.4
+        },
+        {
+          "sigma": "Dst",
+          "mode": "load",
+          "register": "retained",
+          "axis": "Cfg",
+          "magnitude": 0.5
+        }
+      ]
+    }
+  ]
+}
