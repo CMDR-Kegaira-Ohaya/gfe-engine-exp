@@ -1,0 +1,102 @@
+/* Usability pass: expand the reading area and strengthen primary controls */
+.left-column {
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.sidebar-documents {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  min-height: 62vh;
+}
+
+.sidebar-documents .documents-context-strip {
+  margin-bottom: 14px;
+}
+
+.sidebar-documents .documents-body {
+  max-height: none;
+  min-height: 56vh;
+  padding-right: 6px;
+}
+
+/* Make most-used controls read as controls, not neutral text */
+.case-card,
+.lens-button,
+.filter-button,
+.doc-tab,
+.moment-title,
+.chip,
+.event-row,
+.pin-button,
+.repo-save-button,
+.context-action-button {
+  font-weight: 600;
+}
+
+/* Interaction target size */
+.case-card,
+.doc-tab,
+.chip,
+.event-row,
+.pin-button,
+.repo-save-button,
+.context-action-button {
+  min-height: 42px;
+}
+
+.lens-button,
+.filter-button {
+  min-height: 38px;
+  padding: 8px 13px;
+}
+
+.doc-tab,
+.pin-button,
+.repo-save-button,
+.context-action-button {
+  background: rgba(124, 196, 255, 0.07);
+  border-color: rgba(124, 196, 255, 0.18);
+}
+
+.case-card,
+.chip,
+.event-row {
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.case-card.active,
+.doc-tab.active,
+.lens-button.active,
+.filter-button.active,
+.chip:hover,
+.event-row:hover,
+.pin-button:hover,
+.repo-save-button:hover,
+.context-action-button:hover {
+  color: var(--text);
+  border-color: rgba(124, 196, 255, 0.42);
+  background: rgba(124, 196, 255, 0.12);
+  box-shadow: 0 0 18px rgba(124, 196, 255, 0.1);
+}
+
+.moment-title {
+  font-size: 1.03rem;
+}
+
+.doc-tab {
+  padding-inline: 14px;
+}
+
+.case-card .case-title {
+  font-size: 0.98rem;
+}
+
+@media (max-width: 1200px) {
+  .sidebar-documents {
+    min-height: auto;
+  }
+
+  .sidebar-documents .documents-body {
+    min-height: 48vh;
+  }
+}
