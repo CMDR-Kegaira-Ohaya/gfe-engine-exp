@@ -112,6 +112,7 @@
 │   │   │   └── workbench-note.md
 │   │   └── README.md
 │   ├── gui/
+│   │   ├── axis-rack.css
 │   │   ├── context-panel.js
 │   │   ├── documents-panel.js
 │   │   ├── payload-visualizer.js
