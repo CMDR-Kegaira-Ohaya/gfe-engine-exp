@@ -34,6 +34,7 @@
 .
 ├── .github/
 │   └── workflows/
+│       ├── pages-static-html.yml
 │       └── update-toc.yml
 ├── cases/
 │   ├── gui_smoke_modern_case/
