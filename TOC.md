@@ -124,7 +124,8 @@
 │   │   ├── specified-view.js
 │   │   ├── styles.css
 │   │   ├── usability-pass.css
-│   │   └── ux-overrides.css
+│   │   ├── ux-overrides.css
+│   │   └── window-surface.js
 │   ├── workflows/
 │   │   ├── README.md
 │   │   └── REPO_INTEGRATION.md
