@@ -88,22 +88,10 @@ function renderCaseList(state) {
           <div class="case-title">${escapeHtml(entry.title)}</div>
           <div class="case-meta">${escapeHtml(entry.summary || 'Case bundle')}</div>
           <div class="artifact-grid">
-            ${renderCaseStatusPill(
-              'provenance',
-              provenanceClass,
-              toneForProvenanceClass(provenanceClass),
-            )}
-            ${renderCaseStatusPill(
-              'structure',
-              structuralStatus,
-              toneForStructureStatus(structuralStatus),
-            )}
+            ${renderCaseStatusPill('provenance', provenanceClass, toneForProvenanceClass(provenanceClass))}
+            ${renderCaseStatusPill('structure', structuralStatus, toneForStructureStatus(structuralStatus))}
             ${renderCaseStatusPill('solver-certified', solverCertified ? 'yes' : 'no', toneForBoolean(solverCertified))}
-            ${renderCaseStatusPill(
-              'solve artifact',
-              solveArtifactPresent ? 'present' : 'absent',
-              toneForBoolean(solveArtifactPresent, 'missing'),
-            )}
+            ${renderCaseStatusPill('solve artifact', solveArtifactPresent ? 'present' : 'absent', toneForBoolean(solveArtifactPresent, 'missing'))}
           </div>
         </button>
       `;
@@ -160,7 +148,7 @@ function renderFilterBar(state) {
   const waiting = filterState.items.filter((item) => item.requested && !item.available);
 
   els.filterBar.innerHTML = `
-    <div class="filter-bar-label">Filters{requestedCount ? ` (${requestedCount})` : ''}</div>
+    <div class="filter-bar-label">Filters${requestedCount ? ` (${requestedCount})` : ''}</div>
     <div class="filter-button-row">
       ${FILTERS.map((filter) => {
         const status = filterState.items.find((item) => item.id === filter.id);
@@ -185,7 +173,7 @@ function renderFilterBar(state) {
       }).join('')}
     </div>
     ${waiting.length
-      ? `<div class="filter-bar-note">Waiting: ${escapeHtml(waiting.map((item) => item.label).join(' • ')}. Start a trace to activate.</div>`
+      ? `<div class="filter-bar-note">Waiting: ${escapeHtml(waiting.map((item) => item.label).join(' • '))}. Start a trace to activate.</div>`
       : ''}
   `;
 }
@@ -513,7 +501,7 @@ async function saveControlledCaseSource() {
       bundle: {
         ...state.bundle,
         source: {
-          ...state.bundlle.source,
+          ...state.bundle.source,
           text: state.caseSourceDraft,
         },
       },

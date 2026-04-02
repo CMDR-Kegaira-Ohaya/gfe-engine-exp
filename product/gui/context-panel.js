@@ -76,7 +76,9 @@ function renderInteractionStatus(bundle, state, trace) {
       <div class="detail-row"><span>Inspect</span><strong>${escapeHtml(selection ? targetLabel(bundle, selection) : 'None')}</strong></div>
       <div class="detail-row"><span>Pin</span><strong>${escapeHtml(pinned ? targetLabel(bundle, pinned) : 'None')}</strong></div>
       <div class="detail-row"><span>Trace</span><strong>${escapeHtml(traceTarget ? targetLabel(bundle, traceTarget) : 'Off')}</strong></div>
-      ${traceTarget ? `<p>Process trace currently spans ${escapeHtml(trace.counts.moments)} moment(s), ${escapeHtml(trace.counts.entities)} entit${trace.counts.entities === 1 ? 'y' : 'ies'}, and ${escapeHtml(trace.counts.events)} event(s).</p>` : '<p>Inspect a target, then pin or trace it explicitly.</p>'}
+      ${traceTarget
+        ? `<p>Process trace currently spans ${escapeHtml(trace.counts.moments)} moment(s), ${escapeHtml(trace.counts.entities)} entit${trace.counts.entities === 1 ? 'y' : 'ies'}, and ${escapeHtml(trace.counts.events)} event(s).</p>`
+        : '<p>Inspect a target, then pin or trace it explicitly.</p>'}
       ${renderInteractionActions(selection, pinned, traceTarget)}
     </div>
   `;
@@ -345,7 +347,7 @@ function renderEventDetails(bundle, target, traceTarget, trace, prefix) {
               .map(
                 (item) => `
                   <div class="timeline-list-item">
-                    <strong>${escapeHtml(item?.sigma || 'σ'i}</strong>
+                    <strong>${escapeHtml(item?.sigma || 'σ')}</strong>
                     <span>${escapeHtml(label(item?.mode || 'mode'))}</span>
                     <span>${escapeHtml(label(item?.register || 'register'))}</span>
                     <span>${escapeHtml(item?.magnitude ?? '')}</span>
