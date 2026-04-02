@@ -2,7 +2,7 @@ export function createShell(root) {
   if (!root) throw new Error('Missing #app root');
 
   root.innerHTML = `
-    <div class="app-shell full-map-mode" data-surface="none">
+    <div class="app-shell floating-workbench" data-drawer="none" data-inspector-window="closed" data-documents-window="closed" data-active-window="inspector">
       <header class="topbar panel map-topbar">
         <div class="topbar-main">
           <div class="eyebrow">GFE Product Area</div>
@@ -33,7 +33,7 @@ export function createShell(root) {
         </section>
       </main>
 
-      <aside class="panel drawer drawer-left cases-drawer" data-drawer="cases" aria-label="Cases drawer">
+      <aside class="panel side-drawer cases-drawer" data-drawer-panel="cases" aria-label="Cases drawer">
         <div class="drawer-head">
           <div>
             <div class="eyebrow">Drawer</div>
@@ -44,36 +44,44 @@ export function createShell(root) {
         <div id="case-list" class="case-list drawer-scroll"></div>
       </aside>
 
-      <aside class="panel drawer drawer-right inspector-drawer" data-drawer="inspector" aria-label="Inspector drawer">
-        <div class="drawer-head">
-          <div>
-            <div class="eyebrow">Drawer</div>
+      <section class="panel floating-window inspector-window" data-floating-window="inspector" aria-label="Inspector window">
+        <div class="window-head">
+          <div class="window-titlebar" data-window-drag="inspector">
+            <div class="eyebrow">Window</div>
             <h2>Inspector</h2>
+            <div class="window-hint">Drag to move • Resize from the corner</div>
           </div>
-          <button type="button" class="drawer-close" data-close-surface="inspector">Close</button>
+          <div class="window-controls">
+            <button type="button" class="drawer-close" data-close-surface="inspector">Close</button>
+          </div>
         </div>
-        <div id="context-panel" class="context-panel drawer-scroll"></div>
-        <details class="panel repo-panel-shell utility-drawer">
-          <summary class="repo-shell-summary">
-            <div>
-              <div class="eyebrow">Utility</div>
-              <strong>Repo tools</strong>
-            </div>
-            <span class="muted">Collapsed by default</span>
-          </summary>
-          <div id="repo-panel" class="repo-panel"></div>
-        </details>
-      </aside>
+        <div class="window-body">
+          <div id="context-panel" class="context-panel floating-content"></div>
+          <details class="panel repo-panel-shell utility-drawer">
+            <summary class="repo-shell-summary">
+              <div>
+                <div class="eyebrow">Utility</div>
+                <strong>Repo tools</strong>
+              </div>
+              <span class="muted">Collapsed by default</span>
+            </summary>
+            <div id="repo-panel" class="repo-panel"></div>
+          </details>
+        </div>
+      </section>
 
-      <section class="panel tray documents-tray" data-tray="documents" aria-label="Documents tray">
-        <div class="tray-head">
-          <div>
-            <div class="eyebrow">Tray</div>
+      <section class="panel floating-window documents-window" data-floating-window="documents" aria-label="Documents window">
+        <div class="window-head">
+          <div class="window-titlebar" data-window-drag="documents">
+            <div class="eyebrow">Window</div>
             <h2>Documents</h2>
+            <div class="window-hint">Drag to move • Resize from the corner</div>
           </div>
-          <button type="button" class="drawer-close" data-close-surface="documents">Close</button>
+          <div class="window-controls">
+            <button type="button" class="drawer-close" data-close-surface="documents">Close</button>
+          </div>
         </div>
-        <div id="documents-panel" class="documents-panel tray-documents"></div>
+        <div id="documents-panel" class="documents-panel floating-content"></div>
       </section>
     </div>
   `;
@@ -92,5 +100,8 @@ export function createShell(root) {
     contextPanel: root.querySelector('#context-panel'),
     documentsPanel: root.querySelector('#documents-panel'),
     repoPanel: root.querySelector('#repo-panel'),
+    casesDrawer: root.querySelector('[data-drawer-panel="cases"]'),
+    inspectorWindow: root.querySelector('[data-floating-window="inspector"]'),
+    documentsWindow: root.querySelector('[data-floating-window="documents"]'),
   };
 }
