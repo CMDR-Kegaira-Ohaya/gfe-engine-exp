@@ -41,6 +41,8 @@
 │   │   ├── readings/
 │   │   │   └── current_model_reading.md
 │   │   ├── revisions/
+│   │   │   ├── rev_fixture_ui_v2/
+│   │   │   │   └── encoding.json
 │   │   │   └── rev_smoke_v1/
 │   │   │       └── encoding.json
 │   │   ├── source/
