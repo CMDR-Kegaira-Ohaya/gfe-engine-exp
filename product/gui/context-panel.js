@@ -210,6 +210,7 @@ function renderOverview(bundle, encoding, lens) {
         <div class="detail-row"><span>Linkage state</span><strong>Provisional</strong></div>
       ` : ''}
     </div>
+    ${renderProvenanceStatus(bundle)}
     <div class="context-section">
       <div class="eyebrow">Artifacts</div>
       <div class="artifact-grid">
@@ -217,6 +218,27 @@ function renderOverview(bundle, encoding, lens) {
           .map(([key, value]) => `<span class="artifact-pill ${value ? 'present' : 'missing'}">${escapeHtml(key)}: ${value ? 'present' : 'missing'}</span>`)
           .join('')}
       </div>
+    </div>
+  `;
+}
+
+function renderProvenanceStatus(bundle) {
+  const provenance = bundle.status?.provenance || {};
+  const provenanceClass = String(provenance.class || 'unknown/unspecified');
+  const solverCertified = Boolean(provenance.solverCertified);
+  const solveArtifactPresent = Boolean(bundle.status?.artifacts?.solve || provenance.solveOutputPath);
+  const solveRunRef = provenance.solveRunRef || null;
+  const note = provenance.note || 'No provenance note recorded.';
+
+  return `
+    <div class="context-section">
+      <div class="eyebrow">Provenance</div>
+      <div class="detail-row"><span>Class</span><strong>${escapeHtml(provenanceClass)}</strong></div>
+      <div class="detail-row"><span>Solver-certified</span><strong>${escapeHtml(solverCertified ? 'yes' : 'no')}</strong></div>
+      <div class="detail-row"><span>Solve artifact</span><strong>${escapeHtml(solveArtifactPresent ? 'present' : 'absent')}</strong></div>
+      <div class="detail-row"><span>Structure state</span><strong>${escapeHtml(bundle.status.structural)}</strong></div>
+      ${solveRunRef ? `<div class="detail-row"><span>Solve run ref</span><strong>${escapeHtml(solveRunRef)}</strong></div>` : ''}
+      <p>${escapeHtml(note)}</p>
     </div>
   `;
 }
@@ -323,7 +345,7 @@ function renderEventDetails(bundle, target, traceTarget, trace, prefix) {
               .map(
                 (item) => `
                   <div class="timeline-list-item">
-                    <strong>${escapeHtml(item?.sigma || 'σ')}</strong>
+                    <strong>${escapeHtml(item?.sigma || 'σ'i}</strong>
                     <span>${escapeHtml(label(item?.mode || 'mode'))}</span>
                     <span>${escapeHtml(label(item?.register || 'register'))}</span>
                     <span>${escapeHtml(item?.magnitude ?? '')}</span>
