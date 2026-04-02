@@ -115,6 +115,7 @@
 │   ├── gui/
 │   │   ├── axis-rack.css
 │   │   ├── context-panel.js
+│   │   ├── desktop-workbench.css
 │   │   ├── documents-panel.js
 │   │   ├── payload-visualizer.js
 │   │   ├── README.md
