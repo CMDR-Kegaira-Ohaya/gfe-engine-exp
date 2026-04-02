@@ -1,3 +1,4 @@
+
 import { createShell } from './shell.js';
 import { createStore } from './store.js';
 import { loadCasesIndex, loadCaseBundle, resolveInitialSlug } from './case-bundle.js';
@@ -169,9 +170,7 @@ function renderFilterBar(state) {
         const stateClass = status.requested
           ? (status.available ? ' active' : ' waiting')
           : (status.available ? '' : ' unavailable');
-        const title = status.available
-          ? filter.description
-          : `${filter.description} ${status.reason}`;
+        const title = status.available ? filter.description : `${filter.description} ${status.reason}`;
 
         return `
           <button
@@ -569,10 +568,27 @@ function bind() {
 
     const selectionButton = event.target.closest('[data-select-type]');
     if (selectionButton) {
-      openInspectorForSelection({
+      const nextTarget = {
         type: selectionButton.dataset.selectType,
         id: selectionButton.dataset.selectId,
-      });
+      };
+
+      if (nextTarget.type === 'moment') {
+        const currentState = store.getState();
+        const patch = {
+          selection: nextTarget,
+          uiSurface: 'inspector',
+        };
+
+        if (!currentState.pinned && currentState.selection?.type === 'entity') {
+          patch.pinned = currentState.selection;
+        }
+
+        store.setState(patch);
+        return;
+      }
+
+      openInspectorForSelection(nextTarget);
       return;
     }
 
@@ -623,7 +639,6 @@ function bind() {
 
     if (repoAction?.dataset.repoAction === 'save-case-source') {
       await saveControlledCaseSource();
-      return;
     }
   });
 

@@ -1,3 +1,4 @@
+
 import { escapeHtml } from '../app/helpers.js';
 import { lensLabel, normalizeLens } from '../app/lenses.js';
 import {
@@ -94,15 +95,15 @@ function renderMomentStrip(graph) {
       <div class="moment-strip-head">
         <div>
           <div class="eyebrow">Moment strip</div>
-          <h3>${escapeHtml(graph.activeStep?.timestep_label || `Step ${graph.activeMoment + 1}`))}</h3>
+          <h3>${escapeHtml(graph.activeStep?.timestep_label || `Step ${graph.activeMoment + 1}`)}</h3>
         </div>
         <div class="moment-strip-note">Select time here. The entity map updates without replacing the whole board.</div>
       </div>
       <div class="moment-strip-track">
-        ${graph.moments.map((moment) => renderMomentPill(moment)).innerJoin? '' : graph.moments.map((moment) => renderMomentPill(moment)).innerJoin('')}
+        ${graph.moments.map((moment) => renderMomentPill(moment)).join('')}
       </div>
     </section>
-  `; 
+  `;
 }
 
 function renderMomentPill(moment) {
@@ -122,7 +123,7 @@ function renderMomentPill(moment) {
         <span>${escapeHtml(moment.label)}</span>
       </span>
     </button>
-  `; 
+  `;
 }
 
 function resolveMomentTone(moment) {
