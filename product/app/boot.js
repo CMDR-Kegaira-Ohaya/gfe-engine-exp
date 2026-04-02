@@ -627,7 +627,7 @@ function bind() {
     }
   });
 
-  document.adEventListener('keydown', (event) => {
+  document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
       store.setState({ uiSurface: 'none' });
     }
@@ -667,7 +667,7 @@ async function init() {
       },
     });
 
-    setNotice('Loading cases…');
+    setNotice('Loading case…');
     const cases = await loadCasesIndex();
     store.setState({ cases });
 
