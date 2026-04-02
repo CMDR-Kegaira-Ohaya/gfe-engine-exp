@@ -1,5 +1,4 @@
-
-import { escapeHtml, eventTitle, eventsForStep, label } from '../app/helpers.js';
+import { escapeHtml, eventsForStep } from '../app/helpers.js';
 import { resolveFilterState } from '../app/filters.js';
 import { activeTraceTarget, buildTraceIndex, sameTarget, targetLabel } from '../app/interaction-state.js';
 import { lensLabel, normalizeLens } from '../app/lenses.js';
@@ -51,38 +50,35 @@ export function renderSpecifiedView(container, state) {
   const momentsWithEvents = visibleStepRefs.filter((item) => item.stepEvents.length).length;
 
   container.innerHTML = `
-    <div class="map-summary compact-map-summary">
+    <div class="map-summary compact-map-summary compact-node-summary">
       <div>
         <div class="eyebrow">Case map</div>
         <h2>${escapeHtml(bundle.identity.title)}</h2>
-        <p>${escapeHtml(bundle.identity.synopsis || 'Map the solved arrangement first; reveal detail by clicking nodes.')}</p>
-        <div class="summary-note-strip">
-          <span class="badge badge-lens">lens: ${escapeHtml(lensLabel(lens))}</span>
-          ${state.pinned ? `<span class="badge badge-pinned">pin: ${escapeHtml(targetLabel(bundle, state.pinned))}</span>` : ''}
-          ${traceTarget ? `<span class="badge badge-traced">trace: ${escapeHtml(targetLabel(bundle, traceTarget))}</span>` : ''}
-        </div>
+        <p>${escapeHtml(bundle.identity.synopsis || 'Map the solved arrangement first; inspect detail from the panel on the right.')}</p>
       </div>
-      <div class="summary-badges">
+      <div class="summary-badges compact-summary-badges">
+        <span class="badge badge-lens">lens: ${escapeHtml(lensLabel(lens))}</span>
         <span class="badge">structure: ${escapeHtml(bundle.status.structural)}</span>
         <span class="badge">moments: ${escapeHtml(visibleStepRefs.length)} / ${escapeHtml(steps.length)}</span>
-        <span class="badge">payload moments: ${escapeHtml(momentsWithEvents)}</span>
-        <span class="badge">payload events: ${escapeHtml(events.length)}</span>
+        <span class="badge">payload: ${escapeHtml(momentsWithEvents)}</span>
+        ${state.pinned ? `<span class="badge badge-pinned">pin: ${escapeHtml(targetLabel(bundle, state.pinned))}</span>` : ''}
+        ${traceTarget ? `<span class="badge badge-traced">trace: ${escapeHtml(targetLabel(bundle, traceTarget))}</span>` : ''}
       </div>
     </div>
 
     ${renderStructuralRegistry(axisStats, bundle, visibleStepRefs.length)}
 
-    <section class="node-board-shell spatial-plane lens-${escapeHtml(lens)}">
-      <div class="node-board-head">
+    <section class="node-board-shell spatial-plane lens-${escapeHtml(lens)} compact-node-board-shell">
+      <div class="node-board-head compact-node-board-head">
         <div class="eyebrow">Grid map</div>
-        <div class="node-board-note">Click a node to inspect it. Relation lines show map continuity; highlighted lines follow the active trace or focus.</div>
+        <div class="node-board-note">Nodes stay compact. Click a node to send full detail to the inspector.</div>
       </div>
-      <div class="node-board-frame" style="--board-cols:${board.cols}; --board-rows:${board.rows};">
+      <div class="node-board-frame compact-node-board-frame" style="--board-cols:${board.cols}; --board-rows:${board.rows};">
         <svg class="node-board-lines" viewBox="0 0 ${board.viewWidth} ${board.viewHeight}" preserveAspectRatio="none" aria-hidden="true">
           ${boardLines.map(renderBoardLine).join('')}
         </svg>
-        <div class="node-board-grid">
-          ${board.items.map((item) => renderMomentNode(bundle, item, state, trace, lens, filters)).join('')}
+        <div class="node-board-grid compact-node-board-grid">
+          ${board.items.map((item) => renderMomentNode(item, state, trace)).join('')}
         </div>
       </div>
     </section>
@@ -91,18 +87,18 @@ export function renderSpecifiedView(container, state) {
 
 function renderStructuralRegistry(axisStats, bundle, visibleMoments) {
   return `
-    <section class="structural-registry node-registry-strip">
-      <div class="structural-registry-head">
+    <section class="structural-registry node-registry-strip compact-node-registry-strip">
+      <div class="structural-registry-head compact-node-registry-head">
         <div>
           <div class="eyebrow">Structural registry</div>
           <h3>Canon 5-axis rack</h3>
         </div>
-        <div class="structural-registry-stats">
-          <div class="registry-stat"><strong>${escapeHtml(visibleMoments)}</strong><span>visible moments</span></div>
-          <div class="registry-stat"><strong>${escapeHtml(bundle.status.provenance?.solverCertified ? 'yes' : 'no')}</strong><span>solver certified</span></div>
+        <div class="structural-registry-stats compact-node-registry-stats">
+          <div class="registry-stat"><strong>${escapeHtml(visibleMoments)}</strong><span>visible</span></div>
+          <div class="registry-stat"><strong>${escapeHtml(bundle.status.provenance?.solverCertified ? 'yes' : 'no')}</strong><span>solver</span></div>
         </div>
       </div>
-      <div class="structural-registry-grid">
+      <div class="structural-registry-grid compact-node-registry-grid">
         ${AXIS_ORDER.map((axisId) => renderAxisRegistryGroup(axisId, axisStats[axisId] || 0)).join('')}
       </div>
     </section>
@@ -114,114 +110,49 @@ function renderAxisRegistryGroup(axisId, count) {
     <div class="registry-group axis-rail axis-${escapeHtml(axisId)} ${count ? 'dominant' : ''}">
       <div class="axis-rail-head">
         <strong class="axis-rail-label">${escapeHtml(axisId.toUpperCase())}</strong>
-        <span class="axis-rail-values">${escapeHtml(count)} event${count === 1 ? '' : 's'}</span>
+        <span class="axis-rail-values">${escapeHtml(count)}</span>
       </div>
-      <div class="axis-rail-track">
+      <div class="axis-rail-track compact-axis-track">
         <div class="axis-half left"><span class="axis-fill sigma-l" style="width:${Math.min(100, count * 14)}%"></span></div>
         <div class="axis-theta">Θ</div>
         <div class="axis-half right"><span class="axis-fill sigma-m" style="width:${Math.min(100, count * 14)}%"></span></div>
       </div>
-      <div class="axis-rail-band">
-        <span class="axis-band-pill ${count ? 'band-engaged' : 'band-latent'}">${count ? 'active lane' : 'latent lane'}</span>
-      </div>
     </div>
   `;
 }
 
-function renderMomentNode(bundle, item, state, trace, lens, filters) {
-  const { step, stepIndex, stepEvents, col, row } = item;
-  const momentTarget = { type: 'moment', id: String(stepIndex) };
-  const isSelected = sameTarget(state.selection, momentTarget);
-  const isPinned = sameTarget(state.pinned, momentTarget);
+function renderMomentNode(item, state, trace) {
+  const { step, stepIndex, stepEvents } = item;
+  const target = { type: 'moment', id: String(stepIndex) };
+  const isSelected = sameTarget(state.selection, target);
+  const isPinned = sameTarget(state.pinned, target);
   const isTraced = trace.moments.has(String(stepIndex));
   const isAnchor = trace.anchorMoment === stepIndex;
-  const participantIds = Object.keys(step?.participants || {});
-  const showSatellites = !filters.focusDetailsOnly || isSelected || isPinned || isAnchor;
-  const axisCounts = summarizeAxisStats(stepEvents);
+  const tone = resolveMomentTone({ isSelected, isPinned, isTraced, isAnchor, hasPayload: stepEvents.length > 0 });
 
   return `
-    <article class="grid-node moment-node${isSelected ? ' active' : ''}${isPinned ? ' pinned' : ''}${isTraced ? ' traced' : ''}${isAnchor ? ' anchor' : ''}" style="--node-col:${col}; --node-row:${row};">
-      <div class="moment-node-head">
-        <button class="moment-node-title" type="button" data-select-type="moment" data-select-id="${stepIndex}">
-          ${escapeHtml(step?.timestep_label || `Step ${stepIndex + 1}`)}
-        </button>
-        <button class="pin-button pin-button-small" type="button" data-pin-type="moment" data-pin-id="${stepIndex}">
-          ${isPinned ? 'Unpin' : 'Pin'}
-        </button>
-      </div>
-      <div class="moment-node-meta">
-        ${isAnchor ? '<span class="moment-flow-label anchor">anchor</span>' : ''}
-        ${isTraced && !isAnchor ? '<span class="moment-flow-label">on flow</span>' : ''}
-        ${stepEvents.length ? `<span class="moment-flow-label evidence present">${stepEvents.length} payload</span>` : '<span class="moment-flow-label evidence absent">no payload</span>'}
-      </div>
-      <div class="moment-node-grid">
-        <span class="moment-mini-chip"><strong>${participantIds.length}</strong> entities</span>
-        <span class="moment-mini-chip"><strong>${stepEvents.length}</strong> events</span>
-      </div>
-      <div class="moment-mini-row">
-        ${AXIS_ORDER.map((axisId) => `<span class="moment-mini-chip axis-${escapeHtml(axisId)} ${axisCounts[axisId] ? '' : 'empty'}"><strong>${escapeHtml(axisId.toUpperCase())}</strong> ${escapeHtml(axisCounts[axisId] || 0)}</span>`).join('')}
-      </div>
-      ${showSatellites ? `
-        <div class="node-satellite-strip">
-          ${renderEntitySatellites(participantIds)}
-          ${renderEventSatellites(stepEvents, stepIndex)}
-        </div>
-      ` : '<div class="compact-note">Focus detail hidden until this node is inspected or pinned.</div>'}
+    <article class="grid-node moment-node compact-moment-node ${isSelected ? 'active' : ''}${isPinned ? ' pinned' : ''}${isTraced ? ' traced' : ''}${isAnchor ? ' anchor' : ''} tone-${tone}">
+      <button class="moment-node-button" type="button" data-select-type="moment" data-select-id="${stepIndex}" title="${escapeHtml(step?.timestep_label || `Step ${stepIndex + 1}`)}">
+        <span class="moment-node-status ${tone}" aria-hidden="true"></span>
+        <span class="moment-node-button-label">${escapeHtml(step?.timestep_label || `Step ${stepIndex + 1}`)}</span>
+      </button>
     </article>
   `;
 }
 
-function renderEntitySatellites(participantIds) {
-  if (!participantIds.length) {
-    return '<div class="node-satellite-group"><div class="node-satellite-title">Entities</div><div class="compact-note">No entities recorded.</div></div>';
-  }
-
-  const visible = participantIds.slice(0, 3);
-  const overflow = participantIds.length - visible.length;
-
-  return `
-    <div class="node-satellite-group">
-      <div class="node-satellite-title">Entities</div>
-      <div class="node-satellite-row">
-        ${visible.map((participantId) => `
-          <button class="node-satellite entity-node" type="button" data-select-type="entity" data-select-id="${escapeHtml(participantId)}">
-            ${escapeHtml(label(participantId))}
-          </button>
-        `).join('')}
-        ${overflow > 0 ? `<span class="node-satellite more-node">+${overflow}</span>` : ''}
-      </div>
-    </div>
-  `;
-}
-
-function renderEventSatellites(stepEvents, stepIndex) {
-  if (!stepEvents.length) {
-    return '<div class="node-satellite-group"><div class="node-satellite-title">Relations</div><div class="compact-note">No payload relations.</div></div>';
-  }
-
-  const visible = stepEvents.slice(0, 2);
-  const overflow = stepEvents.length - visible.length;
-
-  return `
-    <div class="node-satellite-group">
-      <div class="node-satellite-title">Relations</div>
-      <div class="node-satellite-row">
-        ${visible.map((event, eventIndex) => `
-          <button class="node-satellite relation-node" type="button" data-select-type="event" data-select-id="${stepIndex}:${eventIndex}">
-            ${escapeHtml(eventTitle(event))}
-          </button>
-        `).join('')}
-        ${overflow > 0 ? `<span class="node-satellite more-node">+${overflow}</span>` : ''}
-      </div>
-    </div>
-  `;
+function resolveMomentTone({ isSelected, isPinned, isTraced, isAnchor, hasPayload }) {
+  if (isSelected || isPinned) return 'focus';
+  if (isAnchor) return 'anchor';
+  if (isTraced) return 'trace';
+  if (hasPayload) return 'payload';
+  return 'quiet';
 }
 
 function buildBoardLayout(visibleStepRefs) {
   const count = visibleStepRefs.length;
-  const cols = Math.min(4, Math.max(2, Math.ceil(Math.sqrt(count))));
-  const cellWidth = 240;
-  const cellHeight = 186;
+  const cols = Math.min(6, Math.max(3, Math.ceil(Math.sqrt(count * 2.2))));
+  const cellWidth = 176;
+  const cellHeight = 82;
   const items = visibleStepRefs.map((item, index) => ({
     ...item,
     col: (index % cols) + 1,
