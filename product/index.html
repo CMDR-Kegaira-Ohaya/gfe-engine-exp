@@ -12,6 +12,44 @@
   </head>
   <body>
     <div id="app"></div>
+    <script>
+      (function () {
+        function escapeHtml(value) {
+          return String(value ?? '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#39;');
+        }
+
+        function showStartupError(detail) {
+          const root = document.getElementById('app') || document.body;
+          const shell = root.querySelector?.('.app-shell');
+          const notice = shell?.querySelector?.('#notice');
+          const mapView = shell?.querySelector?.('#map-view');
+
+          if (notice) notice.textContent = 'Startup failed';
+
+          const message = `Could not start product workbench: ${escapeHtml(detail || 'Unknown error')}`;
+          if (mapView) {
+            mapView.innerHTML = `<div class="empty-state">${message}</div>`;
+            return;
+          }
+
+          root.innerHTML = `<div class="empty-state">${message}</div>`;
+        }
+
+        window.addEventListener('error', (event) => {
+          showStartupError(event.error?.message || event.message || 'Unhandled error');
+        });
+
+        window.addEventListener('unhandledrejection', (event) => {
+          const detail = event.reason?.message || event.reason || 'Unhandled promise rejection';
+          showStartupError(detail);
+        });
+      })();
+    </script>
     <script type="module" src="./app/boot.js"></script>
     <script type="module" src="./gui/window-surface.js"></script>
     <script type="module" src="./gui/payload-visualizer.js"></script>
