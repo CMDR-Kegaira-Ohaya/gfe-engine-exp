@@ -78,14 +78,65 @@ function renderCaseList(state) {
   els.caseList.innerHTML = cases
     .map((entry) => {
       const active = entry.slug === slug ? ' active' : '';
+      const provenanceClass = String(entry.provenance?.class || 'unknown/unspecified');
+      const solverCertified = Boolean(entry.provenance?.solverCertified);
+      const structuralStatus = summarizeCaseStructure(entry);
+      const solveArtifactPresent = summarizeSolveArtifact(entry);
+
       return `
         <button class="case-card${active}" type="button" data-case-slug="${entry.slug}">
           <div class="case-title">${escapeHtml(entry.title)}</div>
           <div class="case-meta">${escapeHtml(entry.summary || 'Case bundle')}</div>
+          <div class="artifact-grid">
+            ${renderCaseStatusPill(
+              'provenance',
+              provenanceClass,
+              toneForProvenanceClass(provenanceClass),
+            )}
+            ${renderCaseStatusPill(
+              'structure',
+              structuralStatus,
+              toneForStructureStatus(structuralStatus),
+            )}
+            ${renderCaseStatusPill('solver-certified', solverCertified ? 'yes' : 'no', toneForBoolean(solverCertified))}
+            ${renderCaseStatusPill(
+              'solve artifact',
+              solveArtifactPresent ? 'present' : 'absent',
+              toneForBoolean(solveArtifactPresent, 'missing'),
+            )}
+          </div>
         </button>
       `;
     })
     .join('');
+}
+
+function renderCaseStatusPill(labelText, valueText, tone = 'waiting') {
+  return `<span class="artifact-pill ${escapeHtml(tone)}">${escapeHtml(labelText)}: ${escapeHtml(valueText)}</span>`;
+}
+
+function summarizeCaseStructure(entry) {
+  const hasEncoding = Boolean(entry.paths?.encoding);
+  if (!hasEncoding) return 'absent';
+  return entry.provenance?.solverCertified ? 'solver-certified' : 'provisional';
+}
+
+function summarizeSolveArtifact(entry) {
+  return Boolean(entry.paths?.solve || entry.provenance?.solveOutputPath);
+}
+
+function toneForProvenanceClass(provenanceClass) {
+  return provenanceClass === 'solver-certified' ? 'present' : 'waiting';
+}
+
+function toneForStructureStatus(structuralStatus) {
+  if (structuralStatus === 'solver-certified') return 'present';
+  if (structuralStatus === 'absent') return 'missing';
+  return 'waiting';
+}
+
+function toneForBoolean(value, falseTone = 'waiting') {
+  return value ? 'present' : falseTone;
 }
 
 function renderLensBar(state) {
@@ -109,7 +160,7 @@ function renderFilterBar(state) {
   const waiting = filterState.items.filter((item) => item.requested && !item.available);
 
   els.filterBar.innerHTML = `
-    <div class="filter-bar-label">Filters${requestedCount ? ` (${requestedCount})` : ''}</div>
+    <div class="filter-bar-label">Filters{requestedCount ? ` (${requestedCount})` : ''}</div>
     <div class="filter-button-row">
       ${FILTERS.map((filter) => {
         const status = filterState.items.find((item) => item.id === filter.id);
@@ -134,7 +185,7 @@ function renderFilterBar(state) {
       }).join('')}
     </div>
     ${waiting.length
-      ? `<div class="filter-bar-note">Waiting: ${escapeHtml(waiting.map((item) => item.label).join(' • '))}. Start a trace to activate.</div>`
+      ? `<div class="filter-bar-note">Waiting: ${escapeHtml(waiting.map((item) => item.label).join(' • ')}. Start a trace to activate.</div>`
       : ''}
   `;
 }
@@ -462,7 +513,7 @@ async function saveControlledCaseSource() {
       bundle: {
         ...state.bundle,
         source: {
-          ...state.bundle.source,
+          ...state.bundlle.source,
           text: state.caseSourceDraft,
         },
       },
