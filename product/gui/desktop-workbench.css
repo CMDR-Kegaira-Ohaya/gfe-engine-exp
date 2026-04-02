@@ -1,0 +1,306 @@
+/* Desktop compaction pass: fixed-height layered workbench with stable bottom dock */
+body {
+  padding: 12px;
+  overflow: hidden;
+}
+
+.app-shell.layered-workbench {
+  height: calc(100dvh - 24px);
+  grid-template-rows: auto minmax(0, 1fr) minmax(236px, 30vh);
+  gap: 12px;
+}
+
+.compact-topbar {
+  padding: 12px 14px;
+  align-items: center;
+}
+
+.compact-topbar .topbar-main,
+.compact-topbar .topbar-meta,
+.strip-identity,
+.current-tools {
+  min-width: 0;
+}
+
+.compact-topbar .topbar-main {
+  display: grid;
+  gap: 4px;
+}
+
+.compact-topbar h1 {
+  font-size: 1.28rem;
+  line-height: 1.1;
+}
+
+.workspace-frame {
+  display: grid;
+  grid-template-columns: minmax(240px, 280px) minmax(0, 1fr) minmax(300px, 348px);
+  gap: 12px;
+  min-height: 0;
+}
+
+.left-column.workbench-rail {
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.center-column.workbench-main {
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.right-column.workbench-rail {
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+
+.workbench-rail,
+.workbench-main {
+  display: grid;
+  gap: 12px;
+  min-height: 0;
+}
+
+.case-rail,
+.context-panel,
+.map-view,
+.repo-panel-shell,
+.documents-dock {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.case-rail {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.compact-panel-head,
+.compact-strip {
+  padding: 12px 14px;
+}
+
+.compact-panel-head p {
+  margin: 4px 0 0;
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+.compact-strip {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.95fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.current-tools {
+  gap: 8px;
+  justify-items: start;
+  align-content: start;
+}
+
+.current-tools .status-note {
+  max-width: none;
+  text-align: left;
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+.lens-bar,
+.filter-button-row,
+.filter-bar,
+.summary-badges {
+  justify-content: flex-start;
+}
+
+.filter-bar {
+  align-items: start;
+}
+
+.case-list,
+.context-panel,
+.map-view,
+.repo-panel,
+.documents-body {
+  overflow: auto;
+  min-height: 0;
+  padding-right: 4px;
+}
+
+.bottom-dock {
+  display: grid;
+  padding: 12px 14px;
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.3);
+}
+
+.dock-documents {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 10px;
+  min-height: 0;
+}
+
+.dock-documents .documents-head {
+  margin-bottom: 0;
+}
+
+.dock-documents .documents-body {
+  max-height: none;
+  height: 100%;
+  padding-top: 10px;
+}
+
+.utility-drawer {
+  padding: 0;
+  align-self: stretch;
+}
+
+.utility-drawer .repo-shell-summary {
+  padding: 12px 14px;
+}
+
+.utility-drawer[open] .repo-panel {
+  padding: 12px 14px;
+}
+
+.spatial-plane {
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.inspector-plane {
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.map-summary {
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.map-summary h2 {
+  margin: 2px 0 6px;
+  font-size: 1.15rem;
+}
+
+.map-summary p {
+  margin: 0;
+}
+
+.summary-note-strip {
+  margin-top: 8px;
+}
+
+.moment-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  align-content: start;
+}
+
+.moment-card {
+  padding: 12px;
+  gap: 10px;
+}
+
+.moment-head {
+  gap: 10px;
+}
+
+.moment-title {
+  font-size: 0.96rem;
+  line-height: 1.25;
+}
+
+.moment-block {
+  gap: 6px;
+}
+
+.selectable-row {
+  padding: 5px;
+}
+
+.event-row,
+.doc-tab,
+.repo-save-button,
+.repo-secondary-button,
+.context-action-button,
+.pin-button {
+  padding: 8px 10px;
+}
+
+.pin-button-small {
+  padding: 6px 8px;
+}
+
+.case-card {
+  padding: 10px;
+}
+
+.case-title {
+  margin-bottom: 3px;
+}
+
+.case-meta {
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+.badge,
+.artifact-pill,
+.repo-mode-pill,
+.compact-pill,
+.doc-focus-pill {
+  font-size: 0.78rem;
+  padding: 5px 9px;
+}
+
+.context-section {
+  margin-top: 12px;
+  gap: 8px;
+}
+
+.detail-row {
+  padding-bottom: 6px;
+}
+
+.timeline-list-item {
+  padding: 9px 10px;
+}
+
+.documents-head {
+  margin-bottom: 10px;
+}
+
+.documents-head h2 {
+  font-size: 1rem;
+}
+
+.documents-context-strip {
+  margin-bottom: 10px;
+  padding: 10px 12px;
+}
+
+.filter-empty-state {
+  padding: 16px;
+}
+
+@media (max-width: 1280px) {
+  body {
+    padding: 16px;
+    overflow: auto;
+  }
+
+  .app-shell.layered-workbench {
+    height: auto;
+    min-height: calc(100dvh - 32px);
+    grid-template-rows: auto auto auto;
+  }
+
+  .workspace-frame {
+    grid-template-columns: 1fr;
+  }
+
+  .compact-topbar,
+  .compact-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .bottom-dock {
+    min-height: 320px;
+  }
+}
