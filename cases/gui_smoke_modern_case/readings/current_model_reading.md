@@ -1,17 +1,31 @@
-# Reading: GUI smoke modern case
+# Reading: Workbench fixture — quiet room transition
 
-The case is small, but it makes a real civic problem legible.
+This fixture is useful because it produces an argument-shaped field instead of a single decorative storyline.
 
-At first glance, the library is facing an ordinary modernization decision. A collaboration space looks adaptive, visible, and socially useful. It promises workshops, public activity, and the kind of measurable participation that institutions can defend in a meeting or a budget review. From that angle, the proposal feels easy to justify.
+At the start, the quiet room is already functioning as a public good for the people who use it. That matters because the later proposal is not entering an empty room. It is entering a dependable arrangement. The regulars are therefore not just a nostalgic group resisting change. In the structure of the fixture, they are the carriers of continuity and dependence.
 
-The difficulty appears when the case is read from the personal level rather than the promotional one.
+The youth program team brings a different kind of claim. It can point to visibility, activity, and broader public participation. That makes the proposal attractive to leadership and legible to the budget office. In other words, the proposal does not win because it is obviously better in every dimension. It wins because it translates well into organizational and directional language: activation, measurable use, scheduling, and visible reach.
 
-The quiet room is not just an underused room waiting for improvement. For its regular users, it is already a working public good. Its value lies in reliability: people know what kind of attention the room protects, and they organize their own study, reading, or recovery around that predictability. In that sense, the room is not empty. It is dependable.
+Facilities staff change the shape of the field by making constraint concrete. Once acoustics, staffing, and room routing become explicit, the conflict is no longer only moral or symbolic. It becomes operational. That matters for the UI because the case now has something to show not only in `Org` and `Leg`, but also in `Dir` and `Cfg`.
 
-That is why the conflict is morally asymmetrical. The gains are broad, visible, and future-oriented. The losses are immediate, personal, and concentrated in the lives of people who already depend on the existing arrangement. When institutions talk only in terms of wider access, they can accidentally treat dependable use as if it were a lesser form of participation simply because it is quiet.
+Neighborhood partners are the hinge that prevents the case from collapsing into a simple “modernization versus habit” frame. When they testify, legitimacy shifts. The room is no longer defended only by the people who already occupy it. It is defended as part of neighborhood trust. That introduces a broader claim: dependable use can itself be a public-facing value, not merely a private preference.
 
-The strongest reading, then, is not that the library must refuse change. It is that the burden of justification falls on the party proposing disruption. Leadership has to show more than that collaboration would be lively or modern. It has to show that the people losing the room are not merely being asked to absorb a private cost for a public narrative.
+Leadership becomes the balancing actor across the middle and late moments. It absorbs pressure from all sides:
+- measurable activation from the budget office
+- dependence and continuity from regulars
+- program opportunity from the youth team
+- operational limits from facilities
+- legitimacy pressure from neighborhood partners
 
-Q responsible outcome would widen the library's social reach without pretending that displaced concentration is costless. If the institution cannot preserve a trustworthy quiet function somewhere equally dependable, then the proposal is not a neutral upgrade. It is a redistribution of who gets to feel at home in the space.
+That is why the hybrid draft matters. It does not eliminate conflict, but it makes the final moments structurally richer. A simple replacement plan would flatten the case. A hybrid draft instead creates a readable attempt at reconfiguration: protected quiet hours, timed collaboration blocks, phased adoption, and public guarantees.
 
-That is the personal core of the case: public value is real, but it is not self-justifying when it is purchased by dissolving a quieter, already-working form of common use.
+For the workbench, this makes the fixture do several useful jobs at once:
+
+- the case card can show provenance without ambiguity
+- the registry has all five canon axes represented
+- the map has enough moments to read as a field rather than a sparse sketch
+- trace can follow more than one meaningful path
+- the inspector has several participants and events worth opening
+- future entity-first views can pivot around persistent participants instead of isolated moments
+
+So the point of the reading is not “who was right.” The point is that the field is now dense enough for the UI to prove it can carry provenance, structure, pressure, and change without pretending fixture material is solver-certified.

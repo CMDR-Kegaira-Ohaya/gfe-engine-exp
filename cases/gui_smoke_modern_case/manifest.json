@@ -1,15 +1,16 @@
 {
   "case_id": "gui_smoke_modern_case",
-  "title": "GUI smoke modern case",
+  "title": "Workbench fixture — quiet room transition",
   "slug": "gui_smoke_modern_case",
+  "summary": "Fixture case for UI calibration with six persistent participants, eight moments, and fifteen cross-axis payload events.",
   "current_case_source": "./source/case.md",
-  "current_encoding": "./revisions/rev_smoke_v1/encoding.json",
+  "current_encoding": "./revisions/rev_fixture_ui_v2/encoding.json",
   "current_narrative": "./readings/current_model_reading.md",
   "provenance": {
-    "class": "demo/smoke",
+    "class": "fixture",
     "solver_certified": false,
     "solve_output_path": null,
     "solve_run_ref": null,
-    "note": "GUI smoke case for interface/runtime verification. Not a solver-certified case output."
+    "note": "Hand-authored fixture for product/UI calibration. Built to exercise map, trace, provenance, and inspector behavior. Not a solver-certified case output."
   }
 }

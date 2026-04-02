@@ -1,0 +1,288 @@
+{
+  "case_id": "gui_smoke_modern_case",
+  "system_name": "Workbench fixture — quiet room transition",
+  "locus_of_analysis": "civic",
+  "description": "Hand-authored fixture for product/UI calibration with persistent participants, eight moments, and multi-axis payload flow. This encoding is fixture material only and is not solver-certified.",
+  "participants": [
+    "library_leadership",
+    "quiet_room_regulars",
+    "youth_program_team",
+    "facilities_staff",
+    "neighborhood_partners",
+    "city_budget_office"
+  ],
+  "timeline": [
+    {
+      "timestep_label": "Quiet room carries a dependable reading baseline",
+      "participants": {
+        "library_leadership": {},
+        "quiet_room_regulars": {},
+        "facilities_staff": {},
+        "neighborhood_partners": {}
+      }
+    },
+    {
+      "timestep_label": "Attendance dip triggers review and budget attention",
+      "participants": {
+        "library_leadership": {},
+        "quiet_room_regulars": {},
+        "facilities_staff": {},
+        "city_budget_office": {}
+      }
+    },
+    {
+      "timestep_label": "Youth program pilot reframes the room as visible capacity",
+      "participants": {
+        "library_leadership": {},
+        "quiet_room_regulars": {},
+        "youth_program_team": {},
+        "neighborhood_partners": {}
+      }
+    },
+    {
+      "timestep_label": "Facilities memo surfaces acoustic and staffing constraints",
+      "participants": {
+        "library_leadership": {},
+        "quiet_room_regulars": {},
+        "youth_program_team": {},
+        "facilities_staff": {}
+      }
+    },
+    {
+      "timestep_label": "Budget office ties funding to measurable public activation",
+      "participants": {
+        "library_leadership": {},
+        "youth_program_team": {},
+        "facilities_staff": {},
+        "city_budget_office": {}
+      }
+    },
+    {
+      "timestep_label": "Neighborhood testimony reframes legitimacy around dependable use",
+      "participants": {
+        "library_leadership": {},
+        "quiet_room_regulars": {},
+        "neighborhood_partners": {},
+        "city_budget_office": {}
+      }
+    },
+    {
+      "timestep_label": "Hybrid draft protects quiet hours while opening timed collaboration blocks",
+      "participants": {
+        "library_leadership": {},
+        "quiet_room_regulars": {},
+        "youth_program_team": {},
+        "facilities_staff": {},
+        "neighborhood_partners": {}
+      }
+    },
+    {
+      "timestep_label": "Board adopts phased schedule with protected quiet guarantees",
+      "participants": {
+        "library_leadership": {},
+        "quiet_room_regulars": {},
+        "youth_program_team": {},
+        "facilities_staff": {},
+        "neighborhood_partners": {},
+        "city_budget_office": {}
+      }
+    }
+  ],
+  "payload_events": [
+    {
+      "timestep_idx": 1,
+      "alpha_source": "city_budget_office.Dir",
+      "alpha_receiving": "library_leadership.Cfg",
+      "alpha_medium": "city_budget_office.Dir",
+      "axis": "Dir",
+      "face": "outer",
+      "interference": "review_trigger",
+      "payload_bundle": [
+        {"sigma": "L", "mode": "route", "register": "emitted", "axis": "Dir", "magnitude": 0.6},
+        {"sigma": "Dst", "mode": "load", "register": "retained", "axis": "Cfg", "magnitude": 0.4}
+      ]
+    },
+    {
+      "timestep_idx": 1,
+      "alpha_source": "quiet_room_regulars.Emb",
+      "alpha_receiving": "library_leadership.Cfg",
+      "alpha_medium": "quiet_room_regulars.Emb",
+      "axis": "Emb",
+      "face": "inner",
+      "interference": "dependence_signal",
+      "payload_bundle": [
+        {"sigma": "L", "mode": "route", "register": "emitted", "axis": "Emb", "magnitude": 0.5},
+        {"sigma": "M", "mode": "retain", "register": "retained", "axis": "Cfg", "magnitude": 0.4}
+      ]
+    },
+    {
+      "timestep_idx": 2,
+      "alpha_source": "youth_program_team.Org",
+      "alpha_receiving": "library_leadership.Org",
+      "alpha_medium": "youth_program_team.Org",
+      "axis": "Org",
+      "face": "outer",
+      "interference": "pilot_proposal",
+      "payload_bundle": [
+        {"sigma": "L", "mode": "route", "register": "emitted", "axis": "Org", "magnitude": 0.7},
+        {"sigma": "Dst", "mode": "load", "register": "retained", "axis": "Org", "magnitude": 0.5}
+      ]
+    },
+    {
+      "timestep_idx": 2,
+      "alpha_source": "quiet_room_regulars.Leg",
+      "alpha_receiving": "neighborhood_partners.Leg",
+      "alpha_medium": "quiet_room_regulars.Leg",
+      "axis": "Leg",
+      "face": "inner",
+      "interference": "continuity_claim",
+      "payload_bundle": [
+        {"sigma": "L", "mode": "route", "register": "emitted", "axis": "Leg", "magnitude": 0.6},
+        {"sigma": "M", "mode": "retain", "register": "retained", "axis": "Leg", "magnitude": 0.4}
+      ]
+    },
+    {
+      "timestep_idx": 3,
+      "alpha_source": "facilities_staff.Dir",
+      "alpha_receiving": "library_leadership.Cfg",
+      "alpha_medium": "facilities_staff.Dir",
+      "axis": "Dir",
+      "face": "outer",
+      "interference": "acoustic_constraint",
+      "payload_bundle": [
+        {"sigma": "L", "mode": "route", "register": "emitted", "axis": "Dir", "magnitude": 0.7},
+        {"sigma": "Dst", "mode": "load", "register": "retained", "axis": "Cfg", "magnitude": 0.5}
+      ]
+    },
+    {
+      "timestep_idx": 3,
+      "alpha_source": "facilities_staff.Cfg",
+      "alpha_receiving": "youth_program_team.Cfg",
+      "alpha_medium": "facilities_staff.Cfg",
+      "axis": "Cfg",
+      "face": "outer",
+      "interference": "room_limit",
+      "payload_bundle": [
+        {"sigma": "L", "mode": "threshold-transfer", "register": "emitted", "axis": "Cfg", "magnitude": 0.5},
+        {"sigma": "M", "mode": "suppress", "register": "retained", "axis": "Cfg", "magnitude": 0.3}
+      ]
+    },
+    {
+      "timestep_idx": 4,
+      "alpha_source": "city_budget_office.Leg",
+      "alpha_receiving": "library_leadership.Leg",
+      "alpha_medium": "city_budget_office.Leg",
+      "axis": "Leg",
+      "face": "outer",
+      "interference": "accountability_demand",
+      "payload_bundle": [
+        {"sigma": "L", "mode": "route", "register": "emitted", "axis": "Leg", "magnitude": 0.7},
+        {"sigma": "Dst", "mode": "load", "register": "retained", "axis": "Leg", "magnitude": 0.5}
+      ]
+    },
+    {
+      "timestep_idx": 4,
+      "alpha_source": "city_budget_office.Dir",
+      "alpha_receiving": "facilities_staff.Dir",
+      "alpha_medium": "city_budget_office.Dir",
+      "axis": "Dir",
+      "face": "outer",
+      "interference": "activation_deadline",
+      "payload_bundle": [
+        {"sigma": "L", "mode": "route", "register": "emitted", "axis": "Dir", "magnitude": 0.6},
+        {"sigma": "Dst", "mode": "load", "register": "retained", "axis": "Dir", "magnitude": 0.4}
+      ]
+    },
+    {
+      "timestep_idx": 5,
+      "alpha_source": "neighborhood_partners.Leg",
+      "alpha_receiving": "library_leadership.Leg",
+      "alpha_medium": "neighborhood_partners.Leg",
+      "axis": "Leg",
+      "face": "outer",
+      "interference": "public_testimony",
+      "payload_bundle": [
+        {"sigma": "L", "mode": "route", "register": "emitted", "axis": "Leg", "magnitude": 0.8},
+        {"sigma": "Dst", "mode": "load", "register": "retained", "axis": "Leg", "magnitude": 0.6}
+      ]
+    },
+    {
+      "timestep_idx": 5,
+      "alpha_source": "quiet_room_regulars.Emb",
+      "alpha_receiving": "neighborhood_partners.Emb",
+      "alpha_medium": "quiet_room_regulars.Emb",
+      "axis": "Emb",
+      "face": "inner",
+      "interference": "dependable_use_testimony",
+      "payload_bundle": [
+        {"sigma": "L", "mode": "route", "register": "emitted", "axis": "Emb", "magnitude": 0.6},
+        {"sigma": "M", "mode": "retain", "register": "retained", "axis": "Emb", "magnitude": 0.5}
+      ]
+    },
+    {
+      "timestep_idx": 6,
+      "alpha_source": "library_leadership.Cfg",
+      "alpha_receiving": "facilities_staff.Cfg",
+      "alpha_medium": "library_leadership.Cfg",
+      "axis": "Cfg",
+      "face": "outer",
+      "interference": "hybrid_draft",
+      "payload_bundle": [
+        {"sigma": "L", "mode": "threshold-transfer", "register": "emitted", "axis": "Cfg", "magnitude": 0.6},
+        {"sigma": "Dst", "mode": "load", "register": "retained", "axis": "Cfg", "magnitude": 0.5}
+      ]
+    },
+    {
+      "timestep_idx": 6,
+      "alpha_source": "library_leadership.Org",
+      "alpha_receiving": "quiet_room_regulars.Org",
+      "alpha_medium": "library_leadership.Org",
+      "axis": "Org",
+      "face": "outer",
+      "interference": "protected_hours_commitment",
+      "payload_bundle": [
+        {"sigma": "L", "mode": "route", "register": "emitted", "axis": "Org", "magnitude": 0.5},
+        {"sigma": "Dst", "mode": "load", "register": "retained", "axis": "Org", "magnitude": 0.4}
+      ]
+    },
+    {
+      "timestep_idx": 6,
+      "alpha_source": "library_leadership.Leg",
+      "alpha_receiving": "neighborhood_partners.Leg",
+      "alpha_medium": "library_leadership.Leg",
+      "axis": "Leg",
+      "face": "outer",
+      "interference": "trust_repair_offer",
+      "payload_bundle": [
+        {"sigma": "L", "mode": "route", "register": "emitted", "axis": "Leg", "magnitude": 0.5},
+        {"sigma": "M", "mode": "retain", "register": "retained", "axis": "Leg", "magnitude": 0.4}
+      ]
+    },
+    {
+      "timestep_idx": 7,
+      "alpha_source": "facilities_staff.Dir",
+      "alpha_receiving": "youth_program_team.Dir",
+      "alpha_medium": "facilities_staff.Dir",
+      "axis": "Dir",
+      "face": "outer",
+      "interference": "route_revision",
+      "payload_bundle": [
+        {"sigma": "L", "mode": "route", "register": "emitted", "axis": "Dir", "magnitude": 0.5},
+        {"sigma": "Dst", "mode": "load", "register": "retained", "axis": "Dir", "magnitude": 0.4}
+      ]
+    },
+    {
+      "timestep_idx": 7,
+      "alpha_source": "library_leadership.Leg",
+      "alpha_receiving": "city_budget_office.Leg",
+      "alpha_medium": "library_leadership.Leg",
+      "axis": "Leg",
+      "face": "outer",
+      "interference": "phased_adoption",
+      "payload_bundle": [
+        {"sigma": "L", "mode": "route", "register": "emitted", "axis": "Leg", "magnitude": 0.6},
+        {"sigma": "Dst", "mode": "load", "register": "retained", "axis": "Leg", "magnitude": 0.5}
+      ]
+    }
+  ]
+}
