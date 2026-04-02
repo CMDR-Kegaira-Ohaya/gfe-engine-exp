@@ -126,7 +126,7 @@ function renderFocusRack(focusModel) {
         <div class="focus-badges">
           <span class="badge">scope: ${escapeHtml(focusModel.scope)}</span>
           <span class="badge">events: ${escapeHtml(focusModel.eventCount)}</span>
-          <span class="badge">type: ${escapeHtml(focusModel.targetType)</span>
+          <span class="badge">type: ${escapeHtml(focusModel.targetType)}</span>
         </div>
       </div>
       <div class="focus-axis-row">
@@ -179,12 +179,15 @@ function renderMomentCard(item, state, trace) {
 }
 
 function renderMiniAxisStrip(axisTotals) {
-  const series = axisSeries(axisTotals);
-  return series
+  const visible = axisSeries(axisTotals)
     .filter((entry) => !entry.isEmpty)
-    .slice(0, 3)
-    .map((entry) => `<span class="mini-axis-chip">${escapeHtml(entry.label)}</span>`)
-    .join('');
+    .slice(0, 3);
+
+  if (!visible.length) {
+    return '<span class="mini-axis-chip">No payload</span>';
+  }
+
+  return visible.map((entry) => `<span class="mini-axis-chip">${escapeHtml(entry.label)}</span>`).join('');
 }
 
 function buildFocusModel(bundle, state, visibleStepRefs, allEvents, traceTarget) {
@@ -209,7 +212,9 @@ function buildFocusModel(bundle, state, visibleStepRefs, allEvents, traceTarget)
     const events = eventsForStep(allEvents, stepIndex);
     return {
       label: step?.timestep_label || `Step ${stepIndex + 1}`,
-      note: explicit ? 'Focus rack is currently scoped to this moment.' : 'No explicit focus yet. Showing the first visible moment so the rack does not read as frozen.',
+      note: explicit
+        ? 'Focus rack is currently scoped to this moment.'
+        : 'No explicit focus yet. Showing the first visible moment so the rack does not read as frozen.',
       scope: `Moment M${stepIndex + 1}`,
       eventCount: events.length,
       targetType: 'moment',
@@ -231,7 +236,9 @@ function buildFocusModel(bundle, state, visibleStepRefs, allEvents, traceTarget)
     }
     return {
       label: label(entityId),
-      note: `Updated for the entity you selected. ${events.length ? 'Axes come from payload that touches this entity.' : 'No payload touches this entity in the current scope.'}`,
+      note: events.length
+        ? 'Axes come from payload that touches this entity in the current scope.'
+        : 'No payload touches this entity in the current scope.',
       scope,
       eventCount: events.length,
       targetType: 'entity',
@@ -241,10 +248,12 @@ function buildFocusModel(bundle, state, visibleStepRefs, allEvents, traceTarget)
 
   if (target.type === 'event') {
     const event = findEventById(allEvents, target.id);
-    const roles = event ? eventParticipants(event).size : 0;
+    const roleCount = event ? eventParticipants(event).size : 0;
     return {
       label: event ? eventTitle(event) : `Event ${target.id}`,
-      note: event ? `This focus rack is scoped to a single payload event with ${roles} participant-role(s).g` : 'Event reference could not be resolved.',
+      note: event
+        ? `This focus rack is scoped to one payload event with ${roleCount} participant-role(s).`
+        : 'Event reference could not be resolved.',
       scope: 'Single event',
       eventCount: event ? 1 : 0,
       targetType: 'event',
@@ -255,7 +264,7 @@ function buildFocusModel(bundle, state, visibleStepRefs, allEvents, traceTarget)
   return {
     label: targetLabel(bundle, target),
     note: 'Focus rack could not resolve a specialized scope for this target.',
-    scope: 'Unspecified',
+    scope: 'unspecified',
     eventCount: 0,
     targetType: target.type,
     axisTotals: Object.fromEntries(AXIS_ORDER.map((axisId) => [axisId, 0])),
@@ -279,7 +288,7 @@ function axisTotalsFromEvents(events) {
 }
 
 function axisSeries(axisTotals) {
-  const values = AXIS_ORDER.map((axisId) => Number(axisTotals[...axisId] ?? axisTotals[axisId] ?? 0));
+  const values = AXIS_ORDER.map((axisId) => Number(axisTotals[axisId] ?? 0));
   const maxValue = Math.max(0, ...values);
 
   return AXIS_ORDER.map((axisId) => {
