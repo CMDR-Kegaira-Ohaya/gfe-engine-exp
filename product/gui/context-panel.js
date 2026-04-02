@@ -1,48 +1,40 @@
-
-import { escapeHtml, label, participantFromAlpha } from '../app/helpers.js';
+import { escapeHtml, eventsForStep, label, participantFromAlpha } from '../app/helpers.js';
 import { resolveFilterState } from '../app/filters.js';
-import { activeTraceTarget, sameTarget } from '../app/interaction-state.js';
+import { activeTraceTarget, buildTraceIndex, sameTarget, targetLabel } from '../app/interaction-state.js';
 import { lensDescription, lensLabel, normalizeLens } from '../app/lenses.js';
 import { buildCorrespondenceHints } from '../app/correspondence.js';
-import {
-  buildCaseGraph,
-  canonAxisLabel,
-  entityHistory,
-  entityMomentExposure,
-  eventRefsForMoment,
-  eventRoleSummary,
-  findEventRef,
-} from '../app/case-graph.js';
 
 export function renderContextPanel(container, state) {
   if (!container) return;
 
   const bundle = state.bundle;
   if (!bundle) {
-    container.innerHTML = '<h2>Inspector</h2><p>No case loaded.</p>';
+    container.innerHTML = '<h2>Context Panel</h2><p>No case loaded.</p>';
     return;
   }
 
   const lens = normalizeLens(state.lens);
-  const graph = buildCaseGraph(bundle, state);
   const filterState = resolveFilterState(state.filters, { traceActive: Boolean(state.trace?.enabled) });
-  const correspondence = buildCorrespondenceHints(bundle, state);
+  const encoding = bundle.structure;
+  const selection = state.selection;
+  const pinned = state.pinned;
   const traceTarget = activeTraceTarget(state);
-  const focusTarget = state.selection?.type === 'moment' && state.pinned?.type === 'entity'
-    ? state.pinned
-    : state.selection || state.pinned || traceTarget || null;
+  const trace = buildTraceIndex(bundle, traceTarget);
+  const focusTarget = selection || pinned || traceTarget;
+  const correspondence = buildCorrespondenceHints(bundle, state);
 
   container.innerHTML = `
-    <h2>Inspector</h2>
+    <h2>Context Panel</h2>
     <div class="context-section">
       <div class="eyebrow">Current lens</div>
       <div class="detail-row"><span>Lens</span><strong>${escapeHtml(lensLabel(lens))}</strong></div>
       <p>${escapeHtml(lensDescription(lens))}</p>
     </div>
     ${renderFilterStatus(filterState)}
-    ${renderMomentStatus(graph)}
+    ${renderInteractionStatus(bundle, state, trace)}
     ${renderCorrespondenceStatus(correspondence)}
-    ${focusTarget ? renderFocusedTarget(bundle, graph, state, focusTarget, traceTarget) : renderOverview(bundle, graph)}
+    ${traceTarget ? renderProcessFlow(trace) : ''}
+    ${focusTarget ? renderTargetDetails(bundle, focusTarget, selection, pinned, traceTarget, trace) : renderOverview(bundle, encoding, lens)}
   `;
 }
 
@@ -62,23 +54,32 @@ function renderFilterStatus(filterState) {
         `
         : '<p>No clutter-reduction filters are currently active.</p>'}
       ${waiting.length
-        ? `<p>${escapeHtml(waiting.map((item) => item.reason).join(' '))}</p>`
+        ? `
+          <div class="artifact-grid">
+            ${waiting.map((item) => `<span class="artifact-pill waiting">${escapeHtml(item.label)}</span>`).join('')}
+          </div>
+          <p>Waiting filters are armed but not yet effective. ${escapeHtml(waiting.map((item) => item.reason).join(' '))}</p>
+        `
         : ''}
     </div>
   `;
 }
 
-function renderMomentStatus(graph) {
-  const current = graph.moments.find((moment) => moment.momentIndex === graph.activeMoment);
+function renderInteractionStatus(bundle, state, trace) {
+  const selection = state.selection;
+  const pinned = state.pinned;
+  const traceTarget = activeTraceTarget(state);
+
   return `
     <div class="context-section">
-      <div class="eyebrow">Current moment</div>
-      <div class="detail-row"><span>Selected time</span><strong>${escapeHtml(current?.label || `Step ${graph.activeMoment + 1}`)}</strong></div>
-      <div class="detail-row"><span>Participants</span><strong>${escapeHtml(graph.activeEntities.size)}</strong></div>
-      <div class="detail-row"><span>Payload events</span><strong>${escapeHtml(graph.activeEventRefs.length)}</strong></div>
-      ${graph.traceTarget
-        ? `<p>Trace spans the map and the strip together. Anchor moment: ${escapeHtml(graph.trace.anchorMoment === null ? 'none' : `M${graph.trace.anchorMoment + 1}`)}.</p>`
-        : '<p>Select moments on the strip to reshape the map without replacing the current entity field.</p>'}
+      <div class="eyebrow">Interaction state</div>
+      <div class="detail-row"><span>Inspect</span><strong>${escapeHtml(selection ? targetLabel(bundle, selection) : 'None')}</strong></div>
+      <div class="detail-row"><span>Pin</span><strong>${escapeHtml(pinned ? targetLabel(bundle, pinned) : 'None')}</strong></div>
+      <div class="detail-row"><span>Trace</span><strong>${escapeHtml(traceTarget ? targetLabel(bundle, traceTarget) : 'Off')}</strong></div>
+      ${traceTarget
+        ? `<p>Process trace currently spans ${escapeHtml(trace.counts.moments)} moment(s), ${escapeHtml(trace.counts.entities)} entit${trace.counts.entities === 1 ? 'y' : 'ies'}, and ${escapeHtml(trace.counts.events)} event(s).</p>`
+        : '<p>Inspect a target, then pin or trace it explicitly.</p>'}
+      ${renderInteractionActions(selection, pinned, traceTarget)}
     </div>
   `;
 }
@@ -90,249 +91,272 @@ function renderCorrespondenceStatus(correspondence) {
       <div class="detail-row"><span>Basis</span><strong>${escapeHtml(correspondence.basisLabel)}</strong></div>
       <div class="detail-row"><span>State</span><strong>Provisional</strong></div>
       <p>${escapeHtml(correspondence.note)}</p>
+      <div class="timeline-list correspondence-list">
+        ${renderCorrespondenceItem('Source', correspondence.source)}
+        ${renderCorrespondenceItem('Narrative', correspondence.narrative)}
+        ${renderStructureItem(correspondence.structure)}
+      </div>
     </div>
   `;
 }
 
-function renderOverview(bundle, graph) {
+function renderCorrespondenceItem(name, item) {
+  const matched = item.matchedTerms?.length
+    ? `matched terms: ${item.matchedTerms.join(', ')}`
+    : item.present
+      ? 'artifact present, but no current term hint matched'
+      : 'artifact missing';
+
+  return `
+    <div class="timeline-list-item correspondence-item ${escapeHtml(item.status)}">
+      <strong>${escapeHtml(name)}</strong>
+      <span>${escapeHtml(matched)}</span>
+    </div>
+  `;
+}
+
+function renderStructureItem(item) {
+  return `
+    <div class="timeline-list-item correspondence-item ${item.present ? 'anchored' : 'missing'}">
+      <strong>Structure</strong>
+      <span>${escapeHtml(item.note)}</span>
+    </div>
+  `;
+}
+
+function renderInteractionActions(selection, pinned, traceTarget) {
+  const actions = [];
+
+  if (selection) {
+    actions.push(renderPinAction(selection, pinned));
+    actions.push(renderTraceAction(selection, traceTarget, 'Trace inspect'));
+  }
+
+  if (!selection && pinned) {
+    actions.push(renderPinAction(pinned, pinned, 'Unpin focus'));
+    actions.push(renderTraceAction(pinned, traceTarget, 'Trace pin'));
+  }
+
+  if (traceTarget) {
+    actions.push('<button type="button" class="context-action-button" data-trace-action="stop-trace">Stop trace</button>');
+  }
+
+  if (!actions.length) {
+    return '';
+  }
+
+  return `<div class="context-action-row">${actions.join('')}</div>`;
+}
+
+function renderPinAction(target, pinned, labelText = null) {
+  const isPinned = sameTarget(target, pinned);
+  return `
+    <button type="button" class="context-action-button" data-pin-type="${escapeHtml(target.type)}" data-pin-id="${escapeHtml(target.id)}">
+      ${escapeHtml(labelText || (isPinned ? 'Unpin inspect' : 'Pin inspect'))}
+    </button>
+  `;
+}
+
+function renderTraceAction(target, traceTarget, labelText) {
+  const tracingThis = sameTarget(target, traceTarget);
+  return `
+    <button type="button" class="context-action-button" data-trace-action="start-trace" data-trace-type="${escapeHtml(target.type)}" data-trace-id="${escapeHtml(target.id)}">
+      ${escapeHtml(tracingThis ? `${labelText} (active)` : labelText)}
+    </button>
+  `;
+}
+
+function renderProcessFlow(trace) {
+  return `
+    <div class="context-section">
+      <div class="eyebrow">Process flow</div>
+      <div class="timeline-list">
+        ${trace.flow.length
+          ? trace.flow
+              .map(
+                (item) => `
+                  <div class="timeline-list-item${item.isAnchor ? ' flow-anchor' : ''}">
+                    <strong>${escapeHtml(item.label)}</strong>
+                    <span>${escapeHtml(item.isAnchor ? 'trace anchor' : 'process continuation')}</span>
+                  </div>
+                `,
+              )
+              .join('')
+          : '<span class="muted">No process flow is currently traced.</span>'}
+      </div>
+    </div>
+  `;
+}
+
+function renderOverview(bundle, encoding, lens) {
+  const steps = Array.isArray(encoding?.timeline) ? encoding.timeline.length : 0;
+  const participants = Array.isArray(encoding?.participants) ? encoding.participants.length : 0;
+  const events = Array.isArray(encoding?.payload_events) ? encoding.payload_events.length : 0;
+  const payloadMoments = Array.isArray(encoding?.timeline)
+    ? encoding.timeline.filter((_step, index) => eventsForStep(Array.isArray(encoding.payload_events) ? encoding.payload_events : [], index).length).length
+    : 0;
+
   return `
     <div class="context-section">
       <div class="eyebrow">Overview</div>
       <h3>${escapeHtml(bundle.identity.title)}</h3>
-      <p>${escapeHtml(bundle.identity.synopsis || 'Select an entity on the map to inspect its current rack, timeline, and payload effects.')}</p>
+      <p>${escapeHtml(bundle.identity.synopsis || 'Look around the whole case first, then inspect, pin, and trace from explicit targets.')}</p>
     </div>
     <div class="context-section">
-      <div class="detail-row"><span>Structure status</span><strong>${escapeHtml(bundle.status.structural)}</strong></div>
-      <div class="detail-row"><span>Provenance class</span><strong>${escapeHtml(bundle.status.provenance?.class || 'unknown/unspecified')}</strong></div>
-      <div class="detail-row"><span>Solver-certified</span><strong>${escapeHtml(bundle.status.provenance?.solverCertified ? 'yes' : 'no')}</strong></div>
-      <div class="detail-row"><span>Solve artifact</span><strong>${escapeHtml(bundle.status.artifacts?.solve ? 'present' : 'absent')}</strong></div>
+      <div class="detail-row"><span>Structural status</span><strong>${escapeHtml(bundle.status.structural)}</strong></div>
+      <div class="detail-row"><span>Moments</span><strong>${escapeHtml(steps)}</strong></div>
+      <div class="detail-row"><span>Participants</span><strong>${escapeHtml(participants)}</strong></div>
+      ${lens === 'evidence' ? `
+        <div class="detail-row"><span>Payload events</span><strong>${escapeHtml(events)}</strong></div>
+        <div class="detail-row"><span>Payload moments</span><strong>${escapeHtml(payloadMoments)}</strong></div>
+        <div class="detail-row"><span>Linkage state</span><strong>Provisional</strong></div>
+      ` : ''}
     </div>
+    ${renderProvenanceStatus(bundle)}
     <div class="context-section">
-      <div class="eyebrow">Entities in the current moment</div>
+      <div class="eyebrow">Artifacts</div>
       <div class="artifact-grid">
-        ${graph.nodes
-          .filter((node) => node.isPresent)
-          .map((node) => `<button type="button" class="artifact-pill present inspector-chip-button" data-select-type="entity" data-select-id="${escapeHtml(node.entityId)}">${escapeHtml(node.label)}</button>`)
+        ${Object.entries(bundle.status.artifacts)
+          .map(([key, value]) => `<span class="artifact-pill ${value ? 'present' : 'missing'}">${escapeHtml(key)}: ${value ? 'present' : 'missing'}</span>`)
           .join('')}
       </div>
     </div>
   `;
 }
 
-function renderFocusedTarget(bundle, graph, state, target, traceTarget) {
-  if (target.type === 'entity') {
-    return renderEntityFocus(bundle, graph, state, target, traceTarget);
-  }
+function renderProvenanceStatus(bundle) {
+  const provenance = bundle.status?.provenance || {};
+  const provenanceClass = String(provenance.class || 'unknown/unspecified');
+  const solverCertified = Boolean(provenance.solverCertified);
+  const solveArtifactPresent = Boolean(bundle.status?.artifacts?.solve || provenance.solveOutputPath);
+  const solveRunRef = provenance.solveRunRef || null;
+  const note = provenance.note || 'No provenance note recorded.';
+
+  return `
+    <div class="context-section">
+      <div class="eyebrow">Provenance</div>
+      <div class="detail-row"><span>Class</span><strong>${escapeHtml(provenanceClass)}</strong></div>
+      <div class="detail-row"><span>Solver-certified</span><strong>${escapeHtml(solverCertified ? 'yes' : 'no')}</strong></div>
+      <div class="detail-row"><span>Solve artifact</span><strong>${escapeHtml(solveArtifactPresent ? 'present' : 'absent')}</strong></div>
+      <div class="detail-row"><span>Structure state</span><strong>${escapeHtml(bundle.status.structural)}</strong></div>
+      ${solveRunRef ? `<div class="detail-row"><span>Solve run ref</span><strong>${escapeHtml(solveRunRef)}</strong></div>` : ''}
+      <p>${escapeHtml(note)}</p>
+    </div>
+  `;
+}
+
+function renderTargetDetails(bundle, target, selection, pinned, traceTarget, trace) {
+  const prefix = sameTarget(target, selection) ? 'Inspect' : sameTarget(target, pinned) ? 'Pinned' : 'Focus';
 
   if (target.type === 'moment') {
-    return renderMomentFocus(bundle, graph, state, target, traceTarget);
+    return renderMomentDetails(bundle, target, traceTarget, trace, prefix);
+  }
+
+  if (target.type === 'entity') {
+    return renderEntityDetails(bundle, target, traceTarget, trace, prefix);
   }
 
   if (target.type === 'event') {
-    return renderEventFocus(bundle, graph, state, target, traceTarget);
+    return renderEventDetails(bundle, target, traceTarget, trace, prefix);
   }
 
-  return '<div class="context-section"><p>Selection type not yet supported.</p></div>';
+  return '<p>Selection type not yet supported.</p>';
 }
 
-function renderEntityFocus(bundle, graph, state, target, traceTarget) {
-  const entityId = String(target.id);
-  const exposure = entityMomentExposure(bundle, entityId, graph.activeMoment);
-  const history = entityHistory(bundle, entityId);
-  const currentNode = graph.nodes.find((node) => node.entityId === entityId);
+function renderMomentDetails(bundle, target, traceTarget, trace, prefix) {
+  const encoding = bundle.structure;
+  const stepIndex = Number(target.id);
+  const step = encoding.timeline?.[stepIndex];
+  const stepEvents = eventsForStep(Array.isArray(encoding.payload_events) ? encoding.payload_events : [], stepIndex);
+  const participantIds = Object.keys(step?.participants || {});
 
   return `
     <div class="context-section">
-      <div class="eyebrow">${escapeHtml(sameTarget(target, state.selection) ? 'Inspect' : sameTarget(target, state.pinned) ? 'Pinned' : 'Focus')} entity</div>
-      <h3>${escapeHtml(label(entityId))}</h3>
-      <div class="detail-row"><span>Current moment</span><strong>${escapeHtml(exposure.label)}</strong></div>
-      <div class="detail-row"><span>Present now</span><strong>${escapeHtml(exposure.present ? 'yes' : 'no')}</strong></div>
-      <div class="detail-row"><span>Payload effects now</span><strong>${escapeHtml(exposure.currentEvents.length)}</strong></div>
-      ${renderActionRow(target, state.pinned, traceTarget)}
+      <div class="eyebrow">${escapeHtml(prefix)} moment</div>
+      <h3>${escapeHtml(step?.timestep_label || `Step ${stepIndex + 1}`)}</h3>
+      ${sameTarget(target, traceTarget) ? `<p>Process trace expands from this moment across ${escapeHtml(trace.counts.moments)} total moment(s).</p>` : ''}
     </div>
-
     <div class="context-section">
-      <div class="eyebrow">Current canon rack</div>
-      <p>Moment-scoped canonical exposure for this entity at the selected time.</p>
-      <div class="focus-rack">
-        ${renderAxisRack(exposure.rack.axisEntries)}
-      </div>
-      <div class="detail-row"><span>Total magnitude</span><strong>${escapeHtml(exposure.rack.totalMagnitude.toFixed(2))}</strong></div>
+      <div class="detail-row"><span>Participants</span><strong>${escapeHtml(participantIds.length)}</strong></div>
+      <div class="detail-row"><span>Payload events</span><strong>${escapeHtml(stepEvents.length)}</strong></div>
     </div>
-
     <div class="context-section">
-      <div class="eyebrow">Role balance</div>
+      <div class="eyebrow">Present participants</div>
       <div class="artifact-grid">
-        <span class="artifact-pill ${exposure.rack.byRole.source ? 'present' : 'waiting'}">source: ${escapeHtml(exposure.rack.byRole.source.toFixed(2))}</span>
-        <span class="artifact-pill ${exposure.rack.byRole.receiving ? 'present' : 'waiting'}">receiving: ${escapeHtml(exposure.rack.byRole.receiving.toFixed(2))}</span>
-        <span class="artifact-pill ${exposure.rack.byRole.medium ? 'present' : 'waiting'}">medium: ${escapeHtml(exposure.rack.byRole.medium.toFixed(2))}</span>
-      </div>
-      ${currentNode?.exposure?.peers?.length
-        ? `<p>Current relations: ${escapeHtml(currentNode.exposure.peers.map((peer) => peer.label).join(' • '))}</p>`
-        : '<p>No active relation line touches this entity in the selected moment.</p>'}
-    </div>
-
-    <div class="context-section">
-      <div class="eyebrow">Payload effects in this moment</div>
-      <div class="timeline-list">
-        ${exposure.currentEvents.length
-          ? exposure.currentEvents.map((eventRef) => renderEventRefRow(eventRef)).join('')
-          : '<span class="muted">No current payload effects touch this entity.</span>'}
-      </div>
-    </div>
-
-    <div class="context-section">
-      <div class="eyebrow">Timeline presence</div>
-      <div class="timeline-list">
-        ${history.length
-          ? history.map((item) => `
-            <button type="button" class="timeline-list-item inspector-moment-button${item.momentIndex === graph.activeMoment ? ' flow-anchor' : ''}" data-select-type="moment" data-select-id="${item.momentIndex}">
-              <strong>M${item.momentIndex + 1}</strong>
-              <span>${escapeHtml(item.label)}</span>
-              <span>events: ${escapeHtml(item.eventCount)}</span>
-            </button>
-          `).join('')
-          : '<span class="muted">This entity does not appear in the available timeline.</span>'}
-      </div>
-    </div>
-  `;
-}
-
-function renderMomentFocus(bundle, graph, state, target, traceTarget) {
-  const momentIndex = Number(target.id);
-  const moment = graph.moments.find((item) => item.momentIndex === momentIndex);
-  const step = bundle.structure?.timeline?.[momentIndex] || null;
-  const participants = Object.keys(step?.participants || {});
-  const eventRefs = eventRefsForMoment(bundle, momentIndex);
-
-  return `
-    <div class="context-section">
-      <div class="eyebrow">Inspect moment</div>
-      <h3>${escapeHtml(moment?.label || `Step ${momentIndex + 1}`)}</h3>
-      <div class="detail-row"><span>Participants</span><strong>${escapeHtml(participants.length)}</strong></div>
-      <div class="detail-row"><span>Payload events</span><strong>${escapeHtml(eventRefs.length)}</strong></div>
-      ${renderActionRow(target, state.pinned, traceTarget)}
-    </div>
-
-    <div class="context-section">
-      <div class="eyebrow">Present entities</div>
-      <div class="artifact-grid">
-        ${participants.length
-          ? participants.map((participantId) => `<button type="button" class="artifact-pill present inspector-chip-button" data-select-type="entity" data-select-id="${escapeHtml(participantId)}">${escapeHtml(label(participantId))}</button>`).join('')
+        ${participantIds.length
+          ? participantIds.map((participantId) => `<span class="artifact-pill present">${escapeHtml(label(participantId))}</span>`).join('')
           : '<span class="muted">No participants recorded for this moment.</span>'}
       </div>
     </div>
+  `;
+}
 
+function renderEntityDetails(bundle, target, traceTarget, trace, prefix) {
+  const encoding = bundle.structure;
+  const participantId = String(target.id);
+  const appearances = (encoding.timeline || [])
+    .map((step, stepIndex) => ({ step, stepIndex }))
+    .filter(({ step }) => step?.participants?.[participantId]);
+
+  return `
     <div class="context-section">
-      <div class="eyebrow">Payload effects</div>
+      <div class="eyebrow">${escapeHtml(prefix)} entity</div>
+      <h3>${escapeHtml(label(participantId))}</h3>
+      <p>Appears in ${escapeHtml(appearances.length)} moment(s). ${sameTarget(target, traceTarget) ? `Process trace follows its timeline across ${escapeHtml(trace.counts.moments)} traced moment(s).` : ''}</p>
+    </div>
+    <div class="context-section">
+      <div class="eyebrow">Moments</div>
       <div class="timeline-list">
-        ${eventRefs.length
-          ? eventRefs.map((eventRef) => renderEventRefRow(eventRef)).join('')
-          : '<span class="muted">No payload effects are recorded for this moment.</span>'}
+        ${appearances.length
+          ? appearances.map(({ step, stepIndex }) => `<div class="timeline-list-item">${escapeHtml(stepIndex + 1)} — ${escapeHtml(step?.timestep_label || `Step ${stepIndex + 1}`)}</div>`).join('')
+          : '<span class="muted">This entity does not appear in the current structure.</span>'}
       </div>
     </div>
   `;
 }
 
-function renderEventFocus(bundle, graph, state, target, traceTarget) {
-  const eventRef = findEventRef(bundle, target.id);
-  if (!eventRef) {
-    return '<div class="context-section"><p>Payload event not found.</p></div>';
-  }
-
-  const roles = eventRoleSummary(eventRef.event);
-  const payload = Array.isArray(eventRef.event?.payload_bundle) ? eventRef.event.payload_bundle : [];
+function renderEventDetails(bundle, target, traceTarget, trace, prefix) {
+  const encoding = bundle.structure;
+  const [stepRaw, eventRaw] = String(target.id).split(':');
+  const stepIndex = Number(stepRaw);
+  const eventIndex = Number(eventRaw);
+  const stepEvents = eventsForStep(Array.isArray(encoding.payload_events) ? encoding.payload_events : [], stepIndex);
+  const event = stepEvents[eventIndex];
+  const payload = Array.isArray(event?.payload_bundle) ? event.payload_bundle : [];
+  const source = label(event?.sourceParticipantId ?? participantFromAlpha(event?.alpha_source));
+  const receiving = label(event?.receivingParticipantId ?? participantFromAlpha(event?.alpha_receiving));
+  const medium = label(event?.mediumParticipantId ?? participantFromAlpha(event?.alpha_medium));
 
   return `
     <div class="context-section">
-      <div class="eyebrow">Inspect event</div>
-      <h3>${escapeHtml(roles.source && roles.receiving ? `${roles.source} → ${roles.receiving}` : 'Payload event')}</h3>
-      <div class="detail-row"><span>Moment</span><strong>${escapeHtml(`M${eventRef.stepIndex + 1}`)}</strong></div>
-      <div class="detail-row"><span>Axis</span><strong>${escapeHtml(label(eventRef.event?.axis || 'unknown'))}</strong></div>
-      <div class="detail-row"><span>Interference</span><strong>${escapeHtml(label(eventRef.event?.interference || 'unknown'))}</strong></div>
-      <div class="detail-row"><span>Face</span><strong>${escapeHtml(label(eventRef.event?.face || 'unknown'))}</strong></div>
-      ${renderActionRow(target, state.pinned, traceTarget)}
+      <div class="eyebrow">${escapeHtml(prefix)} event</div>
+      <h3>${escapeHtml(source && receiving ? `${source} → ${receiving}` : 'Payload event')}</h3>
+      ${sameTarget(target, traceTarget) ? `<p>Process trace follows this event through ${escapeHtml(trace.counts.moments)} moment(s) in the current flow.</p>` : ''}
     </div>
-
     <div class="context-section">
-      <div class="eyebrow">Roles</div>
-      <div class="artifact-grid">
-        ${roles.source ? `<button type="button" class="artifact-pill present inspector-chip-button" data-select-type="entity" data-select-id="${escapeHtml(normalizeRoleTarget(eventRef.event?.sourceParticipantId, eventRef.event?.alpha_source))}">source: ${escapeHtml(roles.source)}</button>` : ''}
-        ${roles.receiving ? `<button type="button" class="artifact-pill present inspector-chip-button" data-select-type="entity" data-select-id="${escapeHtml(normalizeRoleTarget(eventRef.event?.receivingParticipantId, eventRef.event?.alpha_receiving))}">receiving: ${escapeHtml(roles.receiving)}</button>` : ''}
-        ${roles.medium ? `<button type="button" class="artifact-pill waiting inspector-chip-button" data-select-type="entity" data-select-id="${escapeHtml(normalizeRoleTarget(eventRef.event?.mediumParticipantId, eventRef.event?.alpha_medium))}">medium: ${escapeHtml(roles.medium)}</button>` : ''}
-      </div>
+      <div class="detail-row"><span>Axis</span><strong>${escapeHtml(label(event?.axis || 'unknown'))}</strong></div>
+      <div class="detail-row"><span>Face</span><strong>${escapeHtml(label(event?.face || ''))}</strong></div>
+      <div class="detail-row"><span>Interference</span><strong>${escapeHtml(label(event?.interference || ''))}</strong></div>
+      <div class="detail-row"><span>Medium</span><strong>${escapeHtml(medium || '—')}</strong></div>
     </div>
-
     <div class="context-section">
       <div class="eyebrow">Payload bundle</div>
       <div class="timeline-list">
         ${payload.length
-          ? payload.map((item) => `
-            <div class="timeline-list-item">
-              <strong>${escapeHtml(item?.sigma || 'Σ')}</strong>
-              <span>${escapeHtml(label(item?.mode || 'mode'))}</span>
-              <span>${escapeHtml(label(item?.register || 'register'))}</span>
-              <span>${escapeHtml(Number(item?.magnitude ?? 0).toFixed(2))}</span>
-            </div>
-          `).join('')
+          ? payload
+              .map(
+                (item) => `
+                  <div class="timeline-list-item">
+                    <strong>${escapeHtml(item?.sigma || 'σ')}</strong>
+                    <span>${escapeHtml(label(item?.mode || 'mode'))}</span>
+                    <span>${escapeHtml(label(item?.register || 'register'))}</span>
+                    <span>${escapeHtml(item?.magnitude ?? '')}</span>
+                  </div>
+                `,
+              )
+              .join('')
           : '<span class="muted">No payload bundle data recorded.</span>'}
       </div>
     </div>
   `;
-}
-
-function renderAxisRack(axisEntries) {
-  return axisEntries.map((entry) => `
-    <div class="focus-axis-row">
-      <div class="focus-axis-head">
-        <strong>${escapeHtml(canonAxisLabel(entry.axisId))}</strong>
-        <span>${escapeHtml(entry.magnitude.toFixed(2))}</span>
-      </div>
-      <div class="axis-rail-track compact-axis-track">
-        <div class="axis-half left"><span class="axis-fill sigma-l" style="width:${entry.width}%"></span></div>
-        <div class="axis-theta">Θ</div>
-        <div class="axis-half right"><span class="axis-fill sigma-m" style="width:${entry.width}%"></span></div>
-      </div>
-    </div>
-  `).join('');
-}
-
-function renderEventRefRow(eventRef) {
-  const roles = eventRoleSummary(eventRef.event);
-  const title = roles.source && roles.receiving ? `${roles.source} → ${roles.receiving}` : 'Payload event';
-
-  return `
-    <button
-      type="button"
-      class="timeline-list-item inspector-event-button"
-      data-select-type="event"
-      data-select-id="${escapeHtml(eventRef.id)}"
-    >
-      <strong>${escapeHtml(title)}</strong>
-      <span>${escapeHtml(label(eventRef.event?.axis || 'unknown'))}</span>
-      <span>${escapeHtml(label(eventRef.event?.interference || 'unknown'))}</span>
-    </button>
-  `;
-}
-
-function renderActionRow(target, pinned, traceTarget) {
-  const isPinned = sameTarget(target, pinned);
-  const isTraced = sameTarget(target, traceTarget);
-
-  return `
-    <div class="context-action-row">
-      <button type="button" class="context-action-button" data-pin-type="${escapeHtml(target.type)}" data-pin-id="${escapeHtml(target.id)}">
-        ${escapeHtml(isPinned ? 'Unpin focus' : 'Pin focus')}
-      </button>
-      <button type="button" class="context-action-button" data-trace-action="${isTraced ? 'stop-trace' : 'start-trace'}" data-trace-type="${escapeHtml(target.type)}" data-trace-id="${escapeHtml(target.id)}">
-        ${escapeHtml(isTraced ? 'Stop trace' : 'Trace focus')}
-      </button>
-    </div>
-  `;
-}
-
-function normalizeRoleTarget(explicitId, alphaValue) {
-  if (explicitId) return String(explicitId);
-  const alpha = String(alphaValue ?? '').trim();
-  return alpha ? alpha.split('.')[0] : '';
 }
