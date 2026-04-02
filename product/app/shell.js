@@ -2,9 +2,9 @@ export function createShell(root) {
   if (!root) throw new Error('Missing #app root');
 
   root.innerHTML = `
-    <div class="app-shell">
-      <header class="topbar panel">
-        <div>
+    <div class="app-shell layered-workbench">
+      <header class="topbar panel compact-topbar">
+        <div class="topbar-main">
           <div class="eyebrow">GFE Product Area</div>
           <h1 id="current-title">Product Workbench</h1>
         </div>
@@ -14,22 +14,20 @@ export function createShell(root) {
         </div>
       </header>
 
-      <main class="layout">
-        <aside class="left-column">
-          <section class="panel sidebar">
-            <div class="panel-head">
-              <h2>Overall View</h2>
-              <p>Choose a case, then inspect the whole transformed case map.</p>
+      <main class="workspace-frame">
+        <aside class="left-column workbench-rail">
+          <section class="panel sidebar case-rail">
+            <div class="panel-head compact-panel-head">
+              <h2>Cases</h2>
+              <p>Keep the case switcher compact, readable, and always available.</p>
             </div>
-            <div id="case-list" class="case-list"></div>
+            <div id="case-list" class="case-list rail-scroll"></div>
           </section>
-
-          <section id="documents-panel" class="panel documents-panel sidebar-documents"></section>
         </aside>
 
-        <section class="center-column">
-          <section class="panel current-strip">
-            <div>
+        <section class="center-column workbench-main">
+          <section class="panel current-strip compact-strip">
+            <div class="strip-identity">
               <div class="eyebrow">Specified View</div>
               <div id="current-slug">No case open</div>
             </div>
@@ -40,13 +38,13 @@ export function createShell(root) {
             </div>
           </section>
 
-          <section id="map-view" class="panel map-view" aria-label="Specified View"></section>
+          <section id="map-view" class="panel map-view spatial-plane" aria-label="Specified View"></section>
         </section>
 
-        <aside class="right-column">
-          <section id="context-panel" class="panel context-panel"></section>
+        <aside class="right-column workbench-rail">
+          <section id="context-panel" class="panel context-panel inspector-plane"></section>
 
-          <details class="panel repo-panel-shell">
+          <details class="panel repo-panel-shell utility-drawer">
             <summary class="repo-shell-summary">
               <div>
                 <div class="eyebrow">Utility</div>
@@ -58,6 +56,10 @@ export function createShell(root) {
           </details>
         </aside>
       </main>
+
+      <section class="panel bottom-dock documents-dock" aria-label="Stable documents dock">
+        <div id="documents-panel" class="documents-panel dock-documents"></div>
+      </section>
     </div>
   `;
 
