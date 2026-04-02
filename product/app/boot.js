@@ -36,6 +36,7 @@ const store = createStore({
     enabled: false,
     target: null,
   },
+  uiSurface: 'none',
   activeDocument: 'source',
   noteDraft: '',
   noteBaseline: '',
@@ -65,6 +66,19 @@ const store = createStore({
 
 function setNotice(message) {
   els.notice.textContent = message;
+}
+
+function setUiSurface(surface) {
+  const state = store.getState();
+  const nextSurface = state.uiSurface === surface ? 'none' : surface;
+  store.setState({ uiSurface: nextSurface });
+}
+
+function openInspectorForSelection(selection) {
+  store.setState({
+    selection,
+    uiSurface: 'inspector',
+  });
 }
 
 function renderCaseList(state) {
@@ -189,6 +203,7 @@ function render() {
     ? `Lens: ${lensLabel(activeLens)} + process trace`
     : `Lens: ${lensLabel(activeLens)}`;
   els.currentNote.textContent = lensNote(activeLens);
+  els.appShell.dataset.surface = state.uiSurface || 'none';
 
   renderLensBar(state);
   renderFilterBar(state);
@@ -225,6 +240,7 @@ async function openCase(slug) {
         enabled: false,
         target: null,
       },
+      uiSurface: 'none',
       activeDocument: bundle.status.artifacts.source ? 'source' : 'narrative',
       caseSourceDraft: caseDraft.text,
       caseSourceBaseline: caseDraft.text,
@@ -521,6 +537,18 @@ async function saveControlledCaseSource() {
 
 function bind() {
   document.addEventListener('click', async (event) => {
+    const surfaceToggle = event.target.closest('[data-ui-surface]');
+    if (surfaceToggle) {
+      setUiSurface(surfaceToggle.dataset.uiSurface);
+      return;
+    }
+
+    const closeSurface = event.target.closest('[data-close-surface]');
+    if (closeSurface) {
+      store.setState({ uiSurface: 'none' });
+      return;
+    }
+
     const caseButton = event.target.closest('[data-case-slug]');
     if (caseButton) {
       await openCase(caseButton.dataset.caseSlug);
@@ -541,11 +569,9 @@ function bind() {
 
     const selectionButton = event.target.closest('[data-select-type]');
     if (selectionButton) {
-      store.setState({
-        selection: {
-          type: selectionButton.dataset.selectType,
-          id: selectionButton.dataset.selectId,
-        },
+      openInspectorForSelection({
+        type: selectionButton.dataset.selectType,
+        id: selectionButton.dataset.selectId,
       });
       return;
     }
@@ -575,7 +601,7 @@ function bind() {
 
     const documentTab = event.target.closest('[data-document-tab]');
     if (documentTab) {
-      store.setState({ activeDocument: documentTab.dataset.documentTab });
+      store.setState({ activeDocument: documentTab.dataset.documentTab, uiSurface: 'documents' });
       return;
     }
 
@@ -597,6 +623,13 @@ function bind() {
 
     if (repoAction?.dataset.repoAction === 'save-case-source') {
       await saveControlledCaseSource();
+      return;
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      store.setState({ uiSurface: 'none' });
     }
   });
 
