@@ -59,16 +59,15 @@ export function renderSpecifiedView(container, state) {
 
   container.innerHTML = `
     <div class="map-summary compact-map-summary compact-node-summary">
-      <div>
+      <div class="map-summary-main">
         <div class="eyebrow">Case map</div>
         <h2>${escapeHtml(bundle.identity.title)}</h2>
-        <p>${escapeHtml(bundle.identity.synopsis || 'Resized for the window. Case coverage and focus readout are kept distinct.')}</p>
       </div>
       <div class="summary-badges compact-summary-badges">
-        <span class="badge badge-lens">lens: ${escapeHtml(lensLabel(lens))}</span>
-        <span class="badge">structure: ${escapeHtml(bundle.status.structural)}</span>
-        <span class="badge">moments: ${escapeHtml(visibleStepRefs.length)} / ${escapeHtml(steps.length)}</span>
-        <span class="badge">payload: ${escapeHtml(payloadMoments)}</span>
+        <span class="badge badge-lens">${escapeHtml(lensLabel(lens))}</span>
+        <span class="badge">${escapeHtml(bundle.status.structural)}</span>
+        <span class="badge">${escapeHtml(visibleStepRefs.length)} / ${escapeHtml(steps.length)} moments</span>
+        <span class="badge">${escapeHtml(payloadMoments)} payload</span>
       </div>
     </div>
 
@@ -81,9 +80,8 @@ export function renderSpecifiedView(container, state) {
       <div class="moment-grid-head">
         <div>
           <div class="eyebrow">Moment grid</div>
-          <h3>The current board still shows moments as compact nodes</h3>
+          <h3>Compact nodes — detail opens in the inspector</h3>
         </div>
-        <div class="moment-grid-note">Case coverage stays global. The focus rack updates per selected moment, entity, or event.</div>
       </div>
       <div class="moment-grid">
         ${visibleStepRefs.map((item) => renderMomentCard(item, state, trace)).join('')}
@@ -121,12 +119,11 @@ function renderFocusRack(focusModel) {
         <div>
           <div class="eyebrow">Focus readout</div>
           <h3>${escapeHtml(focusModel.label)}</h3>
-          <p>${escapeHtml(focusModel.note)}</p>
         </div>
         <div class="focus-badges">
-          <span class="badge">scope: ${escapeHtml(focusModel.scope)}</span>
-          <span class="badge">events: ${escapeHtml(focusModel.eventCount)}</span>
-          <span class="badge">type: ${escapeHtml(focusModel.targetType)}</span>
+          <span class="badge">${escapeHtml(focusModel.scope)}</span>
+          <span class="badge">${escapeHtml(focusModel.eventCount)} events</span>
+          <span class="badge">${escapeHtml(focusModel.targetType)}</span>
         </div>
       </div>
       <div class="focus-axis-row">
@@ -158,36 +155,17 @@ function renderMomentCard(item, state, trace) {
   const isTraced = trace.moments.has(String(stepIndex));
   const tone = resolveMomentTone({ isSelected, isPinned, isTraced, hasPayload: stepEvents.length > 0 });
   const participantCount = Object.keys(step?.participants || {}).length;
-  const axisTotals = axisTotalsFromEvents(stepEvents);
+  const title = step?.timestep_label || `Step ${stepIndex + 1}`;
+  const tooltip = `M${stepIndex + 1} • ${participantCount} participants • ${stepEvents.length} events`;
 
   return `
     <article class="moment-card tone-${tone}${isSelected ? ' active' : ''}${isPinned ? ' pinned' : ''}">
-      <button class="moment-card-button" type="button" data-select-type="moment" data-select-id="${stepIndex}" title="${escapeHtml(step?.timestep_label || `Step ${stepIndex + 1}`)}">
+      <button class="moment-card-button" type="button" data-select-type="moment" data-select-id="${stepIndex}" title="${escapeHtml(tooltip)}">
         <span class="moment-card-status tone-${tone}" aria-hidden="true"></span>
-        <span class="moment-card-content">
-          <strong>${escapeHtml(step?.timestep_label || `Step ${stepIndex + 1}`)}</strong>
-          <span class="moment-card-meta">
-            <span>M ${escapeHtml(stepIndex + 1)}</span>
-            <span>${escapeHtml(participantCount)} participants</span>
-            <span>${escapeHtml(stepEvents.length)} events</span>
-          </span>
-          <span class="moment-card-axis">${renderMiniAxisStrip(axisTotals)}</span>
-        </span>
+        <span class="moment-card-label">${escapeHtml(title)}</span>
       </button>
     </article>
   `;
-}
-
-function renderMiniAxisStrip(axisTotals) {
-  const visible = axisSeries(axisTotals)
-    .filter((entry) => !entry.isEmpty)
-    .slice(0, 3);
-
-  if (!visible.length) {
-    return '<span class="mini-axis-chip">No payload</span>';
-  }
-
-  return visible.map((entry) => `<span class="mini-axis-chip">${escapeHtml(entry.label)}</span>`).join('');
 }
 
 function buildFocusModel(bundle, state, visibleStepRefs, allEvents, traceTarget) {
@@ -198,8 +176,7 @@ function buildFocusModel(bundle, state, visibleStepRefs, allEvents, traceTarget)
   if (!target) {
     return {
       label: 'No focus available',
-      note: 'Select a moment, entity, or event to read its 5-axis profile.',
-      scope: 'unspecified',
+      scope: 'No selection',
       eventCount: 0,
       targetType: 'none',
       axisTotals: Object.fromEntries(AXIS_ORDER.map((axisId) => [axisId, 0])),
@@ -212,10 +189,7 @@ function buildFocusModel(bundle, state, visibleStepRefs, allEvents, traceTarget)
     const events = eventsForStep(allEvents, stepIndex);
     return {
       label: step?.timestep_label || `Step ${stepIndex + 1}`,
-      note: explicit
-        ? 'Focus rack is currently scoped to this moment.'
-        : 'No explicit focus yet. Showing the first visible moment so the rack does not read as frozen.',
-      scope: `Moment M${stepIndex + 1}`,
+      scope: explicit ? `Moment M${stepIndex + 1}` : `Default M${stepIndex + 1}`,
       eventCount: events.length,
       targetType: 'moment',
       axisTotals: axisTotalsFromEvents(events),
@@ -226,7 +200,7 @@ function buildFocusModel(bundle, state, visibleStepRefs, allEvents, traceTarget)
     const entityId = String(target.id);
     const momentScope = activeMomentScope(state);
     let events = allEvents.filter((event) => eventParticipants(event).has(entityId));
-    let scope = 'Across visible case';
+    let scope = 'Across case';
     if (momentScope !== null) {
       const scoped = events.filter((event) => eventStepIndex(event) === momentScope);
       if (scoped.length) {
@@ -236,9 +210,6 @@ function buildFocusModel(bundle, state, visibleStepRefs, allEvents, traceTarget)
     }
     return {
       label: label(entityId),
-      note: events.length
-        ? 'Axes come from payload that touches this entity in the current scope.'
-        : 'No payload touches this entity in the current scope.',
       scope,
       eventCount: events.length,
       targetType: 'entity',
@@ -248,12 +219,8 @@ function buildFocusModel(bundle, state, visibleStepRefs, allEvents, traceTarget)
 
   if (target.type === 'event') {
     const event = findEventById(allEvents, target.id);
-    const roleCount = event ? eventParticipants(event).size : 0;
     return {
       label: event ? eventTitle(event) : `Event ${target.id}`,
-      note: event
-        ? `This focus rack is scoped to one payload event with ${roleCount} participant-role(s).`
-        : 'Event reference could not be resolved.',
       scope: 'Single event',
       eventCount: event ? 1 : 0,
       targetType: 'event',
@@ -263,8 +230,7 @@ function buildFocusModel(bundle, state, visibleStepRefs, allEvents, traceTarget)
 
   return {
     label: targetLabel(bundle, target),
-    note: 'Focus rack could not resolve a specialized scope for this target.',
-    scope: 'unspecified',
+    scope: 'Unspecified',
     eventCount: 0,
     targetType: target.type,
     axisTotals: Object.fromEntries(AXIS_ORDER.map((axisId) => [axisId, 0])),
